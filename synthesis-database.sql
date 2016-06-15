@@ -207,4 +207,19 @@ DELETE FROM soil WHERE soil_id=5;
 \copy air_temp(air_id,doy_ai,year_ai,air_t,air_height,site_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u3\airT_u3.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
 
 
-
+--upload number 4
+\copy contributor(ctbr_id, ctbr_name,institution,email) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u4\contributor_u4.csv' DELIMITER ',' CSV HEADER QUOTE '"'
+\copy siteinfo(site_id,site_name,lat,lon,loc,MAAT,Dist_type,Vege_z,PF_Zone,ctbr_id,elev,year_beg,year_end,day_beg,day_end,dist_hist) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u4\siteinfo_u4.csv' DELIMITER ',' CSV HEADER QUOTE '"'
+\copy refinfo(ref_id,authors,title,journal,dateid,pages,ctbr_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u4\refinfo_u4.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
+\copy refrel(refrel_id,site_id,ref_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u4\refrel_u4.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
+\copy soil(soil_id,soil_class,soil_drain,sand,clay,silt,organic_thick,site_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u4\soil_u4.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
+\copy soilc(soilc_id,soilc,soilc_dep,site_id,c_year,c_doy) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u4\soilc_u4.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
+\copy moss(moss_id,mlt,moss_name,doy_m,year_m,site_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u4\moss_u4.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
+\copy aboveground_bio(bio_id,abg_mean,year_a,site_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u4\aboveground_bio_u4.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
+\copy spec_bio(spbio_id,sp_bio,sp_name,sp_functt,year_sp,doy_sp,site_id,sp_unit) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u4\sp_bio_u4.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
+\copy spcov(cover_id,perc_cover,species,func_type,site_id, year_m, doy_m)FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u4\spcov_u4.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
+\copy LAI(LAI_id, LAI, NDVI, Species, Funct_type, DOY_m, Year_m, Siteid) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u4\LAI_u4.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
+\copy spec_list(specl_id,spec_name,site_id,spl_funcT) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u4\spec_list_u4.csv' DELIMITER ',' CSV HEADER QUOTE '"'
+\copy soil_moist(sm_id,doy_sm,year_sm,SWC,sw_depth,sm_type,site_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u4\soil_moist_u4.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
+\copy soil_temp(stemp_id,doy_st,year_st,soil_t,st_depth,site_id)  FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u4\soilT_u4.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
+\copy air_temp(air_id,doy_ai,year_ai,air_t,air_height,site_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u4\airT_u4.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
