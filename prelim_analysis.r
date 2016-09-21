@@ -13,6 +13,9 @@
 #         same for air temp
 #site 18: has two different measurements of soil temp 
 #         at a depth of zero
+#			removed dulplicate sensor data starting at 221190 since
+#           this should be data associated with the sensor that
+#           is not in the same vegetative area
 #site 19: starting in 2005, another year mismatch
 #         (fixed for this file)
 #site 42: need to delete data from duplicate observations
@@ -37,6 +40,8 @@
 #site 44:  college all of the soil depths other than air 
 #		   and surface are not reliable so do not use
 #          the soil temperature data
+#          removed this site's soil temp
+#          starting at row 42222
 #site 45: 2010 152 second observation, 2011 152-225 deleted second observation
 #			depths 1,7,9,16,18,24,
 #           435019,435458-435531,441722,442160-442233, 443329-443402,
@@ -52,7 +57,10 @@
 #          545089-545151, 551858-551919
 #    Air: 152-214 2011 137562-
 
-#####
+############################################
+######all of these fixes are now in a fixed soil temp file
+###########################################
+######Air temp also removed for site 44
 
 ###########################################
 #########organize data for analysis########
@@ -60,9 +68,9 @@
 # set working directory
 setwd("c:\\Users\\hkropp\\Google Drive\\perma_analysis_backup")
 #read in soil temperature
-datS<-read.table("soil_temp_fix.csv", sep=",", header=TRUE, na.string=c("NaN"))
+datS<-read.table("soil_temp_fix_aU4.csv", sep=",", header=TRUE, na.string=c("NaN"))
 #read in air temperature
-datA<-read.table("air_temp.csv", sep=",", header=TRUE, na.string=c("NaN"))
+datA<-read.table("air_temp_fix.csv", sep=",", header=TRUE, na.string=c("NaN"))
 #change date labels for easier merging
 colnames(datA)<-c("air_id", "doy_st","year_st","air_t","air_height","site_id")
 #read in site info
@@ -100,25 +108,30 @@ dupvec<-numeric(0)
 NdaylengthA<-list()
 duplicateA<-list()
 dupvecA<-numeric(0)
+#need to deal with deleting site 44
+vSiteFlag<-c(rep(1,43),0,rep(1,20))
 for(i in 1:Nsite){
-
-	NdaylengthS[[i]]<-aggregate(datS$soil_t[datS$site_id==i], 
-									by=list(datS$doy_st[datS$site_id==i],
-									datS$year_st[datS$site_id==i],
-									datS$st_depth[datS$site_id==i]),
-									FUN="length")
-	#check to see where there might be more than one observation								
-	duplicate[[i]]<-NdaylengthS[[i]][NdaylengthS[[i]]$x>1,]
-	dupvec[i]<-dim(duplicate[[i]])[1]
-	#Air t check
-	NdaylengthA[[i]]<-aggregate(datA$air_t[datA$site_id==i], 
-									by=list(datA$doy_st[datA$site_id==i],
-									datA$year_st[datA$site_id==i],
-									datA$air_height[datA$site_id==i]),
-									FUN="length")
-	#check to see where there might be more than one observation								
-	duplicateA[[i]]<-NdaylengthA[[i]][NdaylengthA[[i]]$x>1,]
-	dupvecA[i]<-dim(duplicateA[[i]])[1]
+	if(vSiteFlag[i]==1){
+		NdaylengthS[[i]]<-aggregate(datS$soil_t[datS$site_id==i], 
+										by=list(datS$doy_st[datS$site_id==i],
+										datS$year_st[datS$site_id==i],
+										datS$st_depth[datS$site_id==i]),
+										FUN="length")
+		#check to see where there might be more than one observation								
+		duplicate[[i]]<-NdaylengthS[[i]][NdaylengthS[[i]]$x>1,]
+		dupvec[i]<-dim(duplicate[[i]])[1]
+		#Air t check
+		NdaylengthA[[i]]<-aggregate(datA$air_t[datA$site_id==i], 
+										by=list(datA$doy_st[datA$site_id==i],
+										datA$year_st[datA$site_id==i],
+										datA$air_height[datA$site_id==i]),
+										FUN="length")
+		#check to see where there might be more than one observation								
+		duplicateA[[i]]<-NdaylengthA[[i]][NdaylengthA[[i]]$x>1,]
+		dupvecA[i]<-dim(duplicateA[[i]])[1]
+	}else{
+	NdaylengthA[[i]]<-0
+	NdaylengthS[[i]]<-0}
 	
 }
 

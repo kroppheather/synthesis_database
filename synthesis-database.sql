@@ -223,3 +223,12 @@ DELETE FROM soil WHERE soil_id=5;
 \copy soil_moist(sm_id,doy_sm,year_sm,SWC,sw_depth,sm_type,site_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u4\soil_moist_u4.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
 \copy soil_temp(stemp_id,doy_st,year_st,soil_t,st_depth,site_id)  FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u4\soilT_u4.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
 \copy air_temp(air_id,doy_ai,year_ai,air_t,air_height,site_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u4\airT_u4.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
+
+--after upload 4 issues with air temp and soil temp data were found
+--the data files were fixed and now need to be deleted and re-added to the database
+--soil
+DELETE FROM soil_temp;
+\copy soil_temp(stemp_id,doy_st,year_st,soil_t,st_depth,site_id)  FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\soil_temp_fix_a_U4.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
+--air
+DELETE FROM air_temp;
+\copy air_temp(air_id,doy_ai,year_ai,air_t,air_height,site_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\air_temp_fix_a4.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
