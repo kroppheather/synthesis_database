@@ -1,76 +1,18 @@
 ##############################################################################
-######## This file reads in csv files of all data as of the 4th data upload
+######## This file reads in csv files of all data as of the 5th data upload
 ######## and looks at all temperature data
 ##############################################################################
-
-
-#############################################
-#############################################
-####This analysis revealed some problems with
-####the data, and so some sites need to be
-####fixed in the database:
-#site 13: year off by 1 from 1997 (fixed for this file)
-#         same for air temp
-#site 18: has two different measurements of soil temp 
-#         at a depth of zero
-#			removed dulplicate sensor data starting at 221190 since
-#           this should be data associated with the sensor that
-#           is not in the same vegetative area
-#site 19: starting in 2005, another year mismatch
-#         (fixed for this file)
-#site 42: need to delete data from duplicate observations
-#         from May 5 2008- May 31 2008, 122-152 for each depth
-#         database obs id: 355407-355433(last row to delete),
-#         357976-358002, 360543-350569,36111-363137,365313-365339,
-#         368245-368271, 370811-370837,373017-373043,375220-375246,
-#         377787-377813,380357-380383,382927-382953,386224-386250,
-#         388794-388820, 391365-391391,
-#  		June 1 2011-October 8 2011  152-281 second duplicate delete
-#         database obs id: 356632-356761, 359198-359327,361766-361895,
-#         364332-364461,366534-366664,369467-369596,372034-372163,
-#         374239-374368,376441-376571,379009-379138,381579-381708,
-#         384149-384278,387447-387578,390019-390148,392590-392719
-#	Air: 126-152 2008 and 152-281 2011  117724-117750 and 118948-119078
-
-#site 43: duplicate data on 152 2011-281 only for depths 100, 200, 280
-#         deleted second dulicate. database obs id: 416347-416476,
-#         418919-419048, 421491-421620
-#	Air: 152-281 2011 121521-121650
-
-#site 44:  college all of the soil depths other than air 
-#		   and surface are not reliable so do not use
-#          the soil temperature data
-#          removed this site's soil temp
-#          starting at row 42222
-#site 45: 2010 152 second observation, 2011 152-225 deleted second observation
-#			depths 1,7,9,16,18,24,
-#           435019,435458-435531,441722,442160-442233, 443329-443402,
-#           447372-447445,450580,451008-451081,455475-455547
-#   Air: 152- 225 2011 126995-127068
-#site 46: Air 60- 151 2007 129917-130008
-#site 47: Air 152-171 2011 153-236 2012 134053-134072 and
-#         134503-134586
-#site 48: 2011 152-227, 15,30,60 duplicate deleted second
-#          524250-524325,529576-529651,537166-537241
-#    Air: 152-227 2011 136039-136114
-#site 49: 2011 152-214 10,40,
-#          545089-545151, 551858-551919
-#    Air: 152-214 2011 137562-
-
-############################################
-######all of these fixes are now in a fixed soil temp file
-###########################################
-######Air temp also removed for site 44
+#189684 duplicated in air temp u5
 
 ###########################################
 #########organize data for analysis########
 ###########################################
 # set working directory
-setwd("c:\\Users\\hkropp\\Google Drive\\perma_analysis_backup")
+setwd("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_2")
 #read in soil temperature
-datS<-read.table("soil_temp_fix_aU4.csv", sep=",", header=TRUE, na.string=c("NaN"))
+datS<-read.table("soil_temp.csv", sep=",", header=TRUE, na.string=c("NaN"))
 #read in air temperature
-datA<-read.table("air_temp_fix.csv", sep=",", header=TRUE, na.string=c("NaN"))
+datA<-read.table("air_temp.csv", sep=",", header=TRUE, na.string=c("NaN"))
 #change date labels for easier merging
 colnames(datA)<-c("air_id", "doy_st","year_st","air_t","air_height","site_id")
 #read in site info
@@ -108,8 +50,8 @@ dupvec<-numeric(0)
 NdaylengthA<-list()
 duplicateA<-list()
 dupvecA<-numeric(0)
-#need to deal with deleting site 44
-vSiteFlag<-c(rep(1,43),0,rep(1,20))
+#need to deal with sites with no data
+vSiteFlag<-ifelse(Tlength==0,0,1)
 for(i in 1:Nsite){
 	if(vSiteFlag[i]==1){
 		NdaylengthS[[i]]<-aggregate(datS$soil_t[datS$site_id==i], 
@@ -138,10 +80,6 @@ for(i in 1:Nsite){
 siteflag.dup<-which(dupvec!=0)
 siteflag.dupA<-which(dupvecA!=0)
 
-#went back to raw data
-#Problem with site 13 is that I used the original year label in the label was 
-#incorrect. Went back and fixed in the backup csv (changed name), but needs
-#to be fixed in the database
 
 #merge all soil temp together but need to accomadate different conditions
 
