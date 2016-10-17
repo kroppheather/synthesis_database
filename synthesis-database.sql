@@ -267,4 +267,9 @@ DELETE FROM air_temp;
 \copy root_bio TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_2\root_bio.csv' DELIMITER ',' CSV  HEADER;
 
 
+--fix duplicate air
+DELETE FROM air_temp;
+\copy air_temp(air_id,doy_ai,year_ai,air_t,air_height,site_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\air_temp_fix_u5.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
+\copy air_temp TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_2\air_temp_fix.csv' DELIMITER ',' CSV  HEADER;
+
 
