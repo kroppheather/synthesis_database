@@ -269,7 +269,7 @@ DELETE FROM air_temp;
 
 --fix duplicate air
 DELETE FROM air_temp;
-\copy air_temp(air_id,doy_ai,year_ai,air_t,air_height,site_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\air_temp_fix_u5.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
-\copy air_temp TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_2\air_temp_fix.csv' DELIMITER ',' CSV  HEADER;
+\copy air_temp(air_id,doy_ai,year_ai,air_t,air_height,site_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\backup_2\air_temp_fix_u5.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
+\copy air_temp TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_2\air_temp_fix_u5_out.csv' DELIMITER ',' CSV  HEADER;
 
 

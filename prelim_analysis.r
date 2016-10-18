@@ -2,7 +2,7 @@
 ######## This file reads in csv files of all data as of the 5th data upload
 ######## and looks at all temperature data
 ##############################################################################
-#189684 duplicated in air temp u5
+
 
 ###########################################
 #########organize data for analysis########
@@ -12,7 +12,7 @@ setwd("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_2")
 #read in soil temperature
 datS<-read.table("soil_temp.csv", sep=",", header=TRUE, na.string=c("NaN"))
 #read in air temperature
-datA<-read.table("air_temp.csv", sep=",", header=TRUE, na.string=c("NaN"))
+datA<-read.table("air_temp_fix_u5_out.csv", sep=",", header=TRUE, na.string=c("NaN"))
 #change date labels for easier merging
 colnames(datA)<-c("air_id", "doy_st","year_st","air_t","air_height","site_id")
 #read in site info
@@ -31,15 +31,52 @@ for(i in 1:Nsite){
 	#number of unique depths at each site
 	Tlength[i]<-length(unique(datS$st_depth[datS$site_id==i]))
 	}
+	
+#get sites with missing data 
+Ts.missing<-which(Tlength==0)
+	
 #add a row of NA for any site missing data 
-for(i in 1:Nsite){	
-	for(j in 1:length(Tlength[Tlength==0])){
-		if(Tlength[i]==0){
-			datS[dim(datS)[1]+j,]<-c(NA,NA,NA,NA,NA,i)
-		}
+
+missing.mat<-matrix(rep(NA,6*length(Ts.missing)), nrow=length(Ts.missing))
+for(i in 1:length(Ts.missing)){	
 		
-	}
+			missing.mat[i,6]<-Ts.missing[i]
 }
+colnames(missing.mat)<-colnames(datS)
+datS<-rbind(datS,missing.mat)
+
+#remove NAs from soil temp to avoid overly large datasets that are unnecessary
+#this needs to be made more flexible for other data than this current round
+datS<-datS[is.na(datS$soil_t)==FALSE|datS$site_id==Ts.missing[1]|datS$site_id==Ts.missing[2],]
+ 
+#check the length again
+ Tlength2<-numeric(0)
+for(i in 1:Nsite){
+	#number of unique depths at each site
+	Tlength2[i]<-length(unique(datS$st_depth[datS$site_id==i]))
+	}
+	
+#check that none are missing gain
+Tlength2[Tlength2==0]
+
+#check air temperature for missing data
+TlengthA<-numeric(0)
+for(i in 1:Nsite){
+	#number of unique depths at each site
+	TlengthA[i]<-length(unique(datA$air_height[datA$site_id==i]))
+	}
+	
+#get sites with missing data 
+Ta.missing<-which(TlengthA==0)
+#add a row of NA for any site missing data 
+
+missing.matA<-matrix(rep(NA,6*length(Ta.missing)), nrow=length(Ta.missing))
+for(i in 1:length(Ta.missing)){	
+			missing.matA[i,6]<-Ta.missing[i]
+}
+colnames(missing.matA)<-colnames(datA)
+datA<-rbind(datA,missing.matA)
+
 
 
 ##Need some flags and to deal with duplicate depths and duplicated days before
@@ -59,16 +96,20 @@ for(i in 1:Nsite){
 										datS$year_st[datS$site_id==i],
 										datS$st_depth[datS$site_id==i]),
 										FUN="length")
+	
+
 		#check to see where there might be more than one observation								
 		duplicate[[i]]<-NdaylengthS[[i]][NdaylengthS[[i]]$x>1,]
 		dupvec[i]<-dim(duplicate[[i]])[1]
+
 		#Air t check
 		NdaylengthA[[i]]<-aggregate(datA$air_t[datA$site_id==i], 
 										by=list(datA$doy_st[datA$site_id==i],
 										datA$year_st[datA$site_id==i],
 										datA$air_height[datA$site_id==i]),
 										FUN="length")
-		#check to see where there might be more than one observation								
+		#check to see where there might be more than one observation		
+	
 		duplicateA[[i]]<-NdaylengthA[[i]][NdaylengthA[[i]]$x>1,]
 		dupvecA[i]<-dim(duplicateA[[i]])[1]
 	}else{
@@ -81,11 +122,12 @@ siteflag.dup<-which(dupvec!=0)
 siteflag.dupA<-which(dupvecA!=0)
 
 
+
 #merge all soil temp together but need to accomadate different conditions
 
-tempT<-list()
+tempT<-list(list())
 S.all<-list()
-
+tempTuse<-list()
 timedf<-list()
 
 for(i in 1:Nsite){
@@ -101,36 +143,34 @@ for(i in 1:Nsite){
 		if(dim(timedf[[i]])[1]==dim(datS[datS$site_id==i,])[1]){
 			#just include all unique measurements 
 			S.all[[i]]<-datS[datS$site_id==i,]
-		}else{if(i!=44|i!=18){
+		}else{
 	
 		#next need to find the depth with the most amount of measurements and 
 		#order the depths based on this
+			tempT<-list()
 			tempT[[1]]<-timedf[[i]]
 				for(j in 1:Tlength[i]){
-				tempT[[j+1]]<-datS[datS$site_id==i
-					&datS$st_depth==unique(datS$st_depth[datS$site_id==i])[j],]
-		
-			}
-		
+				tempT[[j+1]]<-
+				datS[datS$site_id==i&datS$st_depth==unique(datS$st_depth[datS$site_id==i])[j],]
+					}
+
+
 	#merge all together
 		S.all[[i]]<-join_all(tempT,by=c("doy_st", "year_st"), type="left")
-		}else{
-		S.all[[i]]<-c(NA)
 		}
-	}
+	
 }else{S.all[[i]]<-c(NA)}
 }
 
+
+				
+				
 #now deal with site 24 which is currently missing soil temp data
 S.all[[24]]<-data.frame(doy_st=0,year_st=0,
 						soil_t=NA,
 						st_depth=NA)
 
-S.all[[18]]<-data.frame(doy_st=0,year_st=0,
-						soil_t=NA,
-						st_depth=NA)
-						
-
+					
 S.all[[44]]<-data.frame(doy_st=0,year_st=0,
 						soil_t=NA,
 						st_depth=NA)
@@ -163,6 +203,7 @@ for(i in 1:Nsite){
 	
 		#next need to find the depth with the most amount of measurements and 
 		#order the depths based on this
+			tempA<-list()
 			tempA[[1]]<-timedfa[[i]]
 				for(j in 1:Alength[i]){
 				tempA[[j+1]]<-datA[datA$site_id==i&datA$air_height==unique(datA$air_height[datA$site_id==i])[j],]
@@ -177,15 +218,17 @@ for(i in 1:Nsite){
 }
 
 #sites to exclude for now
-A.all[[18]]<-data.frame(doy_st=0,year_st=0,
-						air_t=NA,
-						air_height=NA)
-						
+
 
 A.all[[44]]<-data.frame(doy_st=0,year_st=0,
 						air_t=NA,
 						air_height=NA)
-												
+										
+#check dimensions of A.all
+A.dim=list()
+for(i in 1:Nsite){
+	A.dim[[i]]<-dim(A.all[[i]])
+}										
 						
 						
 #need a more efficient method than the for loop 
@@ -198,12 +241,15 @@ for(i in 1:Nsite){
 }
 
 #check dim of temp
+
 dimTemp<-numeric(0)
-dimTcheck<-numeric(0)
+SdimV<-numeric(0)
 for(i in 1:Nsite){
 	dimTemp[i]<-dim(Temperature[[i]])[1]
-	dimTcheck[i]<-dimTemp[[i]][1]-S.dim[[i]][1]
+	SdimV[i]<-S.dim[[i]][1]
 }
+TdimCheck<-dimTemp-SdimV
+
 
 #####Need to add in further checks for data errors
 
@@ -454,7 +500,7 @@ Summer.data$n<-Summer.data$T/Summer.data$AT
 plot(Winter.data$wyear[Winter.data$depth<10],
 		Winter.data$n[Winter.data$depth<10],pch=19)
 		
-plot(Winter.data$wyear[Winter.data$depth>10
+plot(Winter.data$wyear[Winter.data$depth>10],
 		Winter.data$n[Winter.data$depth>10],pch=19)
 		
 #merge the site info table to look at more patterns
@@ -500,11 +546,11 @@ Snumbs<-aggregate(N.summ$n[N.summ$depth<10],by=list(as.factor(new_v[N.summ$depth
 par(mfrow=c(1,2))	
 plot(N.wint$n[N.wint$depth<10]~as.factor(new_v[N.wint$depth<10]), pch=19,
 	xlab="biome",ylab="Winter N factor")
-text(seq(1.25,3.25),rep(1,3), c("n=15","n=111","n=6"), cex=2)	
+text(seq(1.25,3.25),rep(1,3), c("n=19","n=124","n=6"), cex=2)	
 plot(N.summ$n[N.summ$depth<10]~as.factor(new_v[N.summ$depth<10]), pch=19,
 	xlab="biome",ylab="Summer N factor")
 mtext("0-10cm depth", side=3, outer=TRUE, cex=2, line=-3)
-text(seq(1.25,3.25),rep(1.4,3), c("n=82","n=201","n=8"), cex=2)
+text(seq(1.25,3.25),rep(1.4,3), c("n=91","n=211","n=7"), cex=2)
 
 #make plot of latitude
 par(mfrow=c(1,2))	
@@ -539,13 +585,20 @@ region<-c("Sweden1", "AK1","AK1","AK1","AK1","AK2","AK2","AK2","AK2",
 			"Russia1","AK3","AK3","AK3","AK3","AK3","AK3","AK3","AK3",
 			rep("AK4",12),rep("AK5",3), "AK6","AK7","AK7","AK8","AK8",
 			rep("Russia2", 6),"Canada3","Canada3","Canada4", "Canada4",
-			"Russia3", "Russia3", "Norway1", "Russia4", "Russia4")
+			"Russia3", "Russia3", "Norway1", "Russia4", "Russia4",
+			"Canada5","Canada5","Canada5","AK9","AK10","AK10","AK10","AK9", "Canada6",
+			"Finland1","Finland2",rep("AK11",17),"Canada7","Canada7",rep("Canada8",5),
+			"Greenland2","Greenland2")
 			
+region.df<-data.frame(siteid=seq(1,101), region=region)
+
+N.wintR<-join(N.wint,region.df,by=c("siteid"), type="inner")			
+N.summR<-join(N.summ,region.df,by=c("siteid"), type="inner")	
 #make box plot
 
-plot(N.wint$n[N.wint$depth<10]~as.factor(N.wint$region[N.wint$depth<10]), pch=19,
+plot(N.wintR$n[N.wintR$depth<10]~as.factor(N.wintR$region[N.wintR$depth<10]), pch=19,
 	xlab="region",ylab="Winter N factor")
 text(seq(1.25,3.25),rep(1,3), c("n=15","n=111","n=6"), cex=2)	
-plot(N.summ$n[N.summ$depth<10]~as.factor(N.summ$region[N.summ$depth<10]), pch=19,
+plot(N.summR$n[N.summR$depth<10]~as.factor(N.summR$region[N.summR$depth<10]), pch=19,
 	xlab="biome",ylab="Summer N factor")
 		
