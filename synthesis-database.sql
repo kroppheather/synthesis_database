@@ -273,3 +273,38 @@ DELETE FROM air_temp;
 \copy air_temp TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_2\air_temp_fix_u5_out.csv' DELIMITER ',' CSV  HEADER;
 
 
+--upload #6
+\copy contributor(ctbr_id, ctbr_name,institution,email) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u6\contibuter_u6.csv' DELIMITER ',' CSV HEADER QUOTE '"'
+\copy siteinfo(site_id,site_name,lat,lon,loc,MAAT,Dist_type,Vege_z,PF_Zone,ctbr_id,elev,year_beg,year_end,day_beg,day_end,dist_hist) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u6\siteinfo_u6.csv' DELIMITER ',' CSV HEADER QUOTE '"'
+\copy refinfo(ref_id,authors,title,journal,dateid,pages,ctbr_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u6\refinfo_u6.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
+\copy refrel(refrel_id,site_id,ref_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u6\refrel_u6.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
+\copy soil(soil_id,soil_class,soil_drain,sand,clay,silt,organic_thick,site_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u6\soil_u6.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
+\copy soilc(soilc_id,soilc,soilc_dep,site_id,c_year,c_doy) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u6\soilc_u6.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
+\copy moss(moss_id,mlt,moss_name,doy_m,year_m,site_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u6\moss_u6.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
+\copy aboveground_bio(bio_id,abg_mean,year_a,site_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u6\aboveground_bio_u6.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
+\copy spec_bio(spbio_id,sp_bio,sp_name,sp_functt,year_sp,doy_sp,site_id,sp_unit) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u6\sp_bio_u6.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
+\copy spcov(cover_id,perc_cover,species,func_type,site_id, year_m, doy_m)FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u6\spcov_u6.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
+\copy LAI(LAI_id, LAI, NDVI, Species, Funct_type, DOY_m, Year_m, Siteid) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u6\LAI_u6.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
+\copy spec_list(specl_id,spec_name,site_id,spl_funcT) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u6\splist_u6.csv' DELIMITER ',' CSV HEADER QUOTE '"'
+\copy soil_moist(sm_id,doy_sm,year_sm,SWC,sw_depth,sm_type,site_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u6\soil_moist_u6.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
+\copy soil_temp(stemp_id,doy_st,year_st,soil_t,st_depth,site_id)  FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u6\soilT_u6.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
+\copy air_temp(air_id,doy_ai,year_ai,air_t,air_height,site_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u6\airT_u6.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
+
+
+--export tables as csv for R
+\copy contributor TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_3\contributor.csv' DELIMITER ',' CSV  HEADER;
+\copy siteinfo TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_3\siteinfo.csv' DELIMITER ',' CSV  HEADER;
+\copy refinfo TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_3\refinfo.csv' DELIMITER ',' CSV  HEADER;
+\copy refrel TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_3\refrel.csv' DELIMITER ',' CSV  HEADER;
+\copy soil TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_3\soil.csv' DELIMITER ',' CSV  HEADER;
+\copy soilc TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_3\soilc.csv' DELIMITER ',' CSV  HEADER;
+\copy moss TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_3\moss.csv' DELIMITER ',' CSV  HEADER;
+\copy aboveground_bio TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_3\aboveground_bio.csv' DELIMITER ',' CSV  HEADER;
+\copy spec_bio TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_3\spec_bio.csv' DELIMITER ',' CSV  HEADER;
+\copy spcov TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_3\spcov.csv' DELIMITER ',' CSV  HEADER;
+\copy LAI TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_3\LAI.csv' DELIMITER ',' CSV  HEADER;
+\copy spec_list TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_3\spec_list.csv' DELIMITER ',' CSV  HEADER;
+\copy soil_moist TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_3\soil_moist.csv' DELIMITER ',' CSV  HEADER;
+\copy soil_temp TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_3\soil_temp.csv' DELIMITER ',' CSV  HEADER;
+\copy air_temp TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_3\air_temp.csv' DELIMITER ',' CSV  HEADER;
+\copy root_bio TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_3\root_bio.csv' DELIMITER ',' CSV  HEADER;
