@@ -10,9 +10,9 @@
 # set working directory
 setwd("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_3")
 #read in soil temperature
-datS<-read.table("soil_temp_fixed.csv", sep=",", header=TRUE, na.string=c("NaN"))
+datS<-read.table("soil_temp_fixed_u6_out.csv", sep=",", header=TRUE, na.string=c("NaN"))
 #read in air temperature
-datA<-read.table("air_temp_fixed.csv", sep=",", header=TRUE, na.string=c("NaN"))
+datA<-read.table("air_temp_fixed_u6_out.csv", sep=",", header=TRUE, na.string=c("NaN"))
 #change date labels for easier merging
 colnames(datA)<-c("air_id", "doy_st","year_st","air_t","air_height","site_id")
 #read in site info
@@ -254,11 +254,11 @@ TdimCheck<-dimTemp-SdimV
 #####Need to add in further checks for data errors
 
 
-#######################################
-#######################################
-#######################################
-### Now calculate N factors ###########
-#######################################
+################################################################################
+################################################################################
+################################################################################
+#################### Now calculate N factors ###################################
+################################################################################
 
 #A closer look also shows site 48 has duplicate data
 #All borehole sites need to be double checked for issues
@@ -460,10 +460,16 @@ colnames(AS.use)<-c("depth", "year","count","siteid")
 sTdf<-ldply(sT.n)
 sAdf<-ldply(sA.n)
 #subset the observations by only site and depth with data for complete season 
-S.forcalc<-join(sTdf,S.use, by=c("depth", "year","siteid"), type="inner")
-W.forcalc<-join(sTdf,W.use, by=c("depth", "wyear","siteid"), type="inner")
-AS.forcalc<-join(sAdf,AS.use, by=c("depth", "year","siteid"), type="inner")
-AW.forcalc<-join(sAdf,AW.use, by=c("depth", "wyear","siteid"), type="inner")
+#subset temperature by season
+SummT<-sTdf[sTdf$s.ind==1,]
+WintT<-sTdf[sTdf$w.ind==1,]
+ASummT<-sAdf[sAdf$s.ind==1,]
+AWintT<-sAdf[sAdf$w.ind==1,]
+#join based on what data to use to meet criteria
+S.forcalc<-join(SummT,S.use, by=c("depth", "year","siteid"), type="inner")
+W.forcalc<-join(WintT,W.use, by=c("depth", "wyear","siteid"), type="inner")
+AS.forcalc<-join(ASummT,AS.use, by=c("depth", "year","siteid"), type="inner")
+AW.forcalc<-join(AWintT,AW.use, by=c("depth", "wyear","siteid"), type="inner")
 #get all the days for freezing and thawing indices
 S.thaw<-S.forcalc[S.forcalc$T>0,]
 W.freeze<-W.forcalc[W.forcalc$T<0,]
@@ -506,15 +512,6 @@ plot(Winter.data$wyear[Winter.data$depth>10],
 #merge the site info table to look at more patterns
 colnames(siteinf)[1]<-c("siteid")
 
-#create a quick site index
-region<-c("Sweden1", "AK1","AK1","AK1","AK1","AK2","AK2","AK2","AK2",
-			"Greenland1","Greenland1","Canada1","Canada1","Canada1",
-			"Canada1","Canada1","Canada2","Canada2","Canada2","Canada2",
-			"Russia1","AK3","AK3","AK3","AK3","AK3","AK3","AK3","AK3",
-			rep("AK4",12),rep("AK5",3), "AK6","AK7","AK7","AK8","AK8",
-			rep("Russia2", 6),"Canada3","Canada3","Canada4", "Canada4",
-			"Russia3", "Russia3", "Norway1", "Russia4", "Russia4")
-siteinf$region<-region
 
 N.wint<-join(Winter.data,siteinf,by=c("siteid"), type="inner")
 N.summ<-join(Summer.data,siteinf,by=c("siteid"), type="inner")
@@ -546,11 +543,11 @@ Snumbs<-aggregate(N.summ$n[N.summ$depth<10],by=list(as.factor(new_v[N.summ$depth
 par(mfrow=c(1,2))	
 plot(N.wint$n[N.wint$depth<10]~as.factor(new_v[N.wint$depth<10]), pch=19,
 	xlab="biome",ylab="Winter N factor")
-text(seq(1.25,3.25),rep(1,3), c("n=19","n=124","n=6"), cex=2)	
+
 plot(N.summ$n[N.summ$depth<10]~as.factor(new_v[N.summ$depth<10]), pch=19,
 	xlab="biome",ylab="Summer N factor")
 mtext("0-10cm depth", side=3, outer=TRUE, cex=2, line=-3)
-text(seq(1.25,3.25),rep(1.4,3), c("n=91","n=211","n=7"), cex=2)
+
 
 #make plot of latitude
 par(mfrow=c(1,2))	
@@ -568,37 +565,173 @@ mtext("0-10cm depth", side=3, outer=TRUE, cex=2, line=-3)
 #make plot of year
 par(mfrow=c(1,2))	
 plot(N.wint$wyear[N.wint$depth<10&new_v=="tundra"],N.wint$n[N.wint$depth<10&new_v=="tundra"], pch=19,
-	xlab="year",ylab="Winter N factor", col="cadetblue3")
+	xlab="year",ylab="Winter N factor", col="cadetblue3", xlim=c(1987,2016))
 points(N.wint$wyear[N.wint$depth<10&new_v=="boreal"],N.wint$n[N.wint$depth<10&new_v=="boreal"], pch=19,
 	 col="forestgreen")
 	legend(2005,1,c("boreal","tundra"), pch=19, col=c("forestgreen","cadetblue3"), cex=1.5, bty="n")
 plot(N.summ$year[N.summ$depth<10&Snew_v=="tundra"],N.summ$n[N.summ$depth<10&Snew_v=="tundra"], pch=19,
-	xlab="latitude",ylab="Summer N factor", col="cadetblue3")		
+	xlab="year",ylab="Summer N factor", col="cadetblue3")		
 points(N.summ$year[N.summ$depth<10&Snew_v=="boreal"],N.summ$n[N.summ$depth<10&Snew_v=="boreal"], pch=19,
 	col="forestgreen")
 mtext("0-10cm depth", side=3, outer=TRUE, cex=2, line=-3)
 
 #create a quick site index
-region<-c("Sweden1", "AK1","AK1","AK1","AK1","AK2","AK2","AK2","AK2",
-			"Greenland1","Greenland1","Canada1","Canada1","Canada1",
-			"Canada1","Canada1","Canada2","Canada2","Canada2","Canada2",
-			"Russia1","AK3","AK3","AK3","AK3","AK3","AK3","AK3","AK3",
-			rep("AK4",12),rep("AK5",3), "AK6","AK7","AK7","AK8","AK8",
-			rep("Russia2", 6),"Canada3","Canada3","Canada4", "Canada4",
-			"Russia3", "Russia3", "Norway1", "Russia4", "Russia4",
-			"Canada5","Canada5","Canada5","AK9","AK10","AK10","AK10","AK9", "Canada6",
-			"Finland1","Finland2",rep("AK11",17),"Canada7","Canada7",rep("Canada8",5),
-			"Greenland2","Greenland2")
-			
-region.df<-data.frame(siteid=seq(1,101), region=region)
 
-N.wintR<-join(N.wint,region.df,by=c("siteid"), type="inner")			
-N.summR<-join(N.summ,region.df,by=c("siteid"), type="inner")	
-#make box plot
 
-plot(N.wintR$n[N.wintR$depth<10]~as.factor(N.wintR$region[N.wintR$depth<10]), pch=19,
+plot(N.wint$n[N.wint$depth<10]~as.factor(N.wint$loc[N.wint$depth<10]), pch=19,
 	xlab="region",ylab="Winter N factor")
-text(seq(1.25,3.25),rep(1,3), c("n=15","n=111","n=6"), cex=2)	
-plot(N.summR$n[N.summR$depth<10]~as.factor(N.summR$region[N.summR$depth<10]), pch=19,
+
+plot(N.summ$n[N.summ$depth<10]~as.factor(N.summ$loc[N.summ$depth<10]), pch=19,
 	xlab="biome",ylab="Summer N factor")
+	
+	
+	
+######################################################################################################
+######################################################################################################
+##################### See if N factors can be corrected if incomplete#################################
+##################### Start by better assessing incomplete data  #####################################
+######################################################################################################
+
+S.use<-na.omit(Scountsdf[Scountsdf$x==154,])
+W.use<-na.omit(Wcountsdf[Wcountsdf$x==212|Wcountsdf$x==213,])
+AS.use<-na.omit(Acountsdf[Acountsdf$x==154,])
+AW.use<-na.omit(Acountwdf[Acountwdf$x==212|Acountwdf$x==213,])
 		
+#subset the observations by only site and depth with data for complete season 
+S.forcalc<-join(sTdf,S.use, by=c("depth", "year","siteid"), type="inner")
+W.forcalc<-join(sTdf,W.use, by=c("depth", "wyear","siteid"), type="inner")
+AS.forcalc<-join(sAdf,AS.use, by=c("depth", "year","siteid"), type="inner")
+AW.forcalc<-join(sAdf,AW.use, by=c("depth", "wyear","siteid"), type="inner")
+#get all the days for freezing and thawing indices
+S.thaw<-S.forcalc[S.forcalc$T>0,]
+W.freeze<-W.forcalc[W.forcalc$T<0,]
+AS.thaw<-AS.forcalc[AS.forcalc$A>0,]
+AW.freeze<-AW.forcalc[AW.forcalc$A<0,]
+#add up all days that are freezing or thawing for degree days
+Sthaw.dd<-aggregate(S.thaw$T, 
+			by=list(S.thaw$depth,S.thaw$year,S.thaw$siteid), FUN="sum")
+Sfreeze.dd<-aggregate(W.freeze$T, 
+			by=list(W.freeze$depth,W.freeze$wyear,W.freeze$siteid), FUN="sum")		
+Athaw.dd<-aggregate(AS.thaw$A, 
+			by=list(AS.thaw$depth,AS.thaw$year,AS.thaw$siteid), FUN="sum")
+Afreeze.dd<-aggregate(AW.freeze$A, 
+			by=list(AW.freeze$depth,AW.freeze$wyear,AW.freeze$siteid), FUN="sum")
+#look at some data
+plot(Sthaw.dd$Group.1[Sthaw.dd$Group.1>10],Sthaw.dd$x[Sthaw.dd$Group.1>10])
+plot(Sfreeze.dd$Group.2[Sfreeze.dd$Group.3==15],Sfreeze.dd$x[Sfreeze.dd$Group.3==15])
+#rename columns		
+colnames(Sthaw.dd)<-c("depth","year","siteid","T")
+colnames(Sfreeze.dd)<-c("depth","wyear","siteid","T")
+colnames(Afreeze.dd)<-c("height","wyear","siteid","AT")	
+colnames(Athaw.dd)<-c("height","year","siteid","AT")				
+			
+#now calculate nfactor
+#soil/air
+#need to make a table of of freezing and thawing where data matches
+Winter.data<-join(Sfreeze.dd,Afreeze.dd, by=c("wyear","siteid"), type="inner")
+Summer.data<-join(Sthaw.dd,Athaw.dd,by=c("year","siteid"), type="inner")
+#calculate n factor
+Winter.data$n<-Winter.data$T/Winter.data$AT
+Summer.data$n<-Summer.data$T/Summer.data$AT
+		
+#figure out how sensitive correcting N factors where 90% of more of the data is present in a season.
+#Start by looking at how sensitive excluding data and doing the calculation is on datasets where
+#the enitre dataset is present for the season.
+
+#first explore how much data changes
+
+SdayLow<-round(0.9*154,0)
+WdayLow<-round(0.9*212,0)
+
+#See what data could be corrected
+S.toCor<-na.omit(Scountsdf[Scountsdf$x<154&Scountsdf$x>=SdayLow,])
+W.toCor<-na.omit(Wcountsdf[Wcountsdf$x<212&Wcountsdf$x>=WdayLow,])
+AS.toCor<-na.omit(Acountsdf[Acountsdf$x<154&Acountsdf$x>=SdayLow,])
+AW.toCor<-na.omit(Acountwdf[Acountwdf$x<212&Acountwdf$x>=WdayLow,])
+#Note adjusting N factor for 90% of the season appears to drastically increase
+#data available for analysis so it is worth exploring
+
+#now need to look at how much a correction for degree days could influence it
+#look at soil
+
+#first exclude 10% of the days under 4 scenarios:
+#1. all at beginning
+#2. all at end
+#3. all in middle
+#4. dispersed randomly
+S.missing<-154-SdayLow
+W.missing<-212-WdayLow
+SeasonLength<-c(154,212,154,212)
+#set up missing data scenarios
+MissingSubtract<-c(S.missing,W.missing,S.missing,W.missing)
+BegSeasS<-MissingSubtract
+BegSeasE<-SeasonLength
+EndSeasS<-rep(1,4)
+EndSeasE<-SeasonLength-MissingSubtract
+MidSeasS
+MidSeasE
+RSeasList
+
+
+#after data is pulled out to use,and data is filtered for proper length/season 
+#S.for calc, W.forcalc, AS.forcalc, AW.forcalc
+
+#need to get site list
+Subsitelist<-list()
+Subsitelist[[1]]<-unique(data.frame(site=S.forcalc$siteid, depth=S.forcalc$depth, year=S.forcalc$year))
+Subsitelist[[2]]<-unique(data.frame(site=W.forcalc$siteid, depth=W.forcalc$depth, wyear=W.forcalc$wyear))
+Subsitelist[[3]]<-unique(data.frame(site=AS.forcalc$siteid, depth=AS.forcalc$depth, year=AS.forcalc$year))
+Subsitelist[[4]]<-unique(data.frame(site=AW.forcalc$siteid, depth=AW.forcalc$depth, wyear=AW.forcalc$wyear))
+
+#make a list of data to subset
+Dataforallcalcs<-list(S.forcalc,W.forcalc,AS.forcalc,AW.forcalc)
+
+#get list for each
+SFORCALC.list<-list()
+
+for(i in 1:dim(Subsitelist[[1]])[1]){
+	SFORCALC.list[[i]]<-Dataforallcalcs[[1]][Dataforallcalcs[[1]]$siteid==Subsitelist[[1]]$site[j]&
+												Dataforallcalcs[[1]]$year==Subsitelist[[1]]$year[j]&
+												Dataforallcalcs[[1]]$depth==Subsitelist[[1]]$depth[j],]
+}
+WFORCALC.list<-list()
+for(i in 1:dim(Subsitelist[[2]])[1]){
+	WFORCALC.list[[i]]<-Dataforallcalcs[[2]][Dataforallcalcs[[2]]$siteid==Subsitelist[[2]]$site[j]&
+												Dataforallcalcs[[2]]$wyear==Subsitelist[[2]]$wyear[j]&
+												Dataforallcalcs[[2]]$depth==Subsitelist[[2]]$depth[j],]
+}
+ASFORCALC.list<-list()
+for(i in 1:dim(Subsitelist[[3]])[1]){
+	ASFORCALC.list[[i]]<-Dataforallcalcs[[3]][Dataforallcalcs[[3]]$siteid==Subsitelist[[3]]$site[j]&
+												Dataforallcalcs[[3]]$year==Subsitelist[[3]]$year[j]&
+												Dataforallcalcs[[3]]$depth==Subsitelist[[3]]$depth[j],]
+}
+AWFORCALC.list<-list()
+for(i in 1:dim(Subsitelist[[4]])[1]){
+	AWFORCALC.list[[i]]<-Dataforallcalcs[[4]][Dataforallcalcs[[4]]$siteid==Subsitelist[[4]]$site[j]&
+												Dataforallcalcs[[4]]$wyear==Subsitelist[[4]]$wyear[j]&
+												Dataforallcalcs[[4]]$depth==Subsitelist[[4]]$depth[j],]
+}
+
+
+#turn into a list
+ALLFORCALC.list<-list(SFORCALC.list,WFORCALC.list,ASFORCALC.list,AWFORCALC.list)
+
+##now the data can be excluded according to each scenario
+
+for(i in 1:4){
+	for(j in 1:dim(Subsitelist[[i]]){
+	begSeasonM[[i]][[j]]
+	
+	}
+
+}
+
+
+
+
+
+##################################################################################
+##################################################################################
+############################Calculate T diff #####################################
+##################################################################################
