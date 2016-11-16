@@ -8,11 +8,12 @@
 #########organize data for analysis########
 ###########################################
 # set working directory
-setwd("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_2")
+#setwd("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_3")
+setwd("c:\\Users\\kropp_000\\Documents\\backup_3")
 #read in soil temperature
 datS<-read.table("soil_temp.csv", sep=",", header=TRUE, na.string=c("NaN"))
 #read in air temperature
-datA<-read.table("air_temp_fix_u5_out.csv", sep=",", header=TRUE, na.string=c("NaN"))
+datA<-read.table("air_temp.csv", sep=",", header=TRUE, na.string=c("NaN"))
 #change date labels for easier merging
 colnames(datA)<-c("air_id", "doy_st","year_st","air_t","air_height","site_id")
 #read in site info
