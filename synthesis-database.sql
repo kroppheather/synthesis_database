@@ -308,3 +308,16 @@ DELETE FROM air_temp;
 \copy soil_temp TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_3\soil_temp.csv' DELIMITER ',' CSV  HEADER;
 \copy air_temp TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_3\air_temp.csv' DELIMITER ',' CSV  HEADER;
 \copy root_bio TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_3\root_bio.csv' DELIMITER ',' CSV  HEADER;
+
+
+--fix data issues
+--fix duplicate air  temp
+DELETE FROM air_temp;
+\copy air_temp(air_id,doy_ai,year_ai,air_t,air_height,site_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\backup_3\air_temp_fixed_u6.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
+\copy air_temp TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_3\air_temp_fixed_u6_out.csv' DELIMITER ',' CSV  HEADER;
+--fix soil temp
+DELETE FROM soil_temp;
+\copy soil_temp(stemp_id,doy_st,year_st,soil_t,st_depth,site_id)  FROM 'c:\\Users\hkropp\Google Drive\raw_data\backup_3\soil_temp_fixed_u6f.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
+\copy soil_temp TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_3\soil_temp_fixed_u6_out.csv' DELIMITER ',' CSV  HEADER;
+
+
