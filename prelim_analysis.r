@@ -607,13 +607,19 @@ S.toCor<-na.omit(Scountsdf[Scountsdf$x<154&Scountsdf$x>=SdayLow,])
 W.toCor<-na.omit(Wcountsdf[Wcountsdf$x<212&Wcountsdf$x>=WdayLow,])
 AS.toCor<-na.omit(Acountsdf[Acountsdf$x<154&Acountsdf$x>=SdayLow,])
 AW.toCor<-na.omit(Acountwdf[Acountwdf$x<212&Acountwdf$x>=WdayLow,])
-#Note adjusting N factor for 90% of the season appears to drastically increase
+#Note adjusting N factor for 95% of the season appears to drastically increase
 #data available for analysis so it is worth exploring
 
+############################################
+#############!!!!!!!!!!!####################
+#####!!! No need to run everytime!!!!#######
+#############!!!!!!!!!!!####################
+############################################
+{
 #now need to look at how much a correction for degree days could influence it
 #look at soil
 
-#first exclude 10% of the days under 4 scenarios:
+#first exclude 5% of the days under 4 scenarios:
 #1. all at beginning
 #2. all at end
 #3. all in middle
@@ -1124,8 +1130,40 @@ Sdf<-data.frame(param=rep(c("intercept","slope","R.sq"), times=4),
 				 N.cor=SNcompdf$corrected, N.uncor=SNcompdf$corrected,Var=rep("Summer TDD", 12))
 
 Allcompdf<-rbind(Wdf,Sdf)				 
-write.table(Allcompdf, "c:\\Users\\hkropp\\Google Drive\\Plots_for_data_quality_check\\Comp95perc.csv",
-			sep=",", row.names=FALSE)			
+#write.table(Allcompdf, "c:\\Users\\hkropp\\Google Drive\\Plots_for_data_quality_check\\Comp95perc.csv",
+#			sep=",", row.names=FALSE)	
+
+}		
+
+##############################################################################
+##############################################################################
+###############The data correction for 5% missing data is ####################
+###############sufficient so can start correcting data #######################
+##############################################################################
+
+#change colnames of data frames with the information on sites to correct
+colnames(S.toCor)<-c("depth","year","count","siteid")
+colnames(W.toCor)<-c("depth","wyear","count","siteid")
+colnames(AS.toCor)<-c("depth","year","count","siteid")
+colnames(AW.toCor)<-c("depth","wyear","count","siteid")
+
+
+#Need to calculate proportion of data present
+
+S.toCor$prop<-round(S.toCor$count/154,2)
+W.toCor$prop<-round(W.toCor$count/212,2)
+AS.toCor$prop<-round(AS.toCor$count/154,2)
+AW.toCor$prop<-round(AW.toCor$count/212,2)
+
+#join based on what data to use to meet criteria
+S.forcorr<-join(SummT,S.toCor, by=c("depth", "year","siteid"), type="inner")
+W.forcorr<-join(WintT,W.toCor, by=c("depth", "wyear","siteid"), type="inner")
+AS.forcorr<-join(ASummT,AS.toCor, by=c("depth", "year","siteid"), type="inner")
+AW.forcorr<-join(AWintT,AW.toCor, by=c("depth", "wyear","siteid"), type="inner")
+
+
+
+
 ##################################################################################
 ##################################################################################
 ############################Calculate T diff #####################################
