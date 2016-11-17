@@ -599,8 +599,8 @@ plot(N.summ$n[N.summ$depth<10]~as.factor(N.summ$loc[N.summ$depth<10]), pch=19,
 
 #first explore how much data changes
 
-SdayLow<-round(0.9*154,0)
-WdayLow<-round(0.9*212,0)
+SdayLow<-round(0.95*154,0)
+WdayLow<-round(0.95*212,0)
 
 #See what data could be corrected
 S.toCor<-na.omit(Scountsdf[Scountsdf$x<154&Scountsdf$x>=SdayLow,])
@@ -856,10 +856,10 @@ for(i in 1:4){
 	}
 	
 for(i in 1:4){	
-	W.freezeL[[i]]$corDD<-W.freezeL[[i]]$T/.9
-	AW.freezeL[[i]]$corADD<-AW.freezeL[[i]]$AT/.9
-	S.thawL[[i]]$corDD<-S.thawL[[i]]$T/.9
-	AS.thawL[[i]]$corADD<-AS.thawL[[i]]$AT/.9
+	W.freezeL[[i]]$corDD<-W.freezeL[[i]]$T/.95
+	AW.freezeL[[i]]$corADD<-AW.freezeL[[i]]$AT/.95
+	S.thawL[[i]]$corDD<-S.thawL[[i]]$T/.95
+	AS.thawL[[i]]$corADD<-AS.thawL[[i]]$AT/.95
 }
 
 Winter.corT<-list()
@@ -1124,7 +1124,7 @@ Sdf<-data.frame(param=rep(c("intercept","slope","R.sq"), times=4),
 				 N.cor=SNcompdf$corrected, N.uncor=SNcompdf$corrected,Var=rep("Summer TDD", 12))
 
 Allcompdf<-rbind(Wdf,Sdf)				 
-write.table(Allcompdf, "c:\\Users\\hkropp\\Google Drive\\Plots_for_data_quality_check\\Comp90perc.csv",
+write.table(Allcompdf, "c:\\Users\\hkropp\\Google Drive\\Plots_for_data_quality_check\\Comp95perc.csv",
 			sep=",", row.names=FALSE)			
 ##################################################################################
 ##################################################################################
