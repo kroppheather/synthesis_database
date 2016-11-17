@@ -520,7 +520,7 @@ N.summ<-join(Summer.data,siteinf,by=c("siteid"), type="inner")
 ########################################
 ##############Some quick initial plots##
 ########################################
-
+{
 plot(N.wint$lat[N.wint$depth<10],N.wint$n[N.wint$depth<10], pch=19,
 	xlab="latitude",ylab="Winter N factor")
 new_v<-ifelse(N.wint$vege_z=="boreal forest", "boreal",
@@ -584,7 +584,7 @@ plot(N.wint$n[N.wint$depth<10]~as.factor(N.wint$loc[N.wint$depth<10]), pch=19,
 plot(N.summ$n[N.summ$depth<10]~as.factor(N.summ$loc[N.summ$depth<10]), pch=19,
 	xlab="biome",ylab="Summer N factor")
 	
-	
+	}
 	
 ######################################################################################################
 ######################################################################################################
@@ -592,47 +592,6 @@ plot(N.summ$n[N.summ$depth<10]~as.factor(N.summ$loc[N.summ$depth<10]), pch=19,
 ##################### Start by better assessing incomplete data  #####################################
 ######################################################################################################
 
-S.use<-na.omit(Scountsdf[Scountsdf$x==154,])
-W.use<-na.omit(Wcountsdf[Wcountsdf$x==212|Wcountsdf$x==213,])
-AS.use<-na.omit(Acountsdf[Acountsdf$x==154,])
-AW.use<-na.omit(Acountwdf[Acountwdf$x==212|Acountwdf$x==213,])
-		
-#subset the observations by only site and depth with data for complete season 
-S.forcalc<-join(sTdf,S.use, by=c("depth", "year","siteid"), type="inner")
-W.forcalc<-join(sTdf,W.use, by=c("depth", "wyear","siteid"), type="inner")
-AS.forcalc<-join(sAdf,AS.use, by=c("depth", "year","siteid"), type="inner")
-AW.forcalc<-join(sAdf,AW.use, by=c("depth", "wyear","siteid"), type="inner")
-#get all the days for freezing and thawing indices
-S.thaw<-S.forcalc[S.forcalc$T>0,]
-W.freeze<-W.forcalc[W.forcalc$T<0,]
-AS.thaw<-AS.forcalc[AS.forcalc$A>0,]
-AW.freeze<-AW.forcalc[AW.forcalc$A<0,]
-#add up all days that are freezing or thawing for degree days
-Sthaw.dd<-aggregate(S.thaw$T, 
-			by=list(S.thaw$depth,S.thaw$year,S.thaw$siteid), FUN="sum")
-Sfreeze.dd<-aggregate(W.freeze$T, 
-			by=list(W.freeze$depth,W.freeze$wyear,W.freeze$siteid), FUN="sum")		
-Athaw.dd<-aggregate(AS.thaw$A, 
-			by=list(AS.thaw$depth,AS.thaw$year,AS.thaw$siteid), FUN="sum")
-Afreeze.dd<-aggregate(AW.freeze$A, 
-			by=list(AW.freeze$depth,AW.freeze$wyear,AW.freeze$siteid), FUN="sum")
-#look at some data
-plot(Sthaw.dd$Group.1[Sthaw.dd$Group.1>10],Sthaw.dd$x[Sthaw.dd$Group.1>10])
-plot(Sfreeze.dd$Group.2[Sfreeze.dd$Group.3==15],Sfreeze.dd$x[Sfreeze.dd$Group.3==15])
-#rename columns		
-colnames(Sthaw.dd)<-c("depth","year","siteid","T")
-colnames(Sfreeze.dd)<-c("depth","wyear","siteid","T")
-colnames(Afreeze.dd)<-c("height","wyear","siteid","AT")	
-colnames(Athaw.dd)<-c("height","year","siteid","AT")				
-			
-#now calculate nfactor
-#soil/air
-#need to make a table of of freezing and thawing where data matches
-Winter.data<-join(Sfreeze.dd,Afreeze.dd, by=c("wyear","siteid"), type="inner")
-Summer.data<-join(Sthaw.dd,Athaw.dd,by=c("year","siteid"), type="inner")
-#calculate n factor
-Winter.data$n<-Winter.data$T/Winter.data$AT
-Summer.data$n<-Summer.data$T/Summer.data$AT
 		
 #figure out how sensitive correcting N factors where 90% of more of the data is present in a season.
 #Start by looking at how sensitive excluding data and doing the calculation is on datasets where
@@ -663,15 +622,30 @@ S.missing<-154-SdayLow
 W.missing<-212-WdayLow
 SeasonLength<-c(154,212,154,212)
 #set up missing data scenarios
+#missing at the beginning
 MissingSubtract<-c(S.missing,W.missing,S.missing,W.missing)
 BegSeasS<-MissingSubtract
 BegSeasE<-SeasonLength
+#block missing at the end
 EndSeasS<-rep(1,4)
 EndSeasE<-SeasonLength-MissingSubtract
-MidSeasS
-MidSeasE
-RSeasList
+#block missing in the middle
+MidSeasS1<-rep(1,4)
+MidSeasE1<-c(77,106,77,106)
+MidSeasS2<-MidSeasE1+MissingSubtract
+MidSeasE2<-SeasonLength
+Midseas<-list()
+for(i in 1:4){
+	Midseas[[i]]<-c(seq(MidSeasS1[i],MidSeasE1[i]),seq(MidSeasS2[i],MidSeasE2[i]))
 
+}
+
+#random days missing
+RSeasListWg<-sample(seq(1,212),size=WdayLow)
+RSeasListW<-sort(RSeasListWg)
+RSeasListSg<-sample(seq(1,154),size=SdayLow)
+RSeasListS<-sort(RSeasListSg)
+RSeas<-list(RSeasListS,RSeasListW,RSeasListS,RSeasListW)
 
 #after data is pulled out to use,and data is filtered for proper length/season 
 #S.for calc, W.forcalc, AS.forcalc, AW.forcalc
@@ -690,47 +664,468 @@ Dataforallcalcs<-list(S.forcalc,W.forcalc,AS.forcalc,AW.forcalc)
 SFORCALC.list<-list()
 
 for(i in 1:dim(Subsitelist[[1]])[1]){
-	SFORCALC.list[[i]]<-Dataforallcalcs[[1]][Dataforallcalcs[[1]]$siteid==Subsitelist[[1]]$site[j]&
-												Dataforallcalcs[[1]]$year==Subsitelist[[1]]$year[j]&
-												Dataforallcalcs[[1]]$depth==Subsitelist[[1]]$depth[j],]
+	SFORCALC.list[[i]]<-Dataforallcalcs[[1]][Dataforallcalcs[[1]]$siteid==Subsitelist[[1]]$site[i]&
+												Dataforallcalcs[[1]]$year==Subsitelist[[1]]$year[i]&
+												Dataforallcalcs[[1]]$depth==Subsitelist[[1]]$depth[i],]
 }
 WFORCALC.list<-list()
 for(i in 1:dim(Subsitelist[[2]])[1]){
-	WFORCALC.list[[i]]<-Dataforallcalcs[[2]][Dataforallcalcs[[2]]$siteid==Subsitelist[[2]]$site[j]&
-												Dataforallcalcs[[2]]$wyear==Subsitelist[[2]]$wyear[j]&
-												Dataforallcalcs[[2]]$depth==Subsitelist[[2]]$depth[j],]
+	WFORCALC.list[[i]]<-Dataforallcalcs[[2]][Dataforallcalcs[[2]]$siteid==Subsitelist[[2]]$site[i]&
+												Dataforallcalcs[[2]]$wyear==Subsitelist[[2]]$wyear[i]&
+												Dataforallcalcs[[2]]$depth==Subsitelist[[2]]$depth[i],]
 }
 ASFORCALC.list<-list()
 for(i in 1:dim(Subsitelist[[3]])[1]){
-	ASFORCALC.list[[i]]<-Dataforallcalcs[[3]][Dataforallcalcs[[3]]$siteid==Subsitelist[[3]]$site[j]&
-												Dataforallcalcs[[3]]$year==Subsitelist[[3]]$year[j]&
-												Dataforallcalcs[[3]]$depth==Subsitelist[[3]]$depth[j],]
+	ASFORCALC.list[[i]]<-Dataforallcalcs[[3]][Dataforallcalcs[[3]]$siteid==Subsitelist[[3]]$site[i]&
+												Dataforallcalcs[[3]]$year==Subsitelist[[3]]$year[i]&
+												Dataforallcalcs[[3]]$depth==Subsitelist[[3]]$depth[i],]
 }
 AWFORCALC.list<-list()
 for(i in 1:dim(Subsitelist[[4]])[1]){
-	AWFORCALC.list[[i]]<-Dataforallcalcs[[4]][Dataforallcalcs[[4]]$siteid==Subsitelist[[4]]$site[j]&
-												Dataforallcalcs[[4]]$wyear==Subsitelist[[4]]$wyear[j]&
-												Dataforallcalcs[[4]]$depth==Subsitelist[[4]]$depth[j],]
+	AWFORCALC.list[[i]]<-Dataforallcalcs[[4]][Dataforallcalcs[[4]]$siteid==Subsitelist[[4]]$site[i]&
+												Dataforallcalcs[[4]]$wyear==Subsitelist[[4]]$wyear[i]&
+												Dataforallcalcs[[4]]$depth==Subsitelist[[4]]$depth[i],]
 }
 
 
-#turn into a list
-ALLFORCALC.list<-list(SFORCALC.list,WFORCALC.list,ASFORCALC.list,AWFORCALC.list)
+
 
 ##now the data can be excluded according to each scenario
+#summer soil
+begSeasonMS<-list()
+endSeasonMS<-list()
+midSeasonMS<-list()
+ranSeasonMS<-list()
+
+#winter soil
+begSeasonMW<-list()
+endSeasonMW<-list()
+midSeasonMW<-list()
+ranSeasonMW<-list()
+
+#summer air
+begSeasonMAS<-list()
+endSeasonMAS<-list()
+midSeasonMAS<-list()
+ranSeasonMAS<-list()
+
+#winter air
+begSeasonMAW<-list()
+endSeasonMAW<-list()
+midSeasonMAW<-list()
+ranSeasonMAW<-list()
+#summer soil
+for(j in 1:dim(Subsitelist[[1]])[1]){
+	begSeasonMS[[j]]<-SFORCALC.list[[j]][BegSeasS[1]:BegSeasE[1],]
+	endSeasonMS[[j]]<-SFORCALC.list[[j]][EndSeasS[1]:EndSeasE[1],]
+	midSeasonMS[[j]]<-SFORCALC.list[[j]][Midseas[[1]],]
+	ranSeasonMS[[j]]<-SFORCALC.list[[j]][RSeas[[1]],]
+}
+#winter soil
+for(j in 1:dim(Subsitelist[[2]])[1]){
+	begSeasonMW[[j]]<-WFORCALC.list[[j]][BegSeasS[2]:BegSeasE[2],]
+	endSeasonMW[[j]]<-WFORCALC.list[[j]][EndSeasS[2]:EndSeasE[2],]
+	midSeasonMW[[j]]<-WFORCALC.list[[j]][Midseas[[2]],]
+	ranSeasonMW[[j]]<-WFORCALC.list[[j]][RSeas[[2]],]
+}
+#summer air
+for(j in 1:dim(Subsitelist[[3]])[1]){
+	begSeasonMAS[[j]]<-ASFORCALC.list[[j]][BegSeasS[3]:BegSeasE[3],]
+	endSeasonMAS[[j]]<-ASFORCALC.list[[j]][EndSeasS[3]:EndSeasE[3],]
+	midSeasonMAS[[j]]<-ASFORCALC.list[[j]][Midseas[[3]],]
+	ranSeasonMAS[[j]]<-ASFORCALC.list[[j]][RSeas[[3]],]
+}
+
+#winter air
+for(j in 1:dim(Subsitelist[[4]])[1]){
+	begSeasonMAW[[j]]<-AWFORCALC.list[[j]][BegSeasS[4]:BegSeasE[4],]
+	endSeasonMAW[[j]]<-AWFORCALC.list[[j]][EndSeasS[4]:EndSeasE[4],]
+	midSeasonMAW[[j]]<-AWFORCALC.list[[j]][Midseas[[4]],]
+	ranSeasonMAW[[j]]<-AWFORCALC.list[[j]][RSeas[[4]],]
+
+}
+
+#now need to calculate freezing, thawing, and n factors with datasets
+#first turn subsetted datasets into dataframes
+begS<-ldply(begSeasonMS,data.frame)
+endS<-ldply(endSeasonMS,data.frame)
+midS<-ldply(midSeasonMS,data.frame)
+ranS<-ldply(ranSeasonMS,data.frame)
+
+begW<-ldply(begSeasonMW,data.frame)
+endW<-ldply(endSeasonMW,data.frame)
+midW<-ldply(midSeasonMW,data.frame)
+ranW<-ldply(ranSeasonMW,data.frame)
+
+begAS<-ldply(begSeasonMAS,data.frame)
+endAS<-ldply(endSeasonMAS,data.frame)
+midAS<-ldply(midSeasonMAS,data.frame)
+ranAS<-ldply(ranSeasonMAS,data.frame)
+
+begAW<-ldply(begSeasonMAW,data.frame)
+endAW<-ldply(endSeasonMAW,data.frame)
+midAW<-ldply(midSeasonMAW,data.frame)
+ranAW<-ldply(ranSeasonMAW,data.frame)
+
+###get thawing together
+begS.thaw<-begS[begS$T>0,]
+endS.thaw<-endS[endS$T>0,]
+midS.thaw<-midS[midS$T>0,]
+ranS.thaw<-ranS[ranS$T>0,]
+
+
+begAS.thaw<-begAS[begAS$A>0,]
+endAS.thaw<-endAS[endAS$A>0,]
+midAS.thaw<-midAS[midAS$A>0,]
+ranAS.thaw<-ranAS[ranAS$A>0,]
+
+
+
+#get freezing together
+
+begW.freeze<-begW[begW$T<0,]
+endW.freeze<-endW[endW$T<0,]
+midW.freeze<-midW[midW$T<0,]
+ranW.freeze<-ranW[ranW$T<0,]
+
+
+begAW.freeze<-begAW[begAW$A<0,]
+endAW.freeze<-endAW[endAW$A<0,]
+midAW.freeze<-midAW[midAW$A<0,]
+ranAW.freeze<-ranAW[ranAW$A<0,]
+
+
+#add up all days that are freezing or thawing for degree days
+begSthaw.dd<-aggregate(begS.thaw$T, 
+			by=list(begS.thaw$depth,begS.thaw$year,begS.thaw$siteid), FUN="sum")
+begASthaw.dd<-aggregate(begAS.thaw$A, 
+			by=list(begAS.thaw$depth,begAS.thaw$year,begAS.thaw$siteid), FUN="sum")
+	
+endSthaw.dd<-aggregate(endS.thaw$T, 
+			by=list(endS.thaw$depth,endS.thaw$year,endS.thaw$siteid), FUN="sum")
+endASthaw.dd<-aggregate(endAS.thaw$A, 
+			by=list(endAS.thaw$depth,endAS.thaw$year,endAS.thaw$siteid), FUN="sum")	
+
+midSthaw.dd<-aggregate(midS.thaw$T, 
+			by=list(midS.thaw$depth,midS.thaw$year,midS.thaw$siteid), FUN="sum")
+midASthaw.dd<-aggregate(midAS.thaw$A, 
+			by=list(midAS.thaw$depth,midAS.thaw$year,midAS.thaw$siteid), FUN="sum")	
+
+ranSthaw.dd<-aggregate(ranS.thaw$T, 
+			by=list(ranS.thaw$depth,ranS.thaw$year,ranS.thaw$siteid), FUN="sum")
+ranASthaw.dd<-aggregate(ranAS.thaw$A, 
+			by=list(ranAS.thaw$depth,ranAS.thaw$year,ranAS.thaw$siteid), FUN="sum")				
+
+			
+begWfreeze.dd<-aggregate(begW.freeze$T, 
+			by=list(begW.freeze$depth,begW.freeze$wyear,begW.freeze$siteid), FUN="sum")		
+
+begAWfreeze.dd<-aggregate(begAW.freeze$A, 
+			by=list(begAW.freeze$depth,begAW.freeze$wyear,begAW.freeze$siteid), FUN="sum")	
+
+endWfreeze.dd<-aggregate(endW.freeze$T, 
+			by=list(endW.freeze$depth,endW.freeze$wyear,endW.freeze$siteid), FUN="sum")		
+
+endAWfreeze.dd<-aggregate(endAW.freeze$A, 
+			by=list(endAW.freeze$depth,endAW.freeze$wyear,endAW.freeze$siteid), FUN="sum")	
+			
+midWfreeze.dd<-aggregate(midW.freeze$T, 
+			by=list(midW.freeze$depth,midW.freeze$wyear,midW.freeze$siteid), FUN="sum")		
+
+midAWfreeze.dd<-aggregate(midAW.freeze$A, 
+			by=list(midAW.freeze$depth,midAW.freeze$wyear,midAW.freeze$siteid), FUN="sum")	
+			
+ranWfreeze.dd<-aggregate(ranW.freeze$T, 
+			by=list(ranW.freeze$depth,ranW.freeze$wyear,ranW.freeze$siteid), FUN="sum")		
+
+ranAWfreeze.dd<-aggregate(ranAW.freeze$A, 
+			by=list(ranAW.freeze$depth,ranAW.freeze$wyear,ranAW.freeze$siteid), FUN="sum")	
+
+#make lists to help clean this up
+W.freezeL<-list(begWfreeze.dd,endWfreeze.dd,midWfreeze.dd,ranWfreeze.dd)
+AW.freezeL<-list(begAWfreeze.dd,endAWfreeze.dd,midAWfreeze.dd,ranAWfreeze.dd)
+S.thawL<-list(begSthaw.dd,endSthaw.dd,midSthaw.dd,ranSthaw.dd)
+AS.thawL<-list(begASthaw.dd,endASthaw.dd,midASthaw.dd,ranASthaw.dd)
+
+#now correct the degree days
+for(i in 1:4){
+	colnames(W.freezeL[[i]])<-c("depth","wyear","siteid","T")
+	colnames(AW.freezeL[[i]])<-c("depth","wyear","siteid","AT")
+	colnames(S.thawL[[i]])<-c("depth","year","siteid","T")
+	colnames(AS.thawL[[i]])<-c("depth","year","siteid","AT")
+	}
+	
+for(i in 1:4){	
+	W.freezeL[[i]]$corDD<-W.freezeL[[i]]$T/.9
+	AW.freezeL[[i]]$corADD<-AW.freezeL[[i]]$AT/.9
+	S.thawL[[i]]$corDD<-S.thawL[[i]]$T/.9
+	AS.thawL[[i]]$corADD<-AS.thawL[[i]]$AT/.9
+}
+
+Winter.corT<-list()
+Summer.corT<-list()
+for(i in 1:4){
+	Winter.corT[[i]]<-join(W.freezeL[[i]],AW.freezeL[[i]], by=c("wyear","siteid"), type="inner")
+	Summer.corT[[i]]<-join(S.thawL[[i]],AS.thawL[[i]], by=c("year","siteid"), type="inner")
+}
 
 for(i in 1:4){
-	for(j in 1:dim(Subsitelist[[i]]){
-	begSeasonM[[i]][[j]]
+	Winter.corT[[i]]$ncor<-Winter.corT[[i]]$corDD/Winter.corT[[i]]$corADD
+	Summer.corT[[i]]$ncor<-Summer.corT[[i]]$corDD/Summer.corT[[i]]$corADD
+	Winter.corT[[i]]$nerr<-Winter.corT[[i]]$T/Winter.corT[[i]]$AT
+	Summer.corT[[i]]$nerr<-Summer.corT[[i]]$T/Summer.corT[[i]]$AT	
 	
-	}
+	colnames(Summer.corT[[i]])<-c("depth","year","siteid","Terr","corDD","height","ATerr","corADD","ncor", "nerr")
+}
+#the only area where the correction falls apart is that some really deep
+#soil layers in the summer are almost entirely freezing. Some of these
+#data only had a few days of non-freezing data and those get excluded
+#this means that I have to account for this in the comparison
+SummerallT<-list()
+for(i in 1:4){
+	SummerallT[[i]]<-join(Summer.corT[[i]], Summer.data, by=c("depth","year","siteid","height"), type="right")
 
 }
 
 
+#now compare to observed data
+#items Winter.data, Summer.data, 
+#need to compare each 
+#start with visual comparisons
+#start with soil
+#beggining of season
+par(mfrow=c(1,2))
+plot(Winter.data$T,Winter.corT[[1]]$corDD, pch=19, col="darkolivegreen3", xlab="observed soil",
+ylab="with error", main="corrected")
+abline(0,1, lwd=3, col="red2")
+#end of season
+points(Winter.data$T,Winter.corT[[2]]$corDD, pch=19, col="deepskyblue1")
+#middle of season
+points(Winter.data$T,Winter.corT[[3]]$corDD, pch=19, col="lavenderblush1")
+#random
+points(Winter.data$T,Winter.corT[[3]]$corDD, pch=19, col="seagreen2")
+#beggining of season
+plot(Winter.data$T,Winter.corT[[1]]$T, pch=19, col="darkolivegreen4", xlab="observed soil",
+ylab="with error", main="uncorrected")
+abline(0,1, lwd=3, col="red2")
+#end of season
+points(Winter.data$T,Winter.corT[[2]]$T, pch=19, col="deepskyblue4")
+#middle of season
+points(Winter.data$T,Winter.corT[[3]]$T, pch=19, col="lavenderblush4")
+#random
+points(Winter.data$T,Winter.corT[[3]]$corDD, pch=19, col="seagreen4")
+################################
+##########summer data
+#beggining of season
+
+plot(SummerallT[[1]]$T,SummerallT[[1]]$corDD, pch=19, col="darkolivegreen3", xlab="observed soil",
+ylab="with error", main="corrected", xlim=c(0,3000), ylim=c(0,3000))
+abline(0,1, lwd=3, col="red2")
+#end of season
+points(SummerallT[[1]]$T,SummerallT[[2]]$corDD, pch=19, col="deepskyblue1")
+#middle of season
+points(SummerallT[[1]]$T,SummerallT[[3]]$corDD, pch=19, col="lavenderblush1")
+#random
+points(SummerallT[[1]]$T,SummerallT[[4]]$corDD, pch=19, col="seagreen2")
+#beggining of season
+plot(SummerallT[[1]]$T,SummerallT[[1]]$Terr, pch=19, col="darkolivegreen4", xlab="observed soil",
+ylab="with error", main="uncorrected", xlim=c(0,3000), ylim=c(0,3000))
+abline(0,1, lwd=3, col="red2")
+#end of season
+points(SummerallT[[1]]$T,SummerallT[[2]]$Terr, pch=19, col="deepskyblue4")
+#middle of season
+points(SummerallT[[1]]$T,SummerallT[[3]]$Terr, pch=19, col="lavenderblush4")
+#random
+points(SummerallT[[1]]$T,SummerallT[[4]]$Terr, pch=19, col="seagreen4")
 
 
+#check air
+#beggining of season
+par(mfrow=c(1,2))
+plot(Winter.data$AT,Winter.corT[[1]]$corADD, pch=19, col="darkolivegreen3", xlab="observed air",
+ylab="with error", main="corrected")
+abline(0,1, lwd=3, col="red2")
+#end of season
+points(Winter.data$AT,Winter.corT[[2]]$corADD, pch=19, col="deepskyblue1")
+#middle of season
+points(Winter.data$AT,Winter.corT[[3]]$corADD, pch=19, col="lavenderblush1")
+#random
+points(Winter.data$aT,Winter.corT[[3]]$corADD, pch=19, col="seagreen2")
+#beggining of season
+plot(Winter.data$AT,Winter.corT[[1]]$AT, pch=19, col="darkolivegreen4", xlab="observed air",
+ylab="with error", main="uncorrected")
+abline(0,1, lwd=3, col="red2")
+#end of season
+points(Winter.data$AT,Winter.corT[[2]]$AT, pch=19, col="deepskyblue4")
+#middle of season
+points(Winter.data$AT,Winter.corT[[3]]$AT, pch=19, col="lavenderblush4")
+#random
+points(Winter.data$AT,Winter.corT[[3]]$corADD, pch=19, col="seagreen4")
 
+
+##########summer data
+#beggining of season
+
+plot(SummerallT[[1]]$AT,SummerallT[[1]]$corADD, pch=19, col="darkolivegreen3", xlab="observed air",
+ylab="with error", main="corrected", xlim=c(0,3000), ylim=c(0,3000))
+abline(0,1, lwd=3, col="red2")
+#end of season
+points(SummerallT[[1]]$AT,SummerallT[[2]]$corADD, pch=19, col="deepskyblue1")
+#middle of season
+points(SummerallT[[1]]$AT,SummerallT[[3]]$corADD, pch=19, col="lavenderblush1")
+#random
+points(SummerallT[[1]]$AT,SummerallT[[4]]$corADD, pch=19, col="seagreen2")
+#beggining of season
+plot(SummerallT[[1]]$AT,SummerallT[[1]]$ATerr, pch=19, col="darkolivegreen4", xlab="observed air",
+ylab="with error", main="uncorrected", xlim=c(0,3000), ylim=c(0,3000))
+abline(0,1, lwd=3, col="red2")
+#end of season
+points(SummerallT[[1]]$AT,SummerallT[[2]]$ATerr, pch=19, col="deepskyblue4")
+#middle of season
+points(SummerallT[[1]]$AT,SummerallT[[3]]$ATerr, pch=19, col="lavenderblush4")
+#random
+points(SummerallT[[1]]$AT,SummerallT[[4]]$ATerr, pch=19, col="seagreen4")
+
+
+#check air
+#beggining of season
+par(mfrow=c(1,2))
+plot(Winter.data$n,Winter.corT[[1]]$ncor, pch=19, col="darkolivegreen3", xlab="observed n",
+ylab="with error", main="corrected")
+abline(0,1, lwd=3, col="red2")
+#end of season
+points(Winter.data$n,Winter.corT[[2]]$ncor, pch=19, col="deepskyblue1")
+#middle of season
+points(Winter.data$n,Winter.corT[[3]]$ncor, pch=19, col="lavenderblush1")
+#random
+points(Winter.data$n,Winter.corT[[3]]$ncor, pch=19, col="seagreen2")
+#beggining of season
+plot(Winter.data$n,Winter.corT[[1]]$nerr, pch=19, col="darkolivegreen4", xlab="observed soil",
+ylab="with error", main="uncorrected")
+abline(0,1, lwd=3, col="red2")
+#end of season
+points(Winter.data$n,Winter.corT[[2]]$nerr, pch=19, col="deepskyblue4")
+#middle of season
+points(Winter.data$n,Winter.corT[[3]]$nerr, pch=19, col="lavenderblush4")
+#random
+points(Winter.data$n,Winter.corT[[3]]$nerr, pch=19, col="seagreen4")
+
+
+##########summer data
+#beggining of season
+
+plot(SummerallT[[1]]$n,SummerallT[[1]]$ncor, pch=19, col="darkolivegreen3", xlab="observed n",
+ylab="with error", main="corrected", xlim=c(0,2), ylim=c(0,2))
+abline(0,1, lwd=3, col="red2")
+#end of season
+points(SummerallT[[1]]$n,SummerallT[[2]]$ncor, pch=19, col="deepskyblue1")
+#middle of season
+points(SummerallT[[1]]$n,SummerallT[[3]]$ncor, pch=19, col="lavenderblush1")
+#random
+points(SummerallT[[1]]$n,SummerallT[[4]]$ncor, pch=19, col="seagreen2")
+#beggining of season
+plot(SummerallT[[1]]$n,SummerallT[[1]]$nerr, pch=19, col="darkolivegreen4", xlab="observed n",
+ylab="with error", main="uncorrected", xlim=c(0,2), ylim=c(0,2))
+abline(0,1, lwd=3, col="red2")
+#end of season
+points(SummerallT[[1]]$n,SummerallT[[2]]$nerr, pch=19, col="deepskyblue4")
+#middle of season
+points(SummerallT[[1]]$n,SummerallT[[3]]$nerr, pch=19, col="lavenderblush4")
+#random
+points(SummerallT[[1]]$n,SummerallT[[4]]$nerr, pch=19, col="seagreen4")
+
+##################data need to be filtered
+
+#now look at prediction:
+Wcor<-list()
+Wuncor<-list()
+Scor<-list()
+Suncor<-list()
+
+AWcor<-list()
+AWuncor<-list()
+AScor<-list()
+ASuncor<-list()
+
+WNcor<-list()
+WNuncor<-list()
+SNcor<-list()
+SNuncor<-list()
+
+
+for(i in 1:4){
+	Wcor[[i]]<-summary(lm(Winter.corT[[i]]$corDD~Winter.data$T))
+	Wuncor[[i]]<-summary(lm(Winter.corT[[i]]$T~Winter.data$T))
+	Scor[[i]]<-summary(lm(SummerallT[[i]]$corDD~SummerallT[[i]]$T))
+	Suncor[[i]]<-summary(lm(SummerallT[[i]]$Terr~SummerallT[[i]]$T))
+	AWcor[[i]]<-summary(lm(Winter.corT[[i]]$corDD~Winter.data$T))
+	AWuncor[[i]]<-summary(lm(Winter.corT[[i]]$AT~Winter.data$AT))
+	AScor[[i]]<-summary(lm(SummerallT[[i]]$corADD~SummerallT[[i]]$AT))
+	ASuncor[[i]]<-summary(lm(SummerallT[[i]]$ATerr~SummerallT[[i]]$AT))
+	WNcor[[i]]<-summary(lm(Winter.corT[[i]]$ncor~Winter.data$n))
+	WNuncor[[i]]<-summary(lm(Winter.corT[[i]]$nerr~Winter.data$n))
+	SNcor[[i]]<-summary(lm(SummerallT[[i]]$ncor~SummerallT[[i]]$n))
+	SNuncor[[i]]<-summary(lm(SummerallT[[i]]$nerr~SummerallT[[i]]$n))	
+	}
+Wcomp<-list()
+Scomp<-list()	
+AWcomp<-list()
+AScomp<-list()	
+WNcomp<-list()
+SNcomp<-list()	
+for(i in 1:4){
+	Wcomp[[i]]<-data.frame(corrected=c(Wcor[[i]]$coefficients[1,1],Wcor[[i]]$coefficients[2,1],
+										Wcor[[i]]$r.squared),
+							uncorrected=c(Wuncor[[i]]$coefficients[1,1],Wuncor[[i]]$coefficients[2,1],
+										Wuncor[[i]]$r.squared))
+										
+	Scomp[[i]]<-data.frame(corrected=c(Scor[[i]]$coefficients[1,1],Scor[[i]]$coefficients[2,1],
+								Scor[[i]]$r.squared),
+							uncorrected=c(Suncor[[i]]$coefficients[1,1],Suncor[[i]]$coefficients[2,1],
+									Suncor[[i]]$r.squared))	
+	AWcomp[[i]]<-data.frame(corrected=c(AWcor[[i]]$coefficients[1,1],AWcor[[i]]$coefficients[2,1],
+										AWcor[[i]]$r.squared),
+							uncorrected=c(AWuncor[[i]]$coefficients[1,1],AWuncor[[i]]$coefficients[2,1],
+										AWuncor[[i]]$r.squared))
+										
+	AScomp[[i]]<-data.frame(corrected=c(AScor[[i]]$coefficients[1,1],AScor[[i]]$coefficients[2,1],
+								AScor[[i]]$r.squared),
+							uncorrected=c(ASuncor[[i]]$coefficients[1,1],ASuncor[[i]]$coefficients[2,1],
+									ASuncor[[i]]$r.squared))										
+	WNcomp[[i]]<-data.frame(corrected=c(WNcor[[i]]$coefficients[1,1],WNcor[[i]]$coefficients[2,1],
+										WNcor[[i]]$r.squared),
+							uncorrected=c(WNuncor[[i]]$coefficients[1,1],WNuncor[[i]]$coefficients[2,1],
+										WNuncor[[i]]$r.squared))
+										
+	SNcomp[[i]]<-data.frame(corrected=c(SNcor[[i]]$coefficients[1,1],SNcor[[i]]$coefficients[2,1],
+								SNcor[[i]]$r.squared),
+							uncorrected=c(SNuncor[[i]]$coefficients[1,1],SNuncor[[i]]$coefficients[2,1],
+									SNuncor[[i]]$r.squared))											
+										
+}
+
+Wcompdf<-ldply(Wcomp,data.frame)
+Scompdf<-ldply(Scomp,data.frame)
+AWcompdf<-ldply(AWcomp,data.frame)
+AScompdf<-ldply(AScomp,data.frame)
+WNcompdf<-ldply(WNcomp,data.frame)
+SNcompdf<-ldply(SNcomp,data.frame)			
+
+Wdf<-data.frame(param=rep(c("intercept","slope","R.sq"), times=4),
+				Type=rep(c("beg.seas", "end.seas", "mid.seas","rand.seas"), each=3),
+				Soil.cor=Wcompdf$corrected,Soil.uncor=Wcompdf$uncorrected,
+				Air.cor=AWcompdf$corrected, Air.uncor=AWcompdf$uncorrected,
+				 N.cor=WNcompdf$corrected, N.uncor=WNcompdf$corrected, Var=rep("Winter FDD", 12))
+			
+Sdf<-data.frame(param=rep(c("intercept","slope","R.sq"), times=4),
+				Type=rep(c("beg.seas", "end.seas", "mid.seas","rand.seas"), each=3),
+				Soil.cor=Scompdf$corrected,Soil.uncor=Scompdf$uncorrected,
+				Air.cor=AScompdf$corrected, Air.uncor=AScompdf$uncorrected,
+				 N.cor=SNcompdf$corrected, N.uncor=SNcompdf$corrected,Var=rep("Summer TDD", 12))
+
+Allcompdf<-rbind(Wdf,Sdf)				 
+write.table(Allcompdf, "c:\\Users\\hkropp\\Google Drive\\Plots_for_data_quality_check\\Comp90perc.csv",
+			sep=",", row.names=FALSE)			
 ##################################################################################
 ##################################################################################
 ############################Calculate T diff #####################################
