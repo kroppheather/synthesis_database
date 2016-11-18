@@ -1162,8 +1162,196 @@ AS.forcorr<-join(ASummT,AS.toCor, by=c("depth", "year","siteid"), type="inner")
 AW.forcorr<-join(AWintT,AW.toCor, by=c("depth", "wyear","siteid"), type="inner")
 
 
+#get all the days for freezing and thawing indices
+S.thawcorr<-S.forcorr[S.forcorr$T>0,]
+W.freezecorr<-W.forcorr[W.forcorr$T<0,]
+AS.thawcorr<-AS.forcorr[AS.forcorr$A>0,]
+AW.freezecorr<-AW.forcorr[AW.forcorr$A<0,]
+#add up all days that are freezing or thawing for degree days
+#include proprotion of observations even thought it isn't something to vary by
+#just to keep it in the table
+Sthaw.ddtocorr<-aggregate(S.thawcorr$T, 
+			by=list(S.thawcorr$prop,S.thawcorr$depth,S.thawcorr$year,S.thawcorr$siteid), FUN="sum")
+Sfreeze.ddtocorr<-aggregate(W.freezecorr$T, 
+			by=list(W.freezecorr$prop,W.freezecorr$depth,W.freezecorr$wyear,W.freezecorr$siteid), FUN="sum")		
+Athaw.ddtocorr<-aggregate(AS.thawcorr$A, 
+			by=list(AS.thawcorr$prop,AS.thawcorr$depth,AS.thawcorr$year,AS.thawcorr$siteid), FUN="sum")
+Afreeze.ddtocorr<-aggregate(AW.freezecorr$A, 
+			by=list(AW.freezecorr$prop,AW.freezecorr$depth,AW.freezecorr$wyear,AW.freezecorr$siteid), FUN="sum")
+			
+#Now correct the data
+Sthaw.ddtocorr$corDD<-Sthaw.ddtocorr$x/Sthaw.ddtocorr$Group.1
+Sfreeze.ddtocorr$corDD<-Sfreeze.ddtocorr$x/Sfreeze.ddtocorr$Group.1		
+Athaw.ddtocorr$corDD<-Athaw.ddtocorr$x/Athaw.ddtocorr$Group.1
+Afreeze.ddtocorr$corDD<-Afreeze.ddtocorr$x/Afreeze.ddtocorr$Group.1		
+
+#now make dataframes that only have groups that are needed.
+Sthaw.c<-data.frame(depth=Sthaw.ddtocorr$Group.2,year=Sthaw.ddtocorr$Group.3,siteid=
+						Sthaw.ddtocorr$Group.4,T=Sthaw.ddtocorr$corDD)
+Sfreeze.c<-data.frame(depth=Sfreeze.ddtocorr$Group.2,wyear=Sfreeze.ddtocorr$Group.3,siteid=
+						Sfreeze.ddtocorr$Group.4,T=Sfreeze.ddtocorr$corDD)
+Athaw.c<-data.frame(depth=Athaw.ddtocorr$Group.2,year=Athaw.ddtocorr$Group.3,siteid=
+						Athaw.ddtocorr$Group.4,AT=Athaw.ddtocorr$corDD)
+Afreeze.c<-data.frame(depth=Afreeze.ddtocorr$Group.2,wyear=Afreeze.ddtocorr$Group.3,siteid=
+						Afreeze.ddtocorr$Group.4,AT=Afreeze.ddtocorr$corDD)
+
+#need to make a table of of freezing and thawing where data matches
+Winter.datac<-join(Sfreeze.c,Afreeze.c, by=c("wyear","siteid"), type="inner")
+Summer.datac<-join(Sthaw.c,Athaw.c,by=c("year","siteid"), type="inner")
+#calculate n factor
+Winter.datac$n<-Winter.datac$T/Winter.datac$AT
+Summer.datac$n<-Summer.datac$T/Summer.datac$AT
+
+range(Summer.datac$AT)
+
+#not add to the full data that didn't need corrections
+#rename to match
+colnames(Winter.datac)<-c("depth", "wyear", "siteid", "T", "height","AT","n")
+#bind two together
+Winter.All<-rbind(Winter.data,Winter.datac)
+#make sure there are no repeat sites
+checkforwinter<-aggregate(Winter.All$T, by=list(Winter.All$depth, Winter.All$wyear, Winter.All$siteid), 
+							FUN="length")
+which(checkforwinter$x>1)
+#rename to match
+colnames(Summer.datac)<-c("depth", "year", "siteid", "T", "height","AT","n")
+#bind two together
+Summer.All<-rbind(Summer.data,Summer.datac)
+#make sure there are no repeat sites
+checkforsummer<-aggregate(Summer.All$T, by=list(Summer.All$depth, Summer.All$year, Summer.All$siteid), 
+							FUN="length")
+which(checkforsummer$x>1)
 
 
+#now combine with siteinfo
+
+N.wintA<-join(Winter.All,siteinf,by=c("siteid"), type="inner")
+N.summA<-join(Summer.All,siteinf,by=c("siteid"), type="inner")
+
+
+####################################################################
+####################################################################
+###########Look at some initial plots###############################
+####################################################################
+
+plot(N.wintA$lat[N.wintA$depth<10],N.wintA$n[N.wintA$depth<10], pch=19,
+	xlab="latitude",ylab="Winter N factor")
+	
+	
+N.wintA$new_vA<-ifelse(N.wintA$vege_z=="boreal forest", "boreal",
+		ifelse(	N.wintA$vege_z=="boreal", "boreal",
+		ifelse(	N.wintA$vege_z=="tundra", "tundra",
+		ifelse(	is.na(N.wintA$vege_z),"unclassified","unclassified"))))
+	
+N.summA$Snew_vA<-ifelse(N.summA$vege_z=="boreal forest", "boreal",
+		ifelse(	N.summA$vege_z=="boreal", "boreal",
+		ifelse(	N.summA$vege_z=="tundra", "tundra",
+		ifelse(	is.na(N.summA$vege_z),"unclassified","unclassified"))))
+		
+#get sample size
+Wnumbs<-aggregate(N.wintA$n[N.wintA$depth<10], by=list(as.factor(new_vA[N.wintA$depth<10])),
+		FUN="length")
+		
+Snumbs<-aggregate(N.summA$n[N.summA$depth<10],by=list(as.factor(Snew_vA[N.summA$depth<10])),
+		FUN="length")
+#make box plot
+par(mfrow=c(1,2))	
+plot(N.wintA$n[N.wintA$depth<10]~as.factor(new_vA[N.wintA$depth<10]), pch=19,
+	xlab="biome",ylab="Winter N factor")
+text(1.3,1.2, paste("n=",Wnumbs$x[1]), cex=2)
+text(2.3,1.2, paste("n=",Wnumbs$x[2]), cex=2)
+text(3.3,1.2, paste("n=",Wnumbs$x[3]), cex=2)
+
+plot(N.summA$n[N.summA$depth<10]~as.factor(Snew_vA[N.summA$depth<10]), pch=19,
+	xlab="biome",ylab="Summer N factor")
+	
+text(1.3,1.65, paste("n=",Snumbs$x[1]), cex=2)
+text(2.3,1.65, paste("n=",Snumbs$x[2]), cex=2)
+text(3.3,1.65, paste("n=",Snumbs$x[3]), cex=2)
+
+mtext("0-10cm depth", side=3, outer=TRUE, cex=2, line=-3)
+
+##########################################################################
+##########################################################################
+######### Revisit some of the unclassified areas to see ##################
+######### what can be classified                        ##################
+##########################################################################
+
+#sites 23-28 in summer are marked as unclassified but they are all in a
+#tundra zone
+N.summA$Snew_vA[N.summA$siteid>=22&N.summA$siteid<=28]<-"tundra"
+N.wintA$new_vA[N.wintA$siteid>=22&N.wintA$siteid<=28]<-"tundra"
+#get re calculate 
+Wnumbs<-aggregate(N.wintA$n[N.wintA$depth<10], by=list(as.factor(N.wintA$new_vA[N.wintA$depth<10])),
+		FUN="length")
+		
+Snumbs<-aggregate(N.summA$n[N.summA$depth<10],by=list(as.factor(N.summA$Snew_vA[N.summA$depth<10])),
+		FUN="length")
+
+#####################################################################
+######################################################################
+########Redo initial plots ##########################################
+#####################################################################		
+		
+#make box plot
+par(mfrow=c(1,2))	
+plot(N.wintA$n[N.wintA$depth<10]~as.factor(N.wintA$new_vA[N.wintA$depth<10]), pch=19,
+	xlab="biome",ylab="Winter N factor")
+text(1.3,1.2, paste("n=",Wnumbs$x[1]), cex=2)
+text(2.3,1.2, paste("n=",Wnumbs$x[2]), cex=2)
+
+
+plot(N.summA$n[N.summA$depth<10]~as.factor(N.summA$Snew_vA[N.summA$depth<10]), pch=19,
+	xlab="biome",ylab="Summer N factor")
+	
+text(1.3,1.65, paste("n=",Snumbs$x[1]), cex=2)
+text(2.3,1.65, paste("n=",Snumbs$x[2]), cex=2)
+
+
+mtext("0-10cm depth", side=3, outer=TRUE, cex=2, line=-3)
+#make plot of latitude
+par(mfrow=c(1,2))	
+plot(N.wintA$lat[N.wintA$depth<10&N.wintA$new_vA=="tundra"],N.wint$n[N.wintA$depth<10&N.wintA$new_vA=="tundra"], pch=19,
+	xlab="latitude",ylab="Winter N factor", col="cadetblue3")
+points(N.wintA$lat[N.wint$depth<10&N.wintA$new_vA=="boreal"],N.wintA$n[N.wint$depth<10&N.wintA$new_vA=="boreal"], pch=19,
+	 col="forestgreen")
+legend(58,1.15,c("boreal","tundra"), pch=19, col=c("forestgreen","cadetblue3"), cex=1.5, bty="n")
+plot(N.summA$lat[N.summA$depth<10&N.summA$Snew_vA=="tundra"],N.summA$n[N.summA$depth<10&N.summA$Snew_vA=="tundra"], pch=19,
+	xlab="latitude",ylab="Summer N factor", col="cadetblue3")		
+points(N.summA$lat[N.summA$depth<10&N.summA$Snew_vA=="boreal"],N.summA$n[N.summA$depth<10&N.summA$Snew_vA=="boreal"], pch=19,
+	col="forestgreen")
+mtext("0-10cm depth", side=3, outer=TRUE, cex=2, line=-3)	
+legend(58,1.77,c("boreal","tundra"), pch=19, col=c("forestgreen","cadetblue3"), cex=1.5, bty="n")
+#make plot of year
+par(mfrow=c(1,2))	
+plot(N.wintA$wyear[N.wintA$depth<10&N.wintA$new_vA=="tundra"],N.wintA$n[N.wintA$depth<10&N.wintA$new_vA=="tundra"], pch=19,
+	xlab="year",ylab="Winter N factor", col="cadetblue3", xlim=c(1987,2016))
+points(N.wintA$wyear[N.wintA$depth<10&N.wintA$new_vA=="boreal"],N.wintA$n[N.wintA$depth<10&N.wintA$new_vA=="boreal"], pch=19,
+	 col="forestgreen")
+	legend(1987,1.33,c("boreal","tundra"), pch=19, col=c("forestgreen","cadetblue3"), cex=1.5, bty="n")
+plot(N.summA$year[N.summA$depth<10&N.summA$Snew_vA=="tundra"],N.summA$n[N.summA$depth<10&N.summA$Snew_vA=="tundra"], pch=19,
+	xlab="year",ylab="Summer N factor", col="cadetblue3")		
+points(N.summA$year[N.summA$depth<10&N.summA$Snew_vA=="boreal"],N.summA$n[N.summA$depth<10&N.summA$Snew_vA=="boreal"], pch=19,
+	col="forestgreen")
+mtext("0-10cm depth", side=3, outer=TRUE, cex=2, line=-3)
+legend(1991,1.77,c("boreal","tundra"), pch=19, col=c("forestgreen","cadetblue3"), cex=1.5, bty="n")
+
+###############################################################################
+###############################################################################
+###############################################################################
+############# Output N factor and DD for further analysis #####################
+###############################################################################
+
+
+#output summer
+write.table(N.summA, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\SummerN.csv", sep=",",
+			row.names=FALSE)	
+write.table(N.wintA, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\WinterN.csv", sep=",",
+			row.names=FALSE)	
+
+
+
+	
 ##################################################################################
 ##################################################################################
 ############################Calculate T diff #####################################
