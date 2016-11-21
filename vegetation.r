@@ -85,7 +85,7 @@ colnames(Moss.c)[3]<-"moss.pc"
 Ground.c<-perc.sm[perc.sm$FuncType=="bare ground",]
 colnames(Ground.c)[3]<-"ground.pc"
 Gram.c<-perc.sm[perc.sm$FuncType=="graminoid",]
-colnames(Ground.c)[3]<-"gram.pc"
+colnames(Gram.c)[3]<-"gram.pc"
 				
 organic<-data.frame(siteid=datS$site_id,olt=datS$organic_thick)				
 				
