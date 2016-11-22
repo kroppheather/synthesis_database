@@ -35,6 +35,7 @@ Ssite$siteIDm<-seq(1,length(Ssite$siteid))
 datSNi<-join(datSN,Ssite, by=c("siteid","lat","lon","loc"), type="right")
 
 
+
 #need an index that varies by N data for site and year
 #get unique years in the dataset
 Syear<-data.frame(year=unique(datSN$year))
@@ -44,6 +45,24 @@ Syear$yearID<-seq(1,length(Syear$year))
 #now add the year Id to the table too
 datSNii<-join(datSNi,Syear,by=c("year"), type="right")
 
+#siteid 22-33,43-45,42+46,54-186,57-59,63-63,72-73
+#have same lat lon even though taken at different plots
+#see if that is causing the covariance matrix problems
+#add slight variation to see if it helps
+#calculate D.S in code
+D.S<-matrix(rep(NA,73*73), ncol=73)
+D.Scor<-matrix(rep(NA,73*73), ncol=73)
+for(i in 1:73){
+	for(j in 1:73){
+		D.S[i,j]<-sqrt(((Ssite$lat[i]-Ssite$lat[j])^2)+ 
+					((Ssite$lon[i]-Ssite$lon[j])^2))
+	if(i!=j&D.S[i,j]==0){
+	D.Scor[i,j]<-.001
+	}else{D.Scor[i,j]<-D.S[i,j]}
+	
+	}
+}
+
 
 #set up data list
 datamodellist<-list(NobsS=dim(datSNii)[1],n.factS=datSNii$n,
@@ -51,9 +70,9 @@ datamodellist<-list(NobsS=dim(datSNii)[1],n.factS=datSNii$n,
 					siteS=datSNii$siteIDm, NyearS=dim(Syear)[1],
 					xS=Syear$yearID, yS=rep(1,dim(Syear)[1]),
 					NsiteS=dim(Ssite)[1], latS=Ssite$lat,
-					longS=Ssite$lon)
+					longS=Ssite$lon, D.S=D.Scor)
 Samplelist<-c("deviance", "nbeta.star", "nbeta[2]","eps.star","alpha.star",
-				"mu.ns","Sigma.eps","Sigma.alpha")
+				"mu.nS")
 				
 inits.SN<-list(list(t.eps=1,t.alpha=1,rho.alpha=.99,rho.eps=.99),
 				list(t.eps=1.5,t.alpha=1.5,rho.alpha=.98,rho.eps=.90),
@@ -65,31 +84,30 @@ n.model.init=jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_da
 						n.chains=3,
 						inits=inits.SN)
 						
-### try troubleshooting in bugs						
-library(R2OpenBUGS)
-library(coda)
-n.model.initial<-bugs(data=datamodellist,
-	inits=inits.SN,
-	parameters=Samplelist,
-	n.iter=3000,
-	model.file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\n_model\\N_model_code.txt",
-	n.chains=3,
-	n.burnin=1000,
-	n.thin=1,working.directory="c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6",
-	debug=TRUE,codaPkg=TRUE)
-#set up model
-
-				  
 #run initial coda samples to check burn in and check duration needed for run
 #define burn in and iteration
 #note: n.iter does not include n.adapt			  
-n.iter.i=2000
-codaobj.init = coda.samples(lh.model.init,variable.names=c("deviance","Dsum","mu.Ca.ppm","mu.Fmoles.monitor","mu.Ca.monitor",
-                                                 "sig.CO2","sig.Ca","sig.R","Fmoles[1:10]","Fmoles[500:510]", 
-                                                 "Fmoles[1000:1010]", "Fmoles[1500:1510]", "Fmoles[2000:2010]", 
-                                                 "Fmoles[2500:2510]", "Fmoles[3000:3010]"),
-                       n.iter=n.iter.i)
+n.iter.i=3000
+codaobj.init = coda.samples(n.model.init,variable.names=Samplelist,
+                       n.iter=n.iter.i, thin=5)
 					   
 #check trace plots
 #plot function will prompt to click to display each window of parameters
-plot(codaobj.init, ask=TRUE)
+plot(codaobj.init, ask=TRUE)						
+						
+						
+### try troubleshooting in bugs						
+#library(R2OpenBUGS)
+#library(coda)
+#n.model.initial<-bugs(data=datamodellist,
+#	inits=inits.SN,
+#	parameters=Samplelist,
+#	n.iter=3000,
+#	model.file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\n_model\\N_model_code.txt",
+#	n.chains=3,
+#	n.burnin=1000,
+#	n.thin=1,working.directory="c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6",
+#	debug=TRUE,codaPkg=TRUE)
+#set up model
+
+				  

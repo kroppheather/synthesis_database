@@ -79,12 +79,7 @@ model{
 		
 		}
 	}
-	#calculate the distance component of Sigma
-	for(y in 1:NsiteS){
-		for(m in 1:NsiteS){
-			D.S[y,m]<-sqrt(pow(latS[y]-latS[m],2)+ pow(longS[y]-longS[m],2))
-		}
-	}
+
 	
 	#set up priors for year covariance
 	#use a folded t
