@@ -64,7 +64,4 @@ plot(SummD, datSu$n, pch=19, xlab="Sensor Dist",
 plot(WintD, datW$n, pch=19, xlab="Sensor Dist",
 		ylab="Winter N factor")
 		
-#for starting with a simple model, see how many observations have organic
-#layer
-W.o<-datW[is.na(datW$olt)==FALSE&is.na(datW$moss.pc)==FALSE,]
-S.o<-datSu[is.na(datSu$olt)==FALSE,]
+
