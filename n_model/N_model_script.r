@@ -87,9 +87,9 @@ n.model.init=jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_da
 #run initial coda samples to check burn in and check duration needed for run
 #define burn in and iteration
 #note: n.iter does not include n.adapt			  
-n.iter.i=3000
+n.iter.i=35000
 codaobj.init = coda.samples(n.model.init,variable.names=Samplelist,
-                       n.iter=n.iter.i, thin=5)
+                       n.iter=n.iter.i, thin=15)
 					   
 #check trace plots
 #plot function will prompt to click to display each window of parameters
