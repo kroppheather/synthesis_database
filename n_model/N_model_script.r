@@ -91,10 +91,18 @@ n.iter.i=35000
 codaobj.init = coda.samples(n.model.init,variable.names=Samplelist,
                        n.iter=n.iter.i, thin=15)
 					   
+  
 #check trace plots
 #plot function will prompt to click to display each window of parameters
+windows(18)
 plot(codaobj.init, ask=TRUE)						
-						
+	
+Mod.out<-summary(codaobj.init)	
+
+write.table(Mod.out$statistics, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\model_variaion1_stats.csv",
+			sep=",",row.names=FALSE)
+write.table(Mod.out$quantiles, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\model_variaion1_quant.csv",
+			sep=",",row.names=FALSE)
 						
 ### try troubleshooting in bugs						
 #library(R2OpenBUGS)
