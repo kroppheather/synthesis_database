@@ -1,5 +1,6 @@
+
 # N factor Model
-This code is for a Bayesian analysis of N factor availabilty across summer and winter growing seasons in shallow soil layers (0-10 cm). 
+This code is for a Bayesian analysis of N factor availabilty across summer and winter growing seasons. 
 
 ## Version 1:
 
