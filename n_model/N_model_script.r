@@ -39,16 +39,31 @@ Ssite$siteIDm<-seq(1,length(Ssite$siteid))
 #now create the siteid to match the summer n factor
 datSNi<-join(datSN,Ssite, by=c("siteid","lat","lon","loc"), type="right")
 
+#now create unique site table for winter n factor
+Wsite<-unique(data.frame(siteid=datWN$siteid, lat=datWN$lat, lon=datWN$lon,
+						loc=datWN$loc))
 
+Wsite$siteIDm<-seq(1,length(Wsite$siteid))						
 
+#now create the siteid to match the summer n factor
+datWNi<-join(datWN,Wsite, by=c("siteid","lat","lon","loc"), type="right")						
+						
 #need an index that varies by N data for site and year
 #get unique years in the dataset
 Syear<-data.frame(year=unique(datSN$year))
 Syear$year<-sort.int(Syear$year)
 Syear$yearID<-seq(1,length(Syear$year))
 
+#get winter year year
+Wyear<-data.frame(wyear=unique(datWN$wyear))
+Wyear$wyear<-sort.int(Wyear$wyear)
+Wyear$yearID<-seq(1,length(Wyear$wyear))
+
 #now add the year Id to the table too
 datSNii<-join(datSNi,Syear,by=c("year"), type="right")
+
+#add wyear to table
+datWNii<-join(datWNi,Wyear,by=c("wyear"), type="right")
 
 #siteid 22-33,43-45,42+46,54-186,57-59,63-63,72-73
 #have same lat lon even though taken at different plots
@@ -68,20 +83,44 @@ for(i in 1:73){
 	}
 }
 
+#set up D.W 
+D.W<-matrix(rep(NA,dim(Wsite)[1]*dim(Wsite)[1]), ncol=dim(Wsite)[1])
+D.Wcor<-matrix(rep(NA,dim(Wsite)[1]*dim(Wsite)[1]), ncol=dim(Wsite)[1])
+for(i in 1:dim(Wsite)[1]){
+	for(j in 1:dim(Wsite)[1]){
+		D.W[i,j]<-sqrt(((Wsite$lat[i]-Wsite$lat[j])^2)+ 
+					((Wsite$lon[i]-Wsite$lon[j])^2))
+	if(i!=j&D.W[i,j]==0){
+	D.Wcor[i,j]<-.001
+	}else{D.Wcor[i,j]<-D.W[i,j]}
+	
+	}
+}
 
 #set up data list
+
 datamodellist<-list(NobsS=dim(datSNii)[1],n.factS=datSNii$n,
 					DistS=datSNii$Dist, yearS=datSNii$yearID,
 					siteS=datSNii$siteIDm, NyearS=dim(Syear)[1],
 					xS=Syear$yearID, yS=rep(1,dim(Syear)[1]),
 					NsiteS=dim(Ssite)[1], latS=Ssite$lat,
-					longS=Ssite$lon, D.S=D.Scor)
-Samplelist<-c("deviance", "nbeta.star", "nbeta[2]","eps.star","alpha.star",
-				"mu.nS")
+					longS=Ssite$lon, D.S=D.Scor,
+					NobsW=dim(datWNii)[1], n.factW=datWNii$n, DistW=datWNii$Dist,
+					yearW=datWNii$yearID,siteW=datWNii$siteIDm,
+					NyearW=dim(Wyear)[1], xW=Wyear$wyear,yW=rep(1,dim(Wyear)[1]),
+					NsiteW=dim(Wsite)[1], D.W=D.Wcor)
+					
+Samplelist<-c("deviance", "nbeta.star1","nbeta.star2","nbeta1", "nbeta2","eps.star","alpha.star",
+				"mu.nS","epsW.star","alphaW.star","mu.nW","rho.alphaW","Sigma.alphaW",
+				"rho.epsW","Sigma.epsW","rho.alpha","Sigma.alpha",
+				"rho.eps","Sigma.eps")
 				
-inits.SN<-list(list(t.eps=1,t.alpha=1,rho.alpha=.99,rho.eps=.99),
-				list(t.eps=1.5,t.alpha=1.5,rho.alpha=.98,rho.eps=.90),
-				list(t.eps=.5,t.alpha=.5,rho.alpha=.97,rho.eps=.83))
+inits.SN<-list(list(t.eps=1,t.alpha=1,rho.alpha=.99,rho.eps=.99,
+					t.epsW=1,t.alphaW=1,rho.alphaW=.99,rho.epsW=.99),
+				list(t.eps=1.5,t.alpha=1.5,rho.alpha=.98,rho.eps=.90,
+					t.epsW=1.5,t.alphaW=1.5,rho.alphaW=.98,rho.epsW=.90),
+				list(t.eps=.5,t.alpha=.5,rho.alpha=.97,rho.eps=.83,
+					t.epsW=.5,t.alphaW=.5,rho.alphaW=.97,rho.epsW=.83))
 				
 n.model.init=jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\n_model\\N_model_code.r",
 						data=datamodellist,
