@@ -3,7 +3,7 @@ This code is for a Bayesian analysis of N factor availabilty across summer and w
 
 ## Version 1:
 
-_N.factor_~Normal(_$$\mu$$N_,$$\tau$$)
+_N.factor_ ~Normal( _$$\mu$$N_ , $$\tau$$ )
 
 _$$\mu$$N_= $$\beta_1$$+$$\beta_2$$*_Sens.dist_ + $$\alpha$$ + $$\epsilon$$
  
