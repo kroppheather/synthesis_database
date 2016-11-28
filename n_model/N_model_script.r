@@ -18,6 +18,11 @@ datWN<-read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\WinterN
 #summer N factor data
 datSN<-read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\SummerNvege.csv")
 
+#there is a site in the summer that clearly has some numbers
+#that are not correct for soil temperature. There is likely
+#a large number used for a NA. This needs to be fixed, but
+#until that can happen need filter out
+datSN<-datSN[datSN$T<3000,]
 
 #calculate the distance between the two measurements
 
@@ -100,9 +105,9 @@ plot(codaobj.init, ask=TRUE)
 Mod.out<-summary(codaobj.init)	
 
 write.table(Mod.out$statistics, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\model_variaion1_stats.csv",
-			sep=",",row.names=FALSE)
+			sep=",",row.names=TRUE)
 write.table(Mod.out$quantiles, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\model_variaion1_quant.csv",
-			sep=",",row.names=FALSE)
+			sep=",",row.names=TRUE)
 						
 ### try troubleshooting in bugs						
 #library(R2OpenBUGS)
