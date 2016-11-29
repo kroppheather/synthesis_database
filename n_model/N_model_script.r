@@ -29,6 +29,9 @@ datSN<-datSN[datSN$T<3000,]
 datWN$Dist<-datWN$height+(datWN$depth/100)
 datSN$Dist<-datSN$height+(datSN$depth/100)
 
+#now filter to only focus on 0-10cm
+
+
 #now work on structuring the data to match up with the model
 #start by getting the indexes together for the data
 #set up a table to get unique site
