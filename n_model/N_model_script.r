@@ -139,8 +139,11 @@ codaobj.init = coda.samples(n.model.init,variable.names=Samplelist,
 #check trace plots
 #plot function will prompt to click to display each window of parameters
 windows(18)
-plot(codaobj.init, ask=TRUE)						
-	
+plot(codaobj.init[,"epsW.star[26]"], ask=TRUE)	
+
+
+#generate summary
+
 Mod.out<-summary(codaobj.init)	
 
 write.table(Mod.out$statistics, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\model_variaion1_stats.csv",
@@ -148,18 +151,6 @@ write.table(Mod.out$statistics, "c:\\Users\\hkropp\\Google Drive\\raw_data\\anal
 write.table(Mod.out$quantiles, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\model_variaion1_quant.csv",
 			sep=",",row.names=TRUE)
 						
-### try troubleshooting in bugs						
-#library(R2OpenBUGS)
-#library(coda)
-#n.model.initial<-bugs(data=datamodellist,
-#	inits=inits.SN,
-#	parameters=Samplelist,
-#	n.iter=3000,
-#	model.file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\n_model\\N_model_code.txt",
-#	n.chains=3,
-#	n.burnin=1000,
-#	n.thin=1,working.directory="c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6",
-#	debug=TRUE,codaPkg=TRUE)
-#set up model
+
 
 				  
