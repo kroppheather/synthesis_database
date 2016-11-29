@@ -30,6 +30,8 @@ datWN$Dist<-datWN$height+(datWN$depth/100)
 datSN$Dist<-datSN$height+(datSN$depth/100)
 
 #now filter to only focus on 0-10cm
+datWN<-datWN[datWN$depth<=10,]
+datSN<-datSN[datSN$depth<=10,]
 
 
 #now work on structuring the data to match up with the model
@@ -73,10 +75,10 @@ datWNii<-join(datWNi,Wyear,by=c("wyear"), type="right")
 #see if that is causing the covariance matrix problems
 #add slight variation to see if it helps
 #calculate D.S in code
-D.S<-matrix(rep(NA,73*73), ncol=73)
-D.Scor<-matrix(rep(NA,73*73), ncol=73)
-for(i in 1:73){
-	for(j in 1:73){
+D.S<-matrix(rep(NA,dim(Ssite)[1]*dim(Ssite)[1]), ncol=dim(Ssite)[1])
+D.Scor<-matrix(rep(NA,dim(Ssite)[1]*dim(Ssite)[1]), ncol=dim(Ssite)[1])
+for(i in 1:dim(Ssite)[1]){
+	for(j in 1:dim(Ssite)[1]){
 		D.S[i,j]<-sqrt(((Ssite$lat[i]-Ssite$lat[j])^2)+ 
 					((Ssite$lon[i]-Ssite$lon[j])^2))
 	if(i!=j&D.S[i,j]==0){
@@ -106,17 +108,16 @@ datamodellist<-list(NobsS=dim(datSNii)[1],n.factS=datSNii$n,
 					DistS=datSNii$Dist, yearS=datSNii$yearID,
 					siteS=datSNii$siteIDm, NyearS=dim(Syear)[1],
 					xS=Syear$yearID, yS=rep(1,dim(Syear)[1]),
-					NsiteS=dim(Ssite)[1], latS=Ssite$lat,
-					longS=Ssite$lon, D.S=D.Scor,
+					NsiteS=dim(Ssite)[1], D.S=D.Scor,
 					NobsW=dim(datWNii)[1], n.factW=datWNii$n, DistW=datWNii$Dist,
 					yearW=datWNii$yearID,siteW=datWNii$siteIDm,
 					NyearW=dim(Wyear)[1], xW=Wyear$wyear,yW=rep(1,dim(Wyear)[1]),
 					NsiteW=dim(Wsite)[1], D.W=D.Wcor)
 					
 Samplelist<-c("deviance", "nbeta.star1","nbeta.star2","nbeta1", "nbeta2","eps.star","alpha.star",
-				"mu.nS","epsW.star","alphaW.star","mu.nW","rho.alphaW","Sigma.alphaW",
-				"rho.epsW","Sigma.epsW","rho.alpha","Sigma.alpha",
-				"rho.eps","Sigma.eps")
+				"mu.nS","epsW.star","alphaW.star","mu.nW","rho.alphaW",
+				"rho.epsW","rho.alpha",
+				"rho.eps")
 				
 inits.SN<-list(list(t.eps=1,t.alpha=1,rho.alpha=.99,rho.eps=.99,
 					t.epsW=1,t.alphaW=1,rho.alphaW=.99,rho.epsW=.99),
