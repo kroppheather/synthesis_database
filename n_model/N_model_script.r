@@ -143,7 +143,7 @@ codaobj.init = coda.samples(n.model.init,variable.names=Samplelist,
 #check trace plots
 #plot function will prompt to click to display each window of parameters
 windows(18)
-plot(codaobj.init[,"epsW.star[26]"], ask=TRUE)	
+plot(codaobj.init[,"eps.star[26]"], ask=TRUE)	
 
 
 #generate summary
