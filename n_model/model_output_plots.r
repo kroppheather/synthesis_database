@@ -23,6 +23,8 @@ datWN<-read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\WinterN
 #until that can happen need filter out
 datSN<-datSN[datSN$T<3000,]
 
+datSN<-datSN[datSN$depth<=10,]
+datWN<-datWN[datWN$depth<=10,]
 #get the information to go along with each year and site
 
 #now work on structuring the data to match up with the model
@@ -89,7 +91,7 @@ mtext("Random Effect", side=2,cex=2,line=5)
 
 #make a plot for the site random effect
 par(mai=c(3,2,1,1))
-plot(c(0,1),c(0,1), type="n", xlim=c(0,73.5),ylim=c(-2,3), axes=FALSE, xlab=" ", ylab=" ", xaxs="i",
+plot(c(0,1),c(0,1), type="n", xlim=c(0,73.5),ylim=c(-1,1), axes=FALSE, xlab=" ", ylab=" ", xaxs="i",
 	yaxs="i")
 for(i in 1:dim(Ssite)[1]){
 	polygon(c(Ssite$siteIDm[i]-.5,Ssite$siteIDm[i]-.5,Ssite$siteIDm[i]+.5,Ssite$siteIDm[i]+.5), 
@@ -98,8 +100,8 @@ for(i in 1:dim(Ssite)[1]){
 }
 arrows(Ssite$siteIDm,datA$X2.5.[datA$parms=="alpha.star"],Ssite$siteIDm,datA$X97.5.[datA$parms=="alpha.star"],code=0)
 
-axis(1, seq(1,73), Ssite$loc,las=2, cex.axis=1.25)
-axis(2, seq(-2,3,by=.5),las=2,cex.axis=1.25)
+axis(1, seq(1,dim(Ssite)[1]), Ssite$loc,las=2, cex.axis=1.25)
+axis(2, seq(-15,1,by=.5),las=2,cex.axis=1.25)
 mtext("Random Effect", side=2,cex=2,line=5)
 #winter
 par(mai=c(3,2,1,1))
@@ -119,7 +121,7 @@ mtext("Random Effect", side=2,cex=2,line=5)
 
 #now see how random effect varies with latitude
 par(mai=c(3,2,1,1))
-plot(c(0,1),c(0,1), type="n", xlim=c(55,85),ylim=c(-2,3.5), axes=FALSE, xlab=" ", ylab=" ", xaxs="i",
+plot(c(0,1),c(0,1), type="n", xlim=c(55,85),ylim=c(-1,1), axes=FALSE, xlab=" ", ylab=" ", xaxs="i",
 	yaxs="i")
 
 points(Ssite$lat,datA$Mean[datA$parms=="alpha.star"],pch=19,col="grey60")

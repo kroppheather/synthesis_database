@@ -22,3 +22,7 @@ timeM<-as.numeric(substr(timeIn,5,6))
 
 #there are also some missing months
 #so see how many years this is possible for
+#also filter out anytime before 1989
+#there should be 26 years total
+
+#filter to focus only on winter months

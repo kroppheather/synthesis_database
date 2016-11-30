@@ -285,6 +285,9 @@ dseq<-list()
 
 #set up an index that goes by year and winter or summer for each site
 ######To add need to account for leap year
+#set up 
+leap.year<-data.frame(year=seq(1989,2016), leapID=rep(c(0,0,0,1), times=7))
+leapY<-leap.year$year[leap.year$leapID==1]
 
 for(i in 1:Nsite){
 	#set up index for year
@@ -293,26 +296,47 @@ for(i in 1:Nsite){
 	#set up vector to replace Na with index
 	Temperature[[i]]$w.index<-rep(999,dim(Temperature[[i]])[1])
 	Temperature[[i]]$w.year<-rep(-999,dim(Temperature[[i]])[1])
-	Temperature[[i]]$s.index
+	#set up id if the year is a leap year
 	for(j in 1:dim(Temperature[[i]])[1]){
+		for(n in 1:length(leapY)){
+			if(Temperature[[i]]$year_st[j]==leapY[n]){
+				Temperature[[i]]$leapID[j]<-1
+			}else{Temperature[[i]]$leapID[j]<-0}
+		}	
 		for(m in 1:length(dyear[[i]])){
+
 		#index for Jan for May
-			if(Temperature[[i]]$doy_st[j]<122
+		if(Temperature[[i]]$leapID[j]==1){
+			if(Temperature[[i]]$doy_st[j]<=122
 				&Temperature[[i]]$year_st[j]==dyear[[i]][m]){
-				Temperature[[i]]$w.index[j]<-1
-				Temperature[[i]]$w.year[j]<-dyear[[i]][m]
-			}else{
-				if(Temperature[[i]]$doy_st[j]>275
-					&Temperature[[i]]$year_st[j]==dyear[[i]][m]){
 					Temperature[[i]]$w.index[j]<-1
-					Temperature[[i]]$w.year[j]<-dyear[[i]][m+1]
+					Temperature[[i]]$w.year[j]<-dyear[[i]][m]
+			}else{
+				if(Temperature[[i]]$doy_st[j]>=275
+					&Temperature[[i]]$year_st[j]==dyear[[i]][m]){
+						Temperature[[i]]$w.index[j]<-1
+						Temperature[[i]]$w.year[j]<-dyear[[i]][m]+1
 				}
 			}
 		
 		
+		}else{
+		if(Temperature[[i]]$doy_st[j]<=121
+				&Temperature[[i]]$year_st[j]==dyear[[i]][m]){
+					Temperature[[i]]$w.index[j]<-1
+					Temperature[[i]]$w.year[j]<-dyear[[i]][m]
+			}else{
+				if(Temperature[[i]]$doy_st[j]>=274
+					&Temperature[[i]]$year_st[j]==dyear[[i]][m]){
+						Temperature[[i]]$w.index[j]<-1
+						Temperature[[i]]$w.year[j]<-dyear[[i]][m]+1
+				}
+			}
+		
 		}
 
 	}
+}
 }
 #now create summer index
 
@@ -343,8 +367,8 @@ for(i in 1:Nsite){
 	#make a dataframe of soil T and depth
 	sT[[i]]<-data.frame(T=as.vector(data.matrix(Temperature[[i]][,colnames(Temperature[[i]])=="soil_t"])),
 	depth=as.vector(data.matrix(Temperature[[i]][,colnames(Temperature[[i]])=="st_depth"])),
-	w.ind=rep(Temperature[[i]]$w.ind, times=srep[i]),
-	s.ind=rep(Temperature[[i]]$s.ind, times=srep[i]),
+	w.ind=rep(Temperature[[i]]$w.index, times=srep[i]),
+	s.ind=rep(Temperature[[i]]$s.index, times=srep[i]),
 	doy=rep(Temperature[[i]]$doy_st, times=srep[i]),
 	year=rep(Temperature[[i]]$year_st, times=srep[i]),
 	wyear=rep(Temperature[[i]]$w.year, times=srep[i]),
@@ -362,8 +386,8 @@ for(i in 1:Nsite){
 	#make a dataframe of soil T and depth
 	sA[[i]]<-data.frame(A=as.vector(data.matrix(Temperature[[i]][,colnames(Temperature[[i]])=="air_t"])),
 	depth=as.vector(data.matrix(Temperature[[i]][,colnames(Temperature[[i]])=="air_height"])),
-	w.ind=rep(Temperature[[i]]$w.ind, times=srepA[i]),
-	s.ind=rep(Temperature[[i]]$s.ind, times=srepA[i]),
+	w.ind=rep(Temperature[[i]]$w.index, times=srepA[i]),
+	s.ind=rep(Temperature[[i]]$s.index, times=srepA[i]),
 	doy=rep(Temperature[[i]]$doy_st, times=srepA[i]),
 	year=rep(Temperature[[i]]$year_st, times=srepA[i]),
 	wyear=rep(Temperature[[i]]$w.year, times=srepA[i]),
@@ -446,10 +470,10 @@ Acountwdf<-ldply(Acountw,data.frame)
 Acountsdf<-ldply(Acounts,data.frame)
 
 #get rid of any NAs and observations that don't span a full season
-S.use<-na.omit(Scountsdf[Scountsdf$x==154,])
-W.use<-na.omit(Wcountsdf[Wcountsdf$x==212|Wcountsdf$x==213,])
-AS.use<-na.omit(Acountsdf[Acountsdf$x==154,])
-AW.use<-na.omit(Acountwdf[Acountwdf$x==212|Acountwdf$x==213,])
+S.use<-na.omit(Scountsdf[Scountsdf$x==152,])
+W.use<-na.omit(Wcountsdf[Wcountsdf$x==213|Wcountsdf$x==214,])
+AS.use<-na.omit(Acountsdf[Acountsdf$x==152,])
+AW.use<-na.omit(Acountwdf[Acountwdf$x==213|Acountwdf$x==214,])
 #change column names
 colnames(S.use)<-c("depth", "year","count","siteid")
 colnames(W.use)<-c("depth", "wyear","count","siteid")
@@ -537,14 +561,14 @@ Snew_v<-ifelse(N.summ$vege_z=="boreal forest", "boreal",
 Wnumbs<-aggregate(N.wint$n[N.wint$depth<10], by=list(as.factor(new_v[N.wint$depth<10])),
 		FUN="length")
 		
-Snumbs<-aggregate(N.summ$n[N.summ$depth<10],by=list(as.factor(new_v[N.summ$depth<10])),
+Snumbs<-aggregate(N.summ$n[N.summ$depth<10],by=list(as.factor(Snew_v[N.summ$depth<10])),
 		FUN="length")
 #make box plot
 par(mfrow=c(1,2))	
 plot(N.wint$n[N.wint$depth<10]~as.factor(new_v[N.wint$depth<10]), pch=19,
 	xlab="biome",ylab="Winter N factor")
 
-plot(N.summ$n[N.summ$depth<10]~as.factor(new_v[N.summ$depth<10]), pch=19,
+plot(N.summ$n[N.summ$depth<10]~as.factor(Snew_v[N.summ$depth<10]), pch=19,
 	xlab="biome",ylab="Summer N factor")
 mtext("0-10cm depth", side=3, outer=TRUE, cex=2, line=-3)
 
@@ -599,14 +623,14 @@ plot(N.summ$n[N.summ$depth<10]~as.factor(N.summ$loc[N.summ$depth<10]), pch=19,
 
 #first explore how much data changes
 
-SdayLow<-round(0.95*154,0)
-WdayLow<-round(0.95*212,0)
+SdayLow<-round(0.95*152,0)
+WdayLow<-round(0.95*213,0)
 
 #See what data could be corrected
-S.toCor<-na.omit(Scountsdf[Scountsdf$x<154&Scountsdf$x>=SdayLow,])
-W.toCor<-na.omit(Wcountsdf[Wcountsdf$x<212&Wcountsdf$x>=WdayLow,])
-AS.toCor<-na.omit(Acountsdf[Acountsdf$x<154&Acountsdf$x>=SdayLow,])
-AW.toCor<-na.omit(Acountwdf[Acountwdf$x<212&Acountwdf$x>=WdayLow,])
+S.toCor<-na.omit(Scountsdf[Scountsdf$x<152&Scountsdf$x>=SdayLow,])
+W.toCor<-na.omit(Wcountsdf[Wcountsdf$x<213&Wcountsdf$x>=WdayLow,])
+AS.toCor<-na.omit(Acountsdf[Acountsdf$x<152&Acountsdf$x>=SdayLow,])
+AW.toCor<-na.omit(Acountwdf[Acountwdf$x<213&Acountwdf$x>=WdayLow,])
 #Note adjusting N factor for 95% of the season appears to drastically increase
 #data available for analysis so it is worth exploring
 
@@ -624,9 +648,9 @@ AW.toCor<-na.omit(Acountwdf[Acountwdf$x<212&Acountwdf$x>=WdayLow,])
 #2. all at end
 #3. all in middle
 #4. dispersed randomly
-S.missing<-154-SdayLow
-W.missing<-212-WdayLow
-SeasonLength<-c(154,212,154,212)
+S.missing<-152-SdayLow
+W.missing<-213-WdayLow
+SeasonLength<-c(152,213,152,213)
 #set up missing data scenarios
 #missing at the beginning
 MissingSubtract<-c(S.missing,W.missing,S.missing,W.missing)
@@ -647,9 +671,9 @@ for(i in 1:4){
 }
 
 #random days missing
-RSeasListWg<-sample(seq(1,212),size=WdayLow)
+RSeasListWg<-sample(seq(1,213),size=WdayLow)
 RSeasListW<-sort(RSeasListWg)
-RSeasListSg<-sample(seq(1,154),size=SdayLow)
+RSeasListSg<-sample(seq(1,152),size=SdayLow)
 RSeasListS<-sort(RSeasListSg)
 RSeas<-list(RSeasListS,RSeasListW,RSeasListS,RSeasListW)
 
