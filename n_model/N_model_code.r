@@ -13,7 +13,7 @@ model{
 		n.factS[i]~dnorm(mu.nS[i], tau.S)
 		#mean n factor function of distance from sensor and location and
 		#year random effects and location random effects
-		mu.nS[i]<-nbeta1[1]+nbeta1[2]*DistS[i]+eps[yearS[i]]+alpha[siteS[i]]
+		mu.nS[i]<-nbeta1[1]+nbeta1[2]*EVIS[i]+eps[yearS[i]]+alpha[siteS[i]]
 		
 	}
 	#create identifiable intercept
@@ -25,7 +25,7 @@ model{
 		n.factW[i]~dnorm(mu.nW[i], tau.W)
 		#mean n factor function of distance from sensor and location and
 		#year random effects and location random effects
-		mu.nW[i]<-nbeta2[1]+nbeta2[2]*DistW[i]+epsW[yearW[i]]+alphaW[siteW[i]]
+		mu.nW[i]<-nbeta2[1]+nbeta2[2]*EVIW[i]+epsW[yearW[i]]+alphaW[siteW[i]]
 		
 	}
 	

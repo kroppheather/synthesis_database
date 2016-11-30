@@ -17,6 +17,8 @@ library(ggmcmc)
 datWN<-read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\WinterNvege.csv")
 #summer N factor data
 datSN<-read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\SummerNvege.csv")
+#read in EVI data
+datEVI<-read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Site_EVI_out.csv")
 
 #there is a site in the summer that clearly has some numbers
 #that are not correct for soil temperature. There is likely
@@ -70,6 +72,11 @@ datSNii<-join(datSNi,Syear,by=c("year"), type="right")
 #add wyear to table
 datWNii<-join(datWNi,Wyear,by=c("wyear"), type="right")
 
+#now add the EVI data to the data frame
+datSNiii<-join(datSNii, datEVI, by=c("siteid"), type="left")
+datWNiii<-join(datWNii, datEVI, by=c("siteid"), type="left")
+
+
 #siteid 22-33,43-45,42+46,54-186,57-59,63-63,72-73
 #have same lat lon even though taken at different plots
 #see if that is causing the covariance matrix problems
@@ -102,15 +109,17 @@ for(i in 1:dim(Wsite)[1]){
 	}
 }
 
+
+
 #set up data list
 
-datamodellist<-list(NobsS=dim(datSNii)[1],n.factS=datSNii$n,
-					DistS=datSNii$Dist, yearS=datSNii$yearID,
-					siteS=datSNii$siteIDm, NyearS=dim(Syear)[1],
+datamodellist<-list(NobsS=dim(datSNiii)[1],n.factS=datSNiii$n,
+					EVIS=datSNiii$EVI, yearS=datSNiii$yearID,
+					siteS=datSNiii$siteIDm, NyearS=dim(Syear)[1],
 					xS=Syear$yearID, yS=rep(1,dim(Syear)[1]),
 					NsiteS=dim(Ssite)[1], D.S=D.Scor,
-					NobsW=dim(datWNii)[1], n.factW=datWNii$n, DistW=datWNii$Dist,
-					yearW=datWNii$yearID,siteW=datWNii$siteIDm,
+					NobsW=dim(datWNiii)[1], n.factW=datWNiii$n, EVIW=datWNiii$EVI,
+					yearW=datWNiii$yearID,siteW=datWNiii$siteIDm,
 					NyearW=dim(Wyear)[1], xW=Wyear$wyear,yW=rep(1,dim(Wyear)[1]),
 					NsiteW=dim(Wsite)[1], D.W=D.Wcor)
 					
