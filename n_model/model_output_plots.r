@@ -6,9 +6,9 @@
 setwd("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6")
 
 #read in stats
-datS<-read.csv("model_variaion1_stats.csv")
+datS<-read.csv("model_variaion2_stats.csv")
 #read in quantiles
-datQ<-read.csv("model_variaion1_quant.csv")
+datQ<-read.csv("model_variaion2_quant.csv")
 #combine into single data frame
 datA<-cbind(datS,datQ)
 
@@ -137,12 +137,21 @@ mtext("Random Effect", side=2,cex=2,line=5)
 ####is predicted just by
 #### distance and random effects
 
-plot(datSN$n, datA$Mean[datA$parms=="mu.nS"], xlim=c(-.5,1.6),ylim=c(-.5,1.6), pch=19) 
+plot(datSN$n, datA$Mean[datA$parms=="mu.nS"], xlim=c(0,1.6),ylim=c(0,1.6), pch=19) 
 abline(0,1)
 
 fitRE<-lm(datA$Mean[datA$parms=="mu.nS"]~datSN$n)
 summary(fitRE)
 abline(fitRE, lty=2)
+
+plot(datWN$n, datA$Mean[datA$parms=="mu.nW"], xlim=c(0,1.6),ylim=c(0,1.6), pch=19) 
+abline(0,1)
+
+fitREW<-lm(datA$Mean[datA$parms=="mu.nW"]~datWN$n)
+summary(fitREW)
+abline(fitREW, lty=2)
+
+
 
 #get soil depths for each site
 

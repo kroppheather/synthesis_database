@@ -152,16 +152,16 @@ codaobj.init = coda.samples(n.model.init,variable.names=Samplelist,
 #check trace plots
 #plot function will prompt to click to display each window of parameters
 windows(18)
-plot(codaobj.init[,"eps.star[26]"], ask=TRUE)	
+plot(codaobj.init[,"epsW.star[26]"], ask=TRUE)	
 
 
 #generate summary
 
 Mod.out<-summary(codaobj.init)	
 
-write.table(Mod.out$statistics, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\model_variaion1_stats.csv",
+write.table(Mod.out$statistics, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\model_variaion2_stats.csv",
 			sep=",",row.names=TRUE)
-write.table(Mod.out$quantiles, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\model_variaion1_quant.csv",
+write.table(Mod.out$quantiles, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\model_variaion2_quant.csv",
 			sep=",",row.names=TRUE)
 						
 
