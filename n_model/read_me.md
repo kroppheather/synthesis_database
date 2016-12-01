@@ -24,5 +24,6 @@ _Commits: 66c2639-9545346_
   
 #### _Version 2 focuses only on soil temperature observations taken between 0-10cm in the soil. Until soil depths can be dealt with in a more sophisticated manner, very shallow depths are more readily compared across sites. Air temperature sensor height is currently not dealt with, and may be problematic in the winter_
   
-#### _This model version examines how much variability is simply explained by a remotely sensed index of vegetation (EVI), and site location (via random effect), year (random effect). This model is meant to help explore variability in N factors and examine how much variability might be explained by a broad classification of vegetation as well as site specific factors vs arctic wide temporal variables._  
+#### _This model version examines how much variability is simply explained by a remotely sensed index of vegetation (EVI), and site location (via random effect), year (random effect). This model is meant to help explore variability in N factors and examine how much variability might be explained by a broad classification of vegetation as well as site specific factors vs arctic wide temporal variables.
+The maximum EVI band value over multiple years is used. The maximum EVI is expected to represent differernces in vegetation canopy structure is expected to be less subject to artifacts assoicated with growing season changes that can be in the average EVI_  
 _Commits: f4e5622-present_ 
