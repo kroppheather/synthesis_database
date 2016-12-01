@@ -20,8 +20,8 @@ coord$coordID<-seq(1,dim(coord)[1])
 eviA<-join(datM,coord, by=c("lat", "long"), type="right")
 
 #now aggregate by coordID
-evim<-aggregate(eviA$mean.band, by=list(eviA$coordID), FUN="mean")
-evil<-aggregate(eviA$mean.band, by=list(eviA$coordID), FUN="length")
+evim<-aggregate(eviA$max.band, by=list(eviA$coordID), FUN="mean")
+evil<-aggregate(eviA$max.band, by=list(eviA$coordID), FUN="length")
 evim$n<-evil$x
 
 #now add to the coordinate table 
