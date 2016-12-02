@@ -97,7 +97,70 @@ for(i in 1:length(Ssite)){
 
 }
 axis(1, xtl, xll, cex.axis=1.5)
-axis(2, seq(-10,10, by=1), seq(-1000,1000,by=100), las=2,cex.axis=1.5)
-mtext("Difference % of Air Temperature", side=2, line=7, cex=2)
+axis(2, seq(-10,10, by=1), seq(-10,10,by=1), las=2,cex.axis=1.5)
+mtext("Proportion Difference of Air Temperature", side=2, line=7, cex=2)
 mtext("Length into Growing Season", side=1, line=4, cex=2)
 text(100,8, paste0("Number of sites= ",length(Ssite)), cex=2)
+
+#now check out 2013
+
+#get the number of sites with ground temp data
+Ssite<-unique(ShallowD$siteid[ShallowD$year==2013])
+colvec<-terrain.colors(length(Ssite), alpha=1)
+par(mai=c(2,2,1,1))
+plot(c(0,1),c(0,1), type="n", axes=FALSE,xlim=c(0,154), ylim=c(-10,10), xlab=" ", ylab=" ", xaxs="i",
+		yaxs="i")
+for(i in 1:length(Ssite)){
+	points(ShallowD$dayseq[ShallowD$siteid==Ssite[i]],ShallowD$Tdiff[ShallowD$siteid==Ssite[i]], col=colvec[i], pch=19)
+
+}
+axis(1, xtl, xll, cex.axis=1.5)
+axis(2, seq(-10,10, by=1), seq(-10,10,by=1), las=2,cex.axis=1.5)
+mtext("Proportion Difference of Air Temperature", side=2, line=7, cex=2)
+mtext("Length into Growing Season", side=1, line=4, cex=2)
+text(100,8, paste0("Number of sites= ",length(Ssite)), cex=2)
+
+
+#now combine Tdiff with more site info
+
+datS<-read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_3\\siteinfo.csv")
+colnames(datS)[1]<-"siteid"
+#join into a table
+ShDsite<-join(ShallowD,datS,by="siteid", type="left")
+#fix biome names 
+#the missing biome names are from a tundra site
+ShDsite$biome<-ifelse(is.na(ShDsite$vege_z),"tundra",
+				ifelse(ShDsite$vege_z=="boreal forest", "boreal", as.character(ShDsite$vege_z)))
+#now plot a subset of Tdiff for biome
+#get the number of sites with ground temp data
+Ssite<-unique(ShDsite$siteid[ShDsite$year==2013&ShDsite$biome=="boreal"])
+colvec<-topo.colors(length(Ssite), alpha=1)
+par(mai=c(2,2,1,1))
+plot(c(0,1),c(0,1), type="n", axes=FALSE,xlim=c(0,154), ylim=c(-10,10), xlab=" ", ylab=" ", xaxs="i",
+		yaxs="i")
+for(i in 1:length(Ssite)){
+	points(ShDsite$dayseq[ShDsite$siteid==Ssite[i]],ShDsite$Tdiff[ShDsite$siteid==Ssite[i]], col=colvec[i], pch=19)
+
+}
+axis(1, xtl, xll, cex.axis=1.5)
+axis(2, seq(-10,10, by=1), seq(-10,10,by=1), las=2,cex.axis=1.5)
+mtext("Proportion Difference of Air Temperature", side=2, line=7, cex=2)
+mtext("Length into Growing Season", side=1, line=4, cex=2)
+text(100,8, paste0("Number of sites= ",length(Ssite)), cex=2)
+
+#get the number of sites with ground temp data
+Ssite<-unique(ShDsite$siteid[ShDsite$year==2013&ShDsite$biome=="tundra"])
+colvec<-topo.colors(length(Ssite), alpha=1)
+par(mai=c(2,2,1,1))
+plot(c(0,1),c(0,1), type="n", axes=FALSE,xlim=c(0,154), ylim=c(-10,10), xlab=" ", ylab=" ", xaxs="i",
+		yaxs="i")
+for(i in 1:length(Ssite)){
+	points(ShDsite$dayseq[ShDsite$siteid==Ssite[i]],ShDsite$Tdiff[ShDsite$siteid==Ssite[i]], col=colvec[i], pch=19)
+
+}
+axis(1, xtl, xll, cex.axis=1.5)
+axis(2, seq(-10,10, by=1), seq(-10,10,by=1), las=2,cex.axis=1.5)
+mtext("Proportion Difference of Air Temperature", side=2, line=7, cex=2)
+mtext("Length into Growing Season", side=1, line=4, cex=2)
+text(100,8, paste0("Number of sites= ",length(Ssite)), cex=2)
+
