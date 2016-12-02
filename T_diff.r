@@ -164,3 +164,6 @@ mtext("Proportion Difference of Air Temperature", side=2, line=7, cex=2)
 mtext("Length into Growing Season", side=1, line=4, cex=2)
 text(100,8, paste0("Number of sites= ",length(Ssite)), cex=2)
 
+#export T diff for shallow soil layers
+
+write.table(ShDsite, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tdiff_shallow_out.csv", sep=",", row.names=FALSE)
