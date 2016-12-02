@@ -66,3 +66,7 @@ T.model.init=jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_da
 						n.adapt=1000,
 						n.chains=3,
 						inits=inits)
+						
+n.iter.i=30000
+codaobj.init = coda.samples(T.model.init,variable.names=Samplelist,
+                       n.iter=n.iter.i, thin=10)
