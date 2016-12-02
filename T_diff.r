@@ -52,7 +52,7 @@ TempGrow<-Tempall[datause==1,]
 #helpful to interpret
 TempGrow$Tdiff<-(TempGrow$sT-TempGrow$aT)/TempGrow$aT
 TempGrow$TdiffP<-TempGrow$Tdiff*100
-
+TempGrow$TdiffA<-TempGrow$sT-TempGrow$aT
 #get a table of how many observations in a growing season there are for site, year and soil depth
 SeasObs<-aggregate(TempGrow$sT, by=list(TempGrow$siteid,TempGrow$year,TempGrow$depth), FUN="length")
 
@@ -166,4 +166,29 @@ text(100,8, paste0("Number of sites= ",length(Ssite)), cex=2)
 
 #export T diff for shallow soil layers
 
-write.table(ShDsite, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tdiff_shallow_out.csv", sep=",", row.names=FALSE)
+#write.table(ShDsite, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tdiff_shallow_out.csv", sep=",", row.names=FALSE)
+
+
+xta<-seq(1,153)
+xla<-round(xta/153,2)
+xlength<-seq(1, 152, by=4)
+xtl<-xta[xlength]
+xll<-xla[xlength]
+#start by focusing on specific years that have a lot of data
+#start by looking at 2014 with 50 sites
+#start with shallow in 2014
+#get the number of sites with ground temp data
+Ssite<-unique(ShallowD$siteid[ShallowD$year==2014])
+colvec<-terrain.colors(length(Ssite), alpha=1)
+par(mai=c(2,2,1,1))
+plot(c(0,1),c(0,1), type="n", axes=FALSE,xlim=c(0,154), ylim=c(-25,25), xlab=" ", ylab=" ", xaxs="i",
+		yaxs="i")
+for(i in 1:length(Ssite)){
+	points(ShallowD$dayseq[ShallowD$siteid==Ssite[i]],ShallowD$TdiffA[ShallowD$siteid==Ssite[i]],, col=colvec[i], pch=19)
+
+}
+axis(1, xtl, xll, cex.axis=1.5)
+axis(2, seq(-25,25,by=5), las=2,cex.axis=1.5)
+mtext("Difference of Air Temperature", side=2, line=7, cex=2)
+mtext("Length into Growing Season", side=1, line=4, cex=2)
+text(100,8, paste0("Number of sites= ",length(Ssite)), cex=2)
