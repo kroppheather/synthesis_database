@@ -9,6 +9,9 @@ library(ggmcmc)
 #read in temperature difference data
 datT<-read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tdiff_shallow_out.csv")
 
+####site 74 has -999 in the data so exclude these cases
+datT<-datT[datT$aT!=-999,]
+
 #set up an id for a region
 #start by just treating 1 degree of lat and long a reason
 #everything rounded down to the degree is treated as the same region
@@ -55,7 +58,7 @@ datTii$dayX<-datTii$dayseq/153
 datalist<-list(Nobs=dim(datTii)[1], Tdiff=datTii$TdiffA,SeasX=datTii$dayX, siteid=datTii$siteidm,yearid=datTii$yearid,
 				Nsites=dim(Sites)[1],NyearS=dim(Years)[1], xS=rep(1,dim(Years)[1]), yS=Years$year)
 				
-samplelist<-c("eps.star", "rho.eps", "beta2", "beta3", "beta1star","sig.Td","sig.eps")
+samplelist<-c("eps.star", "rho.eps", "beta2", "beta3", "beta1star","sig.Td","sig.eps","Tdiff.rep")
 
 inits<-list(list(t.eps=1,rho.eps=.99),
 			list(t.eps=1.5,rho.eps=.89),
@@ -63,10 +66,20 @@ inits<-list(list(t.eps=1,rho.eps=.99),
 
 T.model.init=jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Tdiff_model\\Tdiff_model_code.r",
 						data=datalist,
-						n.adapt=1000,
+						n.adapt=2000,
 						n.chains=3,
 						inits=inits)
 						
-n.iter.i=30000
+n.iter.i=00000
 codaobj.init = coda.samples(T.model.init,variable.names=samplelist,
-                       n.iter=n.iter.i, thin=10)
+                       n.iter=n.iter.i, thin=5)
+					   
+windows(18)
+plot(codaobj.init, ask=TRUE)
+
+Mod.out<-summary(codaobj.init)	
+
+write.table(Mod.out$statistics, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\model_Tdiff_stats.csv",
+			sep=",",row.names=TRUE)
+write.table(Mod.out$quantiles, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\model_Tdiff_quant.csv",
+			sep=",",row.names=TRUE)

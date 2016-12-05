@@ -9,7 +9,7 @@ model{
 	Tdiff[i]~dnorm(mu.Td[i],tau.Td)
 	mu.Td[i]<-beta1[siteid[i]]+(step(Seas.mid-SeasX[i])*beta2[siteid[i]]*SeasX[i])+((1-step(Seas.mid-SeasX[i]))*beta3[siteid[i]]*SeasX[i])+
 		eps[yearid[i]]
-	
+	Tdiff.rep[i]~dnorm(mu.Td[i],tau.Td)
 	}	
 	#calculate idenfiable intercept
 	for(i in 1: Nsites){
