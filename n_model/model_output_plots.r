@@ -13,18 +13,12 @@ datQ<-read.csv("model_variaion2_quant.csv")
 datA<-cbind(datS,datQ)
 
 #now grab N factor data for comparision
-datSN<-read.csv("SummerNvege.csv")
+datSN<-read.csv("organized_sN_for_model.csv")
 
 #read in winter N factor data
-datWN<-read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\WinterNvege.csv")
+datWN<-read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\organized_wN_for_model.csv")
 
-#Apply data filter used in the model
-#This needs to be fixed, but
-#until that can happen need filter out
-datSN<-datSN[datSN$T<3000,]
 
-datSN<-datSN[datSN$depth<=10,]
-datWN<-datWN[datWN$depth<=10,]
 #get the information to go along with each year and site
 
 #now work on structuring the data to match up with the model

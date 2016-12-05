@@ -165,5 +165,5 @@ write.table(Mod.out$quantiles, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analy
 			sep=",",row.names=TRUE)
 						
 
-
-				  
+write.table(datWNiii, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\organized_wN_for_model.csv", sep=",",)
+write.table(datSNiii, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\organized_sN_for_model.csv", sep=",",)				  
