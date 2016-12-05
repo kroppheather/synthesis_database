@@ -70,12 +70,12 @@ T.model.init=jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_da
 						n.chains=3,
 						inits=inits)
 						
-n.iter.i=00000
+n.iter.i=10000
 codaobj.init = coda.samples(T.model.init,variable.names=samplelist,
                        n.iter=n.iter.i, thin=5)
 					   
 windows(18)
-plot(codaobj.init, ask=TRUE)
+plot(codaobj.init[,"beta1star[22]",])
 
 Mod.out<-summary(codaobj.init)	
 
@@ -83,3 +83,6 @@ write.table(Mod.out$statistics, "c:\\Users\\hkropp\\Google Drive\\raw_data\\anal
 			sep=",",row.names=TRUE)
 write.table(Mod.out$quantiles, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\model_Tdiff_quant.csv",
 			sep=",",row.names=TRUE)
+
+#ouput matching T diff for results
+write.table(datTii,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\datTdiff_model.csv",sep=",", row.names=FALSE)

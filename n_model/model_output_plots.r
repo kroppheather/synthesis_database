@@ -151,3 +151,140 @@ abline(fitREW, lty=2)
 
 soilD<-unique(data.frame(depth=datSN$depth, siteid=datSN$siteid))
 airD<-unique(data.frame(height=datSN$height, siteid=datSN$siteid))
+
+
+#########################################################################################
+#########################################################################################
+###############T diff model output ######################################################
+#########################################################################################
+library(plyr)
+#read in data 
+datQ<-read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\model_Tdiff_quant.csv")
+datM<-read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\model_Tdiff_stats.csv")
+
+datD<-read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\datTdiff_model.csv")
+#get back the original site id and name
+datS<-unique(data.frame(siteid=datD$siteid, model.site=datD$siteidm,sitename=datD$loc))
+
+
+#combine quantiles with means
+datA<-cbind(datM,datQ)
+dexps<-"\\[*[[:digit:]]*\\]"
+datA$parms<-gsub(dexps,"",rownames(datA))
+
+#start by looking at goodness of fit
+datr<-datA[datA$parms=="Tdiff.rep",]
+
+plot(datD$TdiffA,datr$Mean, xlim=c(-30,30),ylim=c(-30,30))
+abline(0,1, lwd=2, col="red")
+fit1<-lm(datr$Mean~datD$TdiffA)
+summary(fit1)
+abline(fit1, lwd=2, lty=2)
+
+
+#now look at parameters
+datint<-datA[datA$parms=="beta1star",]
+dats1<-datA[datA$parms=="beta2",]
+dats2<-datA[datA$parms=="beta3",]
+
+parmall<-data.frame(b1=datint$Mean,b1l=datint$X2.5.,b1h=datint$X97.5.,b2=dats1$Mean,b2l=dats1$X2.5.,b2h=dats1$X97.5.,
+						b3=dats2$Mean,b3l=dats2$X2.5.,b3h=dats2$X97.5.,model.site=seq(1,dim(datint)[1]))
+
+parmS<-join(parmall,datS, by="model.site", type="inner")						
+	
+
+	
+#combine paramer table 
+xp<-seq(1,dim(parmS)[1])
+par(mai=c(3,2,1,1))
+plot(c(0,1),c(0,1), type="n", xlim=c(0,length(xp)+1), ylim=c(-15,5),xlab=" ", ylab=" ", axes=FALSE,xaxs="i", yaxs="i")
+for( i in 1:dim(parmS)[1]){
+	polygon(c(xp[i]-.5,xp[i]-.5,xp[i]+.5,xp[i]+.5), c(0,parmS$b1[i],parmS$b1[i],0),col="grey65")
+}
+arrows(xp,parmS$b1l,xp,parmS$b1h, code=0)
+axis(1,xp,parmS$sitename, las=2)
+axis(2,seq(-15,5,by=5), las=2)
+#now look at slope 1
+xp<-seq(1,dim(parmS)[1])
+par(mai=c(3,2,1,1))
+plot(c(0,1),c(0,1), type="n", xlim=c(0,length(xp)+1), ylim=c(-25,20),xlab=" ", ylab=" ", axes=FALSE,xaxs="i", yaxs="i")
+for( i in 1:dim(parmS)[1]){
+	polygon(c(xp[i]-.5,xp[i]-.5,xp[i]+.5,xp[i]+.5), c(0,parmS$b2[i],parmS$b2[i],0),col="grey65")
+}
+arrows(xp,parmS$b2l,xp,parmS$b2h, code=0)
+axis(1,xp,parmS$sitename, las=2)
+axis(2,seq(-25,20,by=5), las=2)
+
+#now look at slope 2
+xp<-seq(1,dim(parmS)[1])
+par(mai=c(3,2,1,1))
+plot(c(0,1),c(0,1), type="n", xlim=c(0,length(xp)+1), ylim=c(-25,20),xlab=" ", ylab=" ", axes=FALSE,xaxs="i", yaxs="i")
+for( i in 1:dim(parmS)[1]){
+	polygon(c(xp[i]-.5,xp[i]-.5,xp[i]+.5,xp[i]+.5), c(0,parmS$b3[i],parmS$b3[i],0),col="grey65")
+}
+arrows(xp,parmS$b3l,xp,parmS$b3h, code=0)
+axis(1,xp,parmS$sitename, las=2)
+axis(2,seq(-25,20,by=5), las=2)
+#now look at year random effect
+#plot the random effect for year
+Syear<-data.frame(year=sort.int(unique(datD$year)))
+Syear$yearID<-seq(1,27)
+
+par(mai=c(2,2,1,1))
+plot(c(0,1),c(0,1), type="n", xlim=c(0,26.5),ylim=c(-1.0,1.6), axes=FALSE, xlab=" ", ylab=" ", xaxs="i",
+	yaxs="i")
+for(i in 1:dim(Syear)[1]){
+	polygon(c(Syear$yearID[i]-.5,Syear$yearID[i]-.5,Syear$yearID[i]+.5,Syear$yearID[i]+.5), 
+			c(0,datA$Mean[datA$parms=="eps.star"][i],datA$Mean[datA$parms=="eps.star"][i],0),
+			col="grey60")
+}
+arrows(Syear$yearID,datA$X2.5.[datA$parms=="eps.star"],Syear$yearID,datA$X97.5.[datA$parms=="eps.star"],code=0)
+axis(1, Syear$yearID, Syear$year, cex.axis=1.25)
+axis(2, seq(-2,2,by=.1),las=2,cex.axis=1.25)
+mtext("Year", side=1,cex=2,line=3)
+mtext("Random Effect", side=2,cex=2,line=5)
+
+
+#############################################################
+####show the T diff function with data for several sites ####
+#############################################################
+
+#parmS
+#subset eps 
+epsS<-data.frame(eps=datA$Mean[datA$parms=="eps.star"],epsl=datA$X2.5.[datA$parms=="eps.star"],epsh=datA$X97.5.[datA$parms=="eps.star"])
+
+Ftd<-function(b1,b2,b3,eps,Tlength){
+	ifelse(0.5-Tlength>=0,b1+(b2*(Tlength*Tlength))+eps,b1+(b3*(Tlength*Tlength))+eps)
+}
+
+#now look at data to plot a few of the sites and years
+#look at siteid: 193, 100,73, 60,62,5
+sitesub<-c(5,60,62,73,100,193)
+parmsite<-c(4,53,54,65,75,153)
+colortype<-c("red","sky","gold", "green","purple", "orange")
+datDS<-list()
+yearS<-list()
+epsDS<-list()
+colall<-list()
+for(i in 1:length(sitesub)){
+	datDS[[i]]<-datD[datD$siteid==sitesub[i],]
+	yearS[[i]]<-unique(datDS[[i]]$yearid)
+	epsDS[[i]]<-epsS[yearS[[i]],]
+	colall[[i]]<-colors()[grep(colortype[[i]],colors())]
+	colall[[i]]<-colall[[i]][1:length(yearS[[i]])]
+}
+parmSS<-parmS[parmsite,]
+
+xseq<-seq(0,1,by=.01)
+
+
+#now make the T diff plot
+plot(c(0,1),c(0,1), type="n", ylim=c(-25,10), xlim=c(0,1), xaxs="i",yaxs="i",axes=FALSE,xlab=" ",ylab=" ")
+for(i in 1:length(sitesub)){
+	for(j in 1:length(yearS[[i]])){
+	points(datDS[[i]]$dayX[datDS[[i]]$yearid==yearS[[i]][j]],datDS[[i]]$TdiffA[datDS[[i]]$yearid==yearS[[i]][j]], col=colall[[i]][j], pch=19)
+	points(xseq,Ftd(parmSS$b1[i],parmSS$b2[i],parmSS$b3[i],epsDS[[i]]$eps[j],xseq), col=colall[[i]][j], type="l",lwd=2)
+	}
+}
+
+points(xseq,Ftd(.2,-100,25,0,xseq), type="l",lwd=2)
