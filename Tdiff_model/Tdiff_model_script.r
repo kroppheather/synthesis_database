@@ -58,7 +58,7 @@ datTii$dayX<-datTii$dayseq/153
 datalist<-list(Nobs=dim(datTii)[1], Tdiff=datTii$TdiffA,SeasX=datTii$dayX, siteid=datTii$siteidm,yearid=datTii$yearid,
 				Nsites=dim(Sites)[1],NyearS=dim(Years)[1], xS=rep(1,dim(Years)[1]), yS=Years$year)
 				
-samplelist<-c("eps.star", "rho.eps", "beta2", "beta3", "beta1star","sig.Td","sig.eps","Tdiff.rep")
+samplelist<-c("eps.star", "rho.eps", "beta2", "beta3", "beta4", "beta5", "beta1star","sig.Td","sig.eps","Tdiff.rep")
 
 inits<-list(list(t.eps=1,rho.eps=.99),
 			list(t.eps=1.5,rho.eps=.89),
@@ -70,9 +70,9 @@ T.model.init=jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_da
 						n.chains=3,
 						inits=inits)
 						
-n.iter.i=10000
+n.iter.i=30000
 codaobj.init = coda.samples(T.model.init,variable.names=samplelist,
-                       n.iter=n.iter.i, thin=5)
+                       n.iter=n.iter.i, thin=15)
 					   
 windows(18)
 plot(codaobj.init[,"beta1star[22]",])

@@ -6,9 +6,11 @@
 model{
 	###Likelihood
 	for(i in 1:Nobs){
+	SeasL[i]<-SeasX[i]-.5
 	Tdiff[i]~dnorm(mu.Td[i],tau.Td)
-	mu.Td[i]<-beta1[siteid[i]]+(step(Seas.mid-SeasX[i])*beta2[siteid[i]]*SeasX[i])+((1-step(Seas.mid-SeasX[i]))*beta3[siteid[i]]*SeasX[i])+
-		eps[yearid[i]]
+	end.seas[i]<-step(SeasL[i])* beta4[siteid[i]]*SeasL[i]+beta5[siteid[i]]*pow(SeasL[i],2)
+	beg.seas[i]<-(1-step(SeasL[i]))* (beta2[siteid[i]]*SeasL[i])+beta3[siteid[i]]*pow(SeasL[i],2)
+	mu.Td[i]<-beta1[siteid[i]]+end.seas[i]+beg.seas[i]+eps[yearid[i]]
 	Tdiff.rep[i]~dnorm(mu.Td[i],tau.Td)
 	}	
 	#calculate idenfiable intercept
@@ -65,6 +67,9 @@ model{
 		beta1[i]~dnorm(0,0.001)
 		beta2[i]~dnorm(0,0.001)
 		beta3[i]~dnorm(0,0.001)
+		beta4[i]~dnorm(0,0.001)
+		beta5[i]~dnorm(0,0.001)
+		
 	}
 	#variance for T diff
 	tau.Td<-pow(sig.Td,-2)
