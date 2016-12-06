@@ -31,7 +31,7 @@ _Commits: f4e5622-present_
 
  _N.fact_~ Normal( _mu_ , _tau_)
  
- _mu_ = _beta1_ +_beta2_* _EVI_ 
+ _mu_ = _beta1_ +_beta2_* _EVI_ + _beta3_ * _OLT_  + _beta4_ * _Shrub % cov_ + _beta5_ * _moss % cov_ + _eps_
  
  
- #### This model focuses only on n factors with common vegetation data. It is a good start at looking at patterns with N factor and vegetation, but it excludes a lot of sites. A better way of incorporating vegetation is needed.  
+ #### This model focuses only on n factors (for summer and winter seperately) with common vegetation data. It is a good start at looking at patterns with N factor and vegetation, but it excludes a lot of sites. A better way of incorporating vegetation is needed.  It is being used for preliminary data analysis for AGU but more sophisticated vegetation metrics are needed to incorporate more types of data.
