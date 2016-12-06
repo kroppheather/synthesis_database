@@ -117,7 +117,7 @@ datamodellist<-list(NobsS=dim(vegeSNi)[1],n.factS=vegeSNi$n,
 					yearW=vegeWNi$yearid,regIDW=vegeWNi$reg.mod,
 					NyearW=dim(yearW)[1], xW=yearW$wyear,yW=rep(1,dim(yearW)[1]))
 					
-Samplelist<-c("deviance", "nbeta.star1W","nbeta.star1S", "nbeta2S","nbeta3S","nbeta4S","nbeta5S",
+Samplelist<-c("deviance", "nbeta1W","nbeta1S", "nbeta2S","nbeta3S","nbeta4S","nbeta5S",
 				"nbeta2W","nbeta3W","nbeta4W","nbeta5W",
 				"eps.star", "sig.S", "sig.W",
 				"mu.nS","epsW.star","mu.nW",
@@ -141,7 +141,7 @@ codaobj.init = coda.samples(n.model.init,variable.names=Samplelist,
 
 
 windows(18)
-plot(codaobj.init[,"epsW.star[26]"], ask=TRUE)	
+plot(codaobj.init[,"nbeta.star1S[1]"], ask=TRUE)	
 
 
 #generate summary

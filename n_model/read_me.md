@@ -37,3 +37,5 @@ _Commits: f4e5622-3c16b76_
 #### _This model focuses only on n factors (for summer and winter seperately) with common vegetation data. It is a good start at looking at patterns with N factor and vegetation, but it excludes a lot of sites. A better way of incorporating vegetation is needed.  It is being used for preliminary data analysis for AGU but more sophisticated vegetation metrics are needed to incorporate more types of data._
 
 _Commits: 7ca9ebf-present_ 
+
+_Note: branch vege_fixedE looks only at fixed effects and removes year random effect to see if it is causing covergence issues_
