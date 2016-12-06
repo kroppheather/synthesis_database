@@ -17,6 +17,7 @@ datT<-datT[datT$aT!=-999,]
 datR<-read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\region_siteinfo.csv")
 reg.to.join<-data.frame(siteid=datR$site_id,regionid=datR$region_id,region.name=datR$region_nam)
 
+
 #need to get together site id
 Sites<-data.frame(siteid=sort.int(unique(datT$siteid)))
 Sites$siteidm<-seq(1,dim(Sites)[1])
@@ -82,7 +83,7 @@ codatoplot<-ggs(codaobj.init)
 ggmcmc(codatoplot, family=c("beta1star","beta2","beta3","beta4","beta5"))
 				   
 windows(18)
-plot(codaobj.init[,"beta5[15]",])
+plot(codaobj.init[,"mu.beta4[3]",])
 
 Mod.out<-summary(codaobj.init)	
 
@@ -92,4 +93,4 @@ write.table(Mod.out$quantiles, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analy
 			sep=",",row.names=TRUE)
 
 #ouput matching T diff for results
-write.table(datTii,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\datTdiff_model.csv",sep=",", row.names=FALSE)
+write.table(datTiii,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\datTdiff_model.csv",sep=",", row.names=FALSE)

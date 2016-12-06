@@ -26,3 +26,12 @@ _Commits: 66c2639-9545346_
   
 #### _This model version examines how much variability is simply explained by a remotely sensed index of vegetation (EVI), and site location (via random effect), year (random effect). This model is meant to help explore variability in N factors and examine how much variability might be explained by a broad classification of vegetation as well as site specific factors vs arctic wide temporal variables. The maximum EVI band value over multiple years is used. The maximum EVI is expected to represent differernces in vegetation canopy structure is expected to be less subject to artifacts assoicated with growing season changes that can be in the average EVI_  
 _Commits: f4e5622-present_ 
+
+## Version 3 (Nvege model)
+
+ _N.fact_~ Normal( _mu_ , _tau_)
+ 
+ _mu_ = _beta1_ +_beta2_* _EVI_ 
+ 
+ 
+ #### This model focuses only on n factors with common vegetation data. It is a good start at looking at patterns with N factor and vegetation, but it excludes a lot of sites. A better way of incorporating vegetation is needed.  
