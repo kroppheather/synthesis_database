@@ -76,6 +76,8 @@ comb3WN<-na.omit(data.frame(datWNiv[1:11],vegez=datWNiv$new_vA, olt=datWNiv$olt,
 #dim(na.omit(comb1WN))[1]
 dim(na.omit(comb3WN))[1]
 
+#exclude data if there is only one data points
+
 #just stick with comb3 for now
 #need to create year and regionIDs
 
@@ -102,6 +104,7 @@ yearW$yearid<-seq(1, dim(yearS)[1])
 vegeSNi<-join(vegeSN,yearS,by="year",type="inner")
 vegeWNi<-join(vegeWN,yearW,by="wyear",type="inner")
 
+#aggregate by region id so that covariate centering is possible
 
 
 datamodellist<-list(NobsS=dim(vegeSNi)[1],n.factS=vegeSNi$n,
@@ -117,6 +120,13 @@ datamodellist<-list(NobsS=dim(vegeSNi)[1],n.factS=vegeSNi$n,
 					yearW=vegeWNi$yearid,regIDW=vegeWNi$reg.mod,
 					NyearW=dim(yearW)[1], xW=yearW$wyear,yW=rep(1,dim(yearW)[1]))
 					
+	plot(vegeSNi$n,vegeSNi$EVI)
+	
+	plot(vegeSNi$n[vegeSNi$reg.mod==1],vegeSNi$mossC[vegeSNi$reg.mod==1])
+	plot(vegeSNi$n,vegeSNi$mossC)
+	plot(vegeSNi$reg.mod,vegeSNi$n)
+	
+					
 Samplelist<-c("deviance", "nbeta1W","nbeta1S", "nbeta2S","nbeta3S","nbeta4S","nbeta5S",
 				"nbeta2W","nbeta3W","nbeta4W","nbeta5W",
 				"eps.star", "sig.S", "sig.W",
@@ -130,18 +140,18 @@ inits<-list(list(t.eps=1,rho.eps=.99,t.epsW=1,rho.epsW=.99),
 			
 n.model.init=jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\n_model\\Nvege_model_code.r",
 						data=datamodellist,
-						n.adapt=10000,
+						n.adapt=100000,
 						n.chains=3,
 						inits=inits)
 						
-n.iter.i=90000
+n.iter.i=200000
 codaobj.init = coda.samples(n.model.init,variable.names=Samplelist,
-                       n.iter=n.iter.i, thin=30)
+                       n.iter=n.iter.i, thin=100)
 					   
 
 
 windows(18)
-plot(codaobj.init[,"nbeta.star1S[1]"], ask=TRUE)	
+plot(codaobj.init[,"nbeta3S[2]"], ask=TRUE)	
 
 
 #generate summary

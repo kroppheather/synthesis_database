@@ -8,7 +8,8 @@ model{
 		n.factS[i]~dnorm(mu.nS[i], tau.S)
 		#mean n factor function of distance from sensor and location and
 		#year random effects and location random effects
-		mu.nS[i]<-nbeta1S[regIDS[i]]+nbeta2S[regIDS[i]]*EVIS[i]+nbeta3S[regIDS[i]]*OLTS[i]+nbeta4S[regIDS[i]]*shrubCS[i]+nbeta5S[regIDS[i]]*mossCS[i]
+		mu.nS[i]<-nbeta1S[regIDS[i]] + (nbeta2S[regIDS[i]]*EVIS[i]) + (nbeta3S[regIDS[i]]*OLTS[i]) + (nbeta4S[regIDS[i]]*shrubCS[i])
+		    + (nbeta5S[regIDS[i]]*mossCS[i])
 		
 	}
 
@@ -19,7 +20,8 @@ model{
 		n.factW[i]~dnorm(mu.nW[i], tau.W)
 		#mean n factor function of distance from sensor and location and
 		#year random effects and location random effects
-		mu.nW[i]<-nbeta1W[regIDW[i]]+nbeta2W[regIDW[i]]*EVIW[i]+nbeta3W[regIDW[i]]*OLTW[i]+nbeta4W[regIDW[i]]*shrubCW[i]+nbeta5W[regIDW[i]]*mossCW[i]
+		mu.nW[i]<-nbeta1W[regIDW[i]] + (nbeta2W[regIDW[i]]*EVIW[i]) + (nbeta3W[regIDW[i]]*OLTW[i]) + (nbeta4W[regIDW[i]]*shrubCW[i]) + 
+				(nbeta5W[regIDW[i]]*mossCW[i])
 		
 	}
 
