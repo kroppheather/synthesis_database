@@ -78,6 +78,10 @@ dim(na.omit(comb3WN))[1]
 
 #just stick with comb3 for now
 #need to create year and regionIDs
+#don't include any region with only one site observation
+#this is regionid 9
+comb3SN<-comb3SN[comb3SN$regionid!=9,]
+comb3WN<-comb3WN[comb3WN$regionid!=9,]
 
 #get unique region id
 
@@ -102,6 +106,15 @@ yearW$yearid<-seq(1, dim(yearS)[1])
 vegeSNi<-join(vegeSN,yearS,by="year",type="inner")
 vegeWNi<-join(vegeWN,yearW,by="wyear",type="inner")
 
+#need to aggregate covariates for covariate centering
+OLTSm<-aggregate(vegeSNi$olt,by=list(vegeSNi$reg.mod), FUN="mean")
+shrubSm<-aggregate(vegeSNi$shrubC,by=list(vegeSNi$reg.mod), FUN="mean")
+mossSm<-aggregate(vegeSNi$mossC,by=list(vegeSNi$reg.mod), FUN="mean")
+EVISm<-aggregate(vegeSNi$EVI,by=list(vegeSNi$reg.mod), FUN="mean")
+OLTWm<-aggregate(vegeWNi$olt,by=list(vegeWNi$reg.mod), FUN="mean")
+shrubWm<-aggregate(vegeWNi$shrubC,by=list(vegeWNi$reg.mod), FUN="mean")
+mossWm<-aggregate(vegeWNi$mossC,by=list(vegeWNi$reg.mod), FUN="mean")
+EVIWm<-aggregate(vegeWNi$EVI,by=list(vegeWNi$reg.mod), FUN="mean")
 
 
 datamodellist<-list(NobsS=dim(vegeSNi)[1],n.factS=vegeSNi$n,
@@ -115,7 +128,9 @@ datamodellist<-list(NobsS=dim(vegeSNi)[1],n.factS=vegeSNi$n,
 					OLTW=vegeWNi$olt,
 					shrubCW=vegeWNi$shrubC,mossCW=vegeWNi$mossC,
 					yearW=vegeWNi$yearid,regIDW=vegeWNi$reg.mod,
-					NyearW=dim(yearW)[1], xW=yearW$wyear,yW=rep(1,dim(yearW)[1]))
+					NyearW=dim(yearW)[1], xW=yearW$wyear,yW=rep(1,dim(yearW)[1]),
+					OLTSm=OLTSm$x,shrubSm=shrubSm$x,mossSm=mossSm$x,
+					OLTWm=OLTWm$x,shrubWm=shrubWm$x, mossWm=mossWm$x, EVISm=EVISm$x,EVIWm=EVIWm$x)
 					
 Samplelist<-c("deviance", "nbeta.star1W","nbeta.star1S", "nbeta2S","nbeta3S","nbeta4S","nbeta5S",
 				"nbeta2W","nbeta3W","nbeta4W","nbeta5W",
