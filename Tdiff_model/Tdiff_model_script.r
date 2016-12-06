@@ -13,30 +13,9 @@ datT<-read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tdiff_sh
 datT<-datT[datT$aT!=-999,]
 
 #set up an id for a region
-#start by just treating 1 degree of lat and long a reason
-#everything rounded down to the degree is treated as the same region
-
-datT$lat.f<-floor(datT$lat)
-datT$lon.f<-floor(datT$lon)
-#aggregate into an unique id
-regions<-unique(data.frame(lat.f=datT$lat.f,lon.f=datT$lon.f))
-regions$regID<-seq(1,dim(regions)[1])
-
-datT<-join(datT,regions,by=c("lat.f","lon.f"), type="left")
-
-#now look at how observations in sites and regions
-regSumm<-aggregate(datT$TdiffA, by=list(datT$siteid,datT$regID), FUN="length")
-#now look at how many sites in each region
-siteRcount<-aggregate(regSumm$Group.1,by=list(regSumm$Group.2), FUN="length")
-
-#####this model should be done heirarchically but more thought needs to 
-#####be put into how to categorize a region. It is probably more appropriate
-#####to group sites by vegetation type or community.
-#####This is an area to work on and think about. However, in the mean time
-#####allow regression parameters to vary by site to see if the model is
-##### even appropriate for Tdiff. This is because just goint off lat,long
-##### results in a high number of cases where only 1 site is in a region
-
+#read in data from region generated in GIS
+datR<-read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\region_siteinfo.csv")
+reg.to.join<-data.frame(siteid=datR$site_id,regionid=datR$region_id,region.name=datR$region_nam)
 
 #need to get together site id
 Sites<-data.frame(siteid=sort.int(unique(datT$siteid)))
@@ -54,11 +33,36 @@ datTii<-join(datTi,Years, by="year",type="inner")
 
 datTii$dayX<-datTii$dayseq/153
 
+datTiii<-join(datTii,reg.to.join,by="siteid",type="inner")
+
+#how many datapoints for a site
+regioncount<-aggregate(datTiii$TdiffA,by=list(datTiii$siteid, datTiii$regionid), FUN="length")
+#see how many sites are in each region
+siteReg<-aggregate(regioncount$Group.1,by=list(regioncount$Group.2), FUN="length")
+#site 17 is alone in region 6 
+#to avoid overparameterizing the hudson bay will be grouped with interior canada for now, region 5
+datTiii$region.fix<-ifelse(datTiii$regionid==6,5,datTiii$regionid)
+
+
+#need a region id for site
+siteRegI<-unique(data.frame(siteidm=datTiii$siteidm,siteid=datTiii$siteid,regid=datTiii$region.fix))
+sitRegII<-siteRegI[order(siteRegI$siteidm),]
+#now see how many unique regions there are
+newreg.df<-data.frame(regid=sort.int(unique(sitRegII$regid)))
+#since 6 is missing need to create a new id
+newreg.df$regidm<-seq(1,dim(newreg.df)[1])
+
+#join to region table
+siteRegIII<-join(sitRegII,newreg.df, by="regid", type="inner")
+
+
 #now get data together for the model
-datalist<-list(Nobs=dim(datTii)[1], Tdiff=datTii$TdiffA,SeasX=datTii$dayX, siteid=datTii$siteidm,yearid=datTii$yearid,
-				Nsites=dim(Sites)[1],NyearS=dim(Years)[1], xS=rep(1,dim(Years)[1]), yS=Years$year)
+datalist<-list(Nobs=dim(datTiii)[1], Tdiff=datTiii$TdiffA,SeasX=datTiii$dayX, siteid=datTiii$siteidm,yearid=datTiii$yearid,
+				Nsites=dim(Sites)[1],NyearS=dim(Years)[1], xS=rep(1,dim(Years)[1]), yS=Years$year, regionid=siteRegIII$regidm,
+				Nreg=dim(newreg.df)[1])
 				
-samplelist<-c("eps.star", "rho.eps", "beta2", "beta3", "beta4", "beta5", "beta1star","sig.Td","sig.eps","Tdiff.rep")
+samplelist<-c("eps.star", "rho.eps", "beta2", "beta3", "beta4", "beta5", "beta1star","sig.Td","sig.eps","Tdiff.rep",
+				"mu.beta1","mu.beta2","mu.beta3","mu.beta4","mu.beta5","sig.beta1","sig.beta2","sig.beta3","sig.beta4","sig.beta5")
 
 inits<-list(list(t.eps=1,rho.eps=.99),
 			list(t.eps=1.5,rho.eps=.89),
@@ -73,9 +77,12 @@ T.model.init=jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_da
 n.iter.i=30000
 codaobj.init = coda.samples(T.model.init,variable.names=samplelist,
                        n.iter=n.iter.i, thin=15)
-					   
+
+codatoplot<-ggs(codaobj.init)
+ggmcmc(codatoplot, family=c("beta1star","beta2","beta3","beta4","beta5"))
+				   
 windows(18)
-plot(codaobj.init[,"beta1star[22]",])
+plot(codaobj.init[,"beta5[15]",])
 
 Mod.out<-summary(codaobj.init)	
 

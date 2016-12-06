@@ -64,13 +64,32 @@ model{
 	
 	###Define likelihood priors
 	for(i in 1:Nsites){
-		beta1[i]~dnorm(0,0.001)
-		beta2[i]~dnorm(0,0.001)
-		beta3[i]~dnorm(0,0.001)
-		beta4[i]~dnorm(0,0.001)
-		beta5[i]~dnorm(0,0.001)
-		
+		beta1[i]~dnorm(mu.beta1[regionid[i]],tau.beta1[regionid[i]])
+		beta2[i]~dnorm(mu.beta2[regionid[i]],tau.beta2[regionid[i]])
+		beta3[i]~dnorm(mu.beta3[regionid[i]],tau.beta3[regionid[i]])
+		beta4[i]~dnorm(mu.beta4[regionid[i]],tau.beta4[regionid[i]])
+		beta5[i]~dnorm(mu.beta5[regionid[i]],tau.beta5[regionid[i]])	
 	}
+	#define hyper priors for region
+	for(i in 1:Nreg){
+	mu.beta1[i]~dnorm(0,.001)
+	mu.beta2[i]~dnorm(0,.001)
+	mu.beta3[i]~dnorm(0,.001)
+	mu.beta4[i]~dnorm(0,.001)
+	mu.beta5[i]~dnorm(0,.001)
+	#most group sizes are large enough to assume this. may need to explore further though
+	tau.beta1[i]<-pow(sig.beta1[i],-2)
+	tau.beta2[i]<-pow(sig.beta2[i],-2)
+	tau.beta3[i]<-pow(sig.beta3[i],-2)
+	tau.beta4[i]<-pow(sig.beta4[i],-2)
+	tau.beta5[i]<-pow(sig.beta5[i],-2)
+	sig.beta1[i]~dunif(0,200)
+	sig.beta2[i]~dunif(0,200)
+	sig.beta3[i]~dunif(0,200)
+	sig.beta4[i]~dunif(0,200)
+	sig.beta5[i]~dunif(0,200)
+	}
+	
 	#variance for T diff
 	tau.Td<-pow(sig.Td,-2)
 	sig.Td~dunif(0,40)
