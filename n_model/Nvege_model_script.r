@@ -106,6 +106,8 @@ yearW$yearid<-seq(1, dim(yearS)[1])
 vegeSNi<-join(vegeSN,yearS,by="year",type="inner")
 vegeWNi<-join(vegeWN,yearW,by="wyear",type="inner")
 
+dim(vegeSNi[vegeSNi$reg.mod==2,])
+
 #need to aggregate covariates for covariate centering
 OLTSm<-aggregate(vegeSNi$olt,by=list(vegeSNi$reg.mod), FUN="mean")
 shrubSm<-aggregate(vegeSNi$shrubC,by=list(vegeSNi$reg.mod), FUN="mean")
@@ -135,7 +137,7 @@ datamodellist<-list(NobsS=dim(vegeSNi)[1],n.factS=vegeSNi$n,
 Samplelist<-c("deviance", "nbeta.star1W","nbeta.star1S", "nbeta2S","nbeta3S","nbeta4S","nbeta5S",
 				"nbeta2W","nbeta3W","nbeta4W","nbeta5W",
 				"eps.star", "sig.S", "sig.W",
-				"mu.nS","epsW.star","mu.nW",
+				"rep.nS","epsW.star","rep.nW",
 				"rho.epsW",
 				"rho.eps")
 				
@@ -145,18 +147,18 @@ inits<-list(list(t.eps=1,rho.eps=.99,t.epsW=1,rho.epsW=.99),
 			
 n.model.init=jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\n_model\\Nvege_model_code.r",
 						data=datamodellist,
-						n.adapt=10000,
+						n.adapt=15000,
 						n.chains=3,
 						inits=inits)
 						
-n.iter.i=90000
+n.iter.i=300000
 codaobj.init = coda.samples(n.model.init,variable.names=Samplelist,
-                       n.iter=n.iter.i, thin=30)
+                       n.iter=n.iter.i, thin=100)
 					   
 
 
 windows(18)
-plot(codaobj.init[,"epsW.star[26]"], ask=TRUE)	
+plot(codaobj.init[,"nbeta5W[4]"], ask=TRUE)	
 
 
 #generate summary
