@@ -232,3 +232,45 @@ axis(4,seq(-.1,.1, by=.01), cex.axis=1.5,las=2)
 axis(1, xW, c("Interior AK","Western Canada", "Greenland"), cex.axis=1.5)
 box(which="plot")
 mtext("Summer % moss cover slope parameter", side=4, line=5, cex=2)
+
+
+###############################################################################
+###############################################################################
+#make a plot for year random effects in the model
+b<-layout(matrix(c(1,2),ncol=1), widths=c(lcm(33),lcm(33)), height=c(lcm(8), lcm(8)))
+layout.show(b)
+
+Syear<-data.frame(yearID=seq(1,26), year=seq(1991,2016))
+Wyear<-Syear
+#plot the random effect for year
+par(mai=c(0,0,0,0))
+plot(c(0,1),c(0,1), type="n", xlim=c(0,27),ylim=c(-.15,.15), axes=FALSE, xlab=" ", ylab=" ", xaxs="i",
+	yaxs="i")
+for(i in 1:dim(Syear)[1]){
+	polygon(c(Syear$yearID[i]-.5,Syear$yearID[i]-.5,Syear$yearID[i]+.5,Syear$yearID[i]+.5), 
+			c(0,datA$means[datA$parms=="eps.star"][i],datA$means[datA$parms=="eps.star"][i],0),
+			col="mediumseagreen")
+}
+arrows(Syear$yearID,datA$ci2.5[datA$parms=="eps.star"],Syear$yearID,datA$ci97.5[datA$parms=="eps.star"],code=0)
+box(which="plot")
+axis(2, seq(-.12,.12,by=.04),las=2,cex.axis=1.25)
+mtext("Random effect", side=2,cex=2,line=5)
+text(3,-.13, "Summer", cex=3)
+#now for winter
+par(mai=c(0,0,0,0))
+plot(c(0,1),c(0,1), type="n", xlim=c(0,27),ylim=c(-.25,.25), axes=FALSE, xlab=" ", ylab=" ", xaxs="i",
+	yaxs="i")
+for(i in 1:dim(Wyear)[1]){
+	polygon(c(Wyear$yearID[i]-.5,Wyear$yearID[i]-.5,Wyear$yearID[i]+.5,Wyear$yearID[i]+.5), 
+			c(0,datA$means[datA$parms=="epsW.star"][i],datA$means[datA$parms=="epsW.star"][i],0),
+			col="deepskyblue4")
+}
+arrows(Wyear$yearID,datA$ci2.5[datA$parms=="epsW.star"],Wyear$yearID,datA$ci97.5[datA$parms=="epsW.star"],code=0)
+axis(1, Wyear$yearID, Wyear$year, cex.axis=1.25)
+axis(2, seq(-.2,.2,by=.05),las=2,cex.axis=1.25)
+box(which="plot")
+mtext("Year", side=1,cex=2,line=3)
+mtext("Random effect", side=2,cex=2,line=5)
+text(3,-.21, "Winter", cex=3)
+
+
