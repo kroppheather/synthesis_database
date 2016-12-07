@@ -274,3 +274,38 @@ mtext("Random effect", side=2,cex=2,line=5)
 text(3,-.21, "Winter", cex=3)
 
 
+##################################################################################
+##########Now plot overall N factors #############################################
+##################################################################################
+
+#read in summer and winter data
+datSN<-read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\SummerNvege.csv")
+datWN<-read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\winterNvege.csv")
+#exclude site with impossible air temperature
+datSN<-datSN[datSN$n<3,]
+#exclude all depths greater than 10
+datSN<-datSN[datSN$depth<10,]
+datWN<-datWN[datWN$depth<10,]
+
+#get the number of observations
+nSn<-aggregate(datSN$n, by=list(datSN$Snew_vA), FUN="length")
+nWn<-aggregate(datWN$n, by=list(datWN$new_vA), FUN="length")
+#make box plots
+par(mfrow=c(1,2))
+par(mai=c(1,1,.5,.5))
+plot(datWN$new_vA,datWN$n, col="deepskyblue4", axes=FALSE, ylim=c(0,1.6), pch=19, yaxs="i")
+axis(1, c(-1,1,2,5),c(NA,"boreal","tundra", NA),cex.axis=1.5)
+axis(2, seq(-.3,1.8, by=.3), las=2,cex.axis=1.5 )
+mtext("Winter n factor", side=2, line=3, cex=2.5)
+mtext("Biome", side=1, line=3, cex=2.5)
+
+text((seq(1,2)+.3),rep(1.4,2),paste("n =",nWn$x), cex=2, font=3)
+
+par(mai=c(1,1,.5,.5))
+plot(datSN$Snew_vA,datSN$n, col="mediumseagreen",axes=FALSE, ylim=c(0,1.6), pch=19, yaxs="i")
+axis(1, c(-1,1,2,5),c(NA,"boreal","tundra", NA),cex.axis=1.5)
+axis(2, seq(-.3,1.8, by=.3), las=2,cex.axis=1.5 )
+mtext("Summer n factor", side=2, line=3, cex=2.5)
+mtext("Biome", side=1, line=3, cex=2.5)
+
+text((seq(1,2)+.3),rep(1.4,2),paste("n =",nSn$x), cex=2, font=3)
