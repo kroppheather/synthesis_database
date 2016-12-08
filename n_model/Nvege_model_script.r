@@ -82,7 +82,9 @@ dim(na.omit(comb3WN))[1]
 #this is regionid 9
 comb3SN<-comb3SN[comb3SN$regionid!=9,]
 comb3WN<-comb3WN[comb3WN$regionid!=9,]
-
+#north interior doesn't have a lot of data and appear to be different from south interior
+comb3SN$regionid<-ifelse(comb3SN$regionid==2,1,comb3SN$regionid)
+comb3WN$regionid<-ifelse(comb3WN$regionid==2,1,comb3WN$regionid)
 #get unique region id
 
 RegionS<-data.frame(regionid=sort.int(unique(comb3SN$regionid)))
@@ -106,7 +108,8 @@ yearW$yearid<-seq(1, dim(yearS)[1])
 vegeSNi<-join(vegeSN,yearS,by="year",type="inner")
 vegeWNi<-join(vegeWN,yearW,by="wyear",type="inner")
 
-dim(vegeSNi[vegeSNi$reg.mod==2,])
+
+
 
 #need to aggregate covariates for covariate centering
 OLTSm<-aggregate(vegeSNi$olt,by=list(vegeSNi$reg.mod), FUN="mean")
@@ -151,20 +154,27 @@ n.model.init=jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_da
 						n.chains=3,
 						inits=inits)
 						
-n.iter.i=300000
+n.iter.i=90000
 codaobj.init = coda.samples(n.model.init,variable.names=Samplelist,
-                       n.iter=n.iter.i, thin=100)
+                       n.iter=n.iter.i, thin=30)
 					   
 
 
 windows(18)
-plot(codaobj.init[,"nbeta5W[4]"], ask=TRUE)	
+plot(codaobj.init[,"nbeta2W[3]"], ask=TRUE)	
 
 
 #generate summary
 
 Mod.out<-summary(codaobj.init)	
-				
+write.table(Mod.out$statistics, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\model_nvege_stats.csv",
+			sep=",",row.names=TRUE)
+write.table(Mod.out$quantiles, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\model_nvege_quant.csv",
+			sep=",",row.names=TRUE)
+						
+
+write.table(vegeWNi, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\organized_vegewN_for_model.csv", sep=",",)
+write.table(vegeSNi, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\organized_vegesN_for_model.csv", sep=",",)				
 
 
 

@@ -83,7 +83,7 @@ for(i in 1:3){
 		
 arrows(xW,datA$ci2.5[datA$parms=="nbeta2W"],xW,datA$ci97.5[datA$parms=="nbeta2W"],code=0)		
 axis(2,seq(-12,10, by=2), cex.axis=1.5,las=2)
-axis(1, xW, c("Interior AK","Western Canada", "Greenland"), cex.axis=1.5)
+axis(1, xW, c("Alaska","Western Canada", "Greenland"), cex.axis=1.5)
 box(which="plot")
 mtext("Winter EVI slope parameter", side=2, line=5, cex=2)
 #summer
@@ -103,7 +103,7 @@ arrows(xS,datA$ci2.5[datA$parms=="nbeta2S"],xS,datA$ci97.5[datA$parms=="nbeta2S"
 
 
 axis(4,seq(-12,10, by=2), cex.axis=1.5,las=2)
-axis(1, xW, c("Interior AK","Western Canada", "Greenland"), cex.axis=1.5)
+axis(1, xW, c("Alaska","Western Canada", "Greenland"), cex.axis=1.5)
 box(which="plot")
 mtext("Summer EVI slope parameter", side=4, line=5, cex=2)
 
@@ -127,7 +127,7 @@ for(i in 1:3){
 		
 arrows(xW,datA$ci2.5[datA$parms=="nbeta3W"],xW,datA$ci97.5[datA$parms=="nbeta3W"],code=0)		
 axis(2,seq(-.1,.1, by=.01), cex.axis=1.5,las=2)
-axis(1, xW, c("Interior AK","Western Canada", "Greenland"), cex.axis=1.5)
+axis(1, xW, c("Alaska","Western Canada", "Greenland"), cex.axis=1.5)
 box(which="plot")
 mtext("Winter organic layer slope parameter", side=2, line=5, cex=2)
 #summer
@@ -147,7 +147,7 @@ arrows(xS,datA$ci2.5[datA$parms=="nbeta3S"],xS,datA$ci97.5[datA$parms=="nbeta3S"
 
 
 axis(4,seq(-.1,.1, by=.01), cex.axis=1.5,las=2)
-axis(1, xW, c("Interior AK","Western Canada", "Greenland"), cex.axis=1.5)
+axis(1, xW, c("Alaska","Western Canada", "Greenland"), cex.axis=1.5)
 box(which="plot")
 mtext("Summer organic layer slope parameter", side=4, line=5, cex=2)
 
@@ -168,7 +168,7 @@ for(i in 1:3){
 		
 arrows(xW,datA$ci2.5[datA$parms=="nbeta4W"],xW,datA$ci97.5[datA$parms=="nbeta4W"],code=0)		
 axis(2,seq(-.1,.1, by=.01), cex.axis=1.5,las=2)
-axis(1, xW, c("Interior AK","Western Canada", "Greenland"), cex.axis=1.5)
+axis(1, xW, c("Alaska","Western Canada", "Greenland"), cex.axis=1.5)
 box(which="plot")
 mtext("Winter % shrub cover slope parameter", side=2, line=5, cex=2)
 #summer
@@ -188,7 +188,7 @@ arrows(xS,datA$ci2.5[datA$parms=="nbeta4S"],xS,datA$ci97.5[datA$parms=="nbeta4S"
 
 
 axis(4,seq(-.1,.1, by=.01), cex.axis=1.5,las=2)
-axis(1, xW, c("Interior AK","Western Canada", "Greenland"), cex.axis=1.5)
+axis(1, xW, c("Alaska","Western Canada", "Greenland"), cex.axis=1.5)
 box(which="plot")
 mtext("Summer % shrub cover slope parameter", side=4, line=5, cex=2)
 
@@ -209,7 +209,7 @@ for(i in 1:3){
 		
 arrows(xW,datA$ci2.5[datA$parms=="nbeta5W"],xW,datA$ci97.5[datA$parms=="nbeta5W"],code=0)		
 axis(2,seq(-.1,.1, by=.01), cex.axis=1.5,las=2)
-axis(1, xW, c("Interior AK","Western Canada", "Greenland"), cex.axis=1.5)
+axis(1, xW, c("Alaska","Western Canada", "Greenland"), cex.axis=1.5)
 box(which="plot")
 mtext("Winter % moss cover slope parameter", side=2, line=5, cex=2)
 #summer
@@ -229,7 +229,7 @@ arrows(xS,datA$ci2.5[datA$parms=="nbeta5S"],xS,datA$ci97.5[datA$parms=="nbeta5S"
 
 
 axis(4,seq(-.1,.1, by=.01), cex.axis=1.5,las=2)
-axis(1, xW, c("Interior AK","Western Canada", "Greenland"), cex.axis=1.5)
+axis(1, xW, c("Alaska","Western Canada", "Greenland"), cex.axis=1.5)
 box(which="plot")
 mtext("Summer % moss cover slope parameter", side=4, line=5, cex=2)
 
