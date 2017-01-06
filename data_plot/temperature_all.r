@@ -224,14 +224,6 @@ for(i in 1:Nsite){
 }										
 						
 						
-#need a more efficient method than the for loop 
-#running out of memory
-#include all data since trying to look at as complete of a year as possible												
-Temperature<-list()
-for(i in 1:Nsite){
-	Temperature[[i]]<-join(S.all[[i]],A.all[[i]], by=c("doy_st", "year_st"), type="full")
-
-}
 
 #check dim of temp
 
@@ -271,59 +263,144 @@ for(i in 1:Nsite){
 }
 
 
-#first create an index in each site that groups by time
-#create 
-dyear<-list()
-dseq<-list()
 
-#set up an index water year
-#note: code below is similar to seasonal break in
-#n factors, but it can actually be simplified
-#down to an ifelse function. Should do this
-# to speed things up and clean up code
+
+
 ######To add need to account for leap year
 #set up 
 leap.year<-data.frame(year=seq(1989,2016), leapID=rep(c(0,0,0,1), times=7))
-leapY<-leap.year$year[leap.year$leapID==1]
+
 colnames(leap.year)<-c("year_st", "leapID")
-##########fix this
+
+
+#add the leap year id and label the water year for air and soil
 
 for(i in 1:Nsite){
-	Temperature[[i]]<-join(Temperature[[i]],leap.year,by=c("year_st"),
+	A.all[[i]]<-join(A.all[[i]],leap.year,by=c("year_st"),
 							type="left")
-Temperature[[i]]$wyear<-
-		ifelse(Temperature[[i]]$leapID==1&Temperature[[i]]$doy_st<275,
-					TemperatureJ$year_st,
-		ifelse(Temperature[[i]]$leapID==0&Temperature[[i]]$doy_st<274,
-					Temperature[[i]]$year_st,Temperature[[i]]$year_st+1))
+A.all[[i]]$wyear<-
+		ifelse(A.all[[i]]$leapID == 1 & A.all[[i]]$doy_st <  275,
+				A.all[[i]]$year_st,
+				ifelse(A.all[[i]]$leapID == 0 & A.all[[i]]$doy_st < 274,
+						A.all[[i]]$year_st,A.all[[i]]$year_st+1))
 
 }
+sA<-list()
 
-AirnoNA<-list()
-site.obsA<-list()
+srepA<-numeric(0)
+siteseq<-seq(1,Nsite)
 for(i in 1:Nsite){
-					#set up air only and exclude NA					
-	AirnoNA[[i]]<-na.omit(data.frame(air_T=Temperature[[i]]$air_t,
-									wyear=Temperature[[i]]$wyear,
-									air_height=Temperature[[i]]$air_height,
-									site_id=Temperature[[i]]$site_id))	
-
-}									
 	
-AirobsA<-ldply(AirnoNA,data.frame)
-	site.obsA<-aggregate(AirobsA$air_T, by=
-							list(
-								AirobsA$wyear,
-								AirobsA$air_height,
-								AirobsA$site_id), 
-								FUN="length")
+	srepA[i]<-length(which(colnames(A.all[[i]])=="air_height"))
+	#make a dataframe of soil T and depth
+	sA[[i]]<-data.frame(A=as.vector(data.matrix(A.all[[i]][,colnames(A.all[[i]])=="air_t"])),
+	depth=as.vector(data.matrix(A.all[[i]][,colnames(A.all[[i]])=="air_height"])),
+	doy=rep(A.all[[i]]$doy_st, times=srepA[i]),
+	year=rep(A.all[[i]]$year_st, times=srepA[i]),
+	wyear=rep(A.all[[i]]$wyear, times=srepA[i]),
+	siteid=rep(siteseq[i],srepA[i]*length(A.all[[i]]$wyear)))
+}
+
+
+
+Air<-ldply(sA,data.frame)
+Airnn<-na.omit(Air)
+								
+
+#see how many obserations for each year in a site
 	
+site.obsA<-aggregate(Airnn$A, by=
+					list(Airnn$depth,		
+						Airnn$siteid,
+						Airnn$wyear), 
+					FUN="length")
 
+
+#now need to get the same for soil
+
+for(i in 1:Nsite){
+	S.all[[i]]<-join(S.all[[i]],leap.year,by=c("year_st"),
+							type="left")
+S.all[[i]]$wyear<-
+		ifelse(S.all[[i]]$leapID == 1 & S.all[[i]]$doy_st <  275,
+				S.all[[i]]$year_st,
+				ifelse(S.all[[i]]$leapID == 0 & S.all[[i]]$doy_st < 274,
+						S.all[[i]]$year_st,S.all[[i]]$year_st+1))
+
+}
+sS<-list()
+
+srepS<-numeric(0)
+siteseq<-seq(1,Nsite)
+for(i in 1:Nsite){
 	
-###############
-#get information on number of observations in a year for each site
+	srepS[i]<-length(which(colnames(S.all[[i]])=="st_depth"))
+	#make a dataframe of soil T and depth
+	sS[[i]]<-data.frame(T=as.vector(data.matrix(S.all[[i]][,colnames(S.all[[i]])=="soil_t"])),
+	depth=as.vector(data.matrix(S.all[[i]][,colnames(S.all[[i]])=="st_depth"])),
+	doy=rep(S.all[[i]]$doy_st, times=srepS[i]),
+	year=rep(S.all[[i]]$year_st, times=srepS[i]),
+	wyear=rep(S.all[[i]]$wyear, times=srepS[i]),
+	siteid=rep(siteseq[i],srepS[i]*length(S.all[[i]]$wyear)))
+}
 
 
 
+Soil<-ldply(sS,data.frame)
+Soilnn<-na.omit(Soil)
+								
+
+#see how many obserations for each year in a site
+	
+site.obsS<-aggregate(Soilnn$T, by=
+					list(Soilnn$depth,		
+						Soilnn$siteid,
+						Soilnn$wyear), 
+					FUN="length")
+
+#start by focusing on sites with at least 75% of the year
+colnames(site.obsS)<-c("depth", "siteid","wyear","n")
+colnames(site.obsA)<-c("height", "siteid","wyear","n")
+
+#how many air temp heights are there
+min(unique(site.obsA$height))
+max(unique(site.obsA$height))
+
+#filter sites to use by observations that aree 75% of the 
+#year and have an air temp height of 1 m at least
+nfilter<-floor(365*.75)
+site.obsAf<-site.obsA[site.obsA$height>=1&site.obsA$n>=nfilter,]
+
+site.obsSf<-site.obsS[site.obsS$n>=nfilter,]
+colnames(site.obsAf)<-c("depth", "siteid","wyear","n")
+
+#now join back with full data frame to apply filter
+SoilS<-join(Soil,site.obsSf,by=c("depth","siteid","wyear"), type="inner")
+AirS<-join(Air,site.obsAf,by=c("depth","siteid","wyear"), type="inner")
+
+#now look at soil temperature in plots
+#make a date column that uses day of year as a decimal place
+#put a little bit of space between years
+SoilS$decdate<-ifelse(SoilS$year!=SoilS$wyear,
+				(SoilS$wyear-1991)+(SoilS$doy-274)/367,
+				(SoilS$wyear-1991)+(SoilS$doy+91)/367)
+plot(SoilS$decdate[SoilS$depth<=10],SoilS$T[SoilS$depth<=10],pch=19)
+
+#looks like a -999 got lefr in a data set so exclude n
+SoilS<-SoilS[SoilS$T>-50,]
+plot(SoilS$decdate[SoilS$depth<=10],SoilS$T[SoilS$depth<=10],pch=19)
 
 
+#add in site information
+
+
+soilsin<-function(Ta,Daysd,Ao){
+		Ta+(Ao*sin(-2*3.14*Daysd))
+		}
+plotyear<-rep(seq(1991,2016), each=365)
+plotdoy<-rep(seq(1,365), times=26)
+plotseq<-(plotyear-1991)+(plotdoy/365)
+
+plot(SoilS$decdate[SoilS$depth<=10],SoilS$T[SoilS$depth<=10],pch=19)
+points(plotseq,soilsin(0,plotdoy/365,20), type="l",col="red")
+abline(h=0)
