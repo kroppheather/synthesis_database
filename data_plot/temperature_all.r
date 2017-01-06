@@ -287,35 +287,43 @@ leap.year<-data.frame(year=seq(1989,2016), leapID=rep(c(0,0,0,1), times=7))
 leapY<-leap.year$year[leap.year$leapID==1]
 colnames(leap.year)<-c("year_st", "leapID")
 ##########fix this
-Temperaturedf<-ldply(Temperature,data.frame)
 
-	TemperatureJ<-join(Temperaturedf,leap.year,by=c("year_st"),
+for(i in 1:Nsite){
+	Temperature[[i]]<-join(Temperature[[i]],leap.year,by=c("year_st"),
 							type="left")
-
-
-TemperatureJ$wyear<-
-		ifelse(TemperatureJ$leapID==1&TemperatureJ$doy_st<275,
+Temperature[[i]]$wyear<-
+		ifelse(Temperature[[i]]$leapID==1&Temperature[[i]]$doy_st<275,
 					TemperatureJ$year_st,
-		ifelse(TemperatureJ$leapID==0&TemperatureJ$doy_st<274,
-					TemperatureJ$year_st,TemperatureJ$year_st+1))
+		ifelse(Temperature[[i]]$leapID==0&Temperature[[i]]$doy_st<274,
+					Temperature[[i]]$year_st,Temperature[[i]]$year_st+1))
 
-		
-		
+}
+
+AirnoNA<-list()
+site.obsA<-list()
+for(i in 1:Nsite){
+					#set up air only and exclude NA					
+	AirnoNA[[i]]<-na.omit(data.frame(air_T=Temperature[[i]]$air_t,
+									wyear=Temperature[[i]]$wyear,
+									air_height=Temperature[[i]]$air_height,
+									site_id=Temperature[[i]]$site_id))	
+
+}									
+	
+AirobsA<-ldply(AirnoNA,data.frame)
+	site.obsA<-aggregate(AirobsA$air_T, by=
+							list(
+								AirobsA$wyear,
+								AirobsA$air_height,
+								AirobsA$site_id), 
+								FUN="length")
+	
 
 	
 ###############
 #get information on number of observations in a year for each site
 
-	AirnoNA<-na.omit(data.frame(air_T=TemperatureJ$air_t,
-									wyear=TemperatureJ$wyear,
-									air_height=TemperatureJ$air_height,
-									site_id=TemperatureJ$site_id))
 
 
-	site.obsA<-aggregate(AirnoNA$air_T, by=
-							list(
-								AirnoNA$wyear,
-								AirnoNA$air_height,
-								AirnoNA$site_id), 
-								FUN="length")
+
 

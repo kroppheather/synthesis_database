@@ -288,68 +288,42 @@ dseq<-list()
 #set up 
 leap.year<-data.frame(year=seq(1989,2016), leapID=rep(c(0,0,0,1), times=7))
 leapY<-leap.year$year[leap.year$leapID==1]
+colnames(leap.year)<-c("year_st", "leapID")
+#now add leap year to Temperature
+
+
 
 for(i in 1:Nsite){
-	#set up index for year
-	dyear[[i]]<-unique(Temperature[[i]]$year_st)
-	dseq[[i]]<-seq(1,length(unique(Temperature[[i]]$year_st)))
-	#set up vector to replace Na with index
-	Temperature[[i]]$w.index<-rep(999,dim(Temperature[[i]])[1])
-	Temperature[[i]]$w.year<-rep(-999,dim(Temperature[[i]])[1])
-	#set up id if the year is a leap year
-	for(j in 1:dim(Temperature[[i]])[1]){
-		for(n in 1:length(leapY)){
-			if(Temperature[[i]]$year_st[j]==leapY[n]){
-				Temperature[[i]]$leapID[j]<-1
-			}else{Temperature[[i]]$leapID[j]<-0}
-		}	
-		for(m in 1:length(dyear[[i]])){
+	Temperature[[i]]<-join(Temperature[[i]],leap.year,by=c("year_st"),
+							type="left")
+Temperature[[i]]$w.index<-
+		ifelse(Temperature[[i]]$leapID==1&Temperature[[i]]$doy_st>=275,
+				1,
+		ifelse(Temperature[[i]]$leapID==0&Temperature[[i]]$doy_st>=274,
+				1,
+		ifelse(Temperature[[i]]$leapID==1&Temperature[[i]]$doy_st<122,
+				1,
+		ifelse(Temperature[[i]]$leapID==0&Temperature[[i]]$doy_st<121,
+				1,999))))		
+Temperature[[i]]$w.year<-
+		ifelse(Temperature[[i]]$leapID==1&Temperature[[i]]$doy_st>=275,
+					Temperature[[i]]$year_st+1,
+		ifelse(Temperature[[i]]$leapID==0&Temperature[[i]]$doy_st>=274,
+					Temperature[[i]]$year_st+1,
+		ifelse(Temperature[[i]]$leapID==1&Temperature[[i]]$doy_st<122,
+				Temperature[[i]]$year_st,
+		ifelse(Temperature[[i]]$leapID==0&Temperature[[i]]$doy_st<121,
+				Temperature[[i]]$year_st,999))))
 
-		#index for Jan for May
-		if(Temperature[[i]]$leapID[j]==1){
-			if(Temperature[[i]]$doy_st[j]<=122
-				&Temperature[[i]]$year_st[j]==dyear[[i]][m]){
-					Temperature[[i]]$w.index[j]<-1
-					Temperature[[i]]$w.year[j]<-dyear[[i]][m]
-			}else{
-				if(Temperature[[i]]$doy_st[j]>=275
-					&Temperature[[i]]$year_st[j]==dyear[[i]][m]){
-						Temperature[[i]]$w.index[j]<-1
-						Temperature[[i]]$w.year[j]<-dyear[[i]][m]+1
-				}
-			}
-		
-		
-		}else{
-		if(Temperature[[i]]$doy_st[j]<=121
-				&Temperature[[i]]$year_st[j]==dyear[[i]][m]){
-					Temperature[[i]]$w.index[j]<-1
-					Temperature[[i]]$w.year[j]<-dyear[[i]][m]
-			}else{
-				if(Temperature[[i]]$doy_st[j]>=274
-					&Temperature[[i]]$year_st[j]==dyear[[i]][m]){
-						Temperature[[i]]$w.index[j]<-1
-						Temperature[[i]]$w.year[j]<-dyear[[i]][m]+1
-				}
-			}
-		
-		}
+}
 
-	}
-}
-}
+
 #now create summer index
 
 for(i in 1:Nsite){
-	Temperature[[i]]$s.index<-rep(999,dim(Temperature[[i]])[1])
-	for(j in 1:dim(Temperature[[i]])[1]){
-		for(m in 1:length(dyear[[i]])){
-			if(Temperature[[i]]$w.index[j]!=1
-				&Temperature[[i]]$year_st[j]==dyear[[i]][m]){
-				Temperature[[i]]$s.index[j]<-1
-			}
-		}
-	}
+			Temperature[[i]]$s.index<-ifelse(Temperature[[i]]$w.index!=1,
+				1,999)
+
 
 }
 
@@ -407,6 +381,7 @@ for(i in 1:Nsite){
 	#now see how many days are in each index
 	sT.n[[i]]<-na.omit(sT[[i]])
 	sT.c[[i]]<-dim(sT.n[[i]])
+
 	#see which data have full winter days
 		if(length(sT.n[[i]]$T[sT.n[[i]]$w.ind==1])!=0){
 			Scountw[[i]]<-aggregate(sT.n[[i]]$T[sT.n[[i]]$w.ind==1],
@@ -427,7 +402,7 @@ for(i in 1:Nsite){
 	#see how many observations for winter and summer
 	#if all observations are present
 	#154 in summer
-	#212 in winter (+1 leap year)
+	#211 in winter (+1 leap year)
 	#now see how many days are in each index
 	sA.n[[i]]<-na.omit(sA[[i]])
 	sA.c[[i]]<-dim(sA.n[[i]])
@@ -467,13 +442,13 @@ for(i in 1:Nsite){
 Scountsdf<-ldply(Scounts,data.frame)
 Wcountsdf<-ldply(Scountw,data.frame)
 Acountwdf<-ldply(Acountw,data.frame)
-Acountsdf<-ldply(Acounts,data.frame)
+Acountsdf<-ldply(Acounts,data.frame)     
 
 #get rid of any NAs and observations that don't span a full season
-S.use<-na.omit(Scountsdf[Scountsdf$x==152,])
-W.use<-na.omit(Wcountsdf[Wcountsdf$x==213|Wcountsdf$x==214,])
-AS.use<-na.omit(Acountsdf[Acountsdf$x==152,])
-AW.use<-na.omit(Acountwdf[Acountwdf$x==213|Acountwdf$x==214,])
+S.use<-na.omit(Scountsdf[Scountsdf$x==153,])
+W.use<-na.omit(Wcountsdf[Wcountsdf$x==212|Wcountsdf$x==213,])
+AS.use<-na.omit(Acountsdf[Acountsdf$x==153,])
+AW.use<-na.omit(Acountwdf[Acountwdf$x==212|Acountwdf$x==213,])
 #change column names
 colnames(S.use)<-c("depth", "year","count","siteid")
 colnames(W.use)<-c("depth", "wyear","count","siteid")
@@ -623,14 +598,14 @@ plot(N.summ$n[N.summ$depth<10]~as.factor(N.summ$loc[N.summ$depth<10]), pch=19,
 
 #first explore how much data changes
 
-SdayLow<-round(0.95*152,0)
-WdayLow<-round(0.95*213,0)
+SdayLow<-round(0.95*153,0)
+WdayLow<-round(0.95*212,0)
 
 #See what data could be corrected
-S.toCor<-na.omit(Scountsdf[Scountsdf$x<152&Scountsdf$x>=SdayLow,])
-W.toCor<-na.omit(Wcountsdf[Wcountsdf$x<213&Wcountsdf$x>=WdayLow,])
-AS.toCor<-na.omit(Acountsdf[Acountsdf$x<152&Acountsdf$x>=SdayLow,])
-AW.toCor<-na.omit(Acountwdf[Acountwdf$x<213&Acountwdf$x>=WdayLow,])
+S.toCor<-na.omit(Scountsdf[Scountsdf$x<153&Scountsdf$x>=SdayLow,])
+W.toCor<-na.omit(Wcountsdf[Wcountsdf$x<212&Wcountsdf$x>=WdayLow,])
+AS.toCor<-na.omit(Acountsdf[Acountsdf$x<153&Acountsdf$x>=SdayLow,])
+AW.toCor<-na.omit(Acountwdf[Acountwdf$x<212&Acountwdf$x>=WdayLow,])
 #Note adjusting N factor for 95% of the season appears to drastically increase
 #data available for analysis so it is worth exploring
 
@@ -1174,10 +1149,10 @@ colnames(AW.toCor)<-c("depth","wyear","count","siteid")
 
 #Need to calculate proportion of data present
 
-S.toCor$prop<-round(S.toCor$count/154,2)
+S.toCor$prop<-round(S.toCor$count/153,2)
 W.toCor$prop<-round(W.toCor$count/212,2)
 AS.toCor$prop<-round(AS.toCor$count/154,2)
-AW.toCor$prop<-round(AW.toCor$count/212,2)
+AW.toCor$prop<-round(AW.toCor$count/213,2)
 
 #join based on what data to use to meet criteria
 S.forcorr<-join(SummT,S.toCor, by=c("depth", "year","siteid"), type="inner")
@@ -1273,20 +1248,20 @@ N.summA$Snew_vA<-ifelse(N.summA$vege_z=="boreal forest", "boreal",
 		ifelse(	is.na(N.summA$vege_z),"unclassified","unclassified"))))
 		
 #get sample size
-Wnumbs<-aggregate(N.wintA$n[N.wintA$depth<10], by=list(as.factor(new_vA[N.wintA$depth<10])),
+Wnumbs<-aggregate(N.wintA$n[N.wintA$depth<10], by=list(as.factor(N.wintA$new_vA[N.wintA$depth<10])),
 		FUN="length")
 		
-Snumbs<-aggregate(N.summA$n[N.summA$depth<10],by=list(as.factor(Snew_vA[N.summA$depth<10])),
+Snumbs<-aggregate(N.summA$n[N.summA$depth<10],by=list(as.factor(N.summA$Snew_vA[N.summA$depth<10])),
 		FUN="length")
 #make box plot
 par(mfrow=c(1,2))	
-plot(N.wintA$n[N.wintA$depth<10]~as.factor(new_vA[N.wintA$depth<10]), pch=19,
+plot(N.wintA$n[N.wintA$depth<10]~as.factor(N.wintA$new_vA[N.wintA$depth<10]), pch=19,
 	xlab="biome",ylab="Winter N factor")
 text(1.3,1.2, paste("n=",Wnumbs$x[1]), cex=2)
 text(2.3,1.2, paste("n=",Wnumbs$x[2]), cex=2)
 text(3.3,1.2, paste("n=",Wnumbs$x[3]), cex=2)
 
-plot(N.summA$n[N.summA$depth<10]~as.factor(Snew_vA[N.summA$depth<10]), pch=19,
+plot(N.summA$n[N.summA$depth<10]~as.factor(N.summA$Snew_vA[N.summA$depth<10]), pch=19,
 	xlab="biome",ylab="Summer N factor")
 	
 text(1.3,1.65, paste("n=",Snumbs$x[1]), cex=2)
