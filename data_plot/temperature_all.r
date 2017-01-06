@@ -285,72 +285,37 @@ dseq<-list()
 #set up 
 leap.year<-data.frame(year=seq(1989,2016), leapID=rep(c(0,0,0,1), times=7))
 leapY<-leap.year$year[leap.year$leapID==1]
+colnames(leap.year)<-c("year_st", "leapID")
 ##########fix this
-for(i in 1:Nsite){
-	#set up index for year
-	dyear[[i]]<-unique(Temperature[[i]]$year_st)
-	dseq[[i]]<-seq(1,length(unique(Temperature[[i]]$year_st)))
-	#set up vector to replace Na with water year index
-	Temperature[[i]]$w.year<-rep(-999,dim(Temperature[[i]])[1])
-	#set up id if the year is a leap year
-	for(j in 1:dim(Temperature[[i]])[1]){
-		for(n in 1:length(leapY)){
-		Temperature[[i]]$leapID[j]<-0
-			if(Temperature[[i]]$year_st[j]==leapY[n]){
-				Temperature[[i]]$leapID[j]<-1
-			}
-		}
-	}
-}
-		tester<-Temperature[[195]]$doy_st[Temperature[[195]]$wyear2==2005]
-		
-		
-for(i in 1:Nsite){
-		#index for Jan for May
+Temperaturedf<-ldply(Temperature,data.frame)
 
-		Temperature[[i]]$wyear2<-
-		ifelse(Temperature[[i]]$leapID==1&Temperature[[i]]$doy_st<275,
-					Temperature[[i]]$year_st,
-		ifelse(Temperature[[i]]$leapID==0&Temperature[[i]]$doy_st<274,
-					Temperature[[i]]$year_st,Temperature[[i]]$year_st+1))
+	TemperatureJ<-join(Temperaturedf,leap.year,by=c("year_st"),
+							type="left")
+
+
+TemperatureJ$wyear<-
+		ifelse(TemperatureJ$leapID==1&TemperatureJ$doy_st<275,
+					TemperatureJ$year_st,
+		ifelse(TemperatureJ$leapID==0&TemperatureJ$doy_st<274,
+					TemperatureJ$year_st,TemperatureJ$year_st+1))
 
 		
-		}
+		
 
 	
-
-
-
 ###############
 #get information on number of observations in a year for each site
-AirnoNA<-list()
-site.obsA<-list()
-site.obsS<-list()
-for(i in 1:Nsite){
-	AirnoNA[[i]]<-na.omit(data.frame(air_T=Temperature[[i]]$air_t,
-									wyear=Temperature[[i]]$wyear,
-									air_height=Temperature[[i]]$air_height))
-	}
-	sitedim<-list()
-for(i in 1:Nsite){
-sitedim[[i]]<-dim(AirnoNA[[i]])	
-	}
-	
-for(i in 1:Nsite){	
-	if(sitedim[[i]][1]>0){
-	site.obsA[[i]]<-aggregate(AirnoNA[[i]]$air_T, by=
+
+	AirnoNA<-na.omit(data.frame(air_T=TemperatureJ$air_t,
+									wyear=TemperatureJ$wyear,
+									air_height=TemperatureJ$air_height,
+									site_id=TemperatureJ$site_id))
+
+
+	site.obsA<-aggregate(AirnoNA$air_T, by=
 							list(
-								AirnoNA[[i]]$wyear,
-								AirnoNA[[i]]$air_height), 
+								AirnoNA$wyear,
+								AirnoNA$air_height,
+								AirnoNA$site_id), 
 								FUN="length")
-	site.obsA[[i]]$siteid<-rep(i,dim(site.obsA[[i]])[1])
-	
-	}else{site.obsA[[i]]<-data.frame(Group.1=c(0),Group.2=c(0),
-									x=c(0), siteid=i)}
-}
-	site.obsS[[i]]<-na.omit(aggregate(Temperature[[i]]$soil_t, by=
-							list(
-								Temperature[[i]]$wyear,
-								Temperature[[i]]$st_depth), FUN="length"))
-	site.obsS[[i]]$siteid<-rep(i,dim(site.obsA[[i]])[1])
-}								
+
