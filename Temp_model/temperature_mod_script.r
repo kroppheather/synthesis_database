@@ -2,6 +2,9 @@
 ##########################################################################
 ########### Data organization and plotting for all temp obs ##############
 ##########################################################################
+library(plyr)
+library(lubridate)
+
 
 # set working directory
 setwd("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_3")
@@ -14,7 +17,6 @@ colnames(datA)<-c("air_id", "doy_st","year_st","air_t","air_height","site_id")
 #read in site info
 siteinf<-read.table("siteinfo.csv", sep=",", header=TRUE, na.string=c("NaN"))
 
-library(plyr)
 
 #get number of sites
 Nsite<-dim(siteinf)[1]
@@ -359,10 +361,65 @@ colnames(site.obsAf)<-c("depth", "siteid","wyear","n")
 SoilS<-join(Soil,site.obsSf,by=c("depth","siteid","wyear"), type="inner")
 AirS<-join(Air,site.obsAf,by=c("depth","siteid","wyear"), type="inner")
 
-#now look at soil temperature in plots
-#make a date column that uses day of year as a decimal place
-#put a little bit of space between years
-SoilS$decdate<-ifelse(SoilS$year!=SoilS$wyear,
-				(SoilS$wyear-1991)+(SoilS$doy-274)/367,
-				(SoilS$wyear-1991)+(SoilS$doy+91)/367)
+
+#now look at unique year
+wyearA<-unique(AirS$wyear)
+wyearS<-unique(SoilS$wyear)
+
+#set up an index for dealing with leap year in water
+#years
+#need to divide the fall by 366 for leap year
+#just set up a dec date sequence and then match
+
+#create a leap year flag
+SoilS$leapid<-ifelse(leap_year(SoilS$year)==TRUE,1,0)
+
+
+SoilS$wdoy<-ifelse(SoilS$leapid==1&SoilS$doy<=274, SoilS$doy+92,
+		ifelse(SoilS$leapid==1&SoilS$doy>274, SoilS$doy-274,
+		ifelse(SoilS$leapid==0&SoilS$doy<=273,SoilS$doy+92,
+		ifelse(SoilS$leapid==0&SoilS$doy>273,SoilS$doy-273,NA))))
+#the .01 is added because day 273 needs to be included in the water year, but if it 
+#is exactly one that bumps it to the first day of the water year.
+SoilS$wdoyP<-ifelse(leap_year(SoilS$wyear)==TRUE, SoilS$wdoy/366.01,SoilS$wdoy/365.01 )
+
+#now add to the year		
+				
+SoilS$decdate<-SoilS$wyear+SoilS$wdoyP
+
+
+
 plot(SoilS$decdate[SoilS$depth<=10],SoilS$T[SoilS$depth<=10],pch=19)
+#exclude outlier that is clearly a -999 output from an instrument
+SoilS<-SoilS[SoilS$T>-999,]
+
+
+#now do air temperature
+#create a leap year flag
+AirS$leapid<-ifelse(leap_year(AirS$year)==TRUE,1,0)
+
+
+AirS$wdoy<-ifelse(AirS$leapid==1&AirS$doy<=274, AirS$doy+92,
+		ifelse(AirS$leapid==1&AirS$doy>274, AirS$doy-274,
+		ifelse(AirS$leapid==0&AirS$doy<=273,AirS$doy+92,
+		ifelse(AirS$leapid==0&AirS$doy>273,AirS$doy-273,NA))))
+#the .01 is added because day 273 needs to be included in the water year, but if it 
+#is exactly one that bumps it to the first day of the water year.
+AirS$wdoyP<-ifelse(leap_year(AirS$wyear)==TRUE, AirS$wdoy/366.01,AirS$wdoy/365.01 )
+
+#now add to the year		
+				
+AirS$decdate<-AirS$wyear+AirS$wdoyP
+
+plot(AirS$decdate,AirS$A,pch=19)
+
+#more -999 from instrument error 
+#exclude these
+
+AirS<-AirS[AirS$A>-999,]
+plot(AirS$decdate[AirS$siteid==15],AirS$A[AirS$siteid==15],pch=19)
+
+#list of data needed for the model
+#NobsA =number of air temp obs
+
+
