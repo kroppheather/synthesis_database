@@ -235,25 +235,6 @@ for(i in 1:Nsite){
 }
 TdimCheck<-dimTemp-SdimV
 
-
-#####Need to add in further checks for data errors
-
-
-################################################################################
-################################################################################
-################################################################################
-#################### Now calculate N factors ###################################
-################################################################################
-
-#A closer look also shows site 48 has duplicate data
-#All borehole sites need to be double checked for issues
-#these rows will need to be deleted from the soil temperature 
-#table and readded. 
-
-#I am excluding the sites with issues in my preliminary analysis
-#for the abstract, and waiting to properly fix them in the database.
-
-
 #see if anysites are missing all temperature data
 sitedimA<-list()
 sitedimS<-list()
@@ -385,30 +366,3 @@ SoilS$decdate<-ifelse(SoilS$year!=SoilS$wyear,
 				(SoilS$wyear-1991)+(SoilS$doy-274)/367,
 				(SoilS$wyear-1991)+(SoilS$doy+91)/367)
 plot(SoilS$decdate[SoilS$depth<=10],SoilS$T[SoilS$depth<=10],pch=19)
-
-#looks like a -999 got lefr in a data set so exclude n
-SoilS<-SoilS[SoilS$T>-50,]
-plot(SoilS$decdate[SoilS$depth<=10],SoilS$T[SoilS$depth<=10],pch=19)
-
-
-#add in site information
-
-
-soilsin<-function(Ta,Daysd,Ao){
-		Ta+(Ao*sin(-2*3.14*Daysd))
-		}
-		
-soilsin2<-function(Ta,Daysd,Ao,D0){
-		Ta+(Ao*sin(-2*3.14*Daysd-D0))
-		}
-plotyear<-rep(seq(1991,2016), each=365)
-plotdoy<-rep(seq(1,365), times=26)
-plotseq<-(plotyear-1991)+(plotdoy/365)
-
-plot(SoilS$decdate[SoilS$depth<=10],SoilS$T[SoilS$depth<=10],pch=19)
-points(plotseq,soilsin(-5,plotdoy/365,.5), type="l",col="red")
-abline(h=0)
-points(plotseq,soilsin2(-5,plotdoy/365,25,-5), type="l",col="red")
-
-plot(SoilS$decdate[SoilS$siteid==22],SoilS$T[SoilS$siteid==22],pch=19)
-points(plotseq,soilsin2(0,plotdoy/365,20,0), type="l",col="red")
