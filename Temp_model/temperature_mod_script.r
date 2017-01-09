@@ -4,6 +4,9 @@
 ##########################################################################
 library(plyr)
 library(lubridate)
+library(rjags)
+library(coda)
+library(xtable)
 
 
 # set working directory
@@ -416,10 +419,45 @@ plot(AirS$decdate,AirS$A,pch=19)
 #more -999 from instrument error 
 #exclude these
 
-AirS<-AirS[AirS$A>-999,]
+AirS<-na.omit(AirS[AirS$A>-999,])
 plot(AirS$decdate[AirS$siteid==15],AirS$A[AirS$siteid==15],pch=19)
+
+
+#need to get unique site and depth for air temperature
+AirIDS<-unique(data.frame(depth=AirS$depth, siteid=AirS$siteid))
+AirIDS$siteD<-seq(1,dim(AirIDS)[1])
+
+#need to get unique site and depth for soil temperature
+SoilIDS<-unique(data.frame(depth=SoilS$depth, siteid=SoilS$siteid))
+SoilIDS$siteD<-seq(1,dim(SoilIDS)[1])
+
+#now combine back into table
+AirM<-join(AirS,AirIDS,by=c("depth","siteid"),type="left")
+SoilM<-join(SoilS,SoilIDS,by=c("depth","siteid"), type="left")
+
 
 #list of data needed for the model
 #NobsA =number of air temp obs
+#TempA
+#T.yrA
+#site.depthidA
 
 
+datalist<-list(NobsA=dim(AirM)[1], TempA=AirM$A, site.depthidA=AirM$siteD,T.yrA=AirM$decdate-1991,
+				NobsS=dim(SoilM)[1], TempS=SoilM$T,site.depthidS=SoilM$siteD, T.yrS=SoilM$decdate-1991,
+				NsitedepthA=dim(AirIDS)[1],NsitedepthS=dim(SoilIDS)[1])
+				
+samplelist<-list("T.aveA","AmpA","T.aveS","AmpS","sig.muA","sig.muS")
+
+
+temp.modI<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Temp_model\\temperature_mod_code.r",
+						data=datalist,
+						n.adapt=3000,
+						n.chains=3)
+
+
+						
+n.iter.i=90000
+n.thin=1
+codaobj.init = coda.samples(temp.modI,variable.names=samplelist,
+                       n.iter=n.iter.i, thin=n.thin)
