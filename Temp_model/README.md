@@ -10,4 +10,4 @@ _mu= Tave + A * sin( 2 * pi * Time)_
 
 Here _Time_ is the proportion into a water year ranging from 1991 to 2016. _Tave_ is the temperature at the inflection points and _A_ is the amplitude. Each parameter is estimated for site and depth. 
 
-_Commits: 1618019 : present _
+_Commits: 1618019 : present_
