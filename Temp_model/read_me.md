@@ -3,7 +3,7 @@ This code implements a Bayesian model on air and soil temperature based on estab
 
 ## Version 1
 
-###### The first version fits the simplest possible model. It assumes that temperature observations for each depth (soil) and height (air) vary with an established sine function. It assumes all parameters are independent and thus does not account for the relationship between amplitude and depth in a given site. It also assumes that the min and max occur between the half of the water year.
+##### The first version fits the simplest possible model. It assumes that temperature observations for each depth (soil) and height (air) vary with an established sine function. It assumes all parameters are independent and thus does not account for the relationship between amplitude and depth in a given site. It also assumes that the min and max occur between the half of the water year.
 
 _Temp ~ Normal(mu, tau)_
 _mu= Tave + A * sin( 2 * pi * Time)_
