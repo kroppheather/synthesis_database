@@ -10,4 +10,15 @@ _mu= Tave + A * sin( 2 * pi * Time)_
 
 Here _Time_ is the proportion into a water year ranging from 1991 to 2016. _Tave_ is the temperature at the inflection points and _A_ is the amplitude. Each parameter is estimated for site and depth. 
 
-_Commits: 1618019 : present_
+_Commits: 1618019 : fcc86c6_
+
+## Version 2
+
+##### The second version adds an offeset day so that max and min do not necessarily occur between the middle of the growing season. It still assumes that all parameters are independent and does not account for the relationship between depth.
+
+_Temp ~ Normal(mu, tau)_
+_mu= Tave + A * sin( 2 * pi * Time - Start)_
+
+Here _Time_ is the proportion into a water year ranging from 1991 to 2016. _Tave_ is the temperature at the inflection points and _A_ is the amplitude. Each parameter is estimated for site and depth. _Start_ is the offset of the peaks from the start of the water year, and is given a non-informative parameter between zero and one.
+
+_Commits: 69d394b :  present_
