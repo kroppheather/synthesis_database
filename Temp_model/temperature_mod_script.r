@@ -441,13 +441,13 @@ SoilM<-join(SoilS,SoilIDS,by=c("depth","siteid"), type="left")
 #TempA
 #T.yrA
 #site.depthidA
-
-
+write.table(AirM,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tair_model.csv",sep=",",row.names=FALSE)
+write.table(SoilM,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tsoil_model.csv",sep=",",row.names=FALSE)
 datalist<-list(NobsA=dim(AirM)[1], TempA=AirM$A, site.depthidA=AirM$siteD,T.yrA=AirM$decdate-1991,
 				NobsS=dim(SoilM)[1], TempS=SoilM$T,site.depthidS=SoilM$siteD, T.yrS=SoilM$decdate-1991,
 				NsitedepthA=dim(AirIDS)[1],NsitedepthS=dim(SoilIDS)[1])
 				
-samplelist<-list("T.aveA","AmpA","T.aveS","AmpS","sig.muA","sig.muS")
+samplelist<-c("T.aveA","AmpA","T.aveS","AmpS","sig.muA","sig.muS")
 
 
 temp.modI<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Temp_model\\temperature_mod_code.r",
@@ -457,7 +457,27 @@ temp.modI<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_data
 
 
 						
-n.iter.i=90000
+n.iter.i=10000
 n.thin=1
 codaobj.init = coda.samples(temp.modI,variable.names=samplelist,
                        n.iter=n.iter.i, thin=n.thin)
+					   
+plot(codaobj.init, ask=TRUE)
+
+
+
+#get summary and save to file
+
+Mod.out<-summary(codaobj.init)
+
+
+write.table(Mod.out$statistics, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Temp_mod_stats.csv",
+			sep=",",row.names=TRUE)
+write.table(Mod.out$quantiles, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Temp_mod_quant.csv",
+			sep=",",row.names=TRUE)
+			
+			
+#need to write ids to table
+
+write.table(AirIDS,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\AirIDS.csv", sep=",", row.names=FALSE)
+write.table(SoilIDS,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\SoilIDS.csv", sep=",", row.names=FALSE)
