@@ -436,18 +436,35 @@ AirM<-join(AirS,AirIDS,by=c("depth","siteid"),type="left")
 SoilM<-join(SoilS,SoilIDS,by=c("depth","siteid"), type="left")
 
 
+#set up a table to filter by one or more depths
+SoilDn<-aggregate(SoilIDS$depth,by=list(SoilIDS$siteid), FUN="length")
+colnames(SoilDn)<-list("siteid","depcount")
+#merge count back with soil ID info
+SoilIDS2<-join(SoilIDS,SoilDn, by="siteid", type="left")
+#now create an id column that uses the actual depth if there is more than one
+#gives the actual depth, and if there is only one depth than it gives it
+#a flag of zero. 
+SoilIDS2$depthF<-ifelse(SoilIDS2$depcount==1,0,SoilIDS2$depth)
+#now merge this with the model data
+
+SoilM2<-join(SoilM, SoilIDS2,by=c("depth","siteid","siteD"),type="left")
+
+#also need a unique site id
+SitesID<-data.frame(siteid=unique(SoilIDS2$siteid))
+SitesID$siteM<-seq(1,dim(SitesID)[1])
+
+#mergre back woil Soil matrix
+SoilM2<-join(SoilM2,SitesID,by="siteid",type="left")
+
 #list of data needed for the model
-#NobsA =number of air temp obs
-#TempA
-#T.yrA
-#site.depthidA
+
 #write.table(AirM,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tair_model.csv",sep=",",row.names=FALSE)
 #write.table(SoilM,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tsoil_model.csv",sep=",",row.names=FALSE)
 datalist<-list(NobsA=dim(AirM)[1], TempA=AirM$A, site.depthidA=AirM$siteD,T.yrA=AirM$decdate-1991,
-				NobsS=dim(SoilM)[1], TempS=SoilM$T,site.depthidS=SoilM$siteD, T.yrS=SoilM$decdate-1991,
-				NsitedepthA=dim(AirIDS)[1],NsitedepthS=dim(SoilIDS)[1])
+				NobsS=dim(SoilM2)[1], TempS=SoilM2$T,site.depthidS=SoilM2$siteD, T.yrS=SoilM2$decdate-1991,
+				NsitedepthA=dim(AirIDS)[1],NsiteS=dim(SitesID)[1],siteM=SoilM2$siteM, depthF=SoilM2$depthF)
 				
-samplelist<-c("T.aveA","AmpA","T.aveS","AmpS","sig.muA","sig.muS","startA","startS")
+samplelist<-c("T.aveA","AmpA","T.aveS","AmpS","sig.muA","sig.muS","startA","startS","b")
 
 
 temp.modI<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Temp_model\\temperature_mod_code.r",
@@ -457,7 +474,7 @@ temp.modI<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_data
 
 
 						
-n.iter.i=10000
+n.iter.i=5000
 n.thin=1
 codaobj.init = coda.samples(temp.modI,variable.names=samplelist,
                        n.iter=n.iter.i, thin=n.thin)

@@ -9,7 +9,7 @@ model{
 	#likelihood for soil temperature observations
 	for(i in 1:NobsS){
 		TempS[i]~dnorm(muS[i], tau.muS)
-		muS[i]<-T.aveS[site.depthidS[i]]+ AmpS[site.depthidS[i]]*sin(-2*3.14159265*(T.yrS[i]-startS[site.depthidS[i]]))
+		muS[i]<-T.aveS[siteM[i]]+ (AmpS[siteM[i]]*exp(-b[siteM[i]]*depthF[i]))*sin(-2*3.14159265*(T.yrS[i]-startS[siteM[i]])-(b[siteM[i]]*depthF[i]))
 	
 	}
 	#prior for likelihood
@@ -19,11 +19,14 @@ model{
 		startA[i]~dunif(0,1)
 	}
 	#prior for likelihood
-	for(i in 1:NsitedepthS){
+	for(i in 1:NsiteS){
 		T.aveS[i]~dnorm(0,.0001)
 		AmpS[i]~dunif(0,100)
 		startS[i]~dunif(0,1)
+		b[i]~dunif(1/10000,1/300)
 	}
+	
+	
 	#prior for variance term
 	tau.muA<-pow(sig.muA,-2)
 	sig.muA~dunif(0,100)
