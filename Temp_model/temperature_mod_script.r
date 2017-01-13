@@ -457,7 +457,7 @@ temp.modI<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_data
 
 
 						
-n.iter.i=10000
+n.iter.i=3000
 n.thin=1
 codaobj.init = coda.samples(temp.modI,variable.names=samplelist,
                        n.iter=n.iter.i, thin=n.thin)

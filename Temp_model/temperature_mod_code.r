@@ -16,13 +16,13 @@ model{
 	for(i in 1:NsitedepthA){
 		T.aveA[i]~dnorm(0,.0001)
 		AmpA[i]~dunif(0,100)
-		startA[i]~dunif(0,1)
+		startA[i]~dunif(0,.5)
 	}
 	#prior for likelihood
 	for(i in 1:NsitedepthS){
 		T.aveS[i]~dnorm(0,.0001)
 		AmpS[i]~dunif(0,100)
-		startS[i]~dunif(0,1)
+		startS[i]~dunif(0,.7)
 	}
 	#prior for variance term
 	tau.muA<-pow(sig.muA,-2)
