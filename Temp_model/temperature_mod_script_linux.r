@@ -2,12 +2,6 @@
 ##########################################################################
 ########### Data organization and plotting for all temp obs ##############
 ##########################################################################
-library(plyr)
-library(lubridate)
-library(rjags)
-library(coda)
-library(xtable)
-library(mcmcplots)
 
 #linux version
 library(plyr,lib.loc="/home/hkropp/R")
@@ -18,7 +12,7 @@ library(xtable,lib.loc="/home/hkropp/R")
 library(mcmcplots,lib.loc="/home/hkropp/R")
 
 # set working directory
-setwd("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_3")
+setwd("/home/hkropp/synthesis")
 #read in soil temperature
 datS<-read.table("soil_temp_fixed_u6_out.csv", sep=",", header=TRUE, na.string=c("NaN"))
 #read in air temperature
@@ -475,7 +469,7 @@ datalist<-list(NobsA=dim(AirM)[1], TempA=AirM$A, site.depthidA=AirM$siteD,T.yrA=
 samplelist<-c("T.aveA","AmpA","T.aveS","AmpS","sig.muA","sig.muS","startA","startS","b")
 
 
-temp.modI<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Temp_model\\temperature_mod_code.r",
+temp.modI<-jags.model(file="/home/hkropp/github/synthesis_database/temperature_mod_code.r",
 						data=datalist,
 						n.adapt=3000,
 						n.chains=3)
@@ -496,14 +490,14 @@ plot(codaobj.init, ask=TRUE)
 Mod.out<-summary(codaobj.init)
 
 
-write.table(Mod.out$statistics, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Temp_mod_stats.csv",
+write.table(Mod.out$statistics, "/home/hkropp/synthesis/output/Temp_mod_stats.csv",
 			sep=",",row.names=TRUE)
-write.table(Mod.out$quantiles, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Temp_mod_quant.csv",
+write.table(Mod.out$quantiles, "/home/hkropp/synthesis/output/Temp_mod_quant.csv",
 			sep=",",row.names=TRUE)
 
-codagg<-ggs(codatobj.init)			
-ggmcmc(codagg, file="/home/hkropp/synthesis/output.pdf")			
+codagg<-as.mcmc.rjags(codatobj.init)			
+mcmcplot(codagg, dir="/home/hkropp/synthesis/output")			
 #need to write ids to table
 
-write.table(AirIDS,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\AirIDS.csv", sep=",", row.names=FALSE)
-write.table(SoilIDS,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\SoilIDS.csv", sep=",", row.names=FALSE)
+#write.table(AirIDS,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\AirIDS.csv", sep=",", row.names=FALSE)
+#write.table(SoilIDS,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\SoilIDS.csv", sep=",", row.names=FALSE)
