@@ -16,14 +16,14 @@ model{
 	for(i in 1:NsitedepthA){
 		T.aveA[i]~dnorm(0,.0001)
 		AmpA[i]~dunif(0,100)
-		startA[i]~dunif(0,1)
+		startA[i]~dunif(0,.65)
 	}
 	#prior for likelihood
 	for(i in 1:NsiteS){
 		T.aveS[i]~dnorm(0,.0001)
 		AmpS[i]~dunif(0,100)
-		startS[i]~dunif(0,1)
-		b[i]~dunif(1/10000,1/300)
+		startS[i]~dunif(0,.65)
+		b[i]~dunif(1/100000,1/10)
 	}
 	
 	
