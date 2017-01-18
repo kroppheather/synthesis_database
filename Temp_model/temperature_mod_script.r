@@ -466,8 +466,8 @@ SoilM2<-join(SoilM2,SitesID,by="siteid",type="left")
 
 #list of data needed for the model
 
-#write.table(AirM,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tair_model.csv",sep=",",row.names=FALSE)
-#write.table(SoilM,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tsoil_model.csv",sep=",",row.names=FALSE)
+write.table(AirM,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tair_model.csv",sep=",",row.names=FALSE)
+write.table(SoilM2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tsoil_model.csv",sep=",",row.names=FALSE)
 datalist<-list(NobsA=dim(AirM)[1], TempA=AirM$A, site.depthidA=AirM$siteD,T.yrA=AirM$decdate-1991,
 				NobsS=dim(SoilM2)[1], TempS=SoilM2$T,site.depthidS=SoilM2$siteD, T.yrS=SoilM2$decdate-1991,
 				NsitedepthA=dim(AirIDS)[1],NsiteS=dim(SitesID)[1],siteM=SoilM2$siteM, depthF=SoilM2$depthF)
@@ -496,9 +496,9 @@ plot(codaobj.init, ask=TRUE)
 Mod.out<-summary(codaobj.init)
 
 
-write.table(Mod.out$statistics, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Temp_mod_stats.csv",
+write.table(Mod.out$statistics, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Temp_moddf_stats.csv",
 			sep=",",row.names=TRUE)
-write.table(Mod.out$quantiles, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Temp_mod_quant.csv",
+write.table(Mod.out$quantiles, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Temp_moddf_quant.csv",
 			sep=",",row.names=TRUE)
 
 codagg<-ggs(codatobj.init)			
@@ -506,4 +506,5 @@ ggmcmc(codagg, file="/home/hkropp/synthesis/output.pdf")
 #need to write ids to table
 
 write.table(AirIDS,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\AirIDS.csv", sep=",", row.names=FALSE)
-write.table(SoilIDS,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\SoilIDS.csv", sep=",", row.names=FALSE)
+write.table(SitesID,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\SoilIDS.csv", sep=",", row.names=FALSE)
+

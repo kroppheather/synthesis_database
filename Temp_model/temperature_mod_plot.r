@@ -4,8 +4,8 @@ setwd("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6")
 
 datAI<-read.csv("AirIDS.csv")
 datSI<-read.csv("SoilIDS.csv")
-datM<-read.csv("Temp_mod_stats.csv")
-datQ<-read.csv("Temp_mod_quant.csv")
+datM<-read.csv("Temp_moddf_stats.csv")
+datQ<-read.csv("Temp_moddf_quant.csv")
 
 
 datAM<-read.csv("Tair_model.csv")
@@ -23,21 +23,14 @@ dexps<-"\\[*[[:digit:]]*\\]"
 datC$parms1<-gsub(dexps,"",rownames(datC))
 #now add id number
 dexps2<-"\\D"
-pnames<-rownames(datC[1:936,])
+
+datC<-datC[datC$parms1!="sig.muA"|datC$parms1!="sig.muS",]
+pnames<-rownames(datC)
 parms2<-gsub(dexps2,"",pnames)
-datC$parms2<-c(as.numeric(parms2),NA,NA)
+datC$parms2<-c(as.numeric(parms2))
 
 datC<-data.frame(M=datC[,1],pc2.5=datC[,5],pc97.5=datC[,9],param=as.character(datC[,10]),ID=datC[,11])
-datC<-datC[1:936,]
-#now combine back with siteid info
 
-#set up ids for all parm
-IDSJ<-data.frame(depth=c(datAI$depth,datSI$depth,datAI$depth,datSI$depth),siteid=c(datAI$siteid,datSI$siteid,datAI$siteid,datSI$siteid),
-				ID=c(datAI$siteD,datSI$siteD,datAI$siteD,datSI$siteD),
-				param=c(rep("AmpA",dim(datAI)[1]),rep("AmpS",dim(datSI)[1]),rep("T.aveA",dim(datAI)[1]),rep("T.aveS",dim(datSI)[1])))
-				
-#now join to the table 
-datS<-join(datC,IDSJ,by=c("param","ID"),type="left")
 
 
 #now make plots by site to see how this compares
@@ -47,31 +40,43 @@ Tsine<-function(Tave,Amp,Tyear){
 		Tave+ Amp*sin(-2*3.14159265*Tyear)
 	}
 
+Tsine2<-function(Tave,Amp,Tyear,startD,depthF,b){
+
+		Tave+ (Amp*exp(-b*depthF))*sin(-2*3.14159265*(Tyear-startD)-(b*depthF))
+	}
+
 #now need to set up plotting for each site
 #get unique site list from soil params
-sitesS<-data.frame(siteid=unique(datSI$siteid))
-sitesS$siteun<-seq(1,dim(sitesS)[1])
+
+#get unique depth for each site
+
+depthdF<-unique(data.frame(depth=datSM$depth,depthF=datSM$depthF, siteM=datSM$siteM,siteid=datSM$siteid))
+
 depthP<-list()
+depthPF<-list()
 #set up depths and colors for depths in each site
 colP<-c(terrain.colors(7),heat.colors(10),topo.colors(10))
-for(i in 1:dim(sitesS)[1]){
-	depthP[[i]]<-datSI$depth[datSI$siteid==sitesS$siteid[i]]
-
+for(i in 1:dim(datSI)[1]){
+	depthP[[i]]<-depthdF$depth[depthdF$siteid==datSI$siteid[i]]
+	depthPF[[i]]<-depthdF$depthF[depthdF$siteid==datSI$siteid[i]]
 }
 #set up list of x variables for sine function
 xP<-list()
-for(i in 1:dim(sitesS)[1]){
-	xP[[i]]<-seq(floor(min(datSM$decdateA[datSM$siteid==sitesS$siteid[i]])),
-				ceiling(max(datSM$decdateA[datSM$siteid==sitesS$siteid[i]])),
+for(i in 1:dim(datSI)[1]){
+	xP[[i]]<-seq(floor(min(datSM$decdateA[datSM$siteid==datSI$siteid[i]])),
+				ceiling(max(datSM$decdateA[datSM$siteid==datSI$siteid[i]])),
 				by=.01)
 }
 		
-#only look at air vs soil
-datSA<-datS[datS$param=="AmpA"|datS$param=="T.aveA",]
-datSS<-datS[datS$param=="AmpS"|datS$param=="T.aveS",]	
+#only look at soil
+
+datSS<-datC[datC$param=="AmpS"|datC$param=="T.aveS"|datC$param=="b"|datC$param=="startS",]	
+#now joint so that s
+colnames(datSS)[5]<-"siteM"
+datSS<-join(datSS,datSI,by="siteM",type="left")
 #plot the soil
-for(n in 1:dim(sitesS)[1]){	
-	i<-sitesS$siteid[n]
+for(n in 1:dim(datSI)[1]){	
+	i<-datSI$siteid[n]
 	jpeg(file=paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\T_mod_out\\site",i,".jpg"),
 			width=1500,height=1000, units="px")
 
@@ -84,8 +89,10 @@ for(n in 1:dim(sitesS)[1]){
 		points(datSM$decdateA[datSM$siteid==i&datSM$depth==depthP[[n]][j]],
 				datSM$T[datSM$siteid==i&datSM$depth==depthP[[n]][j]],
 				pch=19, col=colP[j])
-		points(xP[[n]],Tsine(datSS$M[datSS$siteid==i&datSS$depth==depthP[[n]][j]&datSS$param=="T.aveS"],
-						datSS$M[datSS$siteid==i&datSS$depth==depthP[[n]][j]&datSS$param=="AmpS"],xP[[n]]),
+		points(xP[[n]],Tsine2(datSS$M[datSS$siteid==i&datSS$param=="T.aveS"],
+						datSS$M[datSS$siteid==i&datSS$param=="AmpS"],xP[[n]],
+						datSS$M[datSS$siteid==i&datSS$param=="startS"],
+					depthPF[[n]][j],datSS$M[datSS$siteid==i&datSS$param=="b"]),
 				col=colP[j],type="l",lwd=2,lty=1)
 	}
 
