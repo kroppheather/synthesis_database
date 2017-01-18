@@ -99,6 +99,6 @@ for(n in 1:dim(datSI)[1]){
 	legend(min(datSM$decdateA[datSM$siteid==i])+.001,max(datSM$T[datSM$siteid==i])-.25, paste("depth=", depthP[[n]]),
 			col=colP[1:length(depthP[[n]])],pch=19, bty="n", cex=1.5)
 			
-	text(min(datSM$decdateA[datSM$siteid==i])+.5,max(datSM$T[datSM$siteid==i])-.5, paste("siteid=", sitesS$siteid[i]), cex=2)
+	text(min(datSM$decdateA[datSM$siteid==i])+.5,max(datSM$T[datSM$siteid==i])-.5, paste("siteid=", i), cex=2)
 	dev.off()
 }
