@@ -9,6 +9,9 @@ library(coda)
 library(xtable)
 library(mcmcplots)
 
+
+###Note site 188 had incorrect t data that was the year for some depths deleted
+
 #linux version
 library(plyr,lib.loc="/home/hkropp/R")
 library(lubridate,lib.loc="/home/hkropp/R")
@@ -463,6 +466,9 @@ SitesID$siteM<-seq(1,dim(SitesID)[1])
 
 #mergre back woil Soil matrix
 SoilM2<-join(SoilM2,SitesID,by="siteid",type="left")
+#create decimal for proportion of the year
+floordd<-floor(SoilM2$decdate)
+SoilM2$propdd<-SoilM2$decdate-floordd
 
 #list of data needed for the model
 
