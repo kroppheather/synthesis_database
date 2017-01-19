@@ -13,12 +13,12 @@ library(mcmcplots)
 ###Note site 188 had incorrect t data that was the year for some depths deleted
 
 #linux version
-library(plyr,lib.loc="/home/hkropp/R")
-library(lubridate,lib.loc="/home/hkropp/R")
-library(rjags,lib.loc="/home/hkropp/R")
-library(coda,lib.loc="/home/hkropp/R")
-library(xtable,lib.loc="/home/hkropp/R")
-library(mcmcplots,lib.loc="/home/hkropp/R")
+#library(plyr,lib.loc="/home/hkropp/R")
+#library(lubridate,lib.loc="/home/hkropp/R")
+#library(rjags,lib.loc="/home/hkropp/R")
+#library(coda,lib.loc="/home/hkropp/R")
+#library(xtable,lib.loc="/home/hkropp/R")
+#library(mcmcplots,lib.loc="/home/hkropp/R")
 
 # set working directory
 setwd("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_3")
@@ -472,26 +472,86 @@ SoilM2$propdd<-SoilM2$decdate-floordd
 
 #list of data needed for the model
 
-write.table(AirM,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tair_model.csv",sep=",",row.names=FALSE)
-write.table(SoilM2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tsoil_model.csv",sep=",",row.names=FALSE)
-datalist<-list(NobsA=dim(AirM)[1], TempA=AirM$A, site.depthidA=AirM$siteD,T.yrA=AirM$decdate-1991,
+#write.table(AirM,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tair_model.csv",sep=",",row.names=FALSE)
+#write.table(SoilM2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tsoil_model.csv",sep=",",row.names=FALSE)
+
+#load libraries for parallel processing
+library(snow)
+library(snowfall)
+
+
+#set the number of cpus to be 3
+sfInit(parallel=TRUE,cpus=3)
+
+
+#assign jags library to each CPU
+
+sfLibrary(rjags)
+sfLibrary(coda)
+sfLibrary(xtable)
+sfLibrary(mcmcplots)
+
+#compile the data list
+datalist <- list(NobsA=dim(AirM)[1], TempA=AirM$A, site.depthidA=AirM$siteD,T.yrA=AirM$decdate-1991,
 				NobsS=dim(SoilM2)[1], TempS=SoilM2$T,site.depthidS=SoilM2$siteD, T.yrS=SoilM2$decdate-1991,
 				NsitedepthA=dim(AirIDS)[1],NsiteS=dim(SitesID)[1],siteM=SoilM2$siteM, depthF=SoilM2$depthF)
-				
-samplelist<-c("T.aveA","AmpA","T.aveS","AmpS","sig.muA","sig.muS","startA","startS","b")
+	
+ #compile list of initial data to 	
+samplelist <- c("T.aveA","AmpA","T.aveS","AmpS","sig.muA","sig.muS","startA","startS","b")
+ 
 
+# create separate directory for each CPU process
+folder1 <- paste(getwd(), "/dm_chain1", sep="")
+folder2 <- paste(getwd(), "/dm_chain2", sep="")
+folder3 <- paste(getwd(), "/dm_chain3", sep="")
+dir.create(folder1); dir.create(folder2); dir.create(folder3)
 
-temp.modI<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Temp_model\\temperature_mod_code.r",
-						data=datalist,
+#put model in folder
+for (folder in c(folder1, folder2, folder3)){
+	file.copy("c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Temp_model\\temperature_mod_code.r",folder)
+}
+ 
+#set up parallel run
+#define a function for each chain
+#where chain is the chain number
+#x data is the data list
+#parms is the sample list
+
+parallel.jags <- function(chain, x.data, params){
+	#define the directory for each CPU
+	 sub.folder = paste(getwd(),"/dm_chain", chain, sep="")
+	#specify inits here if you ever use them
+	
+	#now implement the jags model set up
+	temp.modI = jags.model(file=paste0(sub.folder, "/temperature_mod_code.r", ""),
+						data=x.data,
 						n.adapt=3000,
 						n.chains=3)
+						
+	n.iter.i=3000
+	n.thin=1
+	codaobj.init = coda.samples(temp.modI,variable.names=params,
+                       n.iter=n.iter.i, thin=n.thin)	
+
+	#now save variables in each folder	
+	save(codaobj.init, file=paste(sub.folder, "coda.RData", "" ))
+	
+	#save data summary
+	Mod.out= summary(codaobj.init)
+	write.table(Mod.out$statistics, paste(sub.folder, "Temp_mod_stat.csv", ""),
+			sep=",",row.names=TRUE)
+	write.table(Mod.out$quantiles, paste(sub.folder, "Temp_mod_stat.csv", ""),
+			sep=",",row.names=TRUE)
+
+} 
+ 
+# parallel.bugs on each of the 3 CPUs
+sfLapply(1:3, fun=parallel.jags, x.data=datalist, params=samplelist)
+
 
 
 						
-n.iter.i=5000
-n.thin=1
-codaobj.init = coda.samples(temp.modI,variable.names=samplelist,
-                       n.iter=n.iter.i, thin=n.thin)
+
 					   
 plot(codaobj.init, ask=TRUE)
 
@@ -499,13 +559,10 @@ plot(codaobj.init, ask=TRUE)
 
 #get summary and save to file
 
-Mod.out<-summary(codaobj.init)
 
 
-write.table(Mod.out$statistics, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Temp_moddf_stats.csv",
-			sep=",",row.names=TRUE)
-write.table(Mod.out$quantiles, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Temp_moddf_quant.csv",
-			sep=",",row.names=TRUE)
+
+
 
 codagg<-ggs(codatobj.init)			
 ggmcmc(codagg, file="/home/hkropp/synthesis/output.pdf")			
