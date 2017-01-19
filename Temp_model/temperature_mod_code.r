@@ -10,7 +10,7 @@ model{
 	for(i in 1:NobsS){
 		TempS[i]~dnorm(muS[i], tau.muS)
 		muS[i]<-T.aveS[site.depthidS[i]]+ AmpS[site.depthidS[i]]*sin(-2*3.14159265*(T.yrS[i]-startS[site.depthidS[i]]))
-	
+		TSrep[i]~dnorm(muS[i], tau.muS)
 	}
 	#prior for likelihood
 	for(i in 1:NsitedepthA){
