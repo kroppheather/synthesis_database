@@ -4,8 +4,8 @@ setwd("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6")
 
 datAI<-read.csv("AirIDS.csv")
 datSI<-read.csv("SoilIDS.csv")
-datM<-read.csv("Temp_moddf_stats.csv")
-datQ<-read.csv("Temp_moddf_quant.csv")
+datM<-read.csv("Temp_moddf1_stats.csv")
+datQ<-read.csv("Temp_moddf1_quant.csv")
 
 
 datAM<-read.csv("Tair_model.csv")
@@ -42,7 +42,7 @@ Tsine<-function(Tave,Amp,Tyear){
 
 Tsine2<-function(Tave,Amp,Tyear,startD,depthF,b){
 
-		Tave+ (Amp*exp(-b*depthF))*sin(-2*3.14159265*(Tyear-startD)-(b*depthF))
+		Tave+ (Amp*exp(-b*depthF))*sin(-2*3.14159265*(Tyear-startD)+(b*depthF)+(3.14159265/2))
 	}
 
 #now need to set up plotting for each site
@@ -77,7 +77,7 @@ datSS<-join(datSS,datSI,by="siteM",type="left")
 #plot the soil
 for(n in 1:dim(datSI)[1]){	
 	i<-datSI$siteid[n]
-	jpeg(file=paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\T_mod_out\\site",i,".jpg"),
+	jpeg(file=paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\T_moddT_out\\site",i,".jpg"),
 			width=1500,height=1000, units="px")
 
 	plot(c(0,1),c(0,1),type="n",xlim=c(min(datSM$decdateA[datSM$siteid==i]),max(datSM$decdateA[datSM$siteid==i])),

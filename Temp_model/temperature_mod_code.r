@@ -24,7 +24,7 @@ model{
 		T.aveS[i]~dnorm(0,.0001)
 		AmpS[i]~dunif(0,100)
 		startS[i]~dunif(0,.65)
-		b[i]~dunif(1/100000,1/10)
+		b[i]~dunif(1/100000,1/100)
 	}
 	
 	
