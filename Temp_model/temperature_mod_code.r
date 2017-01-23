@@ -10,7 +10,7 @@ model{
 	for(i in 1:NobsS){
 		TempS[i]~dnorm(muS[i], tau.muS)
 		muS[i]<-T.aveS[siteM[i]]+ 
-			(AmpS[siteM[i]]*exp(-b[siteM[i]]*depthF[i]))*sin(-2*3.14159265*(T.yrS[i]-startS[siteM[i]])+(b[siteM[i]]*depthF[i])+(3.14159265/2))
+			(AmpS[siteM[i]]*exp(-b[siteM[i]]*depthF[i]))*sin(-2*3.14159265*(T.yrS[i]-startS[siteM[i]])+(b[siteM[i]]*depthF[i]))
 	
 	}
 	#prior for likelihood
@@ -24,7 +24,7 @@ model{
 		T.aveS[i]~dnorm(0,.0001)
 		AmpS[i]~dunif(0,100)
 		startS[i]~dunif(0,.65)
-		b[i]~dunif(1/100000,1/100)
+		b[i]~dunif(1/100000,1/200)
 	}
 	
 	
