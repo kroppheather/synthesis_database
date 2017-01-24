@@ -13,12 +13,12 @@ library(mcmcplots)
 ###Note site 188 had incorrect t data that was the year for some depths deleted
 
 #linux version
-library(plyr,lib.loc="/home/hkropp/R")
-library(lubridate,lib.loc="/home/hkropp/R")
-library(rjags,lib.loc="/home/hkropp/R")
-library(coda,lib.loc="/home/hkropp/R")
-library(xtable,lib.loc="/home/hkropp/R")
-library(mcmcplots,lib.loc="/home/hkropp/R")
+#library(plyr,lib.loc="/home/hkropp/R")
+#library(lubridate,lib.loc="/home/hkropp/R")
+#library(rjags,lib.loc="/home/hkropp/R")
+#library(coda,lib.loc="/home/hkropp/R")
+#library(xtable,lib.loc="/home/hkropp/R")
+#library(mcmcplots,lib.loc="/home/hkropp/R")
 
 # set working directory
 setwd("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_3")
@@ -469,6 +469,15 @@ SoilM2<-join(SoilM2,SitesID,by="siteid",type="left")
 #create decimal for proportion of the year
 floordd<-floor(SoilM2$decdate)
 SoilM2$propdd<-SoilM2$decdate-floordd
+
+##############################################################################
+###################Next section focuses on vegetation data ###################
+###################for the empirical temperature model     ###################
+##############################################################################
+
+
+
+
 
 #list of data needed for the model
 
