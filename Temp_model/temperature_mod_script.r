@@ -474,9 +474,17 @@ SoilM2$propdd<-SoilM2$decdate-floordd
 ###################Next section focuses on vegetation data ###################
 ###################for the empirical temperature model     ###################
 ##############################################################################
+#read in vegetation data
+
+datV<-read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\vegetation_tempM.csv")
+
+#subset vegetation to include sites that are the focus of this temp mode
+datVs<-join(datV,SitesID,by="siteid",type="inner")
 
 
+#start with no data missing
 
+#soil c, evi
 
 
 #list of data needed for the model
