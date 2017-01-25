@@ -444,22 +444,28 @@ SoilIDS2$depthF<-ifelse(SoilIDS2$depcount==1,0,SoilIDS2$depth)
 
 SoilM2<-join(SoilM, SoilIDS2,by=c("depth","siteid","siteD"),type="left")
 
+#set up a flag for sites with only one depth
+SoilDn$depthFlag<-ifelse(SoilDn$depcount>1,2,1)
 #also need a unique site id
 SitesID<-data.frame(siteid=unique(SoilIDS2$siteid))
 SitesID$siteM<-seq(1,dim(SitesID)[1])
 
 #mergre back woil Soil matrix
 SoilM2<-join(SoilM2,SitesID,by="siteid",type="left")
+#create decimal for proportion of the year
+floordd<-floor(SoilM2$decdate)
+SoilM2$propdd<-SoilM2$decdate-floordd
 
 #list of data needed for the model
 
 #write.table(AirM,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tair_model.csv",sep=",",row.names=FALSE)
-#write.table(SoilM,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tsoil_model.csv",sep=",",row.names=FALSE)
+#write.table(SoilM2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tsoil_model.csv",sep=",",row.names=FALSE)
 datalist<-list(NobsA=dim(AirM)[1], TempA=AirM$A, site.depthidA=AirM$siteD,T.yrA=AirM$decdate-1991,
 				NobsS=dim(SoilM2)[1], TempS=SoilM2$T,site.depthidS=SoilM2$siteD, T.yrS=SoilM2$decdate-1991,
-				NsitedepthA=dim(AirIDS)[1],NsiteS=dim(SitesID)[1],siteM=SoilM2$siteM, depthF=SoilM2$depthF)
+				NsitedepthA=dim(AirIDS)[1],NsiteS=dim(SitesID)[1],siteM=SoilM2$siteM, depthF=SoilM2$depthF,depthFLAG=SoilDn$depthFlag)
 				
-samplelist<-c("T.aveA","AmpA","T.aveS","AmpS","sig.muA","sig.muS","startA","startS","b")
+samplelist<-c("T.aveA","AmpA","T.aveS","AmpS","sig.muA","sig.muS","startA","startS","b",
+					"sig.Ta","sig.As","sig.sS","sig.bS", "mu.Ta","mu.As","mu.sS","mu.bS")
 
 
 temp.modI<-jags.model(file="/home/hkropp/github/synthesis_database/Temp_model/temperature_mod_code.r",
@@ -483,12 +489,12 @@ plot(codaobj.init, ask=TRUE)
 Mod.out<-summary(codaobj.init)
 
 
-write.table(Mod.out$statistics, "/home/hkropp/synthesis/output/Temp_mod_stats.csv",
+write.table(Mod.out$statistics, "/home/hkropp/synthesis/output/Temp_moddh_stats.csv",
 			sep=",",row.names=TRUE)
-write.table(Mod.out$quantiles, "/home/hkropp/synthesis/output/Temp_mod_quant.csv",
+write.table(Mod.out$quantiles, "/home/hkropp/synthesis/output/Temp_moddh_quant.csv",
 			sep=",",row.names=TRUE)
 
-codagg<-as.mcmc.rjags(codatobj.init)			
+codagg<-as.mcmc.rjags(codaobj.init)			
 mcmcplot(codagg, dir="/home/hkropp/synthesis/output")			
 #need to write ids to table
 
