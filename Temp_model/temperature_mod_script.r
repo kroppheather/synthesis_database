@@ -13,12 +13,12 @@ library(mcmcplots)
 ###Note site 188 had incorrect t data that was the year for some depths deleted
 
 #linux version
-library(plyr,lib.loc="/home/hkropp/R")
-library(lubridate,lib.loc="/home/hkropp/R")
-library(rjags,lib.loc="/home/hkropp/R")
-library(coda,lib.loc="/home/hkropp/R")
-library(xtable,lib.loc="/home/hkropp/R")
-library(mcmcplots,lib.loc="/home/hkropp/R")
+#library(plyr,lib.loc="/home/hkropp/R")
+#library(lubridate,lib.loc="/home/hkropp/R")
+#library(rjags,lib.loc="/home/hkropp/R")
+#library(coda,lib.loc="/home/hkropp/R")
+#library(xtable,lib.loc="/home/hkropp/R")
+#library(mcmcplots,lib.loc="/home/hkropp/R")
 
 # set working directory
 setwd("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_3")
@@ -481,17 +481,17 @@ datalist<-list(NobsA=dim(AirM)[1], TempA=AirM$A, site.depthidA=AirM$siteD,T.yrA=
 				NsitedepthA=dim(AirIDS)[1],NsiteS=dim(SitesID)[1],siteM=SoilM2$siteM, depthF=SoilM2$depthF,depthFLAG=SoilDn$depthFlag)
 				
 samplelist<-c("T.aveA","AmpA","T.aveS","AmpS","sig.muA","sig.muS","startA","startS","b",
-					"sig.Ta","sig.As","sig.sS","sig.bS", "mu.Ta","mu.As","sig.sS","sig.bS")
+					"sig.Ta","sig.As","sig.sS","sig.bS", "mu.Ta","mu.As","mu.sS","mu.bS")
 
 
 temp.modI<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Temp_model\\temperature_mod_code.r",
 						data=datalist,
-						n.adapt=3000,
+						n.adapt=2000,
 						n.chains=3)
 
 
 						
-n.iter.i=3000
+n.iter.i=2000
 n.thin=1
 codaobj.init = coda.samples(temp.modI,variable.names=samplelist,
                        n.iter=n.iter.i, thin=n.thin)
@@ -505,9 +505,9 @@ plot(codaobj.init, ask=TRUE)
 Mod.out<-summary(codaobj.init)
 
 
-write.table(Mod.out$statistics, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Temp_moddf1_stats.csv",
+write.table(Mod.out$statistics, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Temp_moddh_stats.csv",
 			sep=",",row.names=TRUE)
-write.table(Mod.out$quantiles, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Temp_moddf1_quant.csv",
+write.table(Mod.out$quantiles, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Temp_moddh_quant.csv",
 			sep=",",row.names=TRUE)
 
 codagg<-ggs(codatobj.init)			
