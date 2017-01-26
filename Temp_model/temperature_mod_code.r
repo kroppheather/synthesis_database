@@ -21,8 +21,8 @@ model{
 	}
 	#prior for likelihood
 	for(i in 1:NsiteAll){
-		T.aveS[i]<-dnorm(0,.01)
-		AmpS[i]<-dunif(0,30)
+		T.aveS[i]~dnorm(0,.01)
+		AmpS[i]~dunif(0,30)
 		startS[i]~dunif(0,upper[depthFLAG[i]])
 		b[i]~dunif(.0001,.25)
 		#priors for Tave and AmpS	
