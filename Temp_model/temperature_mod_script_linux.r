@@ -422,27 +422,48 @@ plot(AirS$decdate[AirS$siteid==15],AirS$A[AirS$siteid==15],pch=19)
 AirIDS<-unique(data.frame(depth=AirS$depth, siteid=AirS$siteid))
 AirIDS$siteD<-seq(1,dim(AirIDS)[1])
 
+
+#start by excluding sites 96-99 because only one year and all at zero curtain
+SoilS2<-SoilS[SoilS$siteid<96|SoilS$siteid>99,]
+#now exclude any depths where the temperature never gets above .5 degree C
+SoilsmaxT<-aggregate(SoilS2$T, by=list(SoilS2$depth,SoilS2$siteid), FUN="max")
+SoilsActive<-SoilsmaxT[SoilsmaxT$x>=.5,]
+colnames(SoilsActive)<-c("depth","siteid","maxTemp") 
+
+#now exclude depths that don't fit in an active layer descripts
+SoilS3<-join(SoilS2,SoilsActive, by=c("depth", "siteid"), type="inner")
+
 #need to get unique site and depth for soil temperature
-SoilIDS<-unique(data.frame(depth=SoilS$depth, siteid=SoilS$siteid))
+SoilIDS<-unique(data.frame(depth=SoilS3$depth, siteid=SoilS3$siteid))
 SoilIDS$siteD<-seq(1,dim(SoilIDS)[1])
 
-#now combine back into table
-AirM<-join(AirS,AirIDS,by=c("depth","siteid"),type="left")
-SoilM<-join(SoilS,SoilIDS,by=c("depth","siteid"), type="left")
+#now join air and soil ids to get a list of sites for both
 
+AllIDS<-join(SoilIDS,AirIDS,by="siteid", type="inner")
+#get the unique site id
+AllSites<-data.frame(siteid=unique(AllIDS$siteid))
+AllSites$mod.sites<-seq(1,dim(AllSites)[1])
+
+#now combine back into table
+AirM<-join(AirS,AllSites,by=c("siteid"),type="inner")
+SoilM<-join(SoilS3,AllSites,by=c("siteid"), type="inner")
+
+#now create new soil ID for only sites included in AllSites
+#need to get unique site and depth for soil temperature
+SoilIDS2<-join(SoilIDS,AllSites,by=c("siteid"), type="inner")
 
 #set up a table to filter by one or more depths
-SoilDn<-aggregate(SoilIDS$depth,by=list(SoilIDS$siteid), FUN="length")
+SoilDn<-aggregate(SoilIDS2$depth,by=list(SoilIDS2$siteid), FUN="length")
 colnames(SoilDn)<-list("siteid","depcount")
 #merge count back with soil ID info
-SoilIDS2<-join(SoilIDS,SoilDn, by="siteid", type="left")
+SoilIDS3<-join(SoilIDS2,SoilDn, by="siteid", type="left")
 #now create an id column that uses the actual depth if there is more than one
 #gives the actual depth, and if there is only one depth than it gives it
 #a flag of zero. 
-SoilIDS2$depthF<-ifelse(SoilIDS2$depcount==1,0,SoilIDS2$depth)
+SoilIDS3$depthF<-ifelse(SoilIDS3$depcount==1,0,SoilIDS3$depth)
 #now merge this with the model data
 
-SoilM2<-join(SoilM, SoilIDS2,by=c("depth","siteid","siteD"),type="left")
+SoilM2<-join(SoilM, SoilIDS3,by=c("depth","siteid","mod.sites"),type="left")
 
 #set up a flag for sites with only one depth
 SoilDn$depthFlag<-ifelse(SoilDn$depcount>1,2,1)
@@ -456,46 +477,52 @@ SoilM2<-join(SoilM2,SitesID,by="siteid",type="left")
 floordd<-floor(SoilM2$decdate)
 SoilM2$propdd<-SoilM2$decdate-floordd
 
+
 #list of data needed for the model
 
 #write.table(AirM,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tair_model.csv",sep=",",row.names=FALSE)
 #write.table(SoilM2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tsoil_model.csv",sep=",",row.names=FALSE)
-datalist<-list(NobsA=dim(AirM)[1], TempA=AirM$A, site.depthidA=AirM$siteD,T.yrA=AirM$decdate-1991,
-				NobsS=dim(SoilM2)[1], TempS=SoilM2$T,site.depthidS=SoilM2$siteD, T.yrS=SoilM2$decdate-1991,
-				NsitedepthA=dim(AirIDS)[1],NsiteS=dim(SitesID)[1],siteM=SoilM2$siteM, depthF=SoilM2$depthF,depthFLAG=SoilDn$depthFlag)
+datalist<-list(NobsA=dim(AirM)[1], TempA=AirM$A,T.yrA=AirM$decdate-1991,
+				NobsS=dim(SoilM2)[1], TempS=SoilM2$T,T.yrS=SoilM2$decdate-1991,
+				siteAll.A=AirM$mod.sites, depthF=SoilM2$depthF,
+				NsiteAll=dim(AllSites)[1],depthFLAG=SoilDn$depthFlag,
+				siteAll.S=SoilM2$mod.sites)
 				
-samplelist<-c("T.aveA","AmpA","T.aveS","AmpS","sig.muA","sig.muS","startA","startS","b",
-					"sig.Ta","sig.As","sig.sS","sig.bS", "mu.Ta","mu.As","mu.sS","mu.bS")
+samplelist<-c("T.aveA","AmpA","T.aveS","AmpS","sig.muA","sig.muS","startA","startS","b")
 
+stepprint<-"done"
 
 temp.modI<-jags.model(file="/home/hkropp/github/synthesis_database/Temp_model/temperature_mod_code.r",
 						data=datalist,
 						n.adapt=3000,
 						n.chains=3)
 
-
+stepprint
 						
 n.iter.i=5000
 n.thin=1
 codaobj.init = coda.samples(temp.modI,variable.names=samplelist,
                        n.iter=n.iter.i, thin=n.thin)
 					   
-plot(codaobj.init, ask=TRUE)
 
-
+stepprint
 
 #get summary and save to file
 
 Mod.out<-summary(codaobj.init)
 
 
-write.table(Mod.out$statistics, "/home/hkropp/synthesis/output/Temp_moddh_stats.csv",
+write.table(Mod.out$statistics, "/home/hkropp/synthesis/output/Temp_moddS_stats.csv",
 			sep=",",row.names=TRUE)
-write.table(Mod.out$quantiles, "/home/hkropp/synthesis/output/Temp_moddh_quant.csv",
+write.table(Mod.out$quantiles, "/home/hkropp/synthesis/output/Temp_moddS_quant.csv",
 			sep=",",row.names=TRUE)
 
+			
+stepprint
 codagg<-as.mcmc.rjags(codaobj.init)			
-mcmcplot(codagg, dir="/home/hkropp/synthesis/output")			
+mcmcplot(codagg, dir="/home/hkropp/synthesis/output")	
+
+stepprint		
 #need to write ids to table
 
 #write.table(AirIDS,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\AirIDS.csv", sep=",", row.names=FALSE)
