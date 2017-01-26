@@ -2,59 +2,41 @@ model{
 	#likelihood for air temperature observations
 	for(i in 1:NobsA){
 		TempA[i]~dnorm(muA[i], tau.muA)
-		muA[i]<-T.aveA[site.depthidA[i]]+ AmpA[site.depthidA[i]]*sin(-2*3.14159265*(T.yrA[i]-startA[site.depthidA[i]]))
+		muA[i]<-T.aveA[siteAll.A[i]]+ AmpA[siteAll.A[i]]*sin(-2*3.14159265*(T.yrA[i]-startA[siteAll.A[i]]))
 	
 	}
 	
 	#likelihood for soil temperature observations
 	for(i in 1:NobsS){
 		TempS[i]~dnorm(muS[i], tau.muS)
-		muS[i]<-T.aveS[siteM[i]]+ 
-			(AmpS[siteM[i]]*exp(-b[siteM[i]]*depthF[i]))*sin(-2*3.14159265*(T.yrS[i]-startS[siteM[i]])+(b[siteM[i]]*depthF[i]))
+		muS[i]<-T.aveS[siteAll.S[i]]+ 
+			(AmpS[siteAll.S[i]]*exp(-b[siteAll.S[i]]*depthF[i]))*sin(-2*3.14159265*(T.yrS[i]-startS[siteAll.S[i]])+(b[siteAll.S[i]]*depthF[i]))
 	
 	}
 	#prior for likelihood
-	for(i in 1:NsitedepthA){
+	for(i in 1:NsiteAll){
 		T.aveA[i]~dnorm(0,.0001)
 		AmpA[i]~dunif(0,100)
 		startA[i]~dunif(0,.65)
 	}
 	#prior for likelihood
-	for(i in 1:NsiteS){
-		T.aveS[i]~dnorm(mu.Ta,tau.Ta)
-		AmpS[i]~dnorm(mu.As,tau.As)T(0,)
-		startS[i]~dnorm(mu.sS[depthFLAG[i]],tau.sS[depthFLAG[i]])T(0,.7)
-		b[i]~dnorm(mu.bS[depthFLAG[i]],tau.bS[depthFLAG[i]])T(1/10000,1/100)
+	for(i in 1:NsiteAll){
+		T.aveS[i]<-betaT1[i]+betaT2[i]*T.aveA[i]
+		AmpS[i]<-betaA1[i]+betaA2[i]*AmpA[i]
+		startS[i]~dunif(0,upper[depthFLAG[i]])
+		b[i]~dunif(.0001,.25)
+		#priors for Tave and AmpS	
+		betaT1[i]~dnorm(0,.01)
+		betaT2[i]~dnorm(0,.01)
+		betaA1[i]~dunif(0,30)
+		betaA2[i]~dunif(0,3)
+		
 	}
-	
-	#hyperpriors for temperature funcion
-	#mean priors
-	mu.Ta~dnorm(0,.001)
-	mu.As~dunif(0,30)
-	
+		upper[1]<-0.7
+		upper[2]<-0.4
 
-	#variance priors
-	tau.Ta<-pow(sig.Ta,-2)
-	tau.As<-pow(sig.As,-2)
-	
-	
-	sig.Ta~dunif(0,30)
-	sig.As~dunif(0,30)
-	
-	
-	#do a seperate prior for depth flag zero
-	#so it can't influence sites with real data
-	for(i in 1:2){
-		mu.bS[i]~dunif(1/10000,1/100)	
-		tau.bS[i]<-pow(sig.bS[i],-2)
-		sig.bS[i]~dunif(0,.1)
-		#variance prior for start
-		tau.sS[i]<-pow(sig.sS[i],-2)
-		sig.sS[i]~dunif(0,.7)
-	}
-	#
-	mu.sS[1]~dunif(0,.7)
-	mu.sS[2]~dunif(0,.4)
+
+
 	#prior for variance term
 	tau.muA<-pow(sig.muA,-2)
 	sig.muA~dunif(0,100)
