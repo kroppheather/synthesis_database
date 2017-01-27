@@ -139,3 +139,37 @@ for(n in 1:dim(site.ssA)[1]){
 	text(min(ssA$pc2.5[ssA$siteid==i])-.1,min(ssA$depth[ssA$siteid==i])-4,paste("siteid=", i), cex=2)
 	dev.off()
 }
+ssS<-datSS[datSS$param=="startS",]
+colnames(depthpn)<-c("siteid", "depthn")
+ssS<-join(depthpn,ssS, by="siteid", type="inner")
+#get unique site list
+site.ssS<-data.frame(siteid=unique(ssS$siteid))
+site.ssS$ind<-seq(1,dim(site.ssS)[1])
+
+#make plots comparing startS across depth for all sites
+	fit<-lm(ssS$M[ssS$siteid==1]~ssS$depth[ssS$siteid==1])
+	abline(fit)
+	fit$coefficients[1]
+	summary(fit)$r.squared
+for(n in 1:dim(site.ssS)[1]){
+	i<-site.ssS$siteid[n]
+	#save plot to file
+	jpeg(file=paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\T_mod2_out\\startdep\\site",i,".jpg"),
+			width=1500,height=1000, units="px")
+	#make blank plot
+	plot(c(0,1),c(0,1), type="n", ylim=c(min(ssS$pc2.5[ssS$siteid==i])-.2,max(ssS$pc97.5[ssS$siteid==i])+.2),
+			xlim=c(min(ssS$depth[ssS$siteid==i]-1),max(ssS$depth[ssS$siteid==i])+1), xaxs="i",yaxs="i",
+			xlab="Depth",ylab="Start")
+	#add amplitude and error
+	points( ssS$depth[ssS$siteid==i],ssS$M[ssS$siteid==i], pch=19, cex=2, col="deepskyblue3")
+	arrows(ssS$depth[ssS$siteid==i],ssS$pc2.5[ssS$siteid==i],ssS$depth[ssS$siteid==i],ssS$pc97.5[ssS$siteid==i],code=0)
+	#add site lable
+	text(min(ssS$depth[ssS$siteid==i])+4,max(ssS$pc97.5[ssS$siteid==i]),paste("siteid=", i), cex=2)
+	fit<-lm(ssS$M[ssS$siteid==i]~ssS$depth[ssS$siteid==i])
+	abline(fit)
+	text(min(ssS$depth[ssS$siteid==i])+10,max(ssS$pc97.5[ssS$siteid==i])+.1, paste("rsquared =", round(summary(fit)$r.squared,2)), cex=1.5)
+	text(min(ssS$depth[ssS$siteid==i])+15,max(ssS$pc97.5[ssS$siteid==i])+.17, paste("start =", round(fit$coefficients[1],5),"+", round(fit$coefficients[2],5),"*depth"), cex=1.5)
+	
+	dev.off()
+}
+
