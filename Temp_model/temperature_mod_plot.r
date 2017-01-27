@@ -173,3 +173,35 @@ for(n in 1:dim(site.ssS)[1]){
 	dev.off()
 }
 
+
+
+#only look at air vs soil
+datSA<-datS[datS$param=="AmpA"|datS$param=="T.aveA"|datS$param=="startA",]
+datSS<-datS[datS$param=="AmpS"|datS$param=="T.aveS"|datS$param=="startS",]	
+#plot the soil
+for(n in 1:dim(sitesS)[1]){	
+	i<-sitesS$siteid[n]
+	jpeg(file=paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\T_mod2_out\\site",i,".jpg"),
+			width=1500,height=1000, units="px")
+
+	plot(c(0,1),c(0,1),type="n",xlim=c(min(datSM$decdateA[datSM$siteid==i]),max(datSM$decdateA[datSM$siteid==i])),
+								ylim=c(min(datSM$T[datSM$siteid==i]),max(datSM$T[datSM$siteid==i])),
+								xlab="Time", ylab="Temperature")
+		
+		
+	for(j in 1:length(depthP[[n]])){
+		points(datSM$decdateA[datSM$siteid==i&datSM$depth==depthP[[n]][j]],
+				datSM$T[datSM$siteid==i&datSM$depth==depthP[[n]][j]],
+				pch=19, col=colP[j])
+		points(xP[[n]],Tsine(datSS$M[datSS$siteid==i&datSS$depth==depthP[[n]][j]&datSS$param=="T.aveS"],
+						datSS$M[datSS$siteid==i&datSS$depth==depthP[[n]][j]&datSS$param=="AmpS"],xP[[n]],
+						datSS$M[datSS$siteid==i&datSS$depth==depthP[[n]][j]&datSS$param=="startS"]),
+				col=colP[j],type="l",lwd=2,lty=1)
+	}
+
+	legend(min(datSM$decdateA[datSM$siteid==i])+.001,max(datSM$T[datSM$siteid==i])-.25, paste("depth=", depthP[[n]]),
+			col=colP[1:length(depthP[[n]])],pch=19, bty="n", cex=1.5)
+			
+	text(min(datSM$decdateA[datSM$siteid==i])+.5,max(datSM$T[datSM$siteid==i])-.5, paste("siteid=", sitesS$siteid[i]), cex=2)
+	dev.off()
+}
