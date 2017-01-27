@@ -493,11 +493,38 @@ SoilM2<-join(SoilM2,SitesID,by="siteid",type="left")
 floordd<-floor(SoilM2$decdate)
 SoilM2$propdd<-SoilM2$decdate-floordd
 
+#see where the max and min typically occur in the water year
+#take the first maximum if that value occurs more that one day
+
+#get unique
+SoilSUMM<-unique(data.frame(wyear=SoilM2$wyear,depth=SoilM2$depth,mod.sites=SoilM2$mod.sites))
+getmin<-numeric(0)
+Time.min<-numeric(0)
+getmax<-numeric(0)
+Time.max<-numeric(0)
+
+for(i in 1:dim(SoilSUMM)[1]){
+	getmin[i]<-which.min(SoilM2$T[SoilM2$wyear==SoilSUMM$wyear[i]&SoilM2$depth==SoilSUMM$depth[i]&SoilM2$depth==SoilSUMM$depth[i]])
+	getmax[i]<-which.max(SoilM2$T[SoilM2$wyear==SoilSUMM$wyear[i]&SoilM2$depth==SoilSUMM$depth[i]&SoilM2$depth==SoilSUMM$depth[i]])
+	Time.min[i]<-SoilM2$propdd[getmin[i]]
+	Time.max[i]<-SoilM2$propdd[getmax[i]]
+}
+
+#now join back into soil SUmm
+
+SoilSUMM$tmax<-Time.max
+SoilSUMM$tmin<-Time.min
+SoilSUMM$tmaxO<-SoilSUMM$tmax-.5
+SoilSUMM$tminO<-SoilSUMM$tmin-0
+
+
+
+Soilmin<-aggregate(SoilM2$T, by=list(SoilM2$wyear,SoilM2$depth,SoilM2$mod.sites), FUN="which.min")
 
 #list of data needed for the model
 
-#write.table(AirM,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tair_model.csv",sep=",",row.names=FALSE)
-#write.table(SoilM2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tsoil_model.csv",sep=",",row.names=FALSE)
+write.table(AirM,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tair_model.csv",sep=",",row.names=FALSE)
+write.table(SoilM2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tsoil_model.csv",sep=",",row.names=FALSE)
 datalist<-list(NobsA=dim(AirM)[1], TempA=AirM$A,T.yrA=AirM$decdate-1991,
 				NobsS=dim(SoilM2)[1], TempS=SoilM2$T,T.yrS=SoilM2$decdate-1991,
 				siteAll.A=AirM$mod.sites, depthF=SoilM2$depthF,
@@ -529,15 +556,15 @@ plot(codaobj.init, ask=TRUE)
 Mod.out<-summary(codaobj.init)
 
 
-write.table(Mod.out$statistics, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Temp_moddhf_stats.csv",
+write.table(Mod.out$statistics, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Temp_moddpt_stats.csv",
 			sep=",",row.names=TRUE)
-write.table(Mod.out$quantiles, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Temp_moddhf_quant.csv",
+write.table(Mod.out$quantiles, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Temp_moddpt_quant.csv",
 			sep=",",row.names=TRUE)
 
 codagg<-ggs(codatobj.init)			
 ggmcmc(codagg, file="/home/hkropp/synthesis/output.pdf")			
 #need to write ids to table
 
-write.table(AirIDS,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\AirIDS.csv", sep=",", row.names=FALSE)
-write.table(SitesID,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\SoilIDS.csv", sep=",", row.names=FALSE)
+write.table(AllSites,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\AirIDS.csv", sep=",", row.names=FALSE)
+write.table(SoilIDS3,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\SoilIDS.csv", sep=",", row.names=FALSE)
 

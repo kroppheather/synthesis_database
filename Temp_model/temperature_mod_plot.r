@@ -4,8 +4,8 @@ setwd("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6")
 
 datAI<-read.csv("AirIDS.csv")
 datSI<-read.csv("SoilIDS.csv")
-datM<-read.csv("Temp_moddhf_stats.csv")
-datQ<-read.csv("Temp_moddhf_quant.csv")
+datM<-read.csv("Temp_moddpt_stats.csv")
+datQ<-read.csv("Temp_moddpt_quant.csv")
 
 
 datAM<-read.csv("Tair_model.csv")
@@ -31,9 +31,9 @@ datC$parms2<-c(as.numeric(parms2))
 
 datC<-data.frame(M=datC[,1],pc2.5=datC[,5],pc97.5=datC[,9],param=as.character(datC[,10]),ID=datC[,11])
 
-colnames(datSI)<-c("siteid", "ID")
+colnames(datAI)<-c("siteid", "ID")
 
-datC2<-join(datC,datSI, by="ID", type="left")
+datC2<-join(datC,datAI, by="ID", type="left")
 
 #now make plots by site to see how this compares
 #set up sine function
@@ -80,7 +80,7 @@ datSS<-join(datSS,datSI,by="siteM",type="left")
 #plot the soil
 for(n in 1:dim(datSI)[1]){	
 	i<-datSI$siteid[n]
-	jpeg(file=paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\T_moddh_out\\site",i,".jpg"),
+	jpeg(file=paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\T_modpt_out\\site",i,".jpg"),
 			width=1500,height=1000, units="px")
 
 	plot(c(0,1),c(0,1),type="n",xlim=c(min(datSM$decdateA[datSM$siteid==i]),max(datSM$decdateA[datSM$siteid==i])),
