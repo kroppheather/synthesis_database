@@ -493,29 +493,6 @@ SoilM2<-join(SoilM2,SitesID,by="siteid",type="left")
 floordd<-floor(SoilM2$decdate)
 SoilM2$propdd<-SoilM2$decdate-floordd
 
-#see where the max and min typically occur in the water year
-#take the first maximum if that value occurs more that one day
-
-#get unique
-SoilSUMM<-unique(data.frame(wyear=SoilM2$wyear,depth=SoilM2$depth,mod.sites=SoilM2$mod.sites))
-getmin<-numeric(0)
-Time.min<-numeric(0)
-getmax<-numeric(0)
-Time.max<-numeric(0)
-
-for(i in 1:dim(SoilSUMM)[1]){
-	getmin[i]<-which.min(SoilM2$T[SoilM2$wyear==SoilSUMM$wyear[i]&SoilM2$depth==SoilSUMM$depth[i]&SoilM2$depth==SoilSUMM$depth[i]])
-	getmax[i]<-which.max(SoilM2$T[SoilM2$wyear==SoilSUMM$wyear[i]&SoilM2$depth==SoilSUMM$depth[i]&SoilM2$depth==SoilSUMM$depth[i]])
-	Time.min[i]<-SoilM2$propdd[getmin[i]]
-	Time.max[i]<-SoilM2$propdd[getmax[i]]
-}
-
-#now join back into soil SUmm
-
-SoilSUMM$tmax<-Time.max
-SoilSUMM$tmin<-Time.min
-SoilSUMM$tmaxO<-SoilSUMM$tmax-.5
-SoilSUMM$tminO<-SoilSUMM$tmin-0
 
 
 

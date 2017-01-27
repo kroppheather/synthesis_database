@@ -44,7 +44,7 @@ Tsine<-function(Tave,Amp,Tyear){
 
 Tsine2<-function(Tave,Amp,Tyear,startD,depthF,b){
 
-		Tave+ (Amp*exp(-b*depthF))*sin(-2*3.14159265*(Tyear-startD)+(b*depthF)+(3.14159265/2))
+		Tave+ (Amp*exp(-b*depthF))*sin(-2*3.14159265*(Tyear-startD)+(b*depthF))
 	}
 
 #now need to set up plotting for each site
