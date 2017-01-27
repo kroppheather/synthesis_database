@@ -35,6 +35,20 @@ _mu= Tave + A*exp(- depthF * b) * sin( 2 * pi * Time - Start - b * depthF)_
 
 Here _Time_ is the proportion into a water year ranging from 1991 to 2016. _Tave_ is the temperature at the inflection points and _A_ is the amplitude. Each parameter is estimated for site and depth. _Start_ is the offset of the peaks from the start of the water year, and is given a non-informative parameter between zero and one. _depthF_ is the depth in cm, but is set to zero if there is only one depth. This is becasue there is not enough information in the model as is to account for the change from the surface for sites with a single depth. _b_ describes the change in amplitude across depth.
 
-Several variations of this model were run. Priors were origianally set up in a way that caused identifiability issues associated with the start parameter. The model was also run hierarchically with a global hyper prior for  each parameter. 
+Several variations of this model were run. Priors were origianally set up in a way that caused identifiability issues associated with the start parameter. The model was also run hierarchically with a global hyper prior for  each parameter. A variation also included a flawed attempt to relate the temp parameters to air temp.
 
-_Commits: depthmod 93fe7ae:  19b983a_
+_Commits: depthmod 93fe7ae:  22ec8f6_
+
+## Version 4
+
+##### The fourth version includes an offeset day so that max and min do not necessarily occur between the middle of the growing season. It also accounts for the relationship between depth.
+
+_Temp ~ Normal(mu, tau)_
+
+_mu= Tave + A*exp(- depthF * b) * sin( 2 * pi * Time - (Start - StartZ * depthF)_
+
+Here _Time_ is the proportion into a water year ranging from 1991 to 2016. _Tave_ is the temperature at the inflection points and _A_ is the amplitude. Each parameter is estimated for site and depth. _Start_ is the offset of the peaks from the start of the water year, and is given a non-informative parameter between zero and one. _depthF_ is the depth in cm, but is set to zero if there is only one depth. This is becasue there is not enough information in the model as is to account for the change from the surface for sites with a single depth. _b_ describes the change in amplitude across depth.
+
+This model is the final iteration for describing annual soil temperature. The next steps after this are linking it to comparisons between the air and soil and empirically relating it to vegetation data.
+
+_Commits: depthmod ea1d249:  present_
