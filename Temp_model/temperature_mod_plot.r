@@ -4,8 +4,8 @@ setwd("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6")
 
 datAI<-read.csv("AirIDS.csv")
 datSI<-read.csv("SoilIDS.csv")
-datM<-read.csv("Temp_moddpt_stats.csv")
-datQ<-read.csv("Temp_moddpt_quant.csv")
+datM<-read.csv("Temp_modd2_stats.csv")
+datQ<-read.csv("Temp_modd2_quant.csv")
 
 
 datAM<-read.csv("Tair_model.csv")
@@ -42,9 +42,9 @@ Tsine<-function(Tave,Amp,Tyear){
 		Tave+ Amp*sin(-2*3.14159265*Tyear)
 	}
 
-Tsine2<-function(Tave,Amp,Tyear,startD,depthF,b){
+Tsine2<-function(Tave,Amp,Tyear,startD,depthF,b,startZ){
 
-		Tave+ (Amp*exp(-b*depthF))*sin(-2*3.14159265*(Tyear-startD)+(b*depthF))
+		Tave+ (Amp*exp(-b*depthF))*sin(-2*3.14159265*(Tyear-startD)+(startZ*depthF))
 	}
 
 #now need to set up plotting for each site
@@ -73,14 +73,14 @@ for(i in 1:dim(datSI)[1]){
 #need to join siteID to the datC
 
 
-datSS<-datC2[datC2$param=="AmpS"|datC2$param=="T.aveS"|datC2$param=="b"|datC2$param=="startS",]	
+datSS<-datC2[datC2$param=="AmpS"|datC2$param=="T.aveS"|datC2$param=="b"|datC2$param=="startS"|datC2$param=="startZ",]	
 #now joint so that s
 colnames(datSS)[5]<-"siteM"
 datSS<-join(datSS,datSI,by="siteM",type="left")
 #plot the soil
 for(n in 1:dim(datSI)[1]){	
 	i<-datSI$siteid[n]
-	jpeg(file=paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\T_modpt_out\\site",i,".jpg"),
+	jpeg(file=paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\T_modd2_out\\site",i,".jpg"),
 			width=1500,height=1000, units="px")
 
 	plot(c(0,1),c(0,1),type="n",xlim=c(min(datSM$decdateA[datSM$siteid==i]),max(datSM$decdateA[datSM$siteid==i])),
@@ -95,7 +95,7 @@ for(n in 1:dim(datSI)[1]){
 		points(xP[[n]],Tsine2(datSS$M[datSS$siteid==i&datSS$param=="T.aveS"],
 						datSS$M[datSS$siteid==i&datSS$param=="AmpS"],xP[[n]],
 						datSS$M[datSS$siteid==i&datSS$param=="startS"],
-					depthPF[[n]][j],datSS$M[datSS$siteid==i&datSS$param=="b"]),
+					depthPF[[n]][j],datSS$M[datSS$siteid==i&datSS$param=="b"],datSS$M[datSS$siteid==i&datSS$param=="startZ"]),
 				col=colP[j],type="l",lwd=2,lty=1)
 	}
 
