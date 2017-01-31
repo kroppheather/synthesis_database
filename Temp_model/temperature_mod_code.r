@@ -24,16 +24,19 @@ model{
 		T.aveS[i]~dnorm(0,.01)
 		AmpS[i]~dunif(0,30)
 		startS[i]~dunif(0,.30)
-		b[i]<-betab1[vegClass[i]]+betab2[vegClass[i]]*soilC[i]
+		b[i]~dnorm(mu.b[vegClass[i]], tau.b)T(0,.3)
 	}
 		#priors for b
 		
 	for(i in 1:NVClass){
-		betab1[i]~dunif(0,.24)
-		betab2[i]~dunif(0,.029)
+		mu.b[i]~dnorm(mu.bAll, tau.ball)T(0,.3)
 		
 		}
-
+		mu.bAll~dunif(0,.3)
+		tau.b<-pow(sig.b,-2)
+		sig.b~dunif(0,1)
+		tau.ball<-pow(sig.b,-2)
+		sig.ball~dunif(0,1)
 	#prior for variance term
 	tau.muA<-pow(sig.muA,-2)
 	sig.muA~dunif(0,100)
