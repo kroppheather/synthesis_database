@@ -30,7 +30,13 @@ datA<-read.table("air_temp_fixed_u6_out.csv", sep=",", header=TRUE, na.string=c(
 colnames(datA)<-c("air_id", "doy_st","year_st","air_t","air_height","site_id")
 #read in site info
 siteinf<-read.table("siteinfo.csv", sep=",", header=TRUE, na.string=c("NaN"))
+#site vegetation class
+datVClass<-read.csv("vege_class.csv")
+#site mapped soil C
+datSoilC<-read.csv("soilc_30cm.csv")
 
+#read in the soil
+datSoil<-read.csv("soil.csv")
 
 #get number of sites
 Nsite<-dim(siteinf)[1]
@@ -493,10 +499,24 @@ SoilM2<-join(SoilM2,SitesID,by="siteid",type="left")
 floordd<-floor(SoilM2$decdate)
 SoilM2$propdd<-SoilM2$decdate-floordd
 
+#now join to vege class
+#site vegetation class
+colnames(datVClass)<-c("siteid","vclass")
+siteVCj<-join(AllSites,datVClass, by="siteid",type="inner")
+#see how many observations in vege class
+vcNobs<-aggregate(siteVCj$vclass, by=list(siteVCj$vclass), FUN="length")
+
+#site mapped soil C
+colnames(datSoilC)<-c("siteid", "soilc")
+siteSCj<-join(AllSites,datSoilC, by="siteid", type="left")
+#join to soilC
 
 
+#read in the soil
+datSoil2<-datSoil[,7:8]
+colnames(datSoil2)<-c("olt","siteid")
 
-Soilmin<-aggregate(SoilM2$T, by=list(SoilM2$wyear,SoilM2$depth,SoilM2$mod.sites), FUN="which.min")
+siteOS<-join(AllSites,datSoil2, by="siteid", type="left")
 
 #list of data needed for the model
 
@@ -506,10 +526,13 @@ datalist<-list(NobsA=dim(AirM)[1], TempA=AirM$A,T.yrA=AirM$decdate-1991,
 				NobsS=dim(SoilM2)[1], TempS=SoilM2$T,T.yrS=SoilM2$decdate-1991,
 				siteAll.A=AirM$mod.sites, depthF=SoilM2$depthF,
 				NsiteAll=dim(AllSites)[1],depthFLAG=SoilDn$depthFlag,
-				siteAll.S=SoilM2$mod.sites)
+				siteAll.S=SoilM2$mod.sites,
+				vegClass=siteVCj$vclass ,
+				soilC=siteSCj$soilc,
+				NVClass=dim(vcNobs)[1])
 				
 samplelist<-c("T.aveA","AmpA","T.aveS","AmpS","sig.muA","sig.muS","startA","startS","b",
-					"startZ")
+					"mubeta1","mubeta2","sig.beta1","sig.beta2","betab1","betab2")
 
 
 temp.modI<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Temp_model\\temperature_mod_code.r",

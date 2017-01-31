@@ -10,7 +10,7 @@ model{
 	for(i in 1:NobsS){
 		TempS[i]~dnorm(muS[i], tau.muS)
 		muS[i]<-T.aveS[siteAll.S[i]]+ 
-			(AmpS[siteAll.S[i]]*exp(-b[siteAll.S[i]]*depthF[i]))*sin(-2*3.14159265*(T.yrS[i]-(startS[siteAll.S[i]]+(startZ[siteAll.S[i]]*depthF[i]))))
+			(AmpS[siteAll.S[i]]*exp(-b[siteAll.S[i]]*depthF[i]))*sin(-2*3.14159265*(T.yrS[i]-(startS[siteAll.S[i]]+(b[siteAll.S[i]]*depthF[i]))))
 	
 	}
 	#prior for likelihood
@@ -23,17 +23,16 @@ model{
 	for(i in 1:NsiteAll){
 		T.aveS[i]~dnorm(0,.01)
 		AmpS[i]~dunif(0,30)
-		startS[i]~dunif(0,upper[depthFLAG[i]])
-		b[i]~dunif(.0001,.25)
-		startZ[i]~dunif(0,.1)
-		#priors for Tave and AmpS	
-
-		
+		startS[i]~dunif(0,.30)
+		b[i]<-betab1[vegClass[i]]+betab2[vegClass[i]]*soilC[i]
 	}
-		upper[1]<-0.7
-		upper[2]<-0.4
-
-
+		#priors for b
+		
+	for(i in 1:NVClass){
+		betab1[i]~dunif(0,.24)
+		betab2[i]~dunif(0,.029)
+		
+		}
 
 	#prior for variance term
 	tau.muA<-pow(sig.muA,-2)
