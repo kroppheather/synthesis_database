@@ -532,7 +532,7 @@ datalist<-list(NobsA=dim(AirM)[1], TempA=AirM$A,T.yrA=AirM$decdate-1991,
 				NVClass=dim(vcNobs)[1])
 				
 samplelist<-c("T.aveA","AmpA","T.aveS","AmpS","sig.muA","sig.muS","startA","startS","b",
-					"mu.b", "sig.b","mu.ball","sig.ball")
+					"mu.b", "sig.b")
 
 
 temp.modI<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Temp_model\\temperature_mod_code.r",

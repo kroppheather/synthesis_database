@@ -28,10 +28,10 @@ model{
 	}
 		#priors for b
 		
-	for(i in 1:NVClass){
-		mu.b[i]~dunif(0,.3)
+
+		mu.b~dunif(0,.3)
 		
-		}
+
 	
 		tau.b<-pow(sig.b,-2)
 		sig.b~dunif(0,1)
