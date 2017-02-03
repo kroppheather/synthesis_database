@@ -483,6 +483,10 @@ SoilIDS3<-join(SoilIDS2,SoilDn, by="siteid", type="left")
 #gives the actual depth, and if there is only one depth than it gives it
 #a flag of zero. 
 SoilIDS3$depthF<-ifelse(SoilIDS3$depcount==1,0,SoilIDS3$depth)
+
+
+SoilIDS4<-SoilIDS3[SoilIDS3$depth<20,]
+
 #now merge this with the model data
 
 SoilM2<-join(SoilM, SoilIDS3,by=c("depth","siteid","mod.sites"),type="left")
@@ -532,7 +536,7 @@ datalist<-list(NobsA=dim(AirM)[1], TempA=AirM$A,T.yrA=AirM$decdate-1991,
 				NVClass=dim(vcNobs)[1])
 				
 samplelist<-c("T.aveA","AmpA","T.aveS","AmpS","sig.muA","sig.muS","startA","startS","b",
-					"mu.b", "sig.b")
+					"betab1", "betab2")
 
 
 temp.modI<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Temp_model\\temperature_mod_code.r",
@@ -547,7 +551,7 @@ n.thin=1
 codaobj.init = coda.samples(temp.modI,variable.names=samplelist,
                        n.iter=n.iter.i, thin=n.thin)
 					   
-plot(codaobj.init, ask=TRUE)
+plot(codaobj.init[,"betab2",], ask=TRUE)
 
 
 
@@ -556,9 +560,9 @@ plot(codaobj.init, ask=TRUE)
 Mod.out<-summary(codaobj.init)
 
 
-write.table(Mod.out$statistics, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Temp_modd2h3_stats.csv",
+write.table(Mod.out$statistics, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Temp_modd2h4_stats.csv",
 			sep=",",row.names=TRUE)
-write.table(Mod.out$quantiles, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Temp_modd2h3_quant.csv",
+write.table(Mod.out$quantiles, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Temp_modd2h4_quant.csv",
 			sep=",",row.names=TRUE)
 			
 #need to write ids to table

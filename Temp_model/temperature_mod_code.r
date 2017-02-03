@@ -24,17 +24,11 @@ model{
 		T.aveS[i]~dnorm(0,.01)
 		AmpS[i]~dunif(0,30)
 		startS[i]~dunif(0,.30)
-		b[i]~dnorm(mu.b, tau.b)T(0,.3)
+		b[i]<-betab1+betab2*soilC[i]
 	}
 		#priors for b
-		
-
-		mu.b~dunif(0,.3)
-		
-
-	
-		tau.b<-pow(sig.b,-2)
-		sig.b~dunif(0,1)
+		betab1~dunif(0,.3)
+		betab2~dunif(-.00005,.01)
 
 	#prior for variance term
 	tau.muA<-pow(sig.muA,-2)
