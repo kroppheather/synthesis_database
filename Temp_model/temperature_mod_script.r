@@ -8,7 +8,7 @@ library(rjags)
 library(coda)
 library(xtable)
 library(mcmcplots)
-
+library(R2OpenBUGS)
 
 ###Note site 188 had incorrect t data that was the year for some depths deleted
 
@@ -538,6 +538,9 @@ datalist<-list(NobsA=dim(AirM)[1], TempA=AirM$A,T.yrA=AirM$decdate-1991,
 samplelist<-c("T.aveA","AmpA","T.aveS","AmpS","sig.muA","sig.muS","startA","startS","b",
 					"betab1", "betab2")
 
+					
+bugs.data(datalist, dir="c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6", data.file="Dat_forBUGS.txt")					
+					
 
 temp.modI<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Temp_model\\temperature_mod_code.r",
 						data=datalist,
