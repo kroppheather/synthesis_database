@@ -8,7 +8,7 @@ library(rjags)
 library(coda)
 library(xtable)
 library(mcmcplots)
-library(R2OpenBUGS)
+
 
 ###Note site 188 had incorrect t data that was the year for some depths deleted
 
