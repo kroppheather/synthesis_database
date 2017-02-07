@@ -362,6 +362,11 @@ colnames(site.obsAf)<-c("depth", "siteid","wyear","n")
 
 #now join back with full data frame to apply filter
 SoilS<-join(Soil,site.obsSf,by=c("depth","siteid","wyear"), type="inner")
+
+#now exclude all depths that are more than 20cm
+SoilS<-SoilS[SoilS$depth<=20,]
+
+
 AirS<-join(Air,site.obsAf,by=c("depth","siteid","wyear"), type="inner")
 
 
@@ -424,28 +429,66 @@ plot(AirS$decdate[AirS$siteid==15],AirS$A[AirS$siteid==15],pch=19)
 
 
 #need to get unique site and depth for air temperature
-AirIDS<-unique(data.frame(depth=AirS$depth, siteid=AirS$siteid))
-AirIDS$siteD<-seq(1,dim(AirIDS)[1])
+AirIDS<-unique(data.frame(height=AirS$depth, siteid=AirS$siteid, wyear=AirS$wyear))
+AirIDS$siteC<-seq(1,dim(AirIDS)[1])
+
 
 #need to get unique site and depth for soil temperature
-SoilIDS<-unique(data.frame(depth=SoilS$depth, siteid=SoilS$siteid))
-SoilIDS$siteD<-seq(1,dim(SoilIDS)[1])
+SoilIDS<-unique(data.frame(depth=SoilS$depth, siteid=SoilS$siteid, wyear=SoilS$wyear ))
+SoilIDS$siteCS<-seq(1,dim(SoilIDS)[1])
+
+#now match up with air siteid to only take sites with air measurements to accompany
+ALLIDS<-join(SoilIDS,AirIDS, by=c("siteid","wyear"), type="inner")
+#the sites here are the only sites to use
+
+#now get a unique site id data frame
+SitesALL<-data.frame(siteid=unique(ALLIDS$siteid))
+SitesALL$siteM<-seq(1, dim(SitesALL)[1])
+
+#see if anyone measured air temp at multiple heights
+AirDN1<-aggregate(ALLIDS$height,by=list(ALLIDS$height,ALLIDS$siteid), FUN=length)
+AirDN<-aggregate(AirDN1$Group.1, by=list(AirDN1$Group.2), FUN="length")
+which(AirDN$x>1)
+
+
+#will need an air depth ID still
+#need to calculate new IDS based on ALL ID. 
+#get unique soil IDS
+SoilIDS2<-unique(data.frame(siteid=ALLIDS$siteid, depth=ALLIDS$depth, wyear=ALLIDS$wyear))
+SoilIDS2$SDWS<-seq(1,dim(SoilIDS2)[1])
+
+site.depthidS<-unique(data.frame(siteid=SoilIDS2$siteid,depth=SoilIDS2$depth))
+site.depthidS$SDS<-seq(1,dim(site.depthidS)[1])
+
 
 #now combine back into table
-AirM<-join(AirS,AirIDS,by=c("depth","siteid"),type="left")
-SoilM<-join(SoilS,SoilIDS,by=c("depth","siteid"), type="left")
+SoilM<-join(SoilS,SoilIDS2,by=c("depth","siteid","wyear"), type="inner")
+SoilM2<-join(SoilM,site.depthidS,by=c("depth","siteid"), type="left")
 
+#now do the same for air temperature
+AirIDS2<-unique(data.frame(siteid=ALLIDS$siteid, height=ALLIDS$height, wyear=ALLIDS$wyear))
+AirIDS2$SDWA<-seq(1,dim(AirIDS2)[1])
+
+site.heightA<-unique(data.frame(siteid=AirIDS2$siteid, height=AirIDS2$height))
+site.heightA$SDA<-seq(1,dim(site.heightA)[1])
+
+colnames(AirS)[2]<-"height"
+
+AirM<-join(AirS,AirIDS2,by=c("height","siteid","wyear"),type="inner")
+
+AirM2<-join(AirM,site.heightA,by=c("height","siteid"),type="left")
 
 #list of data needed for the model
 #NobsA =number of air temp obs
 #TempA
 #T.yrA
 #site.depthidA
-write.table(AirM,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tair_model.csv",sep=",",row.names=FALSE)
-write.table(SoilM,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tsoil_model.csv",sep=",",row.names=FALSE)
-datalist<-list(NobsA=dim(AirM)[1], TempA=AirM$A, site.depthidA=AirM$siteD,T.yrA=AirM$decdate-1991,
-				NobsS=dim(SoilM)[1], TempS=SoilM$T,site.depthidS=SoilM$siteD, T.yrS=SoilM$decdate-1991,
-				NsitedepthA=dim(AirIDS)[1],NsitedepthS=dim(SoilIDS)[1])
+#write.table(AirM,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tair_model.csv",sep=",",row.names=FALSE)
+#write.table(SoilM,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tsoil_model.csv",sep=",",row.names=FALSE)
+datalist<-list(NobsA=dim(AirM2)[1], TempA=AirM2$A, site.depthidA=AirM2$SDA,T.yrA=AirM2$decdate-1991,
+				NobsS=dim(SoilM2)[1], TempS=SoilM2$T,site.depthidS=SoilM2$SDS, T.yrS=SoilM2$decdate-1991,
+				NsitedepthA=dim(site.heightA)[1],NsitedepthS=dim(site.depthidS)[1], NSDWA=dim(AirIDS2)[1],
+				NSDWS=dim(SoilIDS2)[1], SDWS=SoilIDS2$SDWS, SDWA=AirIDS2$SDWA)
 				
 samplelist<-c("T.aveA","AmpA","T.aveS","AmpS","sig.muA","sig.muS","startA","startS", "TSrep")
 

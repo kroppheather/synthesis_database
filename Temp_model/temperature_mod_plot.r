@@ -116,7 +116,7 @@ depthpn<-depthn[depthn$x>1,]
 #now subset datSS Amplitude by sites to use
 
 ssA<-datSS[datSS$param=="AmpS",]
-
+colnames(depthpn)<-c("siteid", "number")
 ssA<-join(depthpn,ssA, by="siteid", type="inner")
 #get unique site list
 site.ssA<-data.frame(siteid=unique(ssA$siteid))
@@ -260,6 +260,16 @@ for(n in 1:dim(sitesS)[1]){
 resultsB<-data.frame(A0=A0est,P.A0=A0sig,B=best,P.B=bsig, siteid=sitesS$siteid)
 
 plot(resultsB$siteid,resultsB$B)
+
+#join start with B
+
+fitS<-list()	
+for(n in 1:dim(sitesS)[1]){
+	i=sitesS$siteid[n]
+
+	fitS[[i]]<-lm(ssS$M[ssS$siteid==i]~ssS$depth[ssS$siteid==i])
+
+}
 
 #now join with vegeclass
 #1	Herb barren
