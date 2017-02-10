@@ -477,6 +477,32 @@ colnames(AirS)[2]<-"height"
 AirM<-join(AirS,AirIDS2,by=c("height","siteid","wyear"),type="inner")
 
 AirM2<-join(AirM,site.heightA,by=c("height","siteid"),type="left")
+AirM2$indexI<-seq(1,dim(AirM2)[1])
+
+#create index to some for degree days
+AYlength<-numeric(0)
+ASY<-numeric(0)
+AEY<-numeric(0)
+for(i in 1:dim(AirIDS2)[1]){
+	AYlength[i]<-length(AirM2$indexI[AirM2$SDWA==AirIDS2$SDWA[i]])
+	ASY[i]<-AirM2$indexI[AirM2$SDWA==AirIDS2$SDWA[i]][1]
+	AEY[i]<-AirM2$indexI[AirM2$SDWA==AirIDS2$SDWA[i]][AYlength[i]]
+}
+SoilM2$indexI<-seq(1,dim(SoilM2)[1])
+SYlength<-numeric(0)
+SSY<-numeric(0)
+SEY<-numeric(0)
+for(i in 1:dim(SoilIDS2)[1]){
+	SYlength[i]<-length(SoilM2$indexI[SoilM2$SDWS==SoilIDS2$SDWS[i]])
+	SSY[i]<-SoilM2$indexI[SoilM2$SDWS==SoilIDS2$SDWS[i]][1]
+	SEY[i]<-SoilM2$indexI[SoilM2$SDWS==SoilIDS2$SDWS[i]][SYlength[i]]
+}
+
+
+#Next need to create an index that says when sites should be divided
+#want to divide each soil
+#want each soil to be divided by each air combo, but only in a year
+
 
 #list of data needed for the model
 #NobsA =number of air temp obs
