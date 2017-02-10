@@ -4,9 +4,11 @@ setwd("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6")
 
 datAI<-read.csv("AirIDS.csv")
 datSI<-read.csv("SoilIDS.csv")
-datM<-read.csv("Temp_mod2_stats.csv")
-datQ<-read.csv("Temp_mod2_quant.csv")
+datM<-read.csv("Temp_mod3_stats.csv")
+datQ<-read.csv("Temp_mod3_quant.csv")
 
+datAIS<-read.csv("AirIDS_SD.csv")
+datSIS<-read.csv("SoilIDS_SD.csv")
 
 datAM<-read.csv("Tair_model.csv")
 datSM<-read.csv("Tsoil_model.csv")
@@ -21,7 +23,7 @@ datC<-cbind(datM,datQ)
 #make a param vector
 dexps<-"\\[*[[:digit:]]*\\]"
 datC$parms1<-gsub(dexps,"",rownames(datC))
-datC<-rbind(datC[1:932,],datC[935:1400,])
+
 
 #now add id number
 dexps2<-"\\D"
@@ -31,14 +33,17 @@ datC$parms2<-c(as.numeric(parms2))
 
 datC<-data.frame(M=datC[,1],pc2.5=datC[,5],pc97.5=datC[,9],param=as.character(datC[,10]),ID=datC[,11])
 
+datC<-datC[datC$param!="sig.muS",]
+datC<-datC[datC$param!="sig.muA",]
 #now combine back with siteid info
 
 #set up ids for all parm
-IDSJ<-data.frame(depth=c(datAI$depth,datSI$depth,datAI$depth,datSI$depth,datAI$depth,datSI$depth),
-				siteid=c(datAI$siteid,datSI$siteid,datAI$siteid,datSI$siteid,datAI$siteid,datSI$siteid),
-				ID=c(datAI$siteD,datSI$siteD,datAI$siteD,datSI$siteD,datAI$siteD,datSI$siteD),
+IDSJ<-data.frame(depth=c(datAI$height,datSI$depth,datAI$height,datSI$depth,datAIS$height,datSIS$depth),
+				siteid=c(datAI$siteid,datSI$siteid,datAI$siteid,datSI$siteid,datAIS$siteid,datSIS$siteid),
+				ID=c(datAI$SDWA,datSI$SDWS,datAI$SDWA,datSI$SDWS,datAIS$SDA,datSIS$SDS),
+				wyear=c(datAI$wyear,datSI$wyear,datAI$wyear,datSI$wyear,rep(NA,dim(datAIS)[1]),rep("NA",dim(datSIS)[1])),
 				param=c(rep("AmpA",dim(datAI)[1]),rep("AmpS",dim(datSI)[1]),rep("T.aveA",dim(datAI)[1]),rep("T.aveS",dim(datSI)[1]),
-				rep("startA",dim(datAI)[1]),rep("startS",dim(datSI)[1])))
+				rep("startA",dim(datAIS)[1]),rep("startS",dim(datSIS)[1])))
 				
 #now join to the table 
 datS<-join(datC,IDSJ,by=c("param","ID"),type="left")
@@ -56,28 +61,87 @@ Tsine<-function(Tave,Amp,Tyear,Tstart){
 sitesS<-data.frame(siteid=unique(datSI$siteid))
 sitesS$siteun<-seq(1,dim(sitesS)[1])
 depthP<-list()
+wyearP<-list()
 #set up depths and colors for depths in each site
 colP<-c(terrain.colors(7),heat.colors(10),topo.colors(10))
 for(i in 1:dim(sitesS)[1]){
-	depthP[[i]]<-datSI$depth[datSI$siteid==sitesS$siteid[i]]
-	
-
+	depthP[[i]]<-unique(datSI$depth[datSI$siteid==sitesS$siteid[i]])
+	wyearP[[i]]<-unique(datSI$wyear[datSI$siteid==sitesS$siteid[i]])
 }
+
+
+#only look at air vs soil
+datSA<-datS[datS$param=="AmpA"|datS$param=="T.aveA"|datS$param=="startA",]
+datSS<-datS[datS$param=="AmpS"|datS$param=="T.aveS",]
+dattemp<-datS[datS$param=="startS",]
+dattemp<-data.frame(dattemp[1:4],dattemp[,5:7])
+dimssmat<-join(datSS[datSS$param=="AmpS",],dattemp, by=c("depth","siteid"), type="left")
+datstartT2<-data.frame(M=dimssmat[,9], pc2.5=dimssmat[,10],
+						pc97.5=dimssmat[,11],param=dimssmat[,12],
+						ID=dimssmat[,13], depth=dimssmat[,6],siteid=dimssmat[,7],wyear=dimssmat[,8])
+datSS<-rbind(datSS, datstartT2)
 #set up list of x variables for sine function
 xP<-list()
+xPwyear<-list()
+DFtest<-list()
+DFP1<-list()
+DFP2<-list()
+DFP3<-list()
+DFtest3<-list()
+DFtest4<-list()
+DFtest5<-list()
+Ysine<-list()
 for(i in 1:dim(sitesS)[1]){
 	xP[[i]]<-seq(floor(min(datSM$decdateA[datSM$siteid==sitesS$siteid[i]])),
 				ceiling(max(datSM$decdateA[datSM$siteid==sitesS$siteid[i]])),
 				by=.01)
+	#zero is 1991 jan 1 here			
+	xPwyear[[i]]<-floor(xP[[i]])+1991	
+	
+	#below wyear is treated as a factor so 1991 is 1 in the factor list
+	DFtest[[i]]<-data.frame(x=rep(xP[[i]],length(depthP[[i]])),wyear=rep(xPwyear[[i]],length(depthP[[i]])),
+							depth=rep(depthP[[i]], each=length(xP[[i]])))
+					
+	DFP1[[i]]<-data.frame(MT=datSS$M[datSS$siteid==sitesS$siteid[i]&datSS$param=="T.aveS"],
+		depth=datSS$depth[datSS$siteid==sitesS$siteid[i]&datSS$param=="T.aveS"],
+				wyear=as.numeric(datSS$wyear[datSS$siteid==sitesS$siteid[i]&datSS$param=="T.aveS"])+1990)
+				
+	DFtest3[[i]]<-join(DFtest[[i]],DFP1[[i]], by=c("wyear", "depth"), type="left")
+					
+	DFP2[[i]]<-data.frame(MA=datSS$M[datSS$siteid==sitesS$siteid[i]&datSS$param=="AmpS"],
+		depth=datSS$depth[datSS$siteid==sitesS$siteid[i]&datSS$param=="AmpS"],
+				wyear=as.numeric(datSS$wyear[datSS$siteid==sitesS$siteid[i]&datSS$param=="AmpS"])+1990)
+
+					
+	DFP3[[i]]<-data.frame(MS=datSS$M[datSS$siteid==sitesS$siteid[i]&datSS$param=="startS"],
+		depth=datSS$depth[datSS$siteid==sitesS$siteid[i]&datSS$param=="startS"],
+				wyear=as.numeric(datSS$wyear[datSS$siteid==sitesS$siteid[i]&datSS$param=="startS"])+1990)	
+
+	DFtest4[[i]]<-join(DFtest3[[i]],DFP2[[i]], by=c("wyear", "depth"), type="left")
+	DFtest5[[i]]<-join(DFtest4[[i]],DFP3[[i]], by=c("wyear", "depth"), type="left")
+	
+	Ysine[[i]]<-Tsine(DFtest5[[i]]$MT,DFtest5[[i]]$MA,DFtest5[[i]]$x,DFtest5[[i]]$MS)
 }
 		
-#only look at air vs soil
-datSA<-datS[datS$param=="AmpA"|datS$param=="T.aveA"|datS$param=="startA",]
-datSS<-datS[datS$param=="AmpS"|datS$param=="T.aveS"|datS$param=="startS",]	
+
+
+
 #plot the soil
+#create predicted points
+
+test<-list()
+for(n in 1:dim(sitesS)[1]){
+	i<-sitesS$siteid[n]
+test[[n]]<-datSS$M[datSS$siteid==i&datSS$depth==depthP[[n]][j]&datSS$wyear==xPwyear[[n]]&datSS$param=="T.aveS"]
+
+}
+
+Yfit[[i]]<-Tsine(datSS$M[datSS$siteid==i&datSS$depth==depthP[[n]][j]&datSS$wyear==xP&datSS$param=="T.aveS"],
+						datSS$M[datSS$siteid==i&datSS$depth==depthP[[n]][j]&datSS$wyear==wyearP[[n]][j]&datSS$param=="AmpS"],xP[[n]],
+						datSS$M[datSS$siteid==i&datSS$depth==depthP[[n]][j]&datSS$param=="startS"])
 for(n in 1:dim(sitesS)[1]){	
 	i<-sitesS$siteid[n]
-	jpeg(file=paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\T_mod2_out\\site",i,".jpg"),
+	jpeg(file=paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tmodd3\\out\\site",i,".jpg"),
 			width=1500,height=1000, units="px")
 
 	plot(c(0,1),c(0,1),type="n",xlim=c(min(datSM$decdateA[datSM$siteid==i]),max(datSM$decdateA[datSM$siteid==i])),
@@ -89,18 +153,19 @@ for(n in 1:dim(sitesS)[1]){
 		points(datSM$decdateA[datSM$siteid==i&datSM$depth==depthP[[n]][j]],
 				datSM$T[datSM$siteid==i&datSM$depth==depthP[[n]][j]],
 				pch=19, col=colP[j])
-		points(xP[[n]],Tsine(datSS$M[datSS$siteid==i&datSS$depth==depthP[[n]][j]&datSS$param=="T.aveS"],
-						datSS$M[datSS$siteid==i&datSS$depth==depthP[[n]][j]&datSS$param=="AmpS"],xP[[n]],
-						datSS$M[datSS$siteid==i&datSS$depth==depthP[[n]][j]&datSS$param=="startS"]),
+		points(xP[[n]],Ysine[[n]][DFtest5[[n]]$depth==depthP[[n]][j]],
 				col=colP[j],type="l",lwd=2,lty=1)
 	}
 
 	legend(min(datSM$decdateA[datSM$siteid==i])+.001,max(datSM$T[datSM$siteid==i])-.25, paste("depth=", depthP[[n]]),
 			col=colP[1:length(depthP[[n]])],pch=19, bty="n", cex=1.5)
 			
-	text(min(datSM$decdateA[datSM$siteid==i])+.5,max(datSM$T[datSM$siteid==i])-.5, paste("siteid=", sitesS$siteid[i]), cex=2)
+	text(min(datSM$decdateA[datSM$siteid==i])+.5,max(datSM$T[datSM$siteid==i])-.5, paste("siteid=", sitesS$siteid[n]), cex=2)
 	dev.off()
 }
+
+######################################################################################################################
+##########below is old code. Need to fix for new index
 
 
 #now look at how the amplitude compares for sites with the more than three depths

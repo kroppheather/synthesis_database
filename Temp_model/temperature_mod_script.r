@@ -507,8 +507,8 @@ codaobj.init = coda.samples(temp.modI,variable.names=samplelist,
 					   
 plot(codaobj.init, ask=TRUE)
 
-
-
+library(mcmcplots)
+mcmcplot(codaobj.init, dir="c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tmodd3\\history")		
 #get summary and save to file
 
 Mod.out<-summary(codaobj.init)
@@ -519,6 +519,8 @@ write.table(Mod.out$statistics, "c:\\Users\\hkropp\\Google Drive\\raw_data\\anal
 write.table(Mod.out$quantiles, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Temp_mod3_quant.csv",
 			sep=",",row.names=TRUE)
 			
+
+save(codaobj.init, file="c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tmodd3\\coda\\mod3_coda.R")
 			
 #need to write ids to table
 
