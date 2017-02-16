@@ -389,7 +389,7 @@ SoilS$wdoy<-ifelse(SoilS$leapid==1&SoilS$doy<=274, SoilS$doy+92,
 		ifelse(SoilS$leapid==0&SoilS$doy>273,SoilS$doy-273,NA))))
 #the .01 is added because day 273 needs to be included in the water year, but if it 
 #is exactly one that bumps it to the first day of the water year.
-SoilS$wdoyP<-ifelse(leap_year(SoilS$wyear)==TRUE, SoilS$wdoy/366.01,SoilS$wdoy/365.01 )
+SoilS$wdoyP<-ifelse(leap_year(SoilS$wyear)==TRUE, SoilS$wdoy/366.5,SoilS$wdoy/365.5 )
 
 #now add to the year		
 				
@@ -413,7 +413,7 @@ AirS$wdoy<-ifelse(AirS$leapid==1&AirS$doy<=274, AirS$doy+92,
 		ifelse(AirS$leapid==0&AirS$doy>273,AirS$doy-273,NA))))
 #the .01 is added because day 273 needs to be included in the water year, but if it 
 #is exactly one that bumps it to the first day of the water year.
-AirS$wdoyP<-ifelse(leap_year(AirS$wyear)==TRUE, AirS$wdoy/366.01,AirS$wdoy/365.01 )
+AirS$wdoyP<-ifelse(leap_year(AirS$wyear)==TRUE, AirS$wdoy/366.5,AirS$wdoy/365.5 )
 
 #now add to the year		
 				
@@ -461,9 +461,6 @@ site.depthidS<-unique(data.frame(siteid=SoilIDS2$siteid,depth=SoilIDS2$depth))
 site.depthidS$SDS<-seq(1,dim(site.depthidS)[1])
 
 
-#now combine back into table
-SoilM<-join(SoilS,SoilIDS2,by=c("depth","siteid","wyear"), type="inner")
-SoilM2<-join(SoilM,site.depthidS,by=c("depth","siteid"), type="left")
 
 #now do the same for air temperature
 AirIDS2<-unique(data.frame(siteid=ALLIDS$siteid, height=ALLIDS$height, wyear=ALLIDS$wyear))
@@ -474,10 +471,6 @@ site.heightA$SDA<-seq(1,dim(site.heightA)[1])
 
 colnames(AirS)[2]<-"height"
 
-AirM<-join(AirS,AirIDS2,by=c("height","siteid","wyear"),type="inner")
-
-AirM2<-join(AirM,site.heightA,by=c("height","siteid"),type="left")
-AirM2$indexI<-seq(1,dim(AirM2)[1])
 
 #join sitedepth data
 
@@ -527,27 +520,39 @@ for(i in 1:dim(SoilIDS2)[1]){
 }
 #now turn into a data frame
 S.DOY<-ldply(all.wdoyS)
+colnames(S.DOY)[1]<-"decdate"
+colnames(A.DOY)[1]<-"decdate"
+#now join with soilM2 to fill in missing days of year
+#note also in this join soil and air temps with out a pair will be dropped
+#since they have already been dropped from the 
+SoilM2<-join(S.DOY, SoilS, by=c("decdate", "depth","wyear","siteid"), type="left")
+
+AirM2<-join(A.DOY, AirS, by=c("decdate","height","siteid","wyear"), type="left" )
+
+
+
+
 #create index sequence
-S.DOY$indexI<-seq(1, dim(S.DOY)[1])
-A.DOY$indexI<-seq(1, dim(A.DOY)[1])
+SoilM2$indexI<-seq(1, dim(SoilM2)[1])
+AirM2$indexI<-seq(1, dim(AirM2)[1])
 
 #create index to some for degree days
 AYlength<-numeric(0)
 ASY<-numeric(0)
 AEY<-numeric(0)
 for(i in 1:dim(AirIDS2)[1]){
-	AYlength[i]<-length(A.DOY$indexI[A.DOY$SDWA==AirIDS2$SDWA[i]])
-	ASY[i]<-A.DOY$indexI[A.DOY$SDWA==AirIDS2$SDWA[i]][1]
-	AEY[i]<-A.DOY$indexI[A.DOY$SDWA==AirIDS2$SDWA[i]][AYlength[i]]
+	AYlength[i]<-length(AirM2$indexI[AirM2$SDWA==AirIDS2$SDWA[i]])
+	ASY[i]<-AirM2$indexI[AirM2$SDWA==AirIDS2$SDWA[i]][1]
+	AEY[i]<-AirM2$indexI[AirM2$SDWA==AirIDS2$SDWA[i]][AYlength[i]]
 }
 #create index for soil
 SYlength<-numeric(0)
 SSY<-numeric(0)
 SEY<-numeric(0)
 for(i in 1:dim(SoilIDS2)[1]){
-	SYlength[i]<-length(S.DOY$indexI[S.DOY$SDWS==SoilIDS2$SDWS[i]])
-	SSY[i]<-S.DOY$indexI[S.DOY$SDWS==SoilIDS2$SDWS[i]][1]
-	SEY[i]<-S.DOY$indexI[S.DOY$SDWS==SoilIDS2$SDWS[i]][SYlength[i]]
+	SYlength[i]<-length(SoilM2$indexI[SoilM2$SDWS==SoilIDS2$SDWS[i]])
+	SSY[i]<-SoilM2$indexI[SoilM2$SDWS==SoilIDS2$SDWS[i]][1]
+	SEY[i]<-SoilM2$indexI[SoilM2$SDWS==SoilIDS2$SDWS[i]][SYlength[i]]
 }
 
 
@@ -563,16 +568,15 @@ write.table(AirM,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tair_m
 write.table(SoilM,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tsoil_model.csv",sep=",",row.names=FALSE)
 
 
-datalist<-list(NobsA=dim(AirM2)[1], TempA=AirM2$A, site.depthidA=AirM2$SDA,T.yrA=AirM2$decdate-1991,
+datalist<-list(NobsA=dim(AirM2)[1], TempA=AirM2$A, site.depthidA=AirM2$SDS,T.yrA=AirM2$decdate-1991,
 				NobsS=dim(SoilM2)[1], TempS=SoilM2$T,site.depthidS=SoilM2$SDS, T.yrS=SoilM2$decdate-1991,
 				NsitedepthA=dim(site.heightA)[1],NsitedepthS=dim(site.depthidS)[1], NSDWA=dim(AirIDS2)[1],
 				NSDWS=dim(SoilIDS2)[1], SDWS=SoilM2$SDWS, SDWA=AirM2$SDWA,Ncombo=dim(IDforCombo)[1],
 				 AirIND=IDforCombo$SDWA,SoilIND=IDforCombo$SDWS,
-				 Nairpred=dim(A.DOY)[1],SDWA.pred=A.DOY$SDWA, T.yrA.pred=A.DOY$wdoy-1991, site.depthidA.pred=A.DOY$SDS,
-				 Nsoilpred=dim(S.DOY)[1], SDWS.pred=S.DOY$SDWS, T.yrS.pred=S.DOY$wdoy-1991, site.depthidS.pred=S.DOY$SDS,
 				 ASY=ASY, AEY=AEY,SSY=SSY,SEY=SEY)
 				
-samplelist<-c("T.aveA","AmpA","T.aveS","AmpS","sig.muA","sig.muS","startA","startS","Fn","Tn", "FDDA","TDDA","FDDS","TDDS")
+samplelist<-c("T.aveA","AmpA","T.aveS","AmpS","sig.muA","sig.muS","startA","startS","Fn","Tn", "FDDA","TDDA","FDDS","TDDS",
+				"TempA", "TempS")
 
 
 temp.modI<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Temp_model\\temperature_mod_code.r",
