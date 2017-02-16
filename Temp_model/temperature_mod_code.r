@@ -3,8 +3,6 @@ model{
 	for(i in 1:NobsA){
 		TempA[i]~dnorm(muA[i], tau.muA)
 		muA[i]<-T.aveA[SDWA[i]]+ AmpA[SDWA[i]]*sin(-2*3.14159265*(T.yrA[i]-startA[site.depthidA[i]]))
-		FreezeA[i]<-(1-step(muA[i]))*muA[i]
-		ThawA[i]<-step(muA[i])*muA[i]
 		
 	}
 	
@@ -38,11 +36,22 @@ model{
 	}
 	#now need to calculate the predicted temperature for all air observations
 	#this is going to vary by site, wyear, and depth
-	#Temp.predA~dnorm(muApred, tau.muA)
-	#muApred<-
-	#FreezeA<-
-	#ThawA<-
-	
+	#get the predicted temperature
+	for(i in 1:Nairpred){
+		Temp.predA[i]~dnorm(muApred[i], tau.muA)
+		#now get the predicted mean from the sine function
+		muApred[i]<-T.aveA[SDWA.pred[i]]+ AmpA[SDWA.pred[i]]*sin(-2*3.14159265*(T.yrA.pred[i]-startA[site.depthidA.pred[i]]))
+		FreezeA[i]<-(1-step(Temp.predA[i]))*Temp.predA[i]
+		ThawA[i]<-step(Temp.predA[i])*Temp.predA[i]
+	}
+	#prediction for soil
+	for(i in 1:Nsoilpred){
+		Temp.predS[i]~dnorm(muSpred[i], tau.muS)
+		#now get the predicted mean from the sine function
+		muSpred[i]<-T.aveS[SDWS.pred[i]]+ AmpS[SDWS.pred[i]]*sin(-2*3.14159265*(T.yrS.pred[i]-startS[site.depthidS.pred[i]]))
+		FreezeS[i]<-(1-step(Temp.predS[i]))*Temp.predS[i]
+		ThawS[i]<-step(Temp.predS[i])*Temp.predS[i]
+	}
 	
 	#add up thawing and freezing degree days
 	for(i in 1:NSDWA){

@@ -479,23 +479,75 @@ AirM<-join(AirS,AirIDS2,by=c("height","siteid","wyear"),type="inner")
 AirM2<-join(AirM,site.heightA,by=c("height","siteid"),type="left")
 AirM2$indexI<-seq(1,dim(AirM2)[1])
 
+#join sitedepth data
+
+AIRIDNEWALL<-join(AirIDS2, site.heightA, by=c("siteid", "height"), type="left" )
+SOILIDNEWALL<-join(SoilIDS2, site.depthidS, by=c("siteid", "depth"), type="left")
+
+#now need to create the vector for getting the complete years
+#Air
+all.wdoyA<-list()
+for(i in 1:dim(AirIDS2)[1]){
+	if(leap_year(AirIDS2$wyear[i])){
+		all.wdoyA[[i]]<-data.frame(wdoy=c(rep(AirIDS2$wyear[i],366)+seq(1/366.5,366/366.5,length.out=366)),
+									wyear=rep(AirIDS2$wyear[i],366),
+									siteid=rep(AirIDS2$siteid[i],366),
+									height=rep(AirIDS2$height[i],366),
+									SDWA=rep(AirIDS2$SDWA[i],366),
+									SDS=rep(AIRIDNEWALL$SDA[i],366))
+	}else{
+		all.wdoyA[[i]]<-data.frame(wdoy=c(rep(AirIDS2$wyear[i],365)+seq(1/365.5,365/365.5,length.out=365)),
+									wyear=rep(AirIDS2$wyear[i],365),
+									siteid=rep(AirIDS2$siteid[i],365),
+									height=rep(AirIDS2$height[i],365),
+									SDWA=rep(AirIDS2$SDWA[i],365),
+									SDS=rep(AIRIDNEWALL$SDA[i],365))	
+		}
+}
+#now turn into a data frame
+A.DOY<-ldply(all.wdoyA)
+#Soil
+all.wdoyS<-list()
+for(i in 1:dim(SoilIDS2)[1]){
+	if(leap_year(SoilIDS2$wyear[i])){
+		all.wdoyS[[i]]<-data.frame(wdoy=c(rep(SoilIDS2$wyear[i],366)+seq(1/366.5,366/366.5,length.out=366)),
+									wyear=rep(SoilIDS2$wyear[i],366),
+									siteid=rep(SoilIDS2$siteid[i],366),
+									depth=rep(SoilIDS2$depth[i],366),
+									SDWS=rep(SoilIDS2$SDWS[i],366),
+									SDS=rep(SOILIDNEWALL$SDS[i],366))
+	}else{
+		all.wdoyS[[i]]<-data.frame(wdoy=c(rep(SoilIDS2$wyear[i],365)+seq(1/365.5,365/365.5,length.out=365)),
+									wyear=rep(SoilIDS2$wyear[i],365),
+									siteid=rep(SoilIDS2$siteid[i],365),
+									depth=rep(SoilIDS2$depth[i],365),
+									SDWS=rep(SoilIDS2$SDWS[i],365),
+									SDS=rep(SOILIDNEWALL$SDS[i],365))	
+		}
+}
+#now turn into a data frame
+S.DOY<-ldply(all.wdoyS)
+#create index sequence
+S.DOY$indexI<-seq(1, dim(S.DOY)[1])
+A.DOY$indexI<-seq(1, dim(A.DOY)[1])
+
 #create index to some for degree days
 AYlength<-numeric(0)
 ASY<-numeric(0)
 AEY<-numeric(0)
 for(i in 1:dim(AirIDS2)[1]){
-	AYlength[i]<-length(AirM2$indexI[AirM2$SDWA==AirIDS2$SDWA[i]])
-	ASY[i]<-AirM2$indexI[AirM2$SDWA==AirIDS2$SDWA[i]][1]
-	AEY[i]<-AirM2$indexI[AirM2$SDWA==AirIDS2$SDWA[i]][AYlength[i]]
+	AYlength[i]<-length(A.DOY$indexI[A.DOY$SDWA==AirIDS2$SDWA[i]])
+	ASY[i]<-A.DOY$indexI[A.DOY$SDWA==AirIDS2$SDWA[i]][1]
+	AEY[i]<-A.DOY$indexI[A.DOY$SDWA==AirIDS2$SDWA[i]][AYlength[i]]
 }
-SoilM2$indexI<-seq(1,dim(SoilM2)[1])
+#create index for soil
 SYlength<-numeric(0)
 SSY<-numeric(0)
 SEY<-numeric(0)
 for(i in 1:dim(SoilIDS2)[1]){
-	SYlength[i]<-length(SoilM2$indexI[SoilM2$SDWS==SoilIDS2$SDWS[i]])
-	SSY[i]<-SoilM2$indexI[SoilM2$SDWS==SoilIDS2$SDWS[i]][1]
-	SEY[i]<-SoilM2$indexI[SoilM2$SDWS==SoilIDS2$SDWS[i]][SYlength[i]]
+	SYlength[i]<-length(S.DOY$indexI[S.DOY$SDWS==SoilIDS2$SDWS[i]])
+	SSY[i]<-S.DOY$indexI[S.DOY$SDWS==SoilIDS2$SDWS[i]][1]
+	SEY[i]<-S.DOY$indexI[S.DOY$SDWS==SoilIDS2$SDWS[i]][SYlength[i]]
 }
 
 
@@ -506,33 +558,21 @@ IDforCombo<-join(AirIDS2,SoilIDS2, by=c("siteid","wyear"), type="inner")
 IDforCombo$Nseq<-seq(1,dim(IDforCombo)[1])
 
 
-#need to generate a vector of x values	
-#make sure my index is correct
-#Thaw<-ifelse(SoilM2$T>0,SoilM2$T,0)
-#Freeze<-ifelse(SoilM2$T<=0,SoilM2$T,0)
-#Thawagg<-aggregate(Thaw, by=list(SoilM2$SDWS), FUN="sum")
-#Freezeagg<-aggregate(Freeze, by=list(SoilM2$SDWS), FUN="sum")
-#DDtest<-numeric(0)
-#for(i in 1:dim(SoilIDS2)[1]){
-#	DDtest[i]<-sum(Freeze[SSY[i]:SEY[i]])
-
-#}
-#DDDF<-data.frame(ID=SoilIDS2$SDWS,DD=DDtest,CalcDD=Freezeagg$x)
-
-#list of data needed for the model
-#NobsA =number of air temp obs
-#TempA
-#T.yrA
-#site.depthidA
+#model
 write.table(AirM,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tair_model.csv",sep=",",row.names=FALSE)
 write.table(SoilM,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tsoil_model.csv",sep=",",row.names=FALSE)
+
+
 datalist<-list(NobsA=dim(AirM2)[1], TempA=AirM2$A, site.depthidA=AirM2$SDA,T.yrA=AirM2$decdate-1991,
 				NobsS=dim(SoilM2)[1], TempS=SoilM2$T,site.depthidS=SoilM2$SDS, T.yrS=SoilM2$decdate-1991,
 				NsitedepthA=dim(site.heightA)[1],NsitedepthS=dim(site.depthidS)[1], NSDWA=dim(AirIDS2)[1],
 				NSDWS=dim(SoilIDS2)[1], SDWS=SoilM2$SDWS, SDWA=AirM2$SDWA,Ncombo=dim(IDforCombo)[1],
-				ASY=ASY,AEY=AEY,SSY=SSY,SEY=SEY, AirIND=IDforCombo$SDWA,SoilIND=IDforCombo$SDWS)
+				 AirIND=IDforCombo$SDWA,SoilIND=IDforCombo$SDWS,
+				 Nairpred=dim(A.DOY)[1],SDWA.pred=A.DOY$SDWA, T.yrA.pred=A.DOY$wdoy-1991, site.depthidA.pred=A.DOY$SDS,
+				 Nsoilpred=dim(S.DOY)[1], SDWS.pred=S.DOY$SDWS, T.yrS.pred=S.DOY$wdoy-1991, site.depthidS.pred=S.DOY$SDS,
+				 ASY=ASY, AEY=AEY,SSY=SSY,SEY=SEY)
 				
-samplelist<-c("T.aveA","AmpA","T.aveS","AmpS","sig.muA","sig.muS","startA","startS","Fn","Tn")
+samplelist<-c("T.aveA","AmpA","T.aveS","AmpS","sig.muA","sig.muS","startA","startS","Fn","Tn", "FDDA","TDDA","FDDS","TDDS")
 
 
 temp.modI<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Temp_model\\temperature_mod_code.r",
