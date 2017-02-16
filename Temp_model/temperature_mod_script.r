@@ -502,7 +502,22 @@ for(i in 1:dim(SoilIDS2)[1]){
 #Next need to create an index that says when sites should be divided
 #want to divide each soil
 #want each soil to be divided by each air combo, but only in a year
+IDforCombo<-join(AirIDS2,SoilIDS2, by=c("siteid","wyear"), type="inner")
+IDforCombo$Nseq<-seq(1,dim(IDforCombo)[1])
 
+
+#need to generate a vector of x values	
+#make sure my index is correct
+#Thaw<-ifelse(SoilM2$T>0,SoilM2$T,0)
+#Freeze<-ifelse(SoilM2$T<=0,SoilM2$T,0)
+#Thawagg<-aggregate(Thaw, by=list(SoilM2$SDWS), FUN="sum")
+#Freezeagg<-aggregate(Freeze, by=list(SoilM2$SDWS), FUN="sum")
+#DDtest<-numeric(0)
+#for(i in 1:dim(SoilIDS2)[1]){
+#	DDtest[i]<-sum(Freeze[SSY[i]:SEY[i]])
+
+#}
+#DDDF<-data.frame(ID=SoilIDS2$SDWS,DD=DDtest,CalcDD=Freezeagg$x)
 
 #list of data needed for the model
 #NobsA =number of air temp obs
@@ -514,9 +529,10 @@ write.table(SoilM,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tsoil
 datalist<-list(NobsA=dim(AirM2)[1], TempA=AirM2$A, site.depthidA=AirM2$SDA,T.yrA=AirM2$decdate-1991,
 				NobsS=dim(SoilM2)[1], TempS=SoilM2$T,site.depthidS=SoilM2$SDS, T.yrS=SoilM2$decdate-1991,
 				NsitedepthA=dim(site.heightA)[1],NsitedepthS=dim(site.depthidS)[1], NSDWA=dim(AirIDS2)[1],
-				NSDWS=dim(SoilIDS2)[1], SDWS=SoilM2$SDWS, SDWA=AirM2$SDWA)
+				NSDWS=dim(SoilIDS2)[1], SDWS=SoilM2$SDWS, SDWA=AirM2$SDWA,Ncombo=dim(IDforCombo)[1],
+				ASY=ASY,AEY=AEY,SSY=SSY,SEY=SEY, AirIND=IDforCombo$SDWA,SoilIND=IDforCombo$SDWS)
 				
-samplelist<-c("T.aveA","AmpA","T.aveS","AmpS","sig.muA","sig.muS","startA","startS")
+samplelist<-c("T.aveA","AmpA","T.aveS","AmpS","sig.muA","sig.muS","startA","startS","Fn","Tn")
 
 
 temp.modI<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Temp_model\\temperature_mod_code.r",
