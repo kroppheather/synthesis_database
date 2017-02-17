@@ -231,16 +231,6 @@ for(i in 1:Nsite){
 						
 						
 
-#check dim of temp
-
-dimTemp<-numeric(0)
-SdimV<-numeric(0)
-for(i in 1:Nsite){
-	dimTemp[i]<-dim(Temperature[[i]])[1]
-	SdimV[i]<-S.dim[[i]][1]
-}
-TdimCheck<-dimTemp-SdimV
-
 #see if anysites are missing all temperature data
 sitedimA<-list()
 sitedimS<-list()
