@@ -15,6 +15,16 @@ model{
 		FreezeS[i]<-(1-step(TempS[i]))*TempS[i]
 		ThawS[i]<-step(TempS[i])*TempS[i]
 	}
+	for(i in 1:NrepS){
+		TempS.rep[i]~dnorm(muS[SrepSub[i]], tau.muS)
+	
+	}
+	
+	for(i in 1:NrepA){
+		TempA.rep[i]~dnorm(muA[ArepSub[i]], tau.muA)
+	
+	}
+	
 	#prior for likelihood
 	for(i in 1:NSDWA){
 		T.aveA[i]~dnorm(0,.0001)

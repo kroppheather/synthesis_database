@@ -553,6 +553,18 @@ for(i in 1:dim(SoilIDS2)[1]){
 IDforCombo<-join(AirIDS2,SoilIDS2, by=c("siteid","wyear"), type="inner")
 IDforCombo$Nseq<-seq(1,dim(IDforCombo)[1])
 
+#generate replicate id subset
+Soilrepsub<-list()
+for(i in 1:dim(SoilIDS2)[1]){
+	Soilrepsub[[i]]<-sample(SoilM2$indexI[SoilM2$SDWS==i],5)
+}
+SoilrepsubV<-unlist(Soilrepsub)
+
+Airrepsub<-list()
+for(i in 1:dim(AirIDS2)[1]){
+	Airrepsub[[i]]<-sample(AirM2$indexI[AirM2$SDWA==i],5)
+}
+AirrepsubV<-unlist(Airrepsub)
 
 #model
 #write.table(AirM,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tair_model.csv",sep=",",row.names=FALSE)
@@ -564,10 +576,12 @@ datalist<-list(NobsA=dim(AirM2)[1], TempA=AirM2$A, site.depthidA=AirM2$SDS,T.yrA
 				NsitedepthA=dim(site.heightA)[1],NsitedepthS=dim(site.depthidS)[1], NSDWA=dim(AirIDS2)[1],
 				NSDWS=dim(SoilIDS2)[1], SDWS=SoilM2$SDWS, SDWA=AirM2$SDWA,Ncombo=dim(IDforCombo)[1],
 				 AirIND=IDforCombo$SDWA,SoilIND=IDforCombo$SDWS,
-				 ASY=ASY, AEY=AEY,SSY=SSY,SEY=SEY)
+				 ASY=ASY, AEY=AEY,SSY=SSY,SEY=SEY,
+				 Nreps=length(SoilrepsubV), SrepSub=SoilrepsubV,NrepA=length(AirrepsubV),
+				 ArepSub=AirrepsubV)
 				
 samplelist<-c("T.aveA","AmpA","T.aveS","AmpS","sig.muA","sig.muS","startA","startS","Fn","Tn", "FDDA","TDDA","FDDS","TDDS",
-				"TempA", "TempS")
+				"TempA", "TempS","TempA.rep", "TempS.rep")
 
 
 temp.modI<-jags.model(file="/home/hkropp/github/synthesis_database/Temp_model/temperature_mod_code.r",
@@ -589,20 +603,20 @@ print("samples done done")
 Mod.out<-summary(codaobj.init)
 
 
-write.table(Mod.out$statistics, "/home/hkropp/synthesis/output/Temp_mod4_stats.csv",
+write.table(Mod.out$statistics, "/home/hkropp/synthesis/output/rep/Temp_mod4r_stats.csv",
 			sep=",",row.names=TRUE)
-write.table(Mod.out$quantiles, "/home/hkropp/synthesis/output/Temp_mod4_quant.csv",
+write.table(Mod.out$quantiles, "/home/hkropp/synthesis/output/rep/Temp_mod4r_quant.csv",
 			sep=",",row.names=TRUE)
 			
 print("summary out")	
 
 
-save(codaobj.init, file="/home/hkropp/synthesis/output/mod4_coda.R")
+save(codaobj.init, file="/home/hkropp/synthesis/output/rep/mod4r_coda.R")
 			
 print("coda out")	
 
 			
-mcmcplot(codaobj.init, dir="/home/hkropp/synthesis/output")		
+mcmcplot(codaobj.init, dir="/home/hkropp/synthesis/output/rep")		
 #get summary and save to file
 
 print("mcmcplot out")	

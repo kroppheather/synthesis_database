@@ -563,6 +563,20 @@ IDforCombo<-join(AirIDS2,SoilIDS2, by=c("siteid","wyear"), type="inner")
 IDforCombo$Nseq<-seq(1,dim(IDforCombo)[1])
 
 
+#make id to subset for replicated data
+#want to make sure that each wyear, site, depth gets
+#the same number of samples
+Soilrepsub<-list()
+for(i in 1:dim(SoilIDS2)[1]){
+	Soilrepsub[[i]]<-sample(SoilM2$indexI[SoilM2$SDWS==i],5)
+}
+SoilrepsubV<-unlist(Soilrepsub)
+
+Airrepsub<-list()
+for(i in 1:dim(AirIDS2)[1]){
+	Airrepsub[[i]]<-sample(AirM2$indexI[AirM2$SDWA==i],5)
+}
+AirrepsubV<-unlist(Airrepsub)
 #model
 write.table(AirM,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tair_model.csv",sep=",",row.names=FALSE)
 write.table(SoilM,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tsoil_model.csv",sep=",",row.names=FALSE)
@@ -573,20 +587,24 @@ datalist<-list(NobsA=dim(AirM2)[1], TempA=AirM2$A, site.depthidA=AirM2$SDS,T.yrA
 				NsitedepthA=dim(site.heightA)[1],NsitedepthS=dim(site.depthidS)[1], NSDWA=dim(AirIDS2)[1],
 				NSDWS=dim(SoilIDS2)[1], SDWS=SoilM2$SDWS, SDWA=AirM2$SDWA,Ncombo=dim(IDforCombo)[1],
 				 AirIND=IDforCombo$SDWA,SoilIND=IDforCombo$SDWS,
-				 ASY=ASY, AEY=AEY,SSY=SSY,SEY=SEY)
+				 ASY=ASY, AEY=AEY,SSY=SSY,SEY=SEY,
+				 NrepS=length(SoilrepsubV), SrepSub=SoilrepsubV,NrepA=length(AirrepsubV),
+				 ArepSub=AirrepsubV)
+				 
+				 
 				
 samplelist<-c("T.aveA","AmpA","T.aveS","AmpS","sig.muA","sig.muS","startA","startS","Fn","Tn", "FDDA","TDDA","FDDS","TDDS",
-				"TempA", "TempS")
+				"TempA", "TempS", "TempA.rep", "TempS.rep")
 
 
 temp.modI<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Temp_model\\temperature_mod_code.r",
 						data=datalist,
-						n.adapt=2000,
+						n.adapt=1000,
 						n.chains=3)
 
 
 						
-n.iter.i=1500
+n.iter.i=100
 n.thin=1
 codaobj.init = coda.samples(temp.modI,variable.names=samplelist,
                        n.iter=n.iter.i, thin=n.thin)
