@@ -566,6 +566,10 @@ for(i in 1:dim(AirIDS2)[1]){
 }
 AirrepsubV<-unlist(Airrepsub)
 
+write.table(AirrepsubV, "/home/hkropp/synthesis/output/rep/AirrepID.csv", sep=",", row.names=FALSE)
+print("repA_out")
+write.table(SoilrepsubV, "/home/hkropp/synthesis/output/rep/SoilrepID.csv", sep=",", row.names=FALSE)
+print("reps_out")
 #model
 #write.table(AirM,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tair_model.csv",sep=",",row.names=FALSE)
 #write.table(SoilM,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tsoil_model.csv",sep=",",row.names=FALSE)
