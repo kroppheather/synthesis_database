@@ -571,8 +571,8 @@ print("repA_out")
 write.table(SoilrepsubV, "/home/hkropp/synthesis/output/rep/SoilrepID.csv", sep=",", row.names=FALSE)
 print("reps_out")
 #model
-#write.table(AirM,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tair_model.csv",sep=",",row.names=FALSE)
-#write.table(SoilM,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tsoil_model.csv",sep=",",row.names=FALSE)
+#write.table(AirM2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tmod4rep\\rep\\Tair_model.csv",sep=",",row.names=FALSE)
+#write.table(SoilM2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tmod4rep\\rep\\Tsoil_model.csv",sep=",",row.names=FALSE)
 
 
 datalist<-list(NobsA=dim(AirM2)[1], TempA=AirM2$A, site.depthidA=AirM2$SDS,T.yrA=AirM2$decdate-1991,
@@ -628,8 +628,10 @@ print("mcmcplot out")
 
 #need to write ids to table
 
-#write.table(AirIDS2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\AirIDS.csv", sep=",", row.names=FALSE)
-#write.table(SoilIDS2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\SoilIDS.csv", sep=",", row.names=FALSE)
+#write.table(AirIDS2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tmod4rep\\rep\\AirIDS.csv", sep=",", row.names=FALSE)
+#write.table(SoilIDS2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tmod4rep\\rep\\SoilIDS.csv", sep=",", row.names=FALSE)
 
-#write.table(site.heightA,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\AirIDS_SD.csv", sep=",", row.names=FALSE)
-#write.table(site.depthidS,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\SoilIDS_SD.csv", sep=",", row.names=FALSE)
+#write.table(site.heightA,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tmod4rep\\rep\\AirIDS_SD.csv", sep=",", row.names=FALSE)
+#write.table(site.depthidS,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tmod4rep\\rep\\SoilIDS_SD.csv", sep=",", row.names=FALSE)
+
+#write.table(IDforCombo, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tmod4rep\\rep\\NfactorIDS.csv",sep=",", row.names=FALSE)
