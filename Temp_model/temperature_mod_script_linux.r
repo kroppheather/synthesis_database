@@ -11,11 +11,11 @@ library(mcmcplots,lib.loc="/home/hkropp/R")
 
 
 # set working directory
-setwd("/home/hkropp/synthesis")
+setwd("/home/hkropp/synthesis/data_u7")
 #read in soil temperature
-datS<-read.table("soil_temp_fixed_u6_out.csv", sep=",", header=TRUE, na.string=c("NaN"))
+datS<-read.table("soil_temp.csv", sep=",", header=TRUE, na.string=c("NaN"))
 #read in air temperature
-datA<-read.table("air_temp_fixed_u6_out.csv", sep=",", header=TRUE, na.string=c("NaN"))
+datA<-read.table("air_temp.csv", sep=",", header=TRUE, na.string=c("NaN"))
 #change date labels for easier merging
 colnames(datA)<-c("air_id", "doy_st","year_st","air_t","air_height","site_id")
 #read in site info
@@ -388,9 +388,9 @@ SoilS$decdate<-SoilS$wyear+SoilS$wdoyP
 
 
 
-plot(SoilS$decdate[SoilS$depth<=10],SoilS$T[SoilS$depth<=10],pch=19)
+plot(SoilS$decdate[SoilS$depth<=20],SoilS$T[SoilS$depth<=20],pch=19)
 #exclude outlier that is clearly a -999 output from an instrument
-SoilS<-SoilS[SoilS$T>-999,]
+
 
 
 #now do air temperature
@@ -412,10 +412,12 @@ AirS$decdate<-AirS$wyear+AirS$wdoyP
 
 plot(AirS$decdate,AirS$A,pch=19)
 
-#more -999 from instrument error 
-#exclude these
 
-AirS<-na.omit(AirS[AirS$A>-999,])
+#more -999 from instrument error 
+#6999 
+#exclude these from analysis
+AirS<-na.omit(AirS[AirS$A> -999,])
+AirS<-AirS[AirS$A<50,]
 plot(AirS$decdate[AirS$siteid==15],AirS$A[AirS$siteid==15],pch=19)
 
 
@@ -566,9 +568,9 @@ for(i in 1:dim(AirIDS2)[1]){
 }
 AirrepsubV<-unlist(Airrepsub)
 
-write.table(AirrepsubV, "/home/hkropp/synthesis/output/rep/AirrepID.csv", sep=",", row.names=FALSE)
+write.table(AirrepsubV, "/home/hkropp/synthesis/output_u7/AirrepID.csv", sep=",", row.names=FALSE)
 print("repA_out")
-write.table(SoilrepsubV, "/home/hkropp/synthesis/output/rep/SoilrepID.csv", sep=",", row.names=FALSE)
+write.table(SoilrepsubV, "/home/hkropp/synthesis/output_u7/SoilrepID.csv", sep=",", row.names=FALSE)
 print("reps_out")
 #model
 #write.table(AirM2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tmod4rep\\rep\\Tair_model.csv",sep=",",row.names=FALSE)
@@ -607,20 +609,20 @@ print("samples done done")
 Mod.out<-summary(codaobj.init)
 
 
-write.table(Mod.out$statistics, "/home/hkropp/synthesis/output/rep/Temp_mod4r_stats.csv",
+write.table(Mod.out$statistics, "/home/hkropp/synthesis/output_u7/Temp_mod7_stats.csv",
 			sep=",",row.names=TRUE)
-write.table(Mod.out$quantiles, "/home/hkropp/synthesis/output/rep/Temp_mod4r_quant.csv",
+write.table(Mod.out$quantiles, "/home/hkropp/synthesis/output_u7/Temp_mod7_quant.csv",
 			sep=",",row.names=TRUE)
 			
 print("summary out")	
 
 
-save(codaobj.init, file="/home/hkropp/synthesis/output/rep/mod4r_coda.R")
+save(codaobj.init, file="/home/hkropp/synthesis/output_u7/mod7_coda.R")
 			
 print("coda out")	
 
 			
-mcmcplot(codaobj.init, dir="/home/hkropp/synthesis/output/rep")		
+mcmcplot(codaobj.init, dir="/home/hkropp/synthesis/output_u7")		
 #get summary and save to file
 
 print("mcmcplot out")	
@@ -628,10 +630,12 @@ print("mcmcplot out")
 
 #need to write ids to table
 
-#write.table(AirIDS2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tmod4rep\\rep\\AirIDS.csv", sep=",", row.names=FALSE)
-#write.table(SoilIDS2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tmod4rep\\rep\\SoilIDS.csv", sep=",", row.names=FALSE)
+write.table(AirIDS2,"/home/hkropp/synthesis/output_u7/AirIDS.csv", sep=",", row.names=FALSE)
+write.table(SoilIDS2,"/home/hkropp/synthesis/output_u7/SoilIDS.csv", sep=",", row.names=FALSE)
 
-#write.table(site.heightA,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tmod4rep\\rep\\AirIDS_SD.csv", sep=",", row.names=FALSE)
-#write.table(site.depthidS,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tmod4rep\\rep\\SoilIDS_SD.csv", sep=",", row.names=FALSE)
+write.table(site.heightA,"/home/hkropp/synthesis/output_u7/AirIDS_SD.csv", sep=",", row.names=FALSE)
+write.table(site.depthidS,"/home/hkropp/synthesis/output_u7/SoilIDS_SD.csv", sep=",", row.names=FALSE)
 
-#write.table(IDforCombo, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tmod4rep\\rep\\NfactorIDS.csv",sep=",", row.names=FALSE)
+write.table(IDforCombo, "/home/hkropp/synthesis/output_u7/NfactorIDS.csv",sep=",", row.names=FALSE)
+print("ID write out")	
+			

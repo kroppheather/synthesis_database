@@ -411,10 +411,13 @@ AirS$decdate<-AirS$wyear+AirS$wdoyP
 
 plot(AirS$decdate,AirS$A,pch=19)
 
-#more -999 from instrument error 
-#exclude these
 
-AirS<-na.omit(AirS[AirS$A>-999,])
+#more -999 from instrument error 
+#6999 
+#exclude these from analysis
+
+AirS<-na.omit(AirS[AirS$A> -999,])
+AirS<-AirS[AirS$A<50,]
 plot(AirS$decdate[AirS$siteid==15],AirS$A[AirS$siteid==15],pch=19)
 
 
@@ -565,10 +568,10 @@ for(i in 1:dim(AirIDS2)[1]){
 }
 AirrepsubV<-unlist(Airrepsub)
 
-write.table(AirrepsubV, "/home/hkropp/synthesis/output/rep/AirrepID.csv", sep=",", row.names=FALSE)
-print("repA_out")
-write.table(SoilrepsubV, "/home/hkropp/synthesis/output/rep/SoilrepID.csv", sep=",", row.names=FALSE)
-print("reps_out")
+#write.table(AirrepsubV, "/home/hkropp/synthesis/output/rep/AirrepID.csv", sep=",", row.names=FALSE)
+#print("repA_out")
+#write.table(SoilrepsubV, "/home/hkropp/synthesis/output/rep/SoilrepID.csv", sep=",", row.names=FALSE)
+#print("reps_out")
 #model
 #write.table(AirM2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tmod4rep\\rep\\Tair_model.csv",sep=",",row.names=FALSE)
 #write.table(SoilM2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tmod4rep\\rep\\Tsoil_model.csv",sep=",",row.names=FALSE)

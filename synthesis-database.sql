@@ -353,3 +353,7 @@ DELETE FROM soil_temp;
 DELETE FROM soil_temp;
 \copy soil_temp(stemp_id,doy_st,year_st,soil_t,st_depth,site_id)  FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u7\soil_temp_u7_fixed.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
 \copy soil_temp TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_4\soil_temp.csv' DELIMITER ',' CSV  HEADER;
+
+DELETE FROM air_temp;
+\copy air_temp(air_id,doy_ai,year_ai,air_t,air_height,site_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u7\air_temp_u7_fixed.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
+\copy air_temp TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_4\air_temp.csv' DELIMITER ',' CSV  HEADER;
