@@ -418,7 +418,7 @@ plot(AirS$decdate,AirS$A,pch=19)
 #exclude these from analysis
 AirS<-na.omit(AirS[AirS$A> -999,])
 AirS<-AirS[AirS$A<50,]
-plot(AirS$decdate[AirS$siteid==15],AirS$A[AirS$siteid==15],pch=19)
+plot(AirS$decdate,AirS$A,pch=19)
 
 
 #need to get unique site and depth for air temperature
