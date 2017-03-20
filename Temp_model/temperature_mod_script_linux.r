@@ -2,15 +2,16 @@
 ##########################################################################
 ########### Data organization and plotting for all temp obs ##############
 ##########################################################################
-library(plyr)
-library(lubridate)
+library(plyr,lib.loc="/home/hkropp/R")
+library(lubridate,lib.loc="/home/hkropp/R")
 library(rjags)
-library(coda)
-library(xtable)
+library(coda,lib.loc="/home/hkropp/R")
+library(xtable,lib.loc="/home/hkropp/R")
+library(mcmcplots,lib.loc="/home/hkropp/R")
 
 
 # set working directory
-setwd("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_3")
+setwd("/home/hkropp/synthesis")
 #read in soil temperature
 datS<-read.table("soil_temp_fixed_u6_out.csv", sep=",", header=TRUE, na.string=c("NaN"))
 #read in air temperature
@@ -229,16 +230,6 @@ for(i in 1:Nsite){
 }										
 						
 						
-
-#check dim of temp
-
-dimTemp<-numeric(0)
-SdimV<-numeric(0)
-for(i in 1:Nsite){
-	dimTemp[i]<-dim(Temperature[[i]])[1]
-	SdimV[i]<-S.dim[[i]][1]
-}
-TdimCheck<-dimTemp-SdimV
 
 #see if anysites are missing all temperature data
 sitedimA<-list()
@@ -562,10 +553,7 @@ for(i in 1:dim(SoilIDS2)[1]){
 IDforCombo<-join(AirIDS2,SoilIDS2, by=c("siteid","wyear"), type="inner")
 IDforCombo$Nseq<-seq(1,dim(IDforCombo)[1])
 
-
-#make id to subset for replicated data
-#want to make sure that each wyear, site, depth gets
-#the same number of samples
+#generate replicate id subset
 Soilrepsub<-list()
 for(i in 1:dim(SoilIDS2)[1]){
 	Soilrepsub[[i]]<-sample(SoilM2$indexI[SoilM2$SDWS==i],5)
@@ -577,9 +565,14 @@ for(i in 1:dim(AirIDS2)[1]){
 	Airrepsub[[i]]<-sample(AirM2$indexI[AirM2$SDWA==i],5)
 }
 AirrepsubV<-unlist(Airrepsub)
+
+write.table(AirrepsubV, "/home/hkropp/synthesis/output/rep/AirrepID.csv", sep=",", row.names=FALSE)
+print("repA_out")
+write.table(SoilrepsubV, "/home/hkropp/synthesis/output/rep/SoilrepID.csv", sep=",", row.names=FALSE)
+print("reps_out")
 #model
-write.table(AirM,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tair_model.csv",sep=",",row.names=FALSE)
-write.table(SoilM,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tsoil_model.csv",sep=",",row.names=FALSE)
+#write.table(AirM2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tmod4rep\\rep\\Tair_model.csv",sep=",",row.names=FALSE)
+#write.table(SoilM2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tmod4rep\\rep\\Tsoil_model.csv",sep=",",row.names=FALSE)
 
 
 datalist<-list(NobsA=dim(AirM2)[1], TempA=AirM2$A, site.depthidA=AirM2$SDS,T.yrA=AirM2$decdate-1991,
@@ -590,46 +583,55 @@ datalist<-list(NobsA=dim(AirM2)[1], TempA=AirM2$A, site.depthidA=AirM2$SDS,T.yrA
 				 ASY=ASY, AEY=AEY,SSY=SSY,SEY=SEY,
 				 NrepS=length(SoilrepsubV), SrepSub=SoilrepsubV,NrepA=length(AirrepsubV),
 				 ArepSub=AirrepsubV)
-				 
-				 
 				
 samplelist<-c("T.aveA","AmpA","T.aveS","AmpS","sig.muA","sig.muS","startA","startS","Fn","Tn", "FDDA","TDDA","FDDS","TDDS",
-				"TempA", "TempS", "TempA.rep", "TempS.rep")
+				"TempA", "TempS","TempA.rep", "TempS.rep")
 
 
-temp.modI<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Temp_model\\temperature_mod_code.r",
+temp.modI<-jags.model(file="/home/hkropp/github/synthesis_database/Temp_model/temperature_mod_code.r",
 						data=datalist,
-						n.adapt=1000,
+						n.adapt=3000,
 						n.chains=3)
 
 
-						
-n.iter.i=100
+print("initialize done")						
+n.iter.i=2000
 n.thin=1
 codaobj.init = coda.samples(temp.modI,variable.names=samplelist,
                        n.iter=n.iter.i, thin=n.thin)
 					   
-plot(codaobj.init, ask=TRUE)
+					   
+print("samples done done")
 
-library(mcmcplots)
-mcmcplot(codaobj.init, dir="c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tmodd3\\history")		
-#get summary and save to file
 
 Mod.out<-summary(codaobj.init)
 
 
-write.table(Mod.out$statistics, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Temp_mod3_stats.csv",
+write.table(Mod.out$statistics, "/home/hkropp/synthesis/output/rep/Temp_mod4r_stats.csv",
 			sep=",",row.names=TRUE)
-write.table(Mod.out$quantiles, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Temp_mod3_quant.csv",
+write.table(Mod.out$quantiles, "/home/hkropp/synthesis/output/rep/Temp_mod4r_quant.csv",
 			sep=",",row.names=TRUE)
+			
+print("summary out")	
+
+
+save(codaobj.init, file="/home/hkropp/synthesis/output/rep/mod4r_coda.R")
+			
+print("coda out")	
+
+			
+mcmcplot(codaobj.init, dir="/home/hkropp/synthesis/output/rep")		
+#get summary and save to file
+
+print("mcmcplot out")	
 			
 
-save(codaobj.init, file="c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tmodd3\\coda\\mod3_coda.R")
-			
 #need to write ids to table
 
-write.table(AirIDS2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\AirIDS.csv", sep=",", row.names=FALSE)
-write.table(SoilIDS2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\SoilIDS.csv", sep=",", row.names=FALSE)
+#write.table(AirIDS2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tmod4rep\\rep\\AirIDS.csv", sep=",", row.names=FALSE)
+#write.table(SoilIDS2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tmod4rep\\rep\\SoilIDS.csv", sep=",", row.names=FALSE)
 
-write.table(site.heightA,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\AirIDS_SD.csv", sep=",", row.names=FALSE)
-write.table(site.depthidS,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\SoilIDS_SD.csv", sep=",", row.names=FALSE)
+#write.table(site.heightA,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tmod4rep\\rep\\AirIDS_SD.csv", sep=",", row.names=FALSE)
+#write.table(site.depthidS,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tmod4rep\\rep\\SoilIDS_SD.csv", sep=",", row.names=FALSE)
+
+#write.table(IDforCombo, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tmod4rep\\rep\\NfactorIDS.csv",sep=",", row.names=FALSE)

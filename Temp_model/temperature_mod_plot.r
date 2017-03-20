@@ -32,9 +32,15 @@ parms2<-gsub(dexps2,"",pnames)
 datC$parms2<-c(as.numeric(parms2))
 
 datC<-data.frame(M=datC[,1],pc2.5=datC[,5],pc97.5=datC[,9],param=as.character(datC[,10]),ID=datC[,11])
-
+#exclude
 datC<-datC[datC$param!="sig.muS",]
 datC<-datC[datC$param!="sig.muA",]
+
+datCT<-datC[datC$param!="Fn",]
+datCT<-datCT[datCT$param!="T.aveA",]
+datCT<-datCT[datCT$param!="T.aveS",]
+
+
 #now combine back with siteid info
 
 #set up ids for all parm
