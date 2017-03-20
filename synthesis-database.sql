@@ -320,4 +320,32 @@ DELETE FROM soil_temp;
 \copy soil_temp(stemp_id,doy_st,year_st,soil_t,st_depth,site_id)  FROM 'c:\\Users\hkropp\Google Drive\raw_data\backup_3\soil_temp_fixed_u6f.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
 \copy soil_temp TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_3\soil_temp_fixed_u6_out.csv' DELIMITER ',' CSV  HEADER;
 
+--start upload 7
+\copy contributor(ctbr_id, ctbr_name,institution,email) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u7\contributer_u7.csv' DELIMITER ',' CSV HEADER QUOTE '"'
+\copy siteinfo(site_id,site_name,lat,lon,loc,MAAT,Dist_type,Vege_z,PF_Zone,ctbr_id,elev,year_beg,year_end,day_beg,day_end,dist_hist) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u7\siteinfo_u7.csv' DELIMITER ',' CSV HEADER QUOTE '"'
+\copy spcov(cover_id,perc_cover,species,func_type,site_id, year_m, doy_m)FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u7\spcov_u7.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
+\copy spec_list(specl_id,spec_name,site_id,spl_funcT) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u7\splist_u7.csv' DELIMITER ',' CSV HEADER QUOTE '"'
+--Delete old tables that still have issues
+DELETE FROM air_temp;
+\copy air_temp(air_id,doy_ai,year_ai,air_t,air_height,site_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u7\air_temp_u7_fixed.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
+DELETE FROM soil_temp;
+\copy soil_temp(stemp_id,doy_st,year_st,soil_t,st_depth,site_id)  FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u7\soil_temp_u7_fixed.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
 
+
+--now export updated tables to csv
+\copy contributor TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_4\contributor.csv' DELIMITER ',' CSV  HEADER;
+\copy siteinfo TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_4\siteinfo.csv' DELIMITER ',' CSV  HEADER;
+\copy refinfo TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_4\refinfo.csv' DELIMITER ',' CSV  HEADER;
+\copy refrel TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_4\refrel.csv' DELIMITER ',' CSV  HEADER;
+\copy soil TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_4\soil.csv' DELIMITER ',' CSV  HEADER;
+\copy soilc TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_4\soilc.csv' DELIMITER ',' CSV  HEADER;
+\copy moss TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_4\moss.csv' DELIMITER ',' CSV  HEADER;
+\copy aboveground_bio TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_4\aboveground_bio.csv' DELIMITER ',' CSV  HEADER;
+\copy spec_bio TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_4\spec_bio.csv' DELIMITER ',' CSV  HEADER;
+\copy spcov TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_4\spcov.csv' DELIMITER ',' CSV  HEADER;
+\copy LAI TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_4\LAI.csv' DELIMITER ',' CSV  HEADER;
+\copy spec_list TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_4\spec_list.csv' DELIMITER ',' CSV  HEADER;
+\copy soil_moist TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_4\soil_moist.csv' DELIMITER ',' CSV  HEADER;
+\copy soil_temp TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_4\soil_temp.csv' DELIMITER ',' CSV  HEADER;
+\copy air_temp TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_4\air_temp.csv' DELIMITER ',' CSV  HEADER;
+\copy root_bio TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_4\root_bio.csv' DELIMITER ',' CSV  HEADER;
