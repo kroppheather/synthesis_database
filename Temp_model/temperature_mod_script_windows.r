@@ -573,8 +573,8 @@ AirrepsubV<-unlist(Airrepsub)
 #write.table(SoilrepsubV, "/home/hkropp/synthesis/output/rep/SoilrepID.csv", sep=",", row.names=FALSE)
 #print("reps_out")
 #model
-#write.table(AirM2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tmod4rep\\rep\\Tair_model.csv",sep=",",row.names=FALSE)
-#write.table(SoilM2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tmod4rep\\rep\\Tsoil_model.csv",sep=",",row.names=FALSE)
+write.table(AirM2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod1\\output_u7\\Tair_model.csv",sep=",",row.names=FALSE)
+write.table(SoilM2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod1\\output_u7\\Tsoil_model.csv",sep=",",row.names=FALSE)
 
 
 datalist<-list(NobsA=dim(AirM2)[1], TempA=AirM2$A, site.depthidA=AirM2$SDS,T.yrA=AirM2$decdate-1991,
@@ -590,7 +590,7 @@ samplelist<-c("T.aveA","AmpA","T.aveS","AmpS","sig.muA","sig.muS","startA","star
 				"TempA", "TempS","TempA.rep", "TempS.rep")
 
 
-temp.modI<-jags.model(file="/home/hkropp/github/synthesis_database/Temp_model/temperature_mod_code.r",
+temp.modI<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub/synthesis_database/Temp_model/temperature_mod_code.r",
 						data=datalist,
 						n.adapt=3000,
 						n.chains=3)

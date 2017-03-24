@@ -1,9 +1,9 @@
 library(plyr)
 #setwd
-setwd("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tmod4rep\\rep")
+setwd("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod1\\output_u7")
 #model results
-datm<-read.csv("Temp_mod4r_stats.csv")
-dats<-read.csv("Temp_mod4r_quant.csv")
+datm<-read.csv("Temp_mod7_stats.csv")
+dats<-read.csv("Temp_mod7_quant.csv")
 #index for randomly selected rep monitor
 datsid<-read.csv("SoilrepID.csv")
 dataid<-read.csv("AirrepID.csv")
@@ -96,3 +96,5 @@ abline(airfit, col="tomato4", lwd=3)
 
 text(-25,25,"y = -1.25 + 0.79* Tobs", cex=1.5)
 text(-25,20,"R2= 0.79", cex=1.5)
+
+
