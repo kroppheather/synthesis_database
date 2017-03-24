@@ -40,6 +40,10 @@ datC$parms2<-c(as.numeric(parms2))
 
 datC<-data.frame(M=datC[,1],pc2.5=datC[,5],pc97.5=datC[,9],param=as.character(datC[,10]),ID=datC[,11])
 
+datCFN<-datC[datC$param=="Fn",]
+datCTN<-datC[datC$param=="Tn",]
+
+
 datC<-datC[datC$param!="sig.muS",]
 datC<-datC[datC$param!="sig.muA",]
 
@@ -87,15 +91,23 @@ plot(STobs[datRS$M<100],datRS$M[datRS$M<100], pch=19, xlim=c(-35,30), ylim=c(-35
 soilfit<-lm(datRS$M[datRS$M<100]~STobs[datRS$M<100])
 summary(soilfit)
 abline(soilfit, col="tomato4", lwd=3)
+abline(0,1, col="red", lwd=3, lty=2)
 text(-15,25,"y = -0.20 + 0.87* Tobs", cex=1.5)
 text(-15,20,"R2= 0.863", cex=1.5)
 plot(ATobs,datRA$M, pch=19, xlim=c(-45,30), ylim=c(-45,30))
 airfit<-lm(datRA$M~ATobs)
 summary(airfit)
 abline(airfit, col="tomato4", lwd=3)
-
+abline(0,1, col="red", lwd=3, lty=2)
 text(-25,25,"y = -1.04 + 0.82* Tobs", cex=1.5)
 text(-25,20,"R2= 0.81", cex=1.5)
 
 
+###now output n factors for model
+colnames(datComb)[7]<-"ID"
+Fr.n<-join(datCFN, datComb, by="ID", type="left")
+Th.n<-join(datCTN, datComb, by="ID", type="left")
 
+
+write.table(Fr.n, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\FreezeN_out.csv", sep=",", row.names=FALSE)
+write.table(Th.n, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\ThawN_out.csv", sep=",", row.names=FALSE)
