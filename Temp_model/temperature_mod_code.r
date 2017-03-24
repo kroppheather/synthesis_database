@@ -3,7 +3,11 @@ model{
 	for(i in 1:NobsA){
 		TempA[i]~dnorm(muA[i], tau.muA)
 		muA[i]<-T.aveA[SDWA[i]]+ AmpA[SDWA[i]]*sin(-2*3.14159265*(T.yrA[i]-startA[site.depthidA[i]]))
+		#cacluation for freezing degree day
+		#set to zero if not freezing
 		FreezeA[i]<-(1-step(TempA[i]))*TempA[i]
+		#cacluation for thawing degree day
+		#set to zero if not above zero
 		ThawA[i]<-step(TempA[i])*TempA[i]		
 	}
 	
@@ -11,10 +15,14 @@ model{
 	for(i in 1:NobsS){
 		TempS[i]~dnorm(muS[i], tau.muS)
 		muS[i]<-T.aveS[SDWS[i]]+ AmpS[SDWS[i]]*sin(-2*3.14159265*(T.yrS[i]-startS[site.depthidS[i]]))
-		#TSrep[i]~dnorm(muS[i], tau.muS)
+		#cacluation for freezing degree day
+		#set to zero if not freezing
 		FreezeS[i]<-(1-step(TempS[i]))*TempS[i]
+		#cacluation for thawing degree day
+		#set to zero if not above zero		
 		ThawS[i]<-step(TempS[i])*TempS[i]
 	}
+	#look at a subset of replicated data since there is too much temp data to monitor
 	for(i in 1:NrepS){
 		TempS.rep[i]~dnorm(muS[SrepSub[i]], tau.muS)
 	

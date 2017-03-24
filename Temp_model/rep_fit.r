@@ -87,14 +87,15 @@ plot(STobs[datRS$M<100],datRS$M[datRS$M<100], pch=19, xlim=c(-35,30), ylim=c(-35
 soilfit<-lm(datRS$M[datRS$M<100]~STobs[datRS$M<100])
 summary(soilfit)
 abline(soilfit, col="tomato4", lwd=3)
-text(-15,25,"y = -0.19 + 0.85* Tobs", cex=1.5)
-text(-15,20,"R2= 0.85", cex=1.5)
+text(-15,25,"y = -0.20 + 0.87* Tobs", cex=1.5)
+text(-15,20,"R2= 0.863", cex=1.5)
 plot(ATobs,datRA$M, pch=19, xlim=c(-45,30), ylim=c(-45,30))
 airfit<-lm(datRA$M~ATobs)
 summary(airfit)
 abline(airfit, col="tomato4", lwd=3)
 
-text(-25,25,"y = -1.25 + 0.79* Tobs", cex=1.5)
-text(-25,20,"R2= 0.79", cex=1.5)
+text(-25,25,"y = -1.04 + 0.82* Tobs", cex=1.5)
+text(-25,20,"R2= 0.81", cex=1.5)
+
 
 
