@@ -1,11 +1,11 @@
 library(plyr)
 #read in data
-setwd("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6")
+setwd("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod1\\output_u7")
 
 datAI<-read.csv("AirIDS.csv")
 datSI<-read.csv("SoilIDS.csv")
-datM<-read.csv("Temp_mod3_stats.csv")
-datQ<-read.csv("Temp_mod3_quant.csv")
+datM<-read.csv("Temp_mod7_stats.csv")
+datQ<-read.csv("Temp_mod7_quant.csv")
 
 datAIS<-read.csv("AirIDS_SD.csv")
 datSIS<-read.csv("SoilIDS_SD.csv")
@@ -147,12 +147,12 @@ Yfit[[i]]<-Tsine(datSS$M[datSS$siteid==i&datSS$depth==depthP[[n]][j]&datSS$wyear
 						datSS$M[datSS$siteid==i&datSS$depth==depthP[[n]][j]&datSS$param=="startS"])
 for(n in 1:dim(sitesS)[1]){	
 	i<-sitesS$siteid[n]
-	jpeg(file=paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tmodd3\\out\\site",i,".jpg"),
+	jpeg(file=paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod1\\output_u7\\plots\\site",i,".jpg"),
 			width=1500,height=1000, units="px")
-
+	par(mai=c(2,2,2,2))
 	plot(c(0,1),c(0,1),type="n",xlim=c(min(datSM$decdateA[datSM$siteid==i]),max(datSM$decdateA[datSM$siteid==i])),
-								ylim=c(min(datSM$T[datSM$siteid==i]),max(datSM$T[datSM$siteid==i])),
-								xlab="Time", ylab="Temperature")
+								ylim=c(min(na.omit(datSM$T[datSM$siteid==i])),max(na.omit(datSM$T[datSM$siteid==i]))),
+								xlab="Water Year since 1991", ylab="Temperature", cex.axis=2, cex.lab=3)
 		
 		
 	for(j in 1:length(depthP[[n]])){
@@ -163,10 +163,10 @@ for(n in 1:dim(sitesS)[1]){
 				col=colP[j],type="l",lwd=2,lty=1)
 	}
 
-	legend(min(datSM$decdateA[datSM$siteid==i])+.001,max(datSM$T[datSM$siteid==i])-.25, paste("depth=", depthP[[n]]),
-			col=colP[1:length(depthP[[n]])],pch=19, bty="n", cex=1.5)
+	legend(min(na.omit(datSM$decdateA[datSM$siteid==i]))+.001,max(na.omit(datSM$T[datSM$siteid==i]))-.25, paste("depth=", depthP[[n]]),
+			col=colP[1:length(depthP[[n]])],pch=19, bty="n", cex=3)
 			
-	text(min(datSM$decdateA[datSM$siteid==i])+.5,max(datSM$T[datSM$siteid==i])-.5, paste("siteid=", sitesS$siteid[n]), cex=2)
+	text(min(datSM$decdateA[datSM$siteid==i])+2,max(datSM$T[datSM$siteid==i])-2, paste("siteid=", sitesS$siteid[n]), cex=3)
 	dev.off()
 }
 
@@ -198,7 +198,7 @@ site.ssA$ind<-seq(1,dim(site.ssA)[1])
 for(n in 1:dim(site.ssA)[1]){
 	i<-site.ssA$siteid[n]
 	#save plot to file
-	jpeg(file=paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\T_mod2_out\\depAmp\\site",i,".jpg"),
+	jpeg(file=paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod1\\output_u7\\plots\\site",i,".jpg"),
 			width=1500,height=1000, units="px")
 	#make blank plot
 	plot(c(0,1),c(0,1), type="n", xlim=c(min(ssA$pc2.5[ssA$siteid==i])-1,max(ssA$pc97.5[ssA$siteid==i])+1),
