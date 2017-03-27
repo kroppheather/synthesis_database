@@ -146,3 +146,38 @@ Tall6<-join(Tall5,datOLT, by="siteid", type="left")
 #####read in EVI data  #############################################
 ####################################################################
 datEV<-read.csv("Site_EVI_out.csv")
+EVIsub<-data.frame(siteid=datEV$siteid, EVI=datEV$EVI)
+#get only evi and siteid for join
+Fall7<-join(Fall6, EVIsub, by="siteid", type="left")
+Tall7<-join(Tall6, EVIsub, by="siteid", type="left")
+
+######################################################################
+########subset variables for model run ###############################
+######################################################################
+#eventually a missing data model will help use more datasets
+#but for now look at a model run with only all data present
+Tsub<-data.frame(siteid=Tall7$siteid, N.id=Tall7$ID,NT=Tall7$M, wyear=Tall7$wyear,lat=Tall7$lat,
+				biome=Tall7$vege_z, EVI=Tall7$EVI,OLT=Tall7$OLT, 
+				depth=Tall7$depth)
+
+Tsub<-na.omit(Tsub)
+
+Fsub<-data.frame(siteid=Fall7$siteid, N.id=Fall7$ID,NT=Fall7$M, wyear=Fall7$wyear,lat=Fall7$lat,
+				biome=Fall7$vege_z, EVI=Fall7$EVI,OLT=Fall7$OLT, 
+				depth=Fall7$depth
+				)
+
+Fsub<-na.omit(Fsub)
+
+####NEXT:
+#check all wyears are present and set up y vectors for them.
+
+######################################################################
+######################################################################
+#####set model data lists ############################################
+######################################################################
+
+
+datalist<-list(NobsF=dim(Fall7)[1],
+				NobsT=dim(Tall7)[1],
+				)
