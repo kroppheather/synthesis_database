@@ -11,7 +11,7 @@ model{
 	nF[i]~dnorm(mu.nF[i], tau.nF)
 	mu.nF[i]<-betaF1[biomeID.F[i]]+ betaF2[biomeID.F[i]]*EVI.F[i] + betaF3[biomeID.F[i]]*depth.F[i]
 			+ betaF4[biomeID.F[i]]*OLT.F[i] + epsF[yearid.F[i]]
-	nF.rep[i]~dnorm(mu.nT[i], tau.nT)
+	nF.rep[i]~dnorm(mu.nF[i], tau.nF)
 	}
 	
 	#empirical mean model priors
@@ -21,7 +21,7 @@ model{
 		betaT1[i]~dnorm(0,.0001)
 		#identifiable intercept
 		betaF1star[i]<-betaF1[i]+epsF.mean
-		betaT1start[i]<-betaT1[i]+epsT.mean
+		betaT1star[i]<-betaT1[i]+epsT.mean
 		
 		#priors for other regression
 		#freezing

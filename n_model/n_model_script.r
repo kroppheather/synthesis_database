@@ -236,4 +236,8 @@ write.table(ModSumm$statistics, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod
 write.table(ModSumm$quantiles, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n1\\model_variaion_quant.csv",
 			sep=",",row.names=TRUE)			
 
-mcmcplot(codaobj.init, dir="c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n1\\historyPlots")			
+mcmcplot(codaobj.init, dir="c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n1\\historyPlots")	
+
+#write files for output
+write.table(Tsub, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n1\\Thawing_n_forMod.csv", sep=",", row.names=FALSE)	
+write.table(Fsub, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n1\\Freezing_n_forMod.csv", sep=",", row.names=FALSE)	
