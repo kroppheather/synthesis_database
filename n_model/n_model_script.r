@@ -162,6 +162,8 @@ Tsub<-data.frame(siteid=Tall7$siteid, N.id=Tall7$ID,NT=Tall7$M, wyear=Tall7$wyea
 
 Tsub<-na.omit(Tsub)
 
+Tsub$biomeID<-ifelse(Tsub$biome=="tundra", 2,1)
+
 Fsub<-data.frame(siteid=Fall7$siteid, N.id=Fall7$ID,NT=Fall7$M, wyear=Fall7$wyear,lat=Fall7$lat,
 				biome=Fall7$vege_z, EVI=Fall7$EVI,OLT=Fall7$OLT, 
 				depth=Fall7$depth
@@ -169,15 +171,69 @@ Fsub<-data.frame(siteid=Fall7$siteid, N.id=Fall7$ID,NT=Fall7$M, wyear=Fall7$wyea
 
 Fsub<-na.omit(Fsub)
 
+Fsub$biomeID<-ifelse(Fsub$biome=="tundra", 2,1)
+
 ####NEXT:
 #check all wyears are present and set up y vectors for them.
 
+FyearID<-data.frame(wyear=sort(unique(Fsub$wyear)))
+FyearID$yearID<-seq(1,dim(FyearID)[1])
+
+TyearID<-data.frame(wyear=sort(unique(Tsub$wyear)))
+TyearID$yearID<-seq(1,dim(TyearID)[1])
+
+#all 26 years are present, can just subtract off of the wyear column
 ######################################################################
 ######################################################################
 #####set model data lists ############################################
 ######################################################################
 
 
-datalist<-list(NobsF=dim(Fall7)[1],
-				NobsT=dim(Tall7)[1],
-				)
+datalist<-list(NobsF=dim(Fsub)[1],
+				NobsT=dim(Tsub)[1],
+				nF=Fsub$NT,
+				nT=Tsub$NT,
+				biomeID.T=Tsub$biomeID,
+				biomeID.F=Fsub$biomeID,
+				Nbiome=2,
+				EVI.T=Tsub$EVI,
+				EVI.F=Fsub$EVI,
+				depth.T=Tsub$depth,
+				depth.F=Fsub$depth,
+				OLT.T=Tsub$OLT,
+				OLT.F=Fsub$OLT,
+				yearid.T=Tsub$wyear-1990,
+				yearid.F=Fsub$wyear-1990,
+				NyearF=dim(FyearID)[1],
+				NyearT=dim(TyearID)[1],
+				xF=rep(1,dim(FyearID)[1]),
+				yF=FyearID$yearID,
+				xT=rep(1,dim(TyearID)[1]),
+				yT=TyearID$yearID)
+				
+samplelist<-c("deviance","betaT1star", "betaT2", "betaT3", "betaT4",
+					"betaF1star", "betaF2", "betaF3", "betaF4",
+					"nF.rep","nT.rep", "epsF.star", "epsT.star",
+					"sig.epsT", "sig.epsF", "rho.epsT", "rho.epsF",
+					"sig.nT", "sig.nF")
+					
+Initslist<-list(list(t.epsT=1, rho.epsT=.7, t.epsF=1,rho.epsF=.7),
+				list(t.epsT=1.5, rho.epsT=.8, t.epsF=1.5,rho.epsF=.8),
+				list(t.epsT=0.5, rho.epsT=.5, t.epsF=0.5,rho.epsF=.5))
+
+n.modelInit<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\n_model\\n_model_code.r",
+						data=datalist, n.adapt=2000, n.chains=3, inits=Initslist)
+				
+n.iterI=30000
+n.thinI=10
+
+codaobj.init=coda.samples(n.modelInit,variable.names=samplelist,n.iter=n.iterI,thin=n.thinI)				
+
+ModSumm<-summary(codaobj.init)					
+					
+write.table(ModSumm$statistics, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n1\\model_variaion_stats.csv",
+			sep=",",row.names=TRUE)
+write.table(ModSumm$quantiles, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n1\\model_variaion_quant.csv",
+			sep=",",row.names=TRUE)			
+
+mcmcplot(codaobj.init, dir="c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n1\\historyPlots")			
