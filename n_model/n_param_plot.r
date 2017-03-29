@@ -131,3 +131,6 @@ points(datT$OLT[datT$biomeID==2],datT$NT[datT$biomeID==2],pch=19)
 box(which="plot")
 abline(datBT$M[datBT$param=="betaT1star"&datBT$ID==2],datBT$M[datBT$param=="betaT4"&datBT$ID==2],
 	lwd=2)		
+	
+	
+	

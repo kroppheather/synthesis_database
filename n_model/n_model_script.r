@@ -183,6 +183,49 @@ TyearID<-data.frame(wyear=sort(unique(Tsub$wyear)))
 TyearID$yearID<-seq(1,dim(TyearID)[1])
 
 #all 26 years are present, can just subtract off of the wyear column
+
+#####################################################
+###now set up indicater for if the observation is in
+### is in mineral vs organic
+Tsub$orgID<-ifelse(Tsub$depth<=Tsub$OLT,1,2)
+Fsub$orgID<-ifelse(Fsub$depth<=Fsub$OLT,1,2)
+
+#read in data to look at region
+datR<-read.csv("region.csv")
+#join to the tables
+colnames(datR)[1]<-"siteid"
+
+Tsub2<-join(Tsub,datR, by="siteid", type="left")
+Fsub2<-join(Fsub,datR, by="siteid", type="left")
+
+#read in vegetation data to set up vegetation class
+
+datVC<-read.csv("vegeClass.csv")
+colnames(datVC)[1]<-"siteid"
+
+Tsub3<-join(Tsub2,datVC, by="siteid", type="left")
+Fsub3<-join(Fsub2,datVC, by="siteid", type="left")
+
+#now see if there are enough observations to model by these groups
+
+TOL<-aggregate(Tsub3$NT, by=list(Tsub3$orgID), FUN=length)
+FOL<-aggregate(Fsub3$NT, by=list(Fsub3$orgID), FUN=length)
+plot(Tsub3$depth[Tsub3$orgID==2],Tsub3$NT[Tsub3$orgID==2],pch=19)
+plot(Tsub3$depth[Tsub3$orgID==1],Tsub3$NT[Tsub3$orgID==1],pch=19)
+
+TV<-aggregate(Tsub3$NT, by=list(Tsub3$class), FUN=length)
+FV<-aggregate(Fsub3$NT, by=list(Fsub3$class), FUN=length)
+
+plot(as.factor(Tsub3$class),Tsub3$NT)
+plot(as.factor(Fsub3$class),Fsub3$NT)
+
+TR<-aggregate(Tsub3$NT, by=list(Tsub3$region_name), FUN=length)
+FR<-aggregate(Fsub3$NT, by=list(Fsub3$region_name), FUN=length)
+
+plot(as.factor(Tsub3$region_name),Tsub3$NT)
+plot(as.factor(Fsub3$region_name),Fsub3$NT)
+
+
 ######################################################################
 ######################################################################
 #####set model data lists ############################################
