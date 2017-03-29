@@ -213,8 +213,16 @@ FOL<-aggregate(Fsub3$NT, by=list(Fsub3$orgID), FUN=length)
 plot(Tsub3$depth[Tsub3$orgID==2],Tsub3$NT[Tsub3$orgID==2],pch=19)
 plot(Tsub3$depth[Tsub3$orgID==1],Tsub3$NT[Tsub3$orgID==1],pch=19)
 
+plot(Tsub3$EVI[Tsub3$orgID==2],Tsub3$NT[Tsub3$orgID==2],pch=19)
+plot(Tsub3$EVI[Tsub3$orgID==1],Tsub3$NT[Tsub3$orgID==1],pch=19)
+
 TV<-aggregate(Tsub3$NT, by=list(Tsub3$class), FUN=length)
 FV<-aggregate(Fsub3$NT, by=list(Fsub3$class), FUN=length)
+
+#make a vegetation class ID that reflects the actual number
+Tsub3$classID<-ifelse(Tsub3$class>=7, Tsub3$class-1,Tsub3$class)
+Fsub3$classID<-ifelse(Fsub3$class>=7, Fsub3$class-1,Fsub3$class)
+
 
 plot(as.factor(Tsub3$class),Tsub3$NT)
 plot(as.factor(Fsub3$class),Fsub3$NT)
@@ -232,27 +240,20 @@ plot(as.factor(Fsub3$region_name),Fsub3$NT)
 ######################################################################
 
 
-datalist<-list(NobsF=dim(Fsub)[1],
-				NobsT=dim(Tsub)[1],
-				nF=Fsub$NT,
-				nT=Tsub$NT,
-				biomeID.T=Tsub$biomeID,
-				biomeID.F=Fsub$biomeID,
-				Nbiome=2,
-				EVI.T=Tsub$EVI,
-				EVI.F=Fsub$EVI,
-				depth.T=Tsub$depth,
-				depth.F=Fsub$depth,
-				OLT.T=Tsub$OLT,
-				OLT.F=Fsub$OLT,
-				yearid.T=Tsub$wyear-1990,
-				yearid.F=Fsub$wyear-1990,
-				NyearF=dim(FyearID)[1],
-				NyearT=dim(TyearID)[1],
-				xF=rep(1,dim(FyearID)[1]),
-				yF=FyearID$yearID,
-				xT=rep(1,dim(TyearID)[1]),
-				yT=TyearID$yearID)
+datalist<-list(NobsF=dim(Fsub3)[1],
+				NobsT=dim(Tsub3)[1],
+				nF=Fsub3$NT,
+				nT=Tsub3$NT,
+				orgID.T=Tsub3$orgID,
+				orgID.F=Fsub3$orgID,
+				Norg=2,
+				Nvegeclass=7,
+				EVI.T=Tsub3$EVI,
+				EVI.F=Fsub3$EVI,
+				depth.T=Tsub3$depth,
+				depth.F=Fsub3$depth,
+				vegeID.F=Fsub3$classID,
+				vegeID.T=Tsub3$classID)
 				
 samplelist<-c("deviance","betaT1star", "betaT2", "betaT3", "betaT4",
 					"betaF1star", "betaF2", "betaF3", "betaF4",
@@ -260,9 +261,9 @@ samplelist<-c("deviance","betaT1star", "betaT2", "betaT3", "betaT4",
 					"sig.epsT", "sig.epsF", "rho.epsT", "rho.epsF",
 					"sig.nT", "sig.nF")
 					
-Initslist<-list(list(t.epsT=1, rho.epsT=.7, t.epsF=1,rho.epsF=.7),
-				list(t.epsT=1.5, rho.epsT=.8, t.epsF=1.5,rho.epsF=.8),
-				list(t.epsT=0.5, rho.epsT=.5, t.epsF=0.5,rho.epsF=.5))
+Initslist<-list(list(tau.epsF=25, tau.epsT=25),
+				list(tau.epsF=50, tau.epsT=50),
+				list(tau.epsF=5, tau.epsT=5))
 
 n.modelInit<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\n_model\\n_model_code.r",
 						data=datalist, n.adapt=2000, n.chains=3, inits=Initslist)
@@ -274,13 +275,13 @@ codaobj.init=coda.samples(n.modelInit,variable.names=samplelist,n.iter=n.iterI,t
 
 ModSumm<-summary(codaobj.init)					
 					
-write.table(ModSumm$statistics, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n1\\model_variaion_stats.csv",
+write.table(ModSumm$statistics, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n2\\model_variaion_stats.csv",
 			sep=",",row.names=TRUE)
-write.table(ModSumm$quantiles, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n1\\model_variaion_quant.csv",
+write.table(ModSumm$quantiles, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n2\\model_variaion_quant.csv",
 			sep=",",row.names=TRUE)			
 
-mcmcplot(codaobj.init, dir="c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n1\\historyPlots")	
+mcmcplot(codaobj.init, dir="c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n2\\historyPlots")	
 
 #write files for output
-write.table(Tsub, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n1\\Thawing_n_forMod.csv", sep=",", row.names=FALSE)	
-write.table(Fsub, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n1\\Freezing_n_forMod.csv", sep=",", row.names=FALSE)	
+write.table(Tsub, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n2\\Thawing_n_forMod.csv", sep=",", row.names=FALSE)	
+write.table(Fsub, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n2\\Freezing_n_forMod.csv", sep=",", row.names=FALSE)	
