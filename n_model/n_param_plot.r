@@ -296,3 +296,120 @@ jpeg(paste0(getwd(),"//reg_re.jpg"), width=4000,height=2200)
 	mtext("Vegetation community", side=1, line=10, cex=4)
 	
 dev.off()	
+
+
+###############################################################
+###############################################################
+################look at some specific site patterns to help 
+################deal with interpretation
+library(plyr)
+#read in data
+setwd("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod1\\output_u7")
+
+datAI<-read.csv("AirIDS.csv")
+datSI<-read.csv("SoilIDS.csv")
+datM<-read.csv("Temp_mod7_stats.csv")
+datQ<-read.csv("Temp_mod7_quant.csv")
+
+datAIS<-read.csv("AirIDS_SD.csv")
+datSIS<-read.csv("SoilIDS_SD.csv")
+
+datAM<-read.csv("Tair_model.csv")
+datSM<-read.csv("Tsoil_model.csv")
+
+datSM$decdateA<-datSM$decdate-1991
+datAM$decdateA<-datAM$decdate-1991
+
+#read in temperature data used in model
+
+#now join means with quantiles
+datC<-cbind(datM,datQ)
+#make a param vector
+dexps<-"\\[*[[:digit:]]*\\]"
+datC$parms1<-gsub(dexps,"",rownames(datC))
+
+
+#now add id number
+dexps2<-"\\D"
+pnames<-rownames(datC)
+parms2<-gsub(dexps2,"",pnames)
+datC$parms2<-c(as.numeric(parms2))
+
+datC<-data.frame(M=datC[,1],pc2.5=datC[,5],pc97.5=datC[,9],param=as.character(datC[,10]),ID=datC[,11])
+
+datADDF<-datC[datC$param=="FDDA",]
+datADDT<-datC[datC$param=="TDDA",]
+datSDDF<-datC[datC$param=="FDDS",]
+datSDDT<-datC[datC$param=="TDDS",]
+colnames(datADDF)[5]<-"SDWA"
+colnames(datADDT)[5]<-"SDWA"
+colnames(datSDDF)[5]<-"SDWS"
+colnames(datSDDT)[5]<-"SDWS"
+
+
+datADDF2<-join(datADDF,datAI, by="SDWA", type="left")
+datADDT2<-join(datADDT,datAI, by="SDWA", type="left")
+datSDDF2<-join(datSDDF,datSI, by="SDWS", type="left")
+datSDDT2<-join(datSDDT,datSI, by="SDWS", type="left")
+
+#read in vegetation id info
+datVC<-read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\vegeClass.csv")
+colnames(datVC)[1]<-"siteid"
+
+datADDF3<-join(datADDF2,datVC, by="siteid", type="left")
+datADDT3<-join(datADDT2,datVC, by="siteid", type="left")
+datSDDF3<-join(datSDDF2,datVC, by="siteid", type="left")
+datSDDT3<-join(datSDDT2,datVC, by="siteid", type="left")
+
+colnames(datSDDF3)<-c("M.S", "pc2.5S", "pc.97.5S", "paramS",
+					"SDWS", "siteid", "depth", "wyear","classS")
+colnames(datSDDT3)<-c("M.S", "pc2.5S", "pc.97.5S", "paramS",
+					"SDWS", "siteid", "depth", "wyear","classS")
+
+					
+FreezeJ<-join(datSDDF3, datADDF3, by=c("siteid", "wyear"), type="left")
+
+bareFJ<-FreezeJ[FreezeJ$classS==1,]
+par(mai=c(1,1,1,1))
+plot(FreezeJ$M.S[FreezeJ$classS==1],FreezeJ$M[FreezeJ$classS==1],
+		xlim=c(-5000,-3000), ylim=c(-5000,-3000),pch=19,
+		xlab="Freezing degree days soil", 
+		ylab="Freezing degree days air", cex.axis=2, cex.lab=2,
+		cex=1.5)
+		
+AmpA<-datC[datC$param=="AmpA",]
+AmpS<-datC[datC$param=="AmpS",]
+TaA<-datC[datC$param=="T.aveA",]
+TaS<-datC[datC$param=="T.aveS",]
+colnames(AmpA)<-c("Aa", "Aapc2.5","Aapc97.5","paramAA", "SDWA")
+colnames(AmpS)<-c("Sa", "Sapc2.5","Sapc97.5","paramSA", "SDWS")
+colnames(TaA)<-c("At", "Atpc2.5","Atpc97.5","paramAT", "SDWA")
+colnames(TaS)<-c("st", "Stpc2.5","Stpc97.5","paramST", "SDWS")
+
+bareFJ2<-join(bareFJ, AmpA, by="SDWA", type="left")
+bareFJ3<-join(bareFJ2, AmpS, by="SDWS", type="left")	
+bareFJ4<-join(bareFJ3, TaS, by="SDWS", type="left")	
+bareFJ5<-join(bareFJ4, TaA, by="SDWA", type="left")	
+
+par(mai=c(1,1,1,1))
+plot(bareFJ5$Aa,bareFJ5$Sa, pch=19, xlim=c(13,20), ylim=c(13,20),
+	xlab="Air Temperature Amplitude (C)", 
+	ylab="Soil Temperature Amplitude (C)", cex.axis=2, cex.lab=2,
+		cex=1.5 )
+		arrows(bareFJ5$Aapc2.5,bareFJ5$Sa,bareFJ5$Aapc97.5,bareFJ5$Sa,
+		code=0, lwd=1.5)
+		arrows(bareFJ5$Aa,bareFJ5$Sapc2.5,bareFJ5$Aa,bareFJ5$Sapc97.5,
+		code=0, lwd=1.5)		
+		
+	abline(0,1, lty=4, lwd=2)
+	
+par(mai=c(1,1,1,1))
+plot(bareFJ5$At,bareFJ5$st, pch=19, xlim=c(-13,-6), ylim=c(-13,-6),
+	xlab="Air Temperature Average (C)", 
+	ylab="Soil Temperature Average (C)", cex.axis=2, cex.lab=2,
+		cex=1.5 )
+		arrows(bareFJ5$Atpc2.5,bareFJ5$st,bareFJ5$Atpc97.5,bareFJ5$st,
+		code=0, lwd=1.5)
+		arrows(bareFJ5$At,bareFJ5$Stpc2.5,bareFJ5$At,bareFJ5$Stpc97.5,
+		code=0, lwd=1.5)		
+	abline(0,1, lty=4, lwd=2)	
