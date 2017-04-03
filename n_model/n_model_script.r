@@ -206,6 +206,19 @@ colnames(datVC)[1]<-"siteid"
 Tsub3<-join(Tsub2,datVC, by="siteid", type="left")
 Fsub3<-join(Fsub2,datVC, by="siteid", type="left")
 
+#comparision of F and T n factors
+FreBH<-data.frame(N=Fsub3$NT[Fsub3$classID==1])
+FreBH$ID<-rep("freezing", dim(FreBH)[1])
+ThaBH<-data.frame(N=Tsub3$NT[Tsub3$classID==1])
+ThaBH$ID<-rep("thawing", dim(ThaBH)[1])
+
+xN<-c(FreBH$ID,ThaBH$ID)
+yN<-c(FreBH$N,ThaBH$N)
+par(mai=c(1,1,1,1))
+plot(as.factor(xN),yN , xlab="Temeprature type", 
+	ylab="N factor", col="grey75", ylim=c(.7,1.7), cex.axis=2, cex.lab=2)
+axis(4, seq(.8,1.6, by=.2), cex.axis=2)
+
 #now see if there are enough observations to model by these groups
 
 TOL<-aggregate(Tsub3$NT, by=list(Tsub3$orgID), FUN=length)
