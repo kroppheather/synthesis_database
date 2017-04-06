@@ -1,5 +1,7 @@
 # Synthesis Database Notes
 
+#### code edited by Heather Kropp and Mike Loranty
+
 This file describes protocols and data for the vegetation and permafrost data 
 synthesis. All incoming data must have paired air and vegetation data with 
 data pertaining to vegetation around the measurements. Below is a description of
