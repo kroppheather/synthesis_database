@@ -1,0 +1,59 @@
+##########################
+#
+# climate and bio vars 
+# from gridded data sets 
+# for perm-veg data synthesis
+#
+# MML 4/6/17
+##########################
+rm(list=ls())
+require(sp)
+require(raster)
+require(rgdal)
+
+setwd("C:/Users/mloranty/Google Drive/Documents/Research/PCN/Veg_Permafrost_Interactions/Data_Synthesis/raw_data/")
+
+# read in the site data file
+site.dat <- read.csv("siteinfo_for_WC.csv",header=T)
+
+#make data file to append geospatial vars to 
+pcn.site <- site.dat
+
+# convert to spatial points dataframe and specify coordinates and projection
+pcn.site <- SpatialPoints(pcn.site)
+coordinates(pcn.site) <- ~lon+lat
+projection(pcn.site) <- "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"
+
+####################################
+##          extract data          ##
+####################################
+
+setwd("C:/Users/mloranty/Google Drive/GIS_Data/")
+
+# boreal biomass from Chris Neigh
+na.agb <- raster('boreal_biomass_neigh/NACP_BOREAL_BIOME_BIOMASS_1273/data/NA_500_ecoLc_rcAGB.tif')
+eur.agb <- raster('boreal_biomass_neigh/EURASIA_BIOME_1278/data/EU_500_ecoLc_rcagb.tif')
+
+pcn.site$na.agb <- extract(na.agb,pcn.site)
+pcn.site$eur.agb <- extract(eur.agb,pcn.site)
+  
+# worldclim data
+tmean <- stack(list.files(path='WorldClim/v2/wc2.0_30s_tavg/',pattern=".tif",full.names=T))
+tmax <- stack(list.files(path='WorldClim/v2/wc2.0_30s_tmax/',pattern=".tif",full.names=T))
+tmin <- stack(list.files(path='WorldClim/v2/wc2.0_30s_tmin/',pattern=".tif",full.names=T))
+prec <- stack(list.files(path='WorldClim/v2/wc2.0_30s_prec/',pattern=".tif",full.names=T))
+wind <- stack(list.files(path='WorldClim/v2/wc2.0_30s_wind/',pattern=".tif",full.names=T))
+vap <- stack(list.files(path='WorldClim/v2/wc2.0_30s_vapr/',pattern=".tif",full.names=T))
+
+pcn.site$tavg <- rowMeans(extract(tmean,pcn.site)) 
+pcn.site$tmax <- apply((extract(tmax,pcn.site)),1,max)
+pcn.site$tmin <- apply((extract(tmin,pcn.site)),1,min)
+pcn.site$wind <- rowMeans(extract(wind,pcn.site))
+pcn.site$vap <- rowMeans(extract(vap,pcn.site))
+pcn.site$prec <- rowSums(extract(prec,pcn.site))
+
+## write an output file ##
+
+write.csv(pcn.site,row.names=F,
+"C:/Users/mloranty/Google Drive/Documents/Research/PCN/Veg_Permafrost_Interactions/Data_Synthesis/raw_data/WorldClim_data_out.csv")
+
