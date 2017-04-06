@@ -1,0 +1,97 @@
+##########################
+#
+# climate and bio vars 
+# from gridded data sets 
+# for perm-veg data synthesis
+#
+# MML 4/6/17
+##########################
+rm(list=ls())
+require(sp)
+require(raster)
+require(rgdal)
+
+setwd("C:/Users/mloranty/Google Drive/Documents/Research/PCN/Veg_Permafrost_Interactions/Data_Synthesis/raw_data/")
+
+# read in the site data file
+site.dat <- read.csv("siteinfo_for_WC.csv",header=T)
+
+#make data file to append geospatial vars to 
+pcn.site <- site.dat
+
+# convert to spatial points dataframe and specify coordinates and projection
+pcn.site <- SpatialPoints(pcn.site)
+coordinates(pcn.site) <- ~lon+lat
+projection(pcn.site) <- "+proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs"
+
+####################################
+##  extract monthly GlobSNOW data ##
+####################################
+
+swe.files <- list.files(path='C:/Users/mloranty/Google Drive/GIS_Data/GlobSNOW/SWE/monthly_nc/',full.names=T,pattern='.nc')
+# read data for March, 1980-2014
+swe <- stack(swe.files,varname='SWE_avg')
+# EASE Grid Projection - this is not properly defined in the GlobSnow files #
+projection(swe) <- "+proj=laea +lat_0=90 +lon_0=0 +x_0=0 +y_0=0 +a=6371228 +b=6371228 +units=m +no_defs"
+
+swe.dat <- extract(swe,pcn.site)
+colnames(swe.dat) <- substr(list.files(path='C:/Users/mloranty/Google Drive/GIS_Data/GlobSNOW/SWE/monthly_nc/',pattern='.nc'),26,31)
+
+swe.dat <- cbind(site.dat,swe.dat)
+
+write.xlsx(swe.dat, sheetName='SWE_data',col.names=T,row.names=F,
+           '/Users/mloranty/Google Drive/GIS_projects/PCN_NGS_respiration/NGS_site_SWE_data.xlsx')
+
+# change directory to easily access geospatial data layers 
+setwd('/Users/mloranty/Google Drive/GIS_Data/')
+# read in geospatial data and extract points for the site
+# gimms trends from Guay et al #
+gimms.tr <- raster('GIMMS3G_NDVI_TRENDS_1982-2012_Guay/data/gimms3g_gs_ndvi_trend_8km_1982_2012_20deg_trend.tif')
+gimms.sig <- raster('GIMMS3G_NDVI_TRENDS_1982-2012_Guay/data/gimms3g_gs_ndvi_trend_8km_1982_2012_20deg_significance.tif')
+
+ngs.site$gimms.tr <- extract(gimms.tr,ngs.site)
+ngs.site$gimms.sig <- extract(gimms.sig,ngs.site)
+
+# boreal biomass from Chris Neigh
+na.agb <- raster('boreal_biomass_neigh/NACP_BOREAL_BIOME_BIOMASS_1273/data/NA_500_ecoLc_rcAGB.tif')
+eur.agb <- raster('boreal_biomass_neigh/EURASIA_BIOME_1278/data/EU_500_ecoLc_rcagb.tif')
+
+ngs.site$na.agb <- extract(na.agb,ngs.site)
+ngs.site$eur.agb <- extract(eur.agb,ngs.site)
+
+# Grueber permafrost zonation index
+pzi <- raster('Permafrost_Zonation_Index_Gruber/PFI_NoFringe.tif')
+  
+ngs.site$pzi <- extract(pzi,ngs.site)
+  
+# worldclim data
+tmean <- stack(list.files(path='WorldClim/tmean_30s_bil/',pattern=".bil",full.names=T))
+tmax <- stack(list.files(path='WorldClim/tmax_30s_bil/',pattern=".bil",full.names=T))
+tmin <- stack(list.files(path='WorldClim/tmin_30s_bil/',pattern=".bil",full.names=T))
+prec <- stack(list.files(path='WorldClim/prec_30s_bil/',pattern=".bil",full.names=T))
+bioclim <- stack(list.files(path='WorldClim/bio1-9_30s_bil//',pattern=".bil",full.names=T))
+
+## extract the data, rearrange column numbers, and divde by 10 (because data are scaled)
+ngs.site.tmean <- extract(tmean,ngs.site)[,c(1,5:12,2:4)]/10
+ngs.site.tmax <- extract(tmax,ngs.site)[,c(1,5:12,2:4)]/10  
+ngs.site.tmin <- extract(tmin,ngs.site)[,c(1,5:12,2:4)]/10
+ngs.site.prec <- extract(prec,ngs.site)[,c(1,5:12,2:4)]
+  
+ngs.site.bioclim <- extract(bioclim,ngs.site)[,c(1,12:19,2:11)]
+ngs.site.bioclim[,1:11] <- ngs.site.bioclim[,1:11]/10
+
+## write an output file ##
+write.xlsx(cbind(ngs.site@coords,ngs.site@data), sheetName='site_data',col.names=T,row.names=F,
+           '/Users/mloranty/Google Drive/GIS_projects/PCN_NGS_respiration/NGS_site_data.xlsx')
+write.xlsx(cbind(ngs.site@coords,ngs.site.tmean),sheetName='WorldClim_Tmean',col.names=T,row.names=F,
+           '/Users/mloranty/Google Drive/GIS_projects/PCN_NGS_respiration/NGS_site_data.xlsx',append=T)
+write.xlsx(cbind(ngs.site@coords,ngs.site.tmax),sheetName='WorldClim_Tmax',col.names=T,row.names=F,
+           '/Users/mloranty/Google Drive/GIS_projects/PCN_NGS_respiration/NGS_site_data.xlsx',append=T)
+write.xlsx(cbind(ngs.site@coords,ngs.site.tmin),sheetName='WorldClim_Tmin',col.names=T,row.names=F,
+           '/Users/mloranty/Google Drive/GIS_projects/PCN_NGS_respiration/NGS_site_data.xlsx',append=T)
+write.xlsx(cbind(ngs.site@coords,ngs.site.prec),sheetName='WorldClim_Prec',col.names=T,row.names=F,
+           '/Users/mloranty/Google Drive/GIS_projects/PCN_NGS_respiration/NGS_site_data.xlsx',append=T)
+write.xlsx(cbind(ngs.site@coords,ngs.site.bioclim),sheetName='WorldClim_Bioclim',col.names=T,row.names=F,
+           '/Users/mloranty/Google Drive/GIS_projects/PCN_NGS_respiration/NGS_site_data.xlsx',append=T)
+
+
