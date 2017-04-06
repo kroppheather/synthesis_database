@@ -413,3 +413,26 @@ plot(bareFJ5$At,bareFJ5$st, pch=19, xlim=c(-13,-6), ylim=c(-13,-6),
 		arrows(bareFJ5$At,bareFJ5$Stpc2.5,bareFJ5$At,bareFJ5$Stpc97.5,
 		code=0, lwd=1.5)		
 	abline(0,1, lty=4, lwd=2)	
+	
+#####################################################################
+####look at N factors vs world climate data
+####
+
+
+library(plyr)
+#read in world climate data
+datWC<-read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\world_clim.csv")
+colnames(datWC)[1]<-"siteid"	
+#join world clim to the n tables
+datTC<-join(datT,datWC, by="siteid", type="left")	
+datFC<-join(datF,datWC, by="siteid", type="left")	
+
+plot(datTC$prec[datTC$depth<10],datTC$NT[datTC$depth<10] )
+plot(datFC$prec[datTC$depth<10],datFC$NT[datTC$depth<10] )
+plot(datTC$tavg[datTC$depth<10],datTC$NT[datTC$depth<10] )
+plot(datFC$tavg[datTC$depth<10],datFC$NT[datTC$depth<10] )
+
+plot(datTC$tmin[datTC$depth<10],datTC$NT[datTC$depth<10] )
+plot(datFC$tmin[datTC$depth<10],datFC$NT[datTC$depth<10] )
+plot(datTC$tmax[datTC$depth<10],datTC$NT[datTC$depth<10] )
+plot(datFC$tmax[datTC$depth<10],datFC$NT[datTC$depth<10] )
