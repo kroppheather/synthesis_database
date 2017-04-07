@@ -261,11 +261,7 @@ Fsub4$classID<-ifelse(Fsub4$class>=7, Fsub4$class-1,Fsub4$class)
 #7= mixed boreal
 
 
-plot(Tsub3$depth[Tsub4$orgID==1],Tsub3$NT[Tsub4$orgID==1],pch=19)
-plot(Tsub3$depth[Tsub4$orgID==2],Tsub3$NT[Tsub4$orgID==2],pch=19)
-plot(Tsub4$depth[Tsub4$orgID==2&Tsub4$classID==2],Tsub4$NT[Tsub4$orgID==2&Tsub4$classID==2],ylim=c(0,1.75),xlim=c(0,20),pch=19)
-points(Tsub4$depth[Tsub4$orgID==1&Tsub4$classID==2],Tsub4$NT[Tsub4$orgID==1&Tsub4$classID==2],
-		col="cornflowerblue",pch=19)
+
 ###loook at n factor vs air and soil temp
 
 #read in data
@@ -285,34 +281,27 @@ colnames(Airave)<-c("siteid","wyear","Aave")
 Tsub5<-join(Tsub4, Airmax, by=c("siteid","wyear"), type="left")
 Tsub6<-join(Tsub5, Airmin, by=c("siteid","wyear"), type="left")
 Tsub7<-join(Tsub6, Airave, by=c("siteid","wyear"), type="left")
+#Fusb
+
 Fsub5<-join(Fsub4, Airmax, by=c("siteid","wyear"), type="left")
 Fsub6<-join(Fsub5, Airmin, by=c("siteid","wyear"), type="left")
 Fsub7<-join(Fsub6, Airave, by=c("siteid","wyear"), type="left")
 
-plot(Tsub7$Amax[Tsub7$orgID==2&Tsub7$classID==3],Tsub4$NT[Tsub7$orgID==2&Tsub7$classID==3],ylim=c(0,1.75),xlim=c(0,25),pch=19)
-points(Tsub7$Amax[Tsub7$orgID==1&Tsub7$classID==3],Tsub4$NT[Tsub7$orgID==1&Tsub7$classID==3],
-		col="cornflowerblue",pch=19)
-		
-plot(Fsub7$Amin[Fsub7$orgID==2&Fsub7$classID==2],Fsub4$NT[Fsub7$orgID==2&Fsub7$classID==2],ylim=c(0,1.75),xlim=c(-45,0),pch=19)
-points(Fsub7$Amin[Fsub7$orgID==1&Fsub7$classID==2],Fsub4$NT[Fsub7$orgID==1&Fsub7$classID==2],
-		col="cornflowerblue",pch=19)	
+
 
 		
-#now just need to create the soil vege class id
-TOL<-aggregate(Tsub7$NT, by=list(Tsub7$orgID,Tsub7$classID ), FUN=length)
-FOL<-aggregate(Fsub7$NT, by=list(Fsub7$orgID,Tsub7$classID ), FUN=length)
-colnames(TOL)<-c("orgID", "classID", "countToc")		
-TOL$vegeorgID.T<-seq(1,dim(TOL)[1])	
-colnames(FOL)<-c("orgID", "classID", "countFoc")		
-FOL$vegeorgID.F<-seq(1,dim(FOL)[1])
+#now just need to aggregate the vege classid temperatures
+#no difference between organic and mineral soils
 
-#first join ids
-Tsub8<-join(Tsub7,TOL, by=c("orgID","classID"), type="left")
-Fsub8<-join(Fsub7,FOL, by=c("orgID","classID"), type="left")
+ThawMaxAve<-aggregate(Tsub7$Amax, by=list(Tsub7$classID), FUN="mean")
+FreezeMinAve<-aggregate(Fsub7$Amin, by=list(Fsub7$classID), FUN="mean")
+colnames(ThawMaxAve)<-c("classID", "AveMax")
+colnames(FreezeMinAve)<-c("classID", "AveMin")
 
-#make a plot to look at more closely
-jpeg("c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_our\\u7_n3\\n_patternT.jpg", width=4000,height=2200)	
-ab<-layout(matrix(seq(1,14), ncol=7, byrow=TRUE)
+#join for output
+ExtremeAVE<-join(ThawMaxAve, FreezeMinAve, by="classID", type="inner")
+
+#get average
 	
 ######################################################################
 ######################################################################
@@ -320,46 +309,42 @@ ab<-layout(matrix(seq(1,14), ncol=7, byrow=TRUE)
 ######################################################################
 
 
-datalist<-list(NobsF=dim(Fsub8)[1],
-				NobsT=dim(Tsub8)[1],
-				nF=Fsub8$NT,
-				nT=Tsub8$NT,
-				orgvegeID.T=Tsub8$vegeorgID.T,
-				orgvegeID.F=Fsub8$vegeorgID.F,
-				depth.T=Tsub8$depth,
-				depth.F=Fsub8$depth,
-				Tmax=Tsub8$Amax,Tmin=Fsub8$Amin,
-				soilID=TOL$orgID, Nvegeorg=dim(TOL)[1],Nsoil=2)
+datalist<-list(NobsF=dim(Fsub7)[1],
+				NobsT=dim(Tsub7)[1],
+				nF=Fsub7$NT,
+				nT=Tsub7$NT,
+				vegeID.T=Tsub7$classID,
+				vegeID.F=Fsub7$classID,
+				depth.T=Tsub7$depth,
+				depth.F=Fsub7$depth,
+				Tmax=Tsub7$Amax,Tmin=Fsub7$Amin, TminAVE=FreezeMinAve$AveMin,
+				TmaxAVE=ThawMaxAve$AveMax,
+				 Nvege=dim(ThawMaxAve)[1])
 				
-samplelist<-c("deviance","betaT1", "betaT2", "betaT3",
+samplelist<-c("betaT1", "betaT2", "betaT3",
 					"betaF1", "betaF2", "betaF3", 
-					"nF.rep","nT.rep", "mu.bF1","mu.bF2","mu.bF3",
-					"mu.bT1","mu.bT2","mu.bT3","sig.bF2","sig.bF3",
-					"sig.bT1","sig.bT2","sig.bT3",
+					"nF.rep","nT.rep", 
 					"sig.nT", "sig.nF")
 					
-Initslist<-list(list(t.bF1=c(1,1), t.bF2=c(1,1),t.bF3=c(1,1),t.bT1=c(1,1),t.bT2=c(1,1),t.bT3=c(1,1)),
-				list(t.bF1=c(1.5,1.5), t.bF2=c(1.5,1.5),t.bF3=c(1.5,1.5),t.bT1=c(1.5,1.5),t.bT2=c(1.5,1.5),t.bT3=c(1.5,1.5)),
-				list(t.bF1=c(.5,.5), t.bF2=c(.5,.5),t.bF3=c(.5,.5),t.bT1=c(.5,.5),t.bT2=c(.5,.5),t.bT3=c(.5,.5)))
 
 n.modelInit<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\n_model\\n_model_code.r",
-						data=datalist, n.adapt=2000, n.chains=3, inits=Initslist)
+						data=datalist, n.adapt=2000, n.chains=3)
 				
-n.iterI=30000
-n.thinI=10
+n.iterI=60000
+n.thinI=20
 
 codaobj.init=coda.samples(n.modelInit,variable.names=samplelist,n.iter=n.iterI,thin=n.thinI)				
 
 ModSumm<-summary(codaobj.init)					
 					
-write.table(ModSumm$statistics, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n3\\model_variaion_stats.csv",
+write.table(ModSumm$statistics, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n4\\model_variaion_stats.csv",
 			sep=",",row.names=TRUE)
-write.table(ModSumm$quantiles, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n3\\model_variaion_quant.csv",
+write.table(ModSumm$quantiles, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n4\\model_variaion_quant.csv",
 			sep=",",row.names=TRUE)			
 
-mcmcplot(codaobj.init, dir="c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n3\\historyPlots")	
+mcmcplot(codaobj.init, dir="c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n4\\historyPlots")	
 
 #write files for output
-write.table(Tsub8, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n3\\Thawing_n_forMod.csv", sep=",", row.names=FALSE)	
-write.table(Fsub8, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n3\\Freezing_n_forMod.csv", sep=",", row.names=FALSE)
-write.table(TOL, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n3\\vegeorgID_forMod.csv", sep=",", row.names=FALSE)	
+write.table(Tsub8, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n4\\Thawing_n_forMod.csv", sep=",", row.names=FALSE)	
+write.table(Fsub8, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n4\\Freezing_n_forMod.csv", sep=",", row.names=FALSE)
+write.table(TOL, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n4\\vegeorgID_forMod.csv", sep=",", row.names=FALSE)	
