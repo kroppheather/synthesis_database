@@ -142,6 +142,10 @@ datOLT<-data.frame(siteid=datS$site_id, OLT=datS$organic_thick)
 Fall6<-join(Fall5,datOLT, by="siteid", type="left")
 Tall6<-join(Tall5,datOLT, by="siteid", type="left")
 
+
+
+
+
 ####################################################################
 #####read in EVI data  #############################################
 ####################################################################
@@ -151,22 +155,32 @@ EVIsub<-data.frame(siteid=datEV$siteid, EVI=datEV$EVI)
 Fall7<-join(Fall6, EVIsub, by="siteid", type="left")
 Tall7<-join(Tall6, EVIsub, by="siteid", type="left")
 
+#read in world clim data
+datWC<-read.csv("world_clim.csv")
+colnames(datWC)[1]<-"siteid"
+Tall8<-join(Tall7, datWC, by="siteid", type="left")
+Fall8<-join(Fall7, datWC, by="siteid", type="left")
+
+
 ######################################################################
 ########subset variables for model run ###############################
 ######################################################################
 #eventually a missing data model will help use more datasets
 #but for now look at a model run with only all data present
-Tsub<-data.frame(siteid=Tall7$siteid, N.id=Tall7$ID,NT=Tall7$M, wyear=Tall7$wyear,lat=Tall7$lat,
-				biome=Tall7$vege_z, EVI=Tall7$EVI,OLT=Tall7$OLT, 
-				depth=Tall7$depth)
+Tsub<-data.frame(siteid=Tall8$siteid, N.id=Tall8$ID,NT=Tall8$M, wyear=Tall8$wyear,lat=Tall8$lat,
+				biome=Tall8$vege_z,OLT=Tall8$OLT, 
+				depth=Tall8$depth, Tmax=Tall8$tmax, prec=Tall8$prec, 
+				Tave=Tall8$tavg,Tmin=Tall8$tmin)
 
 Tsub<-na.omit(Tsub)
 
 Tsub$biomeID<-ifelse(Tsub$biome=="tundra", 2,1)
 
-Fsub<-data.frame(siteid=Fall7$siteid, N.id=Fall7$ID,NT=Fall7$M, wyear=Fall7$wyear,lat=Fall7$lat,
-				biome=Fall7$vege_z, EVI=Fall7$EVI,OLT=Fall7$OLT, 
-				depth=Fall7$depth
+Fsub<-data.frame(siteid=Fall8$siteid, N.id=Fall8$ID,NT=Fall8$M, wyear=Fall8$wyear,lat=Fall8$lat,
+				biome=Fall8$vege_z, OLT=Fall8$OLT, 
+				depth=Fall8$depth,
+				Tmax=Fall8$tmax, prec=Fall8$prec, 
+				Tave=Fall8$tavg,Tmin=Fall8$tmin
 				)
 
 Fsub<-na.omit(Fsub)
@@ -190,93 +204,143 @@ TyearID$yearID<-seq(1,dim(TyearID)[1])
 Tsub$orgID<-ifelse(Tsub$depth<=Tsub$OLT,1,2)
 Fsub$orgID<-ifelse(Fsub$depth<=Fsub$OLT,1,2)
 
+
+#see if we can seperate out minveral under OLT vs mineral in the entire column
+#create an id just indicate if there is organic present at a site
+ToltIND<-data.frame(siteid=unique(Tsub$siteid[Tsub$orgID==1]))
+ToltIND$Oind<-rep(1, dim(ToltIND)[1])
+
+FoltIND<-data.frame(siteid=unique(Fsub$siteid[Fsub$orgID==1]))
+FoltIND$Oind<-rep(1, dim(FoltIND)[1])
+
+Tsub2<-join(Tsub,ToltIND, by="siteid", type="left")
+Fsub2<-join(Fsub,ToltIND, by="siteid", type="left")
+
+Fsub2$O.id<-ifelse(is.na(Fsub2$Oind),0,Fsub2$Oind)
+Tsub2$O.id<-ifelse(is.na(Tsub2$Oind),0,Tsub2$Oind)
+
+#now set up id for 3 types of soil
+Tsub2$SOILID<-ifelse(Tsub2$orgID==1,1,
+				ifelse(Tsub2$orgID==2&Tsub2$O.id==1,2,3))
+
+Fsub2$SOILID<-ifelse(Fsub2$orgID==1,1,
+				ifelse(Fsub2$orgID==2&Fsub2$O.id==1,2,3))
+				
+				
 #read in data to look at region
 datR<-read.csv("region.csv")
 #join to the tables
 colnames(datR)[1]<-"siteid"
 
-Tsub2<-join(Tsub,datR, by="siteid", type="left")
-Fsub2<-join(Fsub,datR, by="siteid", type="left")
+Tsub3<-join(Tsub2,datR, by="siteid", type="left")
+Fsub3<-join(Fsub2,datR, by="siteid", type="left")
 
 #read in vegetation data to set up vegetation class
 
 datVC<-read.csv("vegeClass.csv")
 colnames(datVC)[1]<-"siteid"
 
-Tsub3<-join(Tsub2,datVC, by="siteid", type="left")
-Fsub3<-join(Fsub2,datVC, by="siteid", type="left")
+Tsub4<-join(Tsub3,datVC, by="siteid", type="left")
+Fsub4<-join(Fsub3,datVC, by="siteid", type="left")
 
-#comparision of F and T n factors
-FreBH<-data.frame(N=Fsub3$NT[Fsub3$classID==1])
-FreBH$ID<-rep("freezing", dim(FreBH)[1])
-ThaBH<-data.frame(N=Tsub3$NT[Tsub3$classID==1])
-ThaBH$ID<-rep("thawing", dim(ThaBH)[1])
 
-xN<-c(FreBH$ID,ThaBH$ID)
-yN<-c(FreBH$N,ThaBH$N)
-par(mai=c(1,1,1,1))
-plot(as.factor(xN),yN , xlab="Temeprature type", 
-	ylab="N factor", col="grey75", ylim=c(.7,1.7), cex.axis=2, cex.lab=2)
-axis(4, seq(.8,1.6, by=.2), cex.axis=2)
 
 #now see if there are enough observations to model by these groups
-
-TOL<-aggregate(Tsub3$NT, by=list(Tsub3$orgID), FUN=length)
-FOL<-aggregate(Fsub3$NT, by=list(Fsub3$orgID), FUN=length)
-plot(Tsub3$depth[Tsub3$orgID==2],Tsub3$NT[Tsub3$orgID==2],pch=19)
-plot(Tsub3$depth[Tsub3$orgID==1],Tsub3$NT[Tsub3$orgID==1],pch=19)
-
-plot(Tsub3$EVI[Tsub3$orgID==2],Tsub3$NT[Tsub3$orgID==2],pch=19)
-plot(Tsub3$EVI[Tsub3$orgID==1],Tsub3$NT[Tsub3$orgID==1],pch=19)
-
-TV<-aggregate(Tsub3$NT, by=list(Tsub3$class), FUN=length)
-FV<-aggregate(Fsub3$NT, by=list(Fsub3$class), FUN=length)
-
 #make a vegetation class ID that reflects the actual number
-Tsub3$classID<-ifelse(Tsub3$class>=7, Tsub3$class-1,Tsub3$class)
-Fsub3$classID<-ifelse(Fsub3$class>=7, Fsub3$class-1,Fsub3$class)
+Tsub4$classID<-ifelse(Tsub4$class>=7, Tsub4$class-1,Tsub4$class)
+Fsub4$classID<-ifelse(Fsub4$class>=7, Fsub4$class-1,Fsub4$class)
 
 
-plot(as.factor(Tsub3$class),Tsub3$NT)
-plot(as.factor(Fsub3$class),Fsub3$NT)
+#classID code
+#1= herb barren
+#2 = grasstundra
+#3= tussock tundra
+#4= shrub tundra
+#5= wetland
+#6= evergreen boreal
+#7= mixed boreal
 
-TR<-aggregate(Tsub3$NT, by=list(Tsub3$region_name), FUN=length)
-FR<-aggregate(Fsub3$NT, by=list(Fsub3$region_name), FUN=length)
 
-plot(as.factor(Tsub3$region_name),Tsub3$NT)
-plot(as.factor(Fsub3$region_name),Fsub3$NT)
+plot(Tsub3$depth[Tsub4$orgID==1],Tsub3$NT[Tsub4$orgID==1],pch=19)
+plot(Tsub3$depth[Tsub4$orgID==2],Tsub3$NT[Tsub4$orgID==2],pch=19)
+plot(Tsub4$depth[Tsub4$orgID==2&Tsub4$classID==2],Tsub4$NT[Tsub4$orgID==2&Tsub4$classID==2],ylim=c(0,1.75),xlim=c(0,20),pch=19)
+points(Tsub4$depth[Tsub4$orgID==1&Tsub4$classID==2],Tsub4$NT[Tsub4$orgID==1&Tsub4$classID==2],
+		col="cornflowerblue",pch=19)
+###loook at n factor vs air and soil temp
 
+#read in data
 
+datAM<-read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod1\\output_u7\\Tair_model.csv")
+datSM<-read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod1\\output_u7\\Tsoil_model.csv")
+datAM<-na.omit(datAM)
+Airmax<-aggregate(datAM$A, by=list(datAM$siteid,datAM$wyear), FUN="max")
+Airmin<-aggregate(datAM$A, by=list(datAM$siteid,datAM$wyear), FUN="min")
+colnames(Airmin)<-c("siteid","wyear","Amin")
+colnames(Airmax)<-c("siteid","wyear","Amax")
+Airmax$Amp<-Airmax$Amax-Airmin$Amin
+Airave<-aggregate(datAM$A, by=list(datAM$siteid,datAM$wyear), FUN="mean")
+colnames(Airave)<-c("siteid","wyear","Aave")
+#now join into the Tsub
+
+Tsub5<-join(Tsub4, Airmax, by=c("siteid","wyear"), type="left")
+Tsub6<-join(Tsub5, Airmin, by=c("siteid","wyear"), type="left")
+Tsub7<-join(Tsub6, Airave, by=c("siteid","wyear"), type="left")
+Fsub5<-join(Fsub4, Airmax, by=c("siteid","wyear"), type="left")
+Fsub6<-join(Fsub5, Airmin, by=c("siteid","wyear"), type="left")
+Fsub7<-join(Fsub6, Airave, by=c("siteid","wyear"), type="left")
+
+plot(Tsub7$Amax[Tsub7$orgID==2&Tsub7$classID==3],Tsub4$NT[Tsub7$orgID==2&Tsub7$classID==3],ylim=c(0,1.75),xlim=c(0,25),pch=19)
+points(Tsub7$Amax[Tsub7$orgID==1&Tsub7$classID==3],Tsub4$NT[Tsub7$orgID==1&Tsub7$classID==3],
+		col="cornflowerblue",pch=19)
+		
+plot(Fsub7$Amin[Fsub7$orgID==2&Fsub7$classID==2],Fsub4$NT[Fsub7$orgID==2&Fsub7$classID==2],ylim=c(0,1.75),xlim=c(-45,0),pch=19)
+points(Fsub7$Amin[Fsub7$orgID==1&Fsub7$classID==2],Fsub4$NT[Fsub7$orgID==1&Fsub7$classID==2],
+		col="cornflowerblue",pch=19)	
+
+		
+#now just need to create the soil vege class id
+TOL<-aggregate(Tsub7$NT, by=list(Tsub7$orgID,Tsub7$classID ), FUN=length)
+FOL<-aggregate(Fsub7$NT, by=list(Fsub7$orgID,Tsub7$classID ), FUN=length)
+colnames(TOL)<-c("orgID", "classID", "countToc")		
+TOL$vegeorgID.T<-seq(1,dim(TOL)[1])	
+colnames(FOL)<-c("orgID", "classID", "countFoc")		
+FOL$vegeorgID.F<-seq(1,dim(FOL)[1])
+
+#first join ids
+Tsub8<-join(Tsub7,TOL, by=c("orgID","classID"), type="left")
+Fsub8<-join(Fsub7,FOL, by=c("orgID","classID"), type="left")
+
+#make a plot to look at more closely
+jpeg("c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_our\\u7_n3\\n_patternT.jpg", width=4000,height=2200)	
+ab<-layout(matrix(seq(1,14), ncol=7, byrow=TRUE)
+	
 ######################################################################
 ######################################################################
 #####set model data lists ############################################
 ######################################################################
 
 
-datalist<-list(NobsF=dim(Fsub3)[1],
-				NobsT=dim(Tsub3)[1],
-				nF=Fsub3$NT,
-				nT=Tsub3$NT,
-				orgID.T=Tsub3$orgID,
-				orgID.F=Fsub3$orgID,
-				Norg=2,
-				Nvegeclass=7,
-				EVI.T=Tsub3$EVI,
-				EVI.F=Fsub3$EVI,
-				depth.T=Tsub3$depth,
-				depth.F=Fsub3$depth,
-				vegeID.F=Fsub3$classID,
-				vegeID.T=Tsub3$classID)
+datalist<-list(NobsF=dim(Fsub8)[1],
+				NobsT=dim(Tsub8)[1],
+				nF=Fsub8$NT,
+				nT=Tsub8$NT,
+				orgvegeID.T=Tsub8$vegeorgID.T,
+				orgvegeID.F=Fsub8$vegeorgID.F,
+				depth.T=Tsub8$depth,
+				depth.F=Fsub8$depth,
+				Tmax=Tsub8$Amax,Tmin=Fsub8$Amin,
+				soilID=TOL$orgID, Nvegeorg=dim(TOL)[1],Nsoil=2)
 				
-samplelist<-c("deviance","betaT1star", "betaT2", "betaT3", "betaT4",
-					"betaF1star", "betaF2", "betaF3", "betaF4",
-					"nF.rep","nT.rep", "epsF.star", "epsT.star",
-					"sig.epsT", "sig.epsF", "rho.epsT", "rho.epsF",
+samplelist<-c("deviance","betaT1", "betaT2", "betaT3",
+					"betaF1", "betaF2", "betaF3", 
+					"nF.rep","nT.rep", "mu.bF1","mu.bF2","mu.bF3",
+					"mu.bT1","mu.bT2","mu.bT3","sig.bF2","sig.bF3",
+					"sig.bT1","sig.bT2","sig.bT3",
 					"sig.nT", "sig.nF")
 					
-Initslist<-list(list(tau.epsF=25, tau.epsT=25),
-				list(tau.epsF=50, tau.epsT=50),
-				list(tau.epsF=5, tau.epsT=5))
+Initslist<-list(list(t.bF1=c(1,1), t.bF2=c(1,1),t.bF3=c(1,1),t.bT1=c(1,1),t.bT2=c(1,1),t.bT3=c(1,1)),
+				list(t.bF1=c(1.5,1.5), t.bF2=c(1.5,1.5),t.bF3=c(1.5,1.5),t.bT1=c(1.5,1.5),t.bT2=c(1.5,1.5),t.bT3=c(1.5,1.5)),
+				list(t.bF1=c(.5,.5), t.bF2=c(.5,.5),t.bF3=c(.5,.5),t.bT1=c(.5,.5),t.bT2=c(.5,.5),t.bT3=c(.5,.5)))
 
 n.modelInit<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\n_model\\n_model_code.r",
 						data=datalist, n.adapt=2000, n.chains=3, inits=Initslist)
@@ -288,13 +352,14 @@ codaobj.init=coda.samples(n.modelInit,variable.names=samplelist,n.iter=n.iterI,t
 
 ModSumm<-summary(codaobj.init)					
 					
-write.table(ModSumm$statistics, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n2\\model_variaion_stats.csv",
+write.table(ModSumm$statistics, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n3\\model_variaion_stats.csv",
 			sep=",",row.names=TRUE)
-write.table(ModSumm$quantiles, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n2\\model_variaion_quant.csv",
+write.table(ModSumm$quantiles, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n3\\model_variaion_quant.csv",
 			sep=",",row.names=TRUE)			
 
-mcmcplot(codaobj.init, dir="c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n2\\historyPlots")	
+mcmcplot(codaobj.init, dir="c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n3\\historyPlots")	
 
 #write files for output
-write.table(Tsub, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n2\\Thawing_n_forMod.csv", sep=",", row.names=FALSE)	
-write.table(Fsub, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n2\\Freezing_n_forMod.csv", sep=",", row.names=FALSE)	
+write.table(Tsub8, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n3\\Thawing_n_forMod.csv", sep=",", row.names=FALSE)	
+write.table(Fsub8, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n3\\Freezing_n_forMod.csv", sep=",", row.names=FALSE)
+write.table(TOL, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n3\\vegeorgID_forMod.csv", sep=",", row.names=FALSE)	

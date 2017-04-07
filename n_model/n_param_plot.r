@@ -436,3 +436,467 @@ plot(datTC$tmin[datTC$depth<10],datTC$NT[datTC$depth<10] )
 plot(datFC$tmin[datTC$depth<10],datFC$NT[datTC$depth<10] )
 plot(datTC$tmax[datTC$depth<10],datTC$NT[datTC$depth<10] )
 plot(datFC$tmax[datTC$depth<10],datFC$NT[datTC$depth<10] )
+
+
+######################################
+#read in data
+
+setwd("c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n3")
+
+datF<-read.csv("Freezing_n_forMod.csv")
+datT<-read.csv("Thawing_n_forMod.csv")
+datID<-read.csv("vegeorgID_forMod.csv")
+
+
+#read in params
+datM<-read.csv("model_variaion_stats.csv")
+datQ<-read.csv("model_variaion_quant.csv")
+#now join means with quantiles
+datC<-cbind(datM,datQ)
+#make a param vector
+#make a param vector
+dexps<-"\\[*[[:digit:]]*\\]"
+datC$parms1<-gsub(dexps,"",rownames(datC))
+
+#now add id number
+dexps2<-"\\D"
+#pull out names
+pnames<-rownames(datC)
+#need to split because there are numbers in param names
+psplit<-strsplit(pnames, "\\[")
+#pull out vector number
+pEnd<-character(0)
+for(i in 1:dim(datC)[1]){
+	if(length(psplit[[i]])>1){
+		pEnd[i]<-psplit[[i]][2]
+	}else{pEnd[i]<-"NA"}
+
+}
+#get vector number only and make numeric
+parmCN<-ifelse(pEnd=="NA", NA, gsub(dexps2,"", pEnd ))
+
+datC$parms2<-c(as.numeric(parmCN))
+
+datCS<-data.frame(M=datC[,1],pc2.5=datC[,5],pc97.5=datC[,9],param=as.character(datC[,10]),ID=datC[,11])
+
+
+datCT<-datCS[datCS$param=="betaT3",]
+colnames(datCT)[5]<- "vegeorgID.T"
+library(plyr)
+datCTI<-join(datCT, datID, by="vegeorgID.T", type="left")
+
+datCF<-datCS[datCS$param=="betaF3",]
+colnames(datCF)[5]<- "vegeorgID.T"
+datCFI<-join(datCF, datID, by="vegeorgID.T", type="left")
+write.table(datCTI, "datCTI.csv", sep=",", row.names=FALSE)
+write.table(datCFI, "datCTI.csv", sep=",", row.names=FALSE)
+
+wb<-40
+hb<-40
+
+TminH<- -5
+TminL<- -50
+TmaxH<- 25
+TmaxL<-10
+
+#classID code
+#1= herb barren
+#2 = grasstundra
+#3= tussock tundra
+#4= shrub tundra
+#5= wetland
+#6= evergreen boreal
+#7= mixed boreal
+
+#make a plot to look at more closely
+jpeg("c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n3\\n_FT.jpg", width=9000,height=2200)	
+ab<-layout(matrix(seq(1,7), ncol=7, byrow=TRUE),
+			width=c(lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb)),
+			height=c(lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb)))
+			
+			
+#
+par(mai=c(0,0,0,0))
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(TminL, TminH), ylim=c(0,1.75), xlab=" ",
+		ylab=" ", xaxs="i", yaxs="i")
+points(datF$Amin[datF$classID==1&datF$orgID==1],datF$NT[datF$classID==1&datF$orgID==1], 
+		pch=19, cex=12, col="seagreen4")		
+points(datF$Amin[datF$classID==1&datF$orgID==2],datF$NT[datF$classID==1&datF$orgID==2], 
+		pch=19, cex=12, col="saddlebrown")	
+text(TminL + 10, 1.6, "Herb barren", cex=10)	
+axis(1, seq(-45, -5, by=10), cex.axis=8, padj=1)
+axis(2, seq(0,1.6, by=.2),cex.axis=8,las=2)
+mtext("Minimum Yearly Temperature (C)", side=1, cex=7, line=-8,outer =TRUE)
+mtext("Freezing n-factor", side=2, cex=7, line=15)
+legend(TminH-20, .4,c("orgnaic","mineral"),col=c("seagreen4","saddlebrown"), pch=19,
+bty="n", cex=10 )	
+box(which="plot")
+#
+par(mai=c(0,0,0,0))
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(TminL, TminH), ylim=c(0,1.75), xlab=" ",
+		ylab=" ", xaxs="i", yaxs="i")
+		
+points(datF$Amin[datF$classID==2&datF$orgID==1],datF$NT[datF$classID==2&datF$orgID==1], 
+		pch=19, cex=12, col="seagreen4")		
+points(datF$Amin[datF$classID==2&datF$orgID==2],datF$NT[datF$classID==2&datF$orgID==2], 
+		pch=19, cex=12, col="saddlebrown")	
+text(TminL + 10, 1.6, "Grass tund", cex=10)	
+axis(1, seq(-45, -5, by=10), cex.axis=8, padj=1)
+
+		
+box(which="plot")
+#
+par(mai=c(0,0,0,0))
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(TminL, TminH), ylim=c(0,1.75), xlab=" ",
+		ylab=" ", xaxs="i", yaxs="i")
+		
+		
+points(datF$Amin[datF$classID==3&datF$orgID==1],datF$NT[datF$classID==3&datF$orgID==1], 
+		pch=19, cex=12, col="seagreen4")		
+points(datF$Amin[datF$classID==3&datF$orgID==2],datF$NT[datF$classID==3&datF$orgID==2], 
+		pch=19, cex=12, col="saddlebrown")	
+text(TminL + 10, 1.6, "Tussock", cex=10)	
+axis(1, seq(-45, -5, by=10), cex.axis=8, padj=1)		
+box(which="plot")
+#
+par(mai=c(0,0,0,0))
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(TminL, TminH), ylim=c(0,1.75), xlab=" ",
+		ylab=" ", xaxs="i", yaxs="i")
+		
+points(datF$Amin[datF$classID==4&datF$orgID==1],datF$NT[datF$classID==4&datF$orgID==1], 
+		pch=19, cex=12, col="seagreen4")		
+points(datF$Amin[datF$classID==4&datF$orgID==2],datF$NT[datF$classID==4&datF$orgID==2], 
+		pch=19, cex=12, col="saddlebrown")	
+text(TminL + 10, 1.6, "Shrub tund", cex=10)	
+axis(1, seq(-45, -5, by=10), cex.axis=8, padj=1)			
+box(which="plot")
+#
+par(mai=c(0,0,0,0))
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(TminL, TminH), ylim=c(0,1.75), xlab=" ",
+		ylab=" ", xaxs="i", yaxs="i")
+points(datF$Amin[datF$classID==5&datF$orgID==1],datF$NT[datF$classID==5&datF$orgID==1], 
+		pch=19, cex=12, col="seagreen4")		
+text(TminL + 10, 1.6, "wetland tund", cex=10)	
+axis(1, seq(-45, -5, by=10), cex.axis=8, padj=1)
+box(which="plot")
+#
+par(mai=c(0,0,0,0))
+
+		
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(TminL, TminH), ylim=c(0,1.75), xlab=" ",
+		ylab=" ", xaxs="i", yaxs="i")
+points(datF$Amin[datF$classID==6&datF$orgID==1],datF$NT[datF$classID==6&datF$orgID==1], 
+		pch=19, cex=12, col="seagreen4")		
+text(TminL + 10, 1.6, "evergreen boreal", cex=10)	
+axis(1, seq(-45, -5, by=10), cex.axis=8, padj=1)
+box(which="plot")
+#
+par(mai=c(0,0,0,0))
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(TminL, TminH), ylim=c(0,1.75), xlab=" ",
+		ylab=" ", xaxs="i", yaxs="i")
+points(datF$Amin[datF$classID==7&datF$orgID==1],datF$NT[datF$classID==7&datF$orgID==1], 
+		pch=19, cex=12, col="seagreen4")		
+points(datF$Amin[datF$classID==7&datF$orgID==2],datF$NT[datF$classID==7&datF$orgID==2], 
+		pch=19, cex=12, col="saddlebrown")	
+text(TminL + 10, 1.6, "mixed boreal", cex=10)	
+axis(1, seq(-45, -5, by=10), cex.axis=8, padj=1)			
+		
+box(which="plot")
+
+dev.off()
+
+
+
+#make a plot to look at more closely
+jpeg("c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n3\\n_TT.jpg", width=9000,height=2200)	
+ab<-layout(matrix(seq(1,7), ncol=7, byrow=TRUE),
+			width=c(lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb)),
+			height=c(lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb)))
+			
+			
+#
+par(mai=c(0,0,0,0))
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(TmaxL, TmaxH), ylim=c(0,1.75), xlab=" ",
+		ylab=" ", xaxs="i", yaxs="i")
+points(datT$Amax[datT$classID==1&datT$orgID==1],datT$NT[datT$classID==1&datT$orgID==1], 
+		pch=19, cex=12, col="seagreen4")		
+points(datT$Amax[datT$classID==1&datT$orgID==2],datT$NT[datT$classID==1&datT$orgID==2], 
+		pch=19, cex=12, col="saddlebrown")	
+text(TmaxL + 10, 1.6, "Herb barren", cex=10)	
+axis(1, seq(15, 25, by=5), cex.axis=8, padj=1)
+axis(2, seq(0,1.6, by=.2),cex.axis=8,las=2)
+mtext("Maximum Yearly Temperature (C)", side=1, cex=7, line=-8,outer =TRUE)
+mtext("Thawing n-factor", side=2, cex=7, line=15)
+legend(TmaxH-10, .4,c("orgnaic","mineral"),col=c("seagreen4","saddlebrown"), pch=19,
+bty="n", cex=10 )	
+box(which="plot")
+#
+par(mai=c(0,0,0,0))
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(TmaxL, TmaxH), ylim=c(0,1.75), xlab=" ",
+		ylab=" ", xaxs="i", yaxs="i")
+		
+points(datT$Amax[datT$classID==2&datT$orgID==1],datT$NT[datT$classID==2&datT$orgID==1], 
+		pch=19, cex=12, col="seagreen4")		
+points(datT$Amax[datT$classID==2&datT$orgID==2],datT$NT[datT$classID==2&datT$orgID==2], 
+		pch=19, cex=12, col="saddlebrown")	
+text(TmaxL + 10, 1.6, "Grass tund", cex=10)	
+axis(1, seq(15, 25, by=5), cex.axis=8, padj=1)
+
+		
+box(which="plot")
+#
+par(mai=c(0,0,0,0))
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(TmaxL, TmaxH), ylim=c(0,1.75), xlab=" ",
+		ylab=" ", xaxs="i", yaxs="i")
+		
+		
+points(datT$Amax[datT$classID==3&datT$orgID==1],datT$NT[datT$classID==3&datT$orgID==1], 
+		pch=19, cex=12, col="seagreen4")		
+points(datT$Amax[datT$classID==3&datT$orgID==2],datT$NT[datT$classID==3&datT$orgID==2], 
+		pch=19, cex=12, col="saddlebrown")	
+text(TmaxL + 10, 1.6, "Tussock", cex=10)	
+axis(1, seq(15, 25, by=5), cex.axis=8, padj=1)		
+box(which="plot")
+#
+par(mai=c(0,0,0,0))
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(TmaxL, TmaxH), ylim=c(0,1.75), xlab=" ",
+		ylab=" ", xaxs="i", yaxs="i")
+		
+points(datT$Amax[datT$classID==4&datT$orgID==1],datT$NT[datT$classID==4&datT$orgID==1], 
+		pch=19, cex=12, col="seagreen4")		
+points(datT$Amax[datT$classID==4&datT$orgID==2],datT$NT[datT$classID==4&datT$orgID==2], 
+		pch=19, cex=12, col="saddlebrown")	
+text(TmaxL + 10, 1.6, "Shrub tund", cex=10)	
+axis(1, seq(15, 25, by=5), cex.axis=8, padj=1)			
+box(which="plot")
+#
+par(mai=c(0,0,0,0))
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(TmaxL, TmaxH), ylim=c(0,1.75), xlab=" ",
+		ylab=" ", xaxs="i", yaxs="i")
+points(datT$Amax[datT$classID==5&datT$orgID==1],datT$NT[datT$classID==5&datT$orgID==1], 
+		pch=19, cex=12, col="seagreen4")		
+text(TmaxL + 10, 1.6, "wetland tund", cex=10)	
+axis(1, seq(15, 25, by=5), cex.axis=8, padj=1)
+box(which="plot")
+#
+par(mai=c(0,0,0,0))
+
+		
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(TmaxL, TmaxH), ylim=c(0,1.75), xlab=" ",
+		ylab=" ", xaxs="i", yaxs="i")
+points(datT$Amax[datT$classID==6&datT$orgID==1],datT$NT[datT$classID==6&datT$orgID==1], 
+		pch=19, cex=12, col="seagreen4")		
+text(TmaxL + 10, 1.6, "evergreen boreal", cex=10)	
+axis(1, seq(15, 25, by=5), cex.axis=8, padj=1)	
+box(which="plot")
+#
+par(mai=c(0,0,0,0))
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(TmaxL, TmaxH), ylim=c(0,1.75), xlab=" ",
+		ylab=" ", xaxs="i", yaxs="i")
+points(datT$Amax[datT$classID==7&datT$orgID==1],datT$NT[datT$classID==7&datT$orgID==1], 
+		pch=19, cex=12, col="seagreen4")		
+points(datT$Amax[datT$classID==7&datT$orgID==2],datT$NT[datT$classID==7&datT$orgID==2], 
+		pch=19, cex=12, col="saddlebrown")	
+text(TmaxL + 10, 1.6, "mixed boreal", cex=10)	
+axis(1, seq(15, 25, by=5), cex.axis=8, padj=1)		
+		
+box(which="plot")
+
+dev.off()
+
+
+
+#make a plot to look at more closely
+jpeg("c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n3\\n_FTdepth.jpg", width=9000,height=2200)	
+ab<-layout(matrix(seq(1,7), ncol=7, byrow=TRUE),
+			width=c(lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb)),
+			height=c(lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb)))
+			
+			
+#
+par(mai=c(0,0,0,0))
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-.50, 21), ylim=c(0,1.75), xlab=" ",
+		ylab=" ", xaxs="i", yaxs="i")
+points(datF$depth[datF$classID==1&datF$orgID==1],datF$NT[datF$classID==1&datF$orgID==1], 
+		pch=19, cex=12, col="seagreen4")		
+points(datF$depth[datF$classID==1&datF$orgID==2],datF$NT[datF$classID==1&datF$orgID==2], 
+		pch=19, cex=12, col="saddlebrown")	
+text(TminL + 10, 1.6, "Herb barren", cex=10)	
+axis(1, seq(0, 20, by=5), cex.axis=8, padj=1)	
+axis(2, seq(0,1.6, by=.2),cex.axis=8,las=2)
+mtext("Depth (cm)", side=1, cex=7, line=-8,outer =TRUE)
+mtext("Freezing n-factor", side=2, cex=7, line=15)
+legend(TminH-20, .4,c("orgnaic","mineral"),col=c("seagreen4","saddlebrown"), pch=19,
+bty="n", cex=10 )	
+box(which="plot")
+#
+par(mai=c(0,0,0,0))
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-.50, 21), ylim=c(0,1.75), xlab=" ",
+		ylab=" ", xaxs="i", yaxs="i")
+		
+points(datF$depth[datF$classID==2&datF$orgID==1],datF$NT[datF$classID==2&datF$orgID==1], 
+		pch=19, cex=12, col="seagreen4")		
+points(datF$depth[datF$classID==2&datF$orgID==2],datF$NT[datF$classID==2&datF$orgID==2], 
+		pch=19, cex=12, col="saddlebrown")	
+text(TminL + 10, 1.6, "Grass tund", cex=10)	
+axis(1, seq(0, 20, by=5), cex.axis=8, padj=1)	
+
+		
+box(which="plot")
+#
+par(mai=c(0,0,0,0))
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-.50, 21), ylim=c(0,1.75), xlab=" ",
+		ylab=" ", xaxs="i", yaxs="i")
+		
+		
+points(datF$depth[datF$classID==3&datF$orgID==1],datF$NT[datF$classID==3&datF$orgID==1], 
+		pch=19, cex=12, col="seagreen4")		
+points(datF$depth[datF$classID==3&datF$orgID==2],datF$NT[datF$classID==3&datF$orgID==2], 
+		pch=19, cex=12, col="saddlebrown")	
+text(TminL + 10, 1.6, "Tussock", cex=10)	
+axis(1, seq(0, 20, by=5), cex.axis=8, padj=1)		
+box(which="plot")
+#
+par(mai=c(0,0,0,0))
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-.50, 21), ylim=c(0,1.75), xlab=" ",
+		ylab=" ", xaxs="i", yaxs="i")
+		
+points(datF$depth[datF$classID==4&datF$orgID==1],datF$NT[datF$classID==4&datF$orgID==1], 
+		pch=19, cex=12, col="seagreen4")		
+points(datF$depth[datF$classID==4&datF$orgID==2],datF$NT[datF$classID==4&datF$orgID==2], 
+		pch=19, cex=12, col="saddlebrown")	
+text(TminL + 10, 1.6, "Shrub tund", cex=10)	
+axis(1, seq(0, 20, by=5), cex.axis=8, padj=1)				
+box(which="plot")
+#
+par(mai=c(0,0,0,0))
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-.50, 21), ylim=c(0,1.75), xlab=" ",
+		ylab=" ", xaxs="i", yaxs="i")
+points(datF$depth[datF$classID==5&datF$orgID==1],datF$NT[datF$classID==5&datF$orgID==1], 
+		pch=19, cex=12, col="seagreen4")		
+text(TminL + 10, 1.6, "wetland tund", cex=10)	
+axis(1, seq(0, 20, by=5), cex.axis=8, padj=1)	
+box(which="plot")
+#
+par(mai=c(0,0,0,0))
+
+		
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-.50, 21), ylim=c(0,1.75), xlab=" ",
+		ylab=" ", xaxs="i", yaxs="i")
+points(datF$depth[datF$classID==6&datF$orgID==1],datF$NT[datF$classID==6&datF$orgID==1], 
+		pch=19, cex=12, col="seagreen4")		
+text(TminL + 10, 1.6, "evergreen boreal", cex=10)	
+axis(1, seq(0, 20, by=5), cex.axis=8, padj=1)	
+box(which="plot")
+#
+par(mai=c(0,0,0,0))
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-.50, 21), ylim=c(0,1.75), xlab=" ",
+		ylab=" ", xaxs="i", yaxs="i")
+points(datF$depth[datF$classID==7&datF$orgID==1],datF$NT[datF$classID==7&datF$orgID==1], 
+		pch=19, cex=12, col="seagreen4")		
+points(datF$depth[datF$classID==7&datF$orgID==2],datF$NT[datF$classID==7&datF$orgID==2], 
+		pch=19, cex=12, col="saddlebrown")	
+text(TminL + 10, 1.6, "mixed boreal", cex=10)	
+axis(1, seq(0, 20, by=5), cex.axis=8, padj=1)				
+		
+box(which="plot")
+
+dev.off()
+
+
+#make a plot to look at more closely
+jpeg("c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n3\\n_TTdepth.jpg", width=9000,height=2200)	
+ab<-layout(matrix(seq(1,7), ncol=7, byrow=TRUE),
+			width=c(lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb)),
+			height=c(lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb)))
+			
+			
+#
+par(mai=c(0,0,0,0))
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-.50, 21), ylim=c(0,1.75), xlab=" ",
+		ylab=" ", xaxs="i", yaxs="i")
+points(datT$depth[datT$classID==1&datT$orgID==1],datT$NT[datT$classID==1&datT$orgID==1], 
+		pch=19, cex=12, col="seagreen4")		
+points(datT$depth[datT$classID==1&datT$orgID==2],datT$NT[datT$classID==1&datT$orgID==2], 
+		pch=19, cex=12, col="saddlebrown")	
+text(10, 1.6, "Herb barren", cex=10)	
+axis(1, seq(0, 25, by=5), cex.axis=8, padj=1)
+axis(2, seq(0,1.6, by=.2),cex.axis=8,las=2)
+mtext("Maximum Yearly Temperature (C)", side=1, cex=7, line=-8,outer =TRUE)
+mtext("Thawing n-factor", side=2, cex=7, line=15)
+legend(15, .4,c("orgnaic","mineral"),col=c("seagreen4","saddlebrown"), pch=19,
+bty="n", cex=10 )	
+box(which="plot")
+#
+par(mai=c(0,0,0,0))
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-.50, 21), ylim=c(0,1.75), xlab=" ",
+		ylab=" ", xaxs="i", yaxs="i")
+		
+points(datT$depth[datT$classID==2&datT$orgID==1],datT$NT[datT$classID==2&datT$orgID==1], 
+		pch=19, cex=12, col="seagreen4")		
+points(datT$depth[datT$classID==2&datT$orgID==2],datT$NT[datT$classID==2&datT$orgID==2], 
+		pch=19, cex=12, col="saddlebrown")	
+text( 10, 1.6, "Grass tund", cex=10)	
+axis(1, seq(0, 25, by=5), cex.axis=8, padj=1)
+
+		
+box(which="plot")
+#
+par(mai=c(0,0,0,0))
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-.50, 21), ylim=c(0,1.75), xlab=" ",
+		ylab=" ", xaxs="i", yaxs="i")
+		
+		
+points(datT$depth[datT$classID==3&datT$orgID==1],datT$NT[datT$classID==3&datT$orgID==1], 
+		pch=19, cex=12, col="seagreen4")		
+points(datT$depth[datT$classID==3&datT$orgID==2],datT$NT[datT$classID==3&datT$orgID==2], 
+		pch=19, cex=12, col="saddlebrown")	
+text( 10, 1.6, "Tussock", cex=10)	
+axis(1, seq(0, 25, by=5), cex.axis=8, padj=1)		
+box(which="plot")
+#
+par(mai=c(0,0,0,0))
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-.50, 21), ylim=c(0,1.75), xlab=" ",
+		ylab=" ", xaxs="i", yaxs="i")
+		
+points(datT$depth[datT$classID==4&datT$orgID==1],datT$NT[datT$classID==4&datT$orgID==1], 
+		pch=19, cex=12, col="seagreen4")		
+points(datT$depth[datT$classID==4&datT$orgID==2],datT$NT[datT$classID==4&datT$orgID==2], 
+		pch=19, cex=12, col="saddlebrown")	
+text( 10, 1.6, "Shrub tund", cex=10)	
+axis(1, seq(0, 25, by=5), cex.axis=8, padj=1)			
+box(which="plot")
+#
+par(mai=c(0,0,0,0))
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-.50, 21), ylim=c(0,1.75), xlab=" ",
+		ylab=" ", xaxs="i", yaxs="i")
+points(datT$depth[datT$classID==5&datT$orgID==1],datT$NT[datT$classID==5&datT$orgID==1], 
+		pch=19, cex=12, col="seagreen4")		
+text( 10, 1.6, "wetland tund", cex=10)	
+axis(1, seq(0, 25, by=5), cex.axis=8, padj=1)
+box(which="plot")
+#
+par(mai=c(0,0,0,0))
+
+		
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-.50, 21), ylim=c(0,1.75), xlab=" ",
+		ylab=" ", xaxs="i", yaxs="i")
+points(datT$depth[datT$classID==6&datT$orgID==1],datT$NT[datT$classID==6&datT$orgID==1], 
+		pch=19, cex=12, col="seagreen4")		
+text( 10, 1.6, "evergreen boreal", cex=10)	
+axis(1, seq(0, 25, by=5), cex.axis=8, padj=1)	
+box(which="plot")
+#
+par(mai=c(0,0,0,0))
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-.50, 21), ylim=c(0,1.75), xlab=" ",
+		ylab=" ", xaxs="i", yaxs="i")
+points(datT$depth[datT$classID==7&datT$orgID==1],datT$NT[datT$classID==7&datT$orgID==1], 
+		pch=19, cex=12, col="seagreen4")		
+points(datT$depth[datT$classID==7&datT$orgID==2],datT$NT[datT$classID==7&datT$orgID==2], 
+		pch=19, cex=12, col="saddlebrown")	
+text(10, 1.6, "mixed boreal", cex=10)	
+axis(1, seq(0, 25, by=5), cex.axis=8, padj=1)		
+		
+box(which="plot")
+
+dev.off()
