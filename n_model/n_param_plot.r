@@ -126,8 +126,8 @@ plot(bareFJ5$At,bareFJ5$st, pch=19, xlim=c(-13,-6), ylim=c(-13,-6),
 ######################################
 #read in data
 library(plyr)
-setwd("c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n4")
-
+#setwd("c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n4")
+setwd("c:\\Users\\hkropp\\Downloads\\n_u4")
 datF<-read.csv("Freezing_n_forMod.csv")
 datT<-read.csv("Thawing_n_forMod.csv")
 datEA<-read.csv("AVET_forMod.csv")
@@ -446,9 +446,7 @@ dev.off()
 #####################################################################################
 #####################################################################################
 
-
-#make a plot to look at more closely
-jpeg("c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n3\\n_FTdepth.jpg", width=9000,height=2200)	
+jpeg("c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n4\\n_Fdepth.jpg", width=9000,height=2200)	
 ab<-layout(matrix(seq(1,7), ncol=7, byrow=TRUE),
 			width=c(lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb)),
 			height=c(lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb)))
@@ -456,97 +454,117 @@ ab<-layout(matrix(seq(1,7), ncol=7, byrow=TRUE),
 			
 #
 par(mai=c(0,0,0,0))
-plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-.50, 21), ylim=c(0,1.75), xlab=" ",
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-1,21), ylim=c(0,1.75), xlab=" ",
 		ylab=" ", xaxs="i", yaxs="i")
-points(datF$depth[datF$classID==1&datF$orgID==1],datF$NT[datF$classID==1&datF$orgID==1], 
-		pch=19, cex=12, col="seagreen4")		
-points(datF$depth[datF$classID==1&datF$orgID==2],datF$NT[datF$classID==1&datF$orgID==2], 
-		pch=19, cex=12, col="saddlebrown")	
-text(TminL + 10, 1.6, "Herb barren", cex=10)	
-axis(1, seq(0, 20, by=5), cex.axis=8, padj=1)	
-axis(2, seq(0,1.6, by=.2),cex.axis=8,las=2)
-mtext("Depth (cm)", side=1, cex=7, line=-8,outer =TRUE)
+points(datF$depth[datF$classID==1],datF$NT[datF$classID==1], 
+		pch=19, cex=12, col="deepskyblue4")		
+abline(h=datCS$M[datCS$param=="betaF1"][1],
+		 col="black", lwd=8)
+
+		
+text(10, 1.6, "Herb barren", cex=10)	
+axis(1, seq(5,20, by=5), cex.axis=8, padj=1)
+axis(2, seq(.2,1.6, by=.2),cex.axis=8,las=2)
+mtext("Depth in the soil (cm)", side=1, cex=7, line=-8,outer =TRUE)
 mtext("Freezing n-factor", side=2, cex=7, line=15)
-legend(TminH-20, .4,c("orgnaic","mineral"),col=c("seagreen4","saddlebrown"), pch=19,
-bty="n", cex=10 )	
+	
 box(which="plot")
 #
 par(mai=c(0,0,0,0))
-plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-.50, 21), ylim=c(0,1.75), xlab=" ",
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-1,21), ylim=c(0,1.75), xlab=" ",
 		ylab=" ", xaxs="i", yaxs="i")
 		
-points(datF$depth[datF$classID==2&datF$orgID==1],datF$NT[datF$classID==2&datF$orgID==1], 
-		pch=19, cex=12, col="seagreen4")		
-points(datF$depth[datF$classID==2&datF$orgID==2],datF$NT[datF$classID==2&datF$orgID==2], 
-		pch=19, cex=12, col="saddlebrown")	
-text(TminL + 10, 1.6, "Grass tund", cex=10)	
-axis(1, seq(0, 20, by=5), cex.axis=8, padj=1)	
+points(datF$depth[datF$classID==2],datF$NT[datF$classID==2], 
+		pch=19, cex=12, col="deepskyblue4")		
+
+abline(h=datCS$M[datCS$param=="betaF1"][2],
+		 col="black", lwd=8)
+text(10, 1.6, "Grass tundra", cex=10)	
+axis(1, seq(5,20, by=5), cex.axis=8, padj=1)
 
 		
 box(which="plot")
 #
 par(mai=c(0,0,0,0))
-plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-.50, 21), ylim=c(0,1.75), xlab=" ",
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-1,21), ylim=c(0,1.75), xlab=" ",
 		ylab=" ", xaxs="i", yaxs="i")
 		
 		
-points(datF$depth[datF$classID==3&datF$orgID==1],datF$NT[datF$classID==3&datF$orgID==1], 
-		pch=19, cex=12, col="seagreen4")		
-points(datF$depth[datF$classID==3&datF$orgID==2],datF$NT[datF$classID==3&datF$orgID==2], 
-		pch=19, cex=12, col="saddlebrown")	
-text(TminL + 10, 1.6, "Tussock", cex=10)	
-axis(1, seq(0, 20, by=5), cex.axis=8, padj=1)		
+points(datF$depth[datF$classID==3],datF$NT[datF$classID==3], 
+		pch=19, cex=12, col="deepskyblue4")	
+abline(h=datCS$M[datCS$param=="betaF1"][3],
+		 col="black", lwd=8)
+	
+	
+text( 10, 1.6, "Tussock tundra", cex=10)	
+axis(1, seq(5,20, by=5), cex.axis=8, padj=1)	
 box(which="plot")
 #
 par(mai=c(0,0,0,0))
-plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-.50, 21), ylim=c(0,1.75), xlab=" ",
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-1,21), ylim=c(0,1.75), xlab=" ",
 		ylab=" ", xaxs="i", yaxs="i")
 		
-points(datF$depth[datF$classID==4&datF$orgID==1],datF$NT[datF$classID==4&datF$orgID==1], 
-		pch=19, cex=12, col="seagreen4")		
-points(datF$depth[datF$classID==4&datF$orgID==2],datF$NT[datF$classID==4&datF$orgID==2], 
-		pch=19, cex=12, col="saddlebrown")	
-text(TminL + 10, 1.6, "Shrub tund", cex=10)	
-axis(1, seq(0, 20, by=5), cex.axis=8, padj=1)				
+points(datF$depth[datF$classID==4],datF$NT[datF$classID==4], 
+		pch=19, cex=12, col="deepskyblue4")		
+
+abline(datCS$M[datCS$param=="betaF1"][4],datCS$M[datCS$param=="betaF2"][4],
+		 col="black", lwd=8)		
+
+text( 10, 1.6, "Shrub tunda", cex=10)	
+axis(1, seq(5,20, by=5), cex.axis=8, padj=1)			
 box(which="plot")
 #
 par(mai=c(0,0,0,0))
-plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-.50, 21), ylim=c(0,1.75), xlab=" ",
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-1,21), ylim=c(0,1.75), xlab=" ",
 		ylab=" ", xaxs="i", yaxs="i")
-points(datF$depth[datF$classID==5&datF$orgID==1],datF$NT[datF$classID==5&datF$orgID==1], 
-		pch=19, cex=12, col="seagreen4")		
-text(TminL + 10, 1.6, "wetland tund", cex=10)	
-axis(1, seq(0, 20, by=5), cex.axis=8, padj=1)	
+points(datF$depth[datF$classID==5],datF$NT[datF$classID==5], 
+		pch=19, cex=12, col="deepskyblue4")	
+abline(h=datCS$M[datCS$param=="betaF1"][5],
+		 col="black", lwd=8)
+
+		
+text(10, 1.6, "wetland tund", cex=10)	
+axis(1, seq(5,20, by=5), cex.axis=8, padj=1)
 box(which="plot")
 #
 par(mai=c(0,0,0,0))
 
 		
-plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-.50, 21), ylim=c(0,1.75), xlab=" ",
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-1,21), ylim=c(0,1.75), xlab=" ",
 		ylab=" ", xaxs="i", yaxs="i")
-points(datF$depth[datF$classID==6&datF$orgID==1],datF$NT[datF$classID==6&datF$orgID==1], 
-		pch=19, cex=12, col="seagreen4")		
-text(TminL + 10, 1.6, "evergreen boreal", cex=10)	
-axis(1, seq(0, 20, by=5), cex.axis=8, padj=1)	
+points(datF$depth[datF$classID==6],datF$NT[datF$classID==6], 
+		pch=19, cex=12, col="deepskyblue4")
+abline(h=datCS$M[datCS$param=="betaF1"][6],
+		 col="black", lwd=8)
+
+		
+text(10, 1.6, "evergreen boreal", cex=10)	
+axis(1, seq(5,20, by=5), cex.axis=8, padj=1)
 box(which="plot")
 #
 par(mai=c(0,0,0,0))
-plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-.50, 21), ylim=c(0,1.75), xlab=" ",
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-1,21), ylim=c(0,1.75), xlab=" ",
 		ylab=" ", xaxs="i", yaxs="i")
-points(datF$depth[datF$classID==7&datF$orgID==1],datF$NT[datF$classID==7&datF$orgID==1], 
-		pch=19, cex=12, col="seagreen4")		
-points(datF$depth[datF$classID==7&datF$orgID==2],datF$NT[datF$classID==7&datF$orgID==2], 
-		pch=19, cex=12, col="saddlebrown")	
-text(TminL + 10, 1.6, "mixed boreal", cex=10)	
-axis(1, seq(0, 20, by=5), cex.axis=8, padj=1)				
+points(datF$depth[datF$classID==7],datF$NT[datF$classID==7], 
+		pch=19, cex=12, col="deepskyblue4")	
+
+abline(h=datCS$M[datCS$param=="betaF1"][7],
+		 col="black", lwd=8)
+
+
+text(10, 1.6, "mixed boreal", cex=10)	
+axis(1, seq(5,20, by=5), cex.axis=8, padj=1)			
 		
 box(which="plot")
 
 dev.off()
 
 
-#make a plot to look at more closely
-jpeg("c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n3\\n_TTdepth.jpg", width=9000,height=2200)	
+
+#####################################################################################
+#####################################################################################
+
+jpeg("c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n4\\n_Tdepth.jpg", width=9000,height=2200)	
 ab<-layout(matrix(seq(1,7), ncol=7, byrow=TRUE),
 			width=c(lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb)),
 			height=c(lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb)))
@@ -554,89 +572,106 @@ ab<-layout(matrix(seq(1,7), ncol=7, byrow=TRUE),
 			
 #
 par(mai=c(0,0,0,0))
-plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-.50, 21), ylim=c(0,1.75), xlab=" ",
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-1,21), ylim=c(0,1.75), xlab=" ",
 		ylab=" ", xaxs="i", yaxs="i")
-points(datT$depth[datT$classID==1&datT$orgID==1],datT$NT[datT$classID==1&datT$orgID==1], 
+points(datT$depth[datT$classID==1],datT$NT[datT$classID==1], 
 		pch=19, cex=12, col="seagreen4")		
-points(datT$depth[datT$classID==1&datT$orgID==2],datT$NT[datT$classID==1&datT$orgID==2], 
-		pch=19, cex=12, col="saddlebrown")	
+abline(datCS$M[datCS$param=="betaT1"][1],datCS$M[datCS$param=="betaT2"][1],
+		 col="black", lwd=8)
+
+		
 text(10, 1.6, "Herb barren", cex=10)	
-axis(1, seq(0, 25, by=5), cex.axis=8, padj=1)
-axis(2, seq(0,1.6, by=.2),cex.axis=8,las=2)
-mtext("Maximum Yearly Temperature (C)", side=1, cex=7, line=-8,outer =TRUE)
-mtext("Thawing n-factor", side=2, cex=7, line=15)
-legend(15, .4,c("orgnaic","mineral"),col=c("seagreen4","saddlebrown"), pch=19,
-bty="n", cex=10 )	
+axis(1, seq(5,20, by=5), cex.axis=8, padj=1)
+axis(2, seq(.2,1.6, by=.2),cex.axis=8,las=2)
+mtext("Depth in the soil (cm)", side=1, cex=7, line=-8,outer =TRUE)
+mtext("Freezing n-factor", side=2, cex=7, line=15)
+	
 box(which="plot")
 #
 par(mai=c(0,0,0,0))
-plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-.50, 21), ylim=c(0,1.75), xlab=" ",
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-1,21), ylim=c(0,1.75), xlab=" ",
 		ylab=" ", xaxs="i", yaxs="i")
 		
-points(datT$depth[datT$classID==2&datT$orgID==1],datT$NT[datT$classID==2&datT$orgID==1], 
+points(datT$depth[datT$classID==2],datT$NT[datT$classID==2], 
 		pch=19, cex=12, col="seagreen4")		
-points(datT$depth[datT$classID==2&datT$orgID==2],datT$NT[datT$classID==2&datT$orgID==2], 
-		pch=19, cex=12, col="saddlebrown")	
-text( 10, 1.6, "Grass tund", cex=10)	
-axis(1, seq(0, 25, by=5), cex.axis=8, padj=1)
+
+abline(datCS$M[datCS$param=="betaT1"][2],datCS$M[datCS$param=="betaT2"][2],
+		 col="black", lwd=8)
+text(10, 1.6, "Grass tundra", cex=10)	
+axis(1, seq(5,20, by=5), cex.axis=8, padj=1)
 
 		
 box(which="plot")
 #
 par(mai=c(0,0,0,0))
-plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-.50, 21), ylim=c(0,1.75), xlab=" ",
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-1,21), ylim=c(0,1.75), xlab=" ",
 		ylab=" ", xaxs="i", yaxs="i")
 		
 		
-points(datT$depth[datT$classID==3&datT$orgID==1],datT$NT[datT$classID==3&datT$orgID==1], 
-		pch=19, cex=12, col="seagreen4")		
-points(datT$depth[datT$classID==3&datT$orgID==2],datT$NT[datT$classID==3&datT$orgID==2], 
-		pch=19, cex=12, col="saddlebrown")	
-text( 10, 1.6, "Tussock", cex=10)	
-axis(1, seq(0, 25, by=5), cex.axis=8, padj=1)		
+points(datT$depth[datT$classID==3],datT$NT[datT$classID==3], 
+		pch=19, cex=12, col="seagreen4")	
+abline(datCS$M[datCS$param=="betaT1"][3],datCS$M[datCS$param=="betaT2"][3],
+		 col="black", lwd=8)
+	
+	
+text( 10, 1.6, "Tussock tundra", cex=10)	
+axis(1, seq(5,20, by=5), cex.axis=8, padj=1)	
 box(which="plot")
 #
 par(mai=c(0,0,0,0))
-plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-.50, 21), ylim=c(0,1.75), xlab=" ",
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-1,21), ylim=c(0,1.75), xlab=" ",
 		ylab=" ", xaxs="i", yaxs="i")
 		
-points(datT$depth[datT$classID==4&datT$orgID==1],datT$NT[datT$classID==4&datT$orgID==1], 
+points(datT$depth[datT$classID==4],datT$NT[datT$classID==4], 
 		pch=19, cex=12, col="seagreen4")		
-points(datT$depth[datT$classID==4&datT$orgID==2],datT$NT[datT$classID==4&datT$orgID==2], 
-		pch=19, cex=12, col="saddlebrown")	
-text( 10, 1.6, "Shrub tund", cex=10)	
-axis(1, seq(0, 25, by=5), cex.axis=8, padj=1)			
+
+abline(datCS$M[datCS$param=="betaT1"][4],datCS$M[datCS$param=="betaT2"][4],
+		 col="black", lwd=8)		
+
+text( 10, 1.6, "Shrub tunda", cex=10)	
+axis(1, seq(5,20, by=5), cex.axis=8, padj=1)			
 box(which="plot")
 #
 par(mai=c(0,0,0,0))
-plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-.50, 21), ylim=c(0,1.75), xlab=" ",
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-1,21), ylim=c(0,1.75), xlab=" ",
 		ylab=" ", xaxs="i", yaxs="i")
-points(datT$depth[datT$classID==5&datT$orgID==1],datT$NT[datT$classID==5&datT$orgID==1], 
-		pch=19, cex=12, col="seagreen4")		
-text( 10, 1.6, "wetland tund", cex=10)	
-axis(1, seq(0, 25, by=5), cex.axis=8, padj=1)
+points(datT$depth[datT$classID==5],datT$NT[datT$classID==5], 
+		pch=19, cex=12, col="seagreen4")	
+abline(datCS$M[datCS$param=="betaT1"][5],datCS$M[datCS$param=="betaT2"][5],
+		 col="black", lwd=8)
+
+		
+text(10, 1.6, "wetland tund", cex=10)	
+axis(1, seq(5,20, by=5), cex.axis=8, padj=1)
 box(which="plot")
 #
 par(mai=c(0,0,0,0))
 
 		
-plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-.50, 21), ylim=c(0,1.75), xlab=" ",
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-1,21), ylim=c(0,1.75), xlab=" ",
 		ylab=" ", xaxs="i", yaxs="i")
-points(datT$depth[datT$classID==6&datT$orgID==1],datT$NT[datT$classID==6&datT$orgID==1], 
-		pch=19, cex=12, col="seagreen4")		
-text( 10, 1.6, "evergreen boreal", cex=10)	
-axis(1, seq(0, 25, by=5), cex.axis=8, padj=1)	
+points(datT$depth[datT$classID==6],datT$NT[datT$classID==6], 
+		pch=19, cex=12, col="seagreen4")
+abline(datCS$M[datCS$param=="betaT1"][6],datCS$M[datCS$param=="betaT2"][6],
+		 col="black", lwd=8)
+
+		
+text(10, 1.6, "evergreen boreal", cex=10)	
+axis(1, seq(5,20, by=5), cex.axis=8, padj=1)
 box(which="plot")
 #
 par(mai=c(0,0,0,0))
-plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-.50, 21), ylim=c(0,1.75), xlab=" ",
+plot(c(0,1),c(0,1), type="n", axes=FALSE, xlim=c(-1,21), ylim=c(0,1.75), xlab=" ",
 		ylab=" ", xaxs="i", yaxs="i")
-points(datT$depth[datT$classID==7&datT$orgID==1],datT$NT[datT$classID==7&datT$orgID==1], 
-		pch=19, cex=12, col="seagreen4")		
-points(datT$depth[datT$classID==7&datT$orgID==2],datT$NT[datT$classID==7&datT$orgID==2], 
-		pch=19, cex=12, col="saddlebrown")	
+points(datT$depth[datT$classID==7],datT$NT[datT$classID==7], 
+		pch=19, cex=12, col="seagreen4")	
+
+abline(datCS$M[datCS$param=="betaT1"][7],datCS$M[datCS$param=="betaT2"][7],
+		 col="black", lwd=8)
+
+
 text(10, 1.6, "mixed boreal", cex=10)	
-axis(1, seq(0, 25, by=5), cex.axis=8, padj=1)		
+axis(1, seq(5,20, by=5), cex.axis=8, padj=1)			
 		
 box(which="plot")
 
