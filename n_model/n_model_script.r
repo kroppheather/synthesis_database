@@ -345,6 +345,6 @@ write.table(ModSumm$quantiles, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_
 mcmcplot(codaobj.init, dir="c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n4\\historyPlots")	
 
 #write files for output
-write.table(Tsub8, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n4\\Thawing_n_forMod.csv", sep=",", row.names=FALSE)	
-write.table(Fsub8, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n4\\Freezing_n_forMod.csv", sep=",", row.names=FALSE)
-write.table(TOL, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n4\\vegeorgID_forMod.csv", sep=",", row.names=FALSE)	
+write.table(Tsub7, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n4\\Thawing_n_forMod.csv", sep=",", row.names=FALSE)	
+write.table(Fsub7, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n4\\Freezing_n_forMod.csv", sep=",", row.names=FALSE)
+write.table(ExtremeAVE, "c:\\Users\\hkropp\\Google Drive\\raw_data\\nmod_out\\u7_n4\\AVET_forMod.csv", sep=",", row.names=FALSE)	
