@@ -586,7 +586,7 @@ datalist<-list(NobsA=dim(AirM2)[1], TempA=AirM2$A, site.depthidA=AirM2$SDS,T.yrA
 				 NrepS=length(SoilrepsubV), SrepSub=SoilrepsubV,NrepA=length(AirrepsubV),
 				 ArepSub=AirrepsubV)
 				
-samplelist<-c("T.aveA1","T.aveA2","TminA","TmaxA","T.aveS1","T.aveS2","TmaxS","TminS","sig.muA","sig.muS","startA","startS","Fn","Tn", "FDDA","TDDA","FDDS","TDDS",
+samplelist<-c("T.aveA1","T.aveA2","TminA","TmaxA","T.aveS1","T.aveS2","TmaxS","TminS","sig.muA","sig.muS","startA","startS","Fn","Tn", 
 				"TempA", "TempS","TempA.rep", "TempS.rep")
 
 
