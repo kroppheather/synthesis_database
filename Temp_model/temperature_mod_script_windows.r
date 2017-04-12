@@ -577,8 +577,8 @@ write.table(AirM2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod1
 write.table(SoilM2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod1\\output_u7\\Tsoil_model.csv",sep=",",row.names=FALSE)
 
 
-datalist<-list(NobsA=dim(AirM2)[1], TempA=AirM2$A, site.depthidA=AirM2$SDS,T.yrA=AirM2$decdate-1991,
-				NobsS=dim(SoilM2)[1], TempS=SoilM2$T,site.depthidS=SoilM2$SDS, T.yrS=SoilM2$decdate-1991,
+datalist<-list(NobsA=dim(AirM2)[1], TempA=AirM2$A, site.depthidA=AirM2$SDS,T.yrA=AirM2$decdate-1991,yearA=floor(AirM2$decdate-1991),
+				NobsS=dim(SoilM2)[1], TempS=SoilM2$T,site.depthidS=SoilM2$SDS, T.yrS=SoilM2$decdate-1991,yearS=floor(SoilM2$decdate-1991),
 				NsitedepthA=dim(site.heightA)[1],NsitedepthS=dim(site.depthidS)[1], NSDWA=dim(AirIDS2)[1],
 				NSDWS=dim(SoilIDS2)[1], SDWS=SoilM2$SDWS, SDWA=AirM2$SDWA,Ncombo=dim(IDforCombo)[1],
 				 AirIND=IDforCombo$SDWA,SoilIND=IDforCombo$SDWS,
@@ -586,7 +586,7 @@ datalist<-list(NobsA=dim(AirM2)[1], TempA=AirM2$A, site.depthidA=AirM2$SDS,T.yrA
 				 NrepS=length(SoilrepsubV), SrepSub=SoilrepsubV,NrepA=length(AirrepsubV),
 				 ArepSub=AirrepsubV)
 				
-samplelist<-c("T.aveA","AmpA","T.aveS","AmpS","sig.muA","sig.muS","startA","startS","Fn","Tn", "FDDA","TDDA","FDDS","TDDS",
+samplelist<-c("T.aveA1","T.aveA2","TminA","TmaxA","T.aveS1","T.aveS2","TmaxS","TminS","sig.muA","sig.muS","startA","startS","Fn","Tn", "FDDA","TDDA","FDDS","TDDS",
 				"TempA", "TempS","TempA.rep", "TempS.rep")
 
 

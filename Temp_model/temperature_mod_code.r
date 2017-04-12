@@ -4,7 +4,7 @@ model{
 		TempA[i]~dnorm(muA[i], tau.muA)
 		T.offA[i]<-T.yrA[i]-startA[site.depthidA[i]]
 		Tstep1[i]<-ifelse(T.offA[i]-yearA[i]<0.25,1,0)
-		Tstep2[i]<-ifelse(T.offA[i]-yearA[i]>=0.25&T.offA[i]-yearA[i]<0.75,1,0)
+		Tstep2[i]<-ifelse((T.offA[i]-yearA[i])>=0.25,ifelse((T.offA[i]-yearA[i])<0.75,1,0),0)
 		Tstep3[i]<-ifelse(T.offA[i]-yearA[i]>=0.75,1,0)
 		muA[i]<-(Tstep1[i]*(T.aveA1[SDWA[i]]-((T.aveA1[SDWA[i]]-TminA[SDWA[i]])*sin(2*3.14159265*ToffA[i]))))+
 				(Tstep2[i]*((TminA[SDWA[i]]+((TmaxA[SDWA[i]]-TminA[SDWA[i]])/2))-(((TmaxA[SDWA[i]]-TminA[SDWA[i]])/2)*sin(2*3.14159265*ToffA[i]))))+
@@ -22,7 +22,7 @@ model{
 		TempS[i]~dnorm(muS[i], tau.muS)
 		T.offS[i]<-T.yrS[i]-startS[site.depthidS[i]]
 		TstepS1[i]<-ifelse(T.offS[i]-yearS[i]<0.25,1,0)
-		TstepS2[i]<-ifelse(T.offS[i]-yearS[i]>=0.25&T.offS[i]-yearS[i]<0.75,1,0)
+		TstepS2[i]<-ifelse(T.offS[i]-yearS[i]>=0.25,ifelse(T.offS[i]-yearS[i]<0.75,1,0),0)
 		TstepS3[i]<-ifelse(T.offS[i]-yearS[i]>=0.75,1,0)
 		muS[i]<-(TstepS1[i]*(T.aveS1[SDWS[i]]-((T.aveS1[SDWS[i]]-TminS[SDWS[i]])*sin(2*3.14159265*ToffS[i]))))+
 				(TstepS2[i]*((TminS[SDWS[i]]+((TmaxS[SDWS[i]]-TminS[SDWS[i]])/2))-(((TmaxS[SDWS[i]]-TminS[SDWS[i]])/2)*sin(2*3.14159265*ToffS[i]))))+
