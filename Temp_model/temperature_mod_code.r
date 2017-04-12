@@ -2,7 +2,13 @@ model{
 	#likelihood for air temperature observations
 	for(i in 1:NobsA){
 		TempA[i]~dnorm(muA[i], tau.muA)
-		muA[i]<-T.aveA[SDWA[i]]+ AmpA[SDWA[i]]*sin(-2*3.14159265*(T.yrA[i]-startA[site.depthidA[i]]))
+		T.offA[i]<-T.yrA[i]-startA[site.depthidA[i]]
+		Tstep1[i]<-ifelse(T.offA[i]-yearA[i]<0.25,1,0)
+		Tstep2[i]<-ifelse(T.offA[i]-yearA[i]>=0.25&T.offA[i]-yearA[i]<0.75,1,0)
+		Tstep3[i]<-ifelse(T.offA[i]-yearA[i]>=0.75,1,0)
+		muA[i]<-(Tstep1[i]*(T.aveA1[SDWA[i]]-((T.aveA1[SDWA[i]]-TminA[SDWA[i]])*sin(2*3.14159265*ToffA[i]))))+
+				(Tstep2[i]*((TminA[SDWA[i]]+((TmaxA[SDWA[i]]-TminA[SDWA[i]])/2))-(((TmaxA[SDWA[i]]-TminA[SDWA[i]])/2)*sin(2*3.14159265*ToffA[i]))))+
+				(Tstep3[i]*(T.aveA2[SDWA[i]]-((TmaxA[SDWA[i]]-T.aveA2[SDWA[i]])*sin(2*3.14159265*ToffA[i]))))
 		#cacluation for freezing degree day
 		#set to zero if not freezing
 		FreezeA[i]<-(1-step(TempA[i]))*TempA[i]
@@ -14,7 +20,13 @@ model{
 	#likelihood for soil temperature observations
 	for(i in 1:NobsS){
 		TempS[i]~dnorm(muS[i], tau.muS)
-		muS[i]<-T.aveS[SDWS[i]]+ AmpS[SDWS[i]]*sin(-2*3.14159265*(T.yrS[i]-startS[site.depthidS[i]]))
+		T.offS[i]<-T.yrS[i]-startS[site.depthidS[i]]
+		TstepS1[i]<-ifelse(T.offS[i]-yearS[i]<0.25,1,0)
+		TstepS2[i]<-ifelse(T.offS[i]-yearS[i]>=0.25&T.offS[i]-yearS[i]<0.75,1,0)
+		TstepS3[i]<-ifelse(T.offS[i]-yearS[i]>=0.75,1,0)
+		muS[i]<-(TstepS1[i]*(T.aveS1[SDWS[i]]-((T.aveS1[SDWS[i]]-TminS[SDWS[i]])*sin(2*3.14159265*ToffS[i]))))+
+				(TstepS2[i]*((TminS[SDWS[i]]+((TmaxS[SDWS[i]]-TminS[SDWS[i]])/2))-(((TmaxS[SDWS[i]]-TminS[SDWS[i]])/2)*sin(2*3.14159265*ToffS[i]))))+
+				(TstepS3[i]*(T.aveS2[SDWS[i]]-((TmaxS[SDWS[i]]-T.aveS2[SDWA[i]])*sin(2*3.14159265*ToffS[i]))))
 		#cacluation for freezing degree day
 		#set to zero if not freezing
 		FreezeS[i]<-(1-step(TempS[i]))*TempS[i]
@@ -35,8 +47,10 @@ model{
 	
 	#prior for likelihood
 	for(i in 1:NSDWA){
-		T.aveA[i]~dnorm(0,.0001)
-		AmpA[i]~dunif(0,100)	
+		T.aveA1[i]~dnorm(0,.0001)
+		T.aveA2[i]~dnorm(0,.0001)
+		TminA[i]~dunif(-60,0)
+		TmaxA[i]~dunif(0,35)
 	}
 	
 	for(i in 1:NsitedepthA){
@@ -45,8 +59,10 @@ model{
 	}
 	#prior for likelihood
 	for(i in 1:NSDWS){
-		T.aveS[i]~dnorm(0,.0001)
-		AmpS[i]~dunif(0,100)	
+		T.aveS1[i]~dnorm(0,.0001)
+		T.aveS2[i]~dnorm(0,.0001)
+		TmaxS[i]~dunif(0,35)	
+		TminS[i]~dunif(-60,0)
 	
 	}
 	
