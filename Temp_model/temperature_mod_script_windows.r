@@ -547,7 +547,46 @@ for(i in 1:dim(SoilIDS2)[1]){
 	SSY[i]<-SoilM2$indexI[SoilM2$SDWS==SoilIDS2$SDWS[i]][1]
 	SEY[i]<-SoilM2$indexI[SoilM2$SDWS==SoilIDS2$SDWS[i]][SYlength[i]]
 }
+#check to see if indes are in order
+SoilIDCHECK<-data.frame(SoilIDS2,SSY,SEY)
+SCHECK1<-SoilIDCHECK$SSY[2:dim(SoilIDCHECK)[1]]-SoilIDCHECK$SEY[1:(dim(SoilIDCHECK)[1]-1)]
+if(length(which(SCHECK1>1))!=0){
+	print("ERROR Improper join arrangement")
+}else{print("Proper join arrangement for soil and depth")}
 
+AirIDCHECK<-data.frame(AirIDS2,ASY,AEY)
+ACHECK1<-AirIDCHECK$ASY[2:dim(AirIDCHECK)[1]]-AirIDCHECK$AEY[1:(dim(AirIDCHECK)[1]-1)]
+if(length(which(ACHECK1>1))!=0){
+	print("ERROR Improper air join arrangement")
+}else{print("Proper join arrangement for air and depth")}
+
+
+#now get the start and end to autoregressive series
+AIRAR<-join(site.heightA, AirIDCHECK, by=c("siteid", "height"), type="left")
+#get the starting point
+AR_Astart<-aggregate(AIRAR$ASY, by=list(AIRAR$SDA), FUN="min")
+colnames(AR_Astart)<-c("SDA","ATstart")
+#get the ending point
+AR_Aend<-aggregate(AIRAR$AEY, by=list(AIRAR$SDA), FUN="max")
+colnames(AR_Aend)<-c("SDA","ATend")
+
+
+#now do soil
+#now get the start and end to autoregressive series
+SoilAR<-join(site.depthidS, SoilIDCHECK, by=c("siteid", "depth"), type="left")
+#get the starting point
+AR_Sstart<-aggregate(SoilAR$SSY, by=list(SoilAR$SDS), FUN="min")
+colnames(AR_Sstart)<-c("SDS","STstart")
+#get the ending point
+AR_Send<-aggregate(SoilAR$SEY, by=list(SoilAR$SDS), FUN="max")
+colnames(AR_Send)<-c("SDS","STend")
+
+#now make sequence of flags
+startFLAGS<-rep(1, dim(SoilM2)[1])
+startFLAGS[AR_Sstart$STstart]<- -1
+
+startFLAGA<-rep(1, dim(AirM2)[1])
+startFLAGA[AR_Astart$ATstart]<- -1
 
 #Next need to create an index that says when sites should be divided
 #want to divide each soil
@@ -584,10 +623,10 @@ datalist<-list(NobsA=dim(AirM2)[1], TempA=AirM2$A, site.depthidA=AirM2$SDS,T.yrA
 				 AirIND=IDforCombo$SDWA,SoilIND=IDforCombo$SDWS,
 				 ASY=ASY, AEY=AEY,SSY=SSY,SEY=SEY,
 				 NrepS=length(SoilrepsubV), SrepSub=SoilrepsubV,NrepA=length(AirrepsubV),
-				 ArepSub=AirrepsubV)
+				 ArepSub=AirrepsubV, startFLAGS=startFLAGS, startFLAGA=startFLAGA)
 				
-samplelist<-c("T.aveA1","T.aveA2","TminA","TmaxA","T.aveS1","T.aveS2","TmaxS","TminS","sig.muA","sig.muS","startA","startS","Fn","Tn", "FDDA","TDDA","FDDS","TDDS",
-				"TempA", "TempS","TempA.rep", "TempS.rep")
+samplelist<-c("T.aveA1","T.aveA2","TminA","TmaxA","T.aveS1","T.aveS2","TmaxS","TminS","sig.muA","sig.muS","startA","startS","Fn","Tn", 
+				"TempA", "TempS","TempA.rep", "TempS.rep", "soilAR", "airAR")
 
 
 temp.modI<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub/synthesis_database/Temp_model/temperature_mod_code.r",

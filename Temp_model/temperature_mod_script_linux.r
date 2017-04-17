@@ -582,6 +582,12 @@ colnames(AR_Sstart)<-c("SDS","STstart")
 AR_Send<-aggregate(SoilAR$SEY, by=list(SoilAR$SDS), FUN="max")
 colnames(AR_Send)<-c("SDS","STend")
 
+#now make sequence of flags
+startFLAGS<-rep(1, dim(SoilM2)[1])
+startFLAGS[AR_Sstart$STstart]<- -1
+
+startFLAGA<-rep(1, dim(AirM2)[1])
+startFLAGA[AR_Astart$ATstart]<- -1
 #Next need to create an index that says when sites should be divided
 #want to divide each soil
 #want each soil to be divided by each air combo, but only in a year
@@ -617,21 +623,21 @@ datalist<-list(NobsA=dim(AirM2)[1], TempA=AirM2$A, site.depthidA=AirM2$SDS,T.yrA
 				 AirIND=IDforCombo$SDWA,SoilIND=IDforCombo$SDWS,
 				 ASY=ASY, AEY=AEY,SSY=SSY,SEY=SEY,
 				 NrepS=length(SoilrepsubV), SrepSub=SoilrepsubV,NrepA=length(AirrepsubV),
-				 ArepSub=AirrepsubV)
+				 ArepSub=AirrepsubV, startFLAGS=startFLAGS, startFLAGA=startFLAGA)
 				
 samplelist<-c("T.aveA1","T.aveA2","TminA","TmaxA","T.aveS1","T.aveS2","TmaxS","TminS","sig.muA","sig.muS","startA","startS","Fn","Tn", 
-				"TempA", "TempS","TempA.rep", "TempS.rep")
+				"TempA", "TempS","TempA.rep", "TempS.rep", "soilAR", "airAR")
 
 
 temp.modI<-jags.model(file="/home/hkropp/github/synthesis_database/Temp_model/temperature_mod_code.r",
 						data=datalist,
 						n.adapt=5000,
-						n.chains=3)
+						n.chains=3, n.thin=2)
 
 
 print("initialize done")						
 n.iter.i=1000
-n.thin=1
+n.thin=2
 codaobj.init = coda.samples(temp.modI,variable.names=samplelist,
                        n.iter=n.iter.i, thin=n.thin)
 					   

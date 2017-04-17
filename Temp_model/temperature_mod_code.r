@@ -1,8 +1,7 @@
 model{
 	#likelihood for air temperature observations
-	for(j in 1:NSDA){
+
 	for(i in 1:NobsA){
-		TempA[i]<-TempAall[ATstart[j]:ATend[j]]
 		TempA[i]~dnorm(muA[i], tau.muA)
 		T.offA[i]<-T.yrA[i]-startA[site.depthidA[i]]
 		Tstep1[i]<-ifelse(T.offA[i]-yearA[i]<0.25,1,0)
@@ -11,18 +10,22 @@ model{
 		sineA[i]<-(Tstep1[i]*(T.aveA1[SDWA[i]]-((T.aveA1[SDWA[i]]-TminA[SDWA[i]])*sin(2*3.14159265*T.offA[i]))))+
 				(Tstep2[i]*((TminA[SDWA[i]]+((TmaxA[SDWA[i]]-TminA[SDWA[i]])/2))-(((TmaxA[SDWA[i]]-TminA[SDWA[i]])/2)*sin(2*3.14159265*T.offA[i]))))+
 				(Tstep3[i]*(T.aveA2[SDWA[i]]-((TmaxA[SDWA[i]]-T.aveA2[SDWA[i]])*sin(2*3.14159265*T.offA[i]))))
+		
 		#cacluation for freezing degree day
 		#set to zero if not freezing
-		FreezeA[i+ACOUNT[j]]<-(1-step(TempA[i]))*TempA[i]
+		FreezeA[i]<-(1-step(TempA[i]))*TempA[i]
 		#cacluation for thawing degree day
 		#set to zero if not above zero
-		ThawA[i+ACOUNT[j]]<-step(TempA[i])*TempA[i]		
+		ThawA[i]<-step(TempA[i])*TempA[i]		
+	}	
+		muA[1]<-sineA[1]
+	for(i in 2:NobsA){	
+		muA[i]<-(step(startFLAGA[i])*(sineA[i]+airAR[site.depthidA[i]]*(TempA[i-1]-sineA[i-1])))+((1-step(startFLAGA[i]))*sineA[i])
+		
 	}
-}
+
 	#likelihood for soil temperature observations
-	for(j in 1:NSDS){
-		for(i in 1:NobsS[j]){
-		TempS[i]<-TempSall[STstart[j]:STend[j]]
+		for(i in 1:NobsS){
 		TempS[i]~dnorm(muS[i], tau.muS)
 		T.offS[i]<-T.yrS[i]-startS[site.depthidS[i]]
 		TstepS1[i]<-ifelse(T.offS[i]-yearS[i]<0.25,1,0)
@@ -33,12 +36,17 @@ model{
 				(TstepS3[i]*(T.aveS2[SDWS[i]]-((TmaxS[SDWS[i]]-T.aveS2[SDWS[i]])*sin(2*3.14159265*T.offS[i]))))
 		#cacluation for freezing degree day
 		#set to zero if not freezing
-		FreezeS[i+SCOUNT[j]]<-(1-step(TempS[i]))*TempS[i]
+		FreezeS[i]<-(1-step(TempS[i]))*TempS[i]
 		#cacluation for thawing degree day
 		#set to zero if not above zero		
-		ThawS[i+SCOUNT[j]]<-step(TempS[i])*TempS[i]
-		}
+		ThawS[i]<-step(TempS[i])*TempS[i]	
 	}
+	muS[1]<-sineS[1]
+	for(i in 2:NobsS){
+		muS[i]<-(step(startFLAGS[i])*(sineS[i]+soilAR[site.depthidS[i]]*(TempS[i-1]-sineS[i-1])))+((1-step(startFLAGS[i]))*sineS[i])
+
+		}
+
 	#look at a subset of replicated data since there is too much temp data to monitor
 	for(i in 1:NrepS){
 		TempS.rep[i]~dnorm(muS[SrepSub[i]], tau.muS)
@@ -59,7 +67,7 @@ model{
 	}
 	
 	for(i in 1:NsitedepthA){
-
+		airAR[i]~dunif(-1.1,1.1)
 		startA[i]~dunif(0,.3)
 	}
 	#prior for likelihood
@@ -72,6 +80,7 @@ model{
 	}
 	
 	for(i in 1:NsitedepthS){
+		soilAR[i]~dunif(-1.1,1.1)
 		startS[i]~dunif(0,.3)
 	}
 	#now need to calculate the predicted temperature for all air observations
