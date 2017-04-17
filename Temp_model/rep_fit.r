@@ -1,6 +1,6 @@
 library(plyr)
 #setwd
-setwd("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod1\\output_u7")
+setwd("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod2\\output_u7m2")
 #model results
 datm<-read.csv("Temp_mod7_stats.csv")
 dats<-read.csv("Temp_mod7_quant.csv")
@@ -31,32 +31,33 @@ datC<-cbind(datm,dats)
 dexps<-"\\[*[[:digit:]]*\\]"
 datC$parms1<-gsub(dexps,"",rownames(datC))
 
+#subset first to only look at soil parms
+datCS<-datC[datC$parms1=="TempS.rep"|datC$parms1=="TempA.rep",]
 
 #now add id number
 dexps2<-"\\D"
-pnames<-rownames(datC)
-parms2<-gsub(dexps2,"",pnames)
-datC$parms2<-c(as.numeric(parms2))
+#pull out names
+pnames<-rownames(datCS)
+#need to split because there are numbers in param names
+psplit<-strsplit(pnames, "\\[")
+#pull out vector number
+pEnd<-character(0)
+for(i in 1:dim(datCS)[1]){
+	if(length(psplit[[i]])>1){
+		pEnd[i]<-psplit[[i]][2]
+	}else{pEnd[i]<-"NA"}
 
-datC<-data.frame(M=datC[,1],pc2.5=datC[,5],pc97.5=datC[,9],param=as.character(datC[,10]),ID=datC[,11])
+}
 
-datCFN<-datC[datC$param=="Fn",]
-datCTN<-datC[datC$param=="Tn",]
+#get vector number only and make numeric
+parmCN<-ifelse(pEnd=="NA", NA, gsub(dexps2,"", pEnd ))
+
+datCS$parms2<-c(as.numeric(parmCN))
 
 
-datC<-datC[datC$param!="sig.muS",]
-datC<-datC[datC$param!="sig.muA",]
+datC<-data.frame(M=datCS[,1],pc2.5=datCS[,5],pc97.5=datCS[,9],param=as.character(datCS[,10]),ID=datCS[,11])
 
-datC<-datC[datC$param!="sig.muS",]
-datC<-datC[datC$param!="sig.muA",]
 
-datCT<-datC[datC$param!="Fn",]
-
-datCT<-datCT[datCT$param!="Tn",]
-datCT<-datCT[datCT$param!="TempA",]
-datCT<-datCT[datCT$param!="TempS",]
-datCT<-datCT[datCT$param!="TempA.rep",]
-datCT<-datCT[datCT$param!="TempS.rep",]
 
 #now combine back with id info
 #set up ids for each individual type of id 
