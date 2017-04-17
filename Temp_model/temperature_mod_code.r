@@ -1,6 +1,8 @@
 model{
 	#likelihood for air temperature observations
+	for(j in 1:NSDA){
 	for(i in 1:NobsA){
+		TempA[i]<-TempAall[ATstart[j]:ATend[j]]
 		TempA[i]~dnorm(muA[i], tau.muA)
 		T.offA[i]<-T.yrA[i]-startA[site.depthidA[i]]
 		Tstep1[i]<-ifelse(T.offA[i]-yearA[i]<0.25,1,0)
@@ -11,14 +13,16 @@ model{
 				(Tstep3[i]*(T.aveA2[SDWA[i]]-((TmaxA[SDWA[i]]-T.aveA2[SDWA[i]])*sin(2*3.14159265*T.offA[i]))))
 		#cacluation for freezing degree day
 		#set to zero if not freezing
-		FreezeA[i]<-(1-step(TempA[i]))*TempA[i]
+		FreezeA[i+ACOUNT[j]]<-(1-step(TempA[i]))*TempA[i]
 		#cacluation for thawing degree day
 		#set to zero if not above zero
-		ThawA[i]<-step(TempA[i])*TempA[i]		
+		ThawA[i+ACOUNT[j]]<-step(TempA[i])*TempA[i]		
 	}
-	
+}
 	#likelihood for soil temperature observations
-	for(i in 1:NobsS){
+	for(j in 1:NSDS){
+		for(i in 1:NobsS[j]){
+		TempS[i]<-TempSall[STstart[j]:STend[j]]
 		TempS[i]~dnorm(muS[i], tau.muS)
 		T.offS[i]<-T.yrS[i]-startS[site.depthidS[i]]
 		TstepS1[i]<-ifelse(T.offS[i]-yearS[i]<0.25,1,0)
@@ -29,10 +33,11 @@ model{
 				(TstepS3[i]*(T.aveS2[SDWS[i]]-((TmaxS[SDWS[i]]-T.aveS2[SDWS[i]])*sin(2*3.14159265*T.offS[i]))))
 		#cacluation for freezing degree day
 		#set to zero if not freezing
-		FreezeS[i]<-(1-step(TempS[i]))*TempS[i]
+		FreezeS[i+SCOUNT[j]]<-(1-step(TempS[i]))*TempS[i]
 		#cacluation for thawing degree day
 		#set to zero if not above zero		
-		ThawS[i]<-step(TempS[i])*TempS[i]
+		ThawS[i+SCOUNT[j]]<-step(TempS[i])*TempS[i]
+		}
 	}
 	#look at a subset of replicated data since there is too much temp data to monitor
 	for(i in 1:NrepS){
