@@ -59,20 +59,7 @@ datC<-data.frame(M=datCS[,1],pc2.5=datCS[,5],pc97.5=datCS[,9],param=as.character
 
 
 
-#now combine back with id info
-#set up ids for each individual type of id 
-IDSJ<-data.frame(depth=c(datSDWA$height,datSDWS$depth,datSDWA$height,datSDWS$depth,datSDWA$height,datSDWS$depth,datSDWA$height,datSDWS$depth,datSDA$height,datSDS$depth),
-				siteid=c(datSDWA$siteid,datSDWS$siteid,datSDWA$siteid,datSDWS$siteid,datSDWA$siteid,datSDWS$siteid,datSDWA$siteid,datSDWS$siteid,datSDA$siteid,datSDS$siteid),
-				ID=c(datSDWA$SDWA,datSDWS$SDWS,datSDWA$SDWA,datSDWS$SDWS,datSDWA$SDWA,datSDWS$SDWS,datSDWA$SDWA,datSDWS$SDWS,datSDA$SDA,datSDS$SDS),
-				wyear=c(datSDWA$wyear,datSDWS$wyear,datSDWA$wyear,datSDWS$wyear,datSDWA$wyear,datSDWS$wyear,datSDWA$wyear,datSDWS$wyear,rep(NA,dim(datSDA)[1]),rep("NA",dim(datSDS)[1])),
-				param=c(rep("AmpA",dim(datSDWA)[1]),rep("AmpS",dim(datSDWS)[1]),
-				rep("FDDA",dim(datSDWA)[1]),rep("FDDS",dim(datSDWS)[1]),
-				rep("T.aveA",dim(datSDWA)[1]),rep("T.aveS",dim(datSDWS)[1]),
-				rep("TDDA",dim(datSDWA)[1]),rep("TDDS",dim(datSDWS)[1]),
-				rep("startA",dim(datSDA)[1]),rep("startS",dim(datSDS)[1])))
 
-
-datST<-join(datCT,IDSJ,by=c("param","ID"),type="left")
 
 
 #now pull out data for goodness of fit
@@ -83,25 +70,24 @@ datRA<-datC[datC$param=="TempA.rep",]
 STobs<-datS$T[datsid$x]
 ATobs<-datA$A[dataid$x]
 
-#now make a plot
 
 
 #somehow decdate is influencing site 189 in the rep data
 par(mfrow=c(1,2))
-plot(STobs[datRS$M<100],datRS$M[datRS$M<100], pch=19, xlim=c(-35,30), ylim=c(-35,30))
-soilfit<-lm(datRS$M[datRS$M<100]~STobs[datRS$M<100])
+plot(STobs,datRS$M, pch=19, xlim=c(-35,30), ylim=c(-35,30))
+soilfit<-lm(datRS$M~STobs)
 summary(soilfit)
 abline(soilfit, col="tomato4", lwd=3)
 abline(0,1, col="red", lwd=3, lty=2)
-text(-15,25,"y = -0.20 + 0.87* Tobs", cex=1.5)
-text(-15,20,"R2= 0.863", cex=1.5)
+text(-15,25,"y = -0.11 + 0.89* Tobs", cex=1.5)
+text(-15,20,"R2= 0.89", cex=1.5)
 plot(ATobs,datRA$M, pch=19, xlim=c(-45,30), ylim=c(-45,30))
 airfit<-lm(datRA$M~ATobs)
 summary(airfit)
 abline(airfit, col="tomato4", lwd=3)
 abline(0,1, col="red", lwd=3, lty=2)
-text(-25,25,"y = -1.04 + 0.82* Tobs", cex=1.5)
-text(-25,20,"R2= 0.81", cex=1.5)
+text(-25,25,"y = -.95 + 0.80* Tobs", cex=1.5)
+text(-25,20,"R2= 0.82", cex=1.5)
 
 
 ###now output n factors for model
