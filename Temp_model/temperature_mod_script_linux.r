@@ -631,13 +631,13 @@ samplelist<-c("T.aveA1","T.aveA2","TminA","TmaxA","T.aveS1","T.aveS2","TmaxS","T
 
 temp.modI<-jags.model(file="/home/hkropp/github/synthesis_database/Temp_model/temperature_mod_code.r",
 						data=datalist,
-						n.adapt=5000,
-						n.chains=3, n.thin=2)
+						n.adapt=10000,
+						n.chains=3)
 
 
 print("initialize done")						
 n.iter.i=1000
-n.thin=2
+n.thin=1
 codaobj.init = coda.samples(temp.modI,variable.names=samplelist,
                        n.iter=n.iter.i, thin=n.thin)
 					   
