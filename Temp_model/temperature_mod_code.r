@@ -4,19 +4,15 @@ model{
 	for(i in 1:NobsA){
 		TempA[i]~dnorm(muA[i], tau.muA)
 		T.offA[i]<-T.yrA[i]-startA[site.depthidA[i]]
-		Tstep1[i]<-ifelse(T.offA[i]-yearA[i]<0.25,1,0)
-		Tstep2[i]<-ifelse((T.offA[i]-yearA[i])>=0.25,ifelse((T.offA[i]-yearA[i])<0.75,1,0),0)
-		Tstep3[i]<-ifelse(T.offA[i]-yearA[i]>=0.75,1,0)
-		sineA[i]<-(Tstep1[i]*(T.aveA1[SDWA[i]]-((T.aveA1[SDWA[i]]-TminA[SDWA[i]])*sin(2*3.14159265*T.offA[i]))))+
-				(Tstep2[i]*((TminA[SDWA[i]]+((TmaxA[SDWA[i]]-TminA[SDWA[i]])/2))-(((TmaxA[SDWA[i]]-TminA[SDWA[i]])/2)*sin(2*3.14159265*T.offA[i]))))+
-				(Tstep3[i]*(T.aveA2[SDWA[i]]-((TmaxA[SDWA[i]]-T.aveA2[SDWA[i]])*sin(2*3.14159265*T.offA[i]))))
+		
+		sineA[i]<-T.aveA[site.depthidA[i]]-(AmpA[site.depthidA[i]]*sin(2*3.14159265*T.offA[i]))
 		
 		#cacluation for freezing degree day
 		#set to zero if not freezing
-		FreezeA[i]<-(1-step(TempA[i]))*TempA[i]
+		#FreezeA[i]<-(1-step(TempA[i]))*TempA[i]
 		#cacluation for thawing degree day
 		#set to zero if not above zero
-		ThawA[i]<-step(TempA[i])*TempA[i]		
+		#ThawA[i]<-step(TempA[i])*TempA[i]		
 	}	
 		muA[1]<-sineA[1]
 	for(i in 2:NobsA){	
@@ -36,10 +32,10 @@ model{
 				(TstepS3[i]*(T.aveS2[SDWS[i]]-((TmaxS[SDWS[i]]-T.aveS2[SDWS[i]])*sin(2*3.14159265*T.offS[i]))))
 		#cacluation for freezing degree day
 		#set to zero if not freezing
-		FreezeS[i]<-(1-step(TempS[i]))*TempS[i]
+		#FreezeS[i]<-(1-step(TempS[i]))*TempS[i]
 		#cacluation for thawing degree day
 		#set to zero if not above zero		
-		ThawS[i]<-step(TempS[i])*TempS[i]	
+		#ThawS[i]<-step(TempS[i])*TempS[i]	
 	}
 	muS[1]<-sineS[1]
 	for(i in 2:NobsS){
@@ -88,20 +84,20 @@ model{
 	#get the predicted temperature
 	
 	#add up thawing and freezing degree days
-	for(i in 1:NSDWA){
-		FDDA[i]<-sum(FreezeA[ASY[i]:AEY[i]])
-		TDDA[i]<-sum(ThawA[ASY[i]:AEY[i]])
-	}		
-	for(i in 1:NSDWS){
-		FDDS[i]<-sum(FreezeS[SSY[i]:SEY[i]])
-		TDDS[i]<-sum(ThawS[SSY[i]:SEY[i]])
-	}	
+	#for(i in 1:NSDWA){
+	#	FDDA[i]<-sum(FreezeA[ASY[i]:AEY[i]])
+	#	TDDA[i]<-sum(ThawA[ASY[i]:AEY[i]])
+	#}		
+	#for(i in 1:NSDWS){
+	#	FDDS[i]<-sum(FreezeS[SSY[i]:SEY[i]])
+	#	TDDS[i]<-sum(ThawS[SSY[i]:SEY[i]])
+	#}	
 	
 	#now calculate N factors
-	for(i in 1:Ncombo){
-		Fn[i]<-FDDS[SoilIND[i]]/FDDA[AirIND[i]]
-		Tn[i]<-TDDS[SoilIND[i]]/TDDA[AirIND[i]]
-	}
+	#for(i in 1:Ncombo){
+	#	Fn[i]<-FDDS[SoilIND[i]]/FDDA[AirIND[i]]
+	#	Tn[i]<-TDDS[SoilIND[i]]/TDDA[AirIND[i]]
+	#}
 	
 	#prior for variance term
 	tau.muA<-pow(sig.muA,-2)
