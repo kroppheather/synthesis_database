@@ -24,12 +24,7 @@ model{
 		for(i in 1:NobsS){
 		TempS[i]~dnorm(muS[i], tau.muS)
 		T.offS[i]<-T.yrS[i]-startS[site.depthidS[i]]
-		TstepS1[i]<-ifelse(T.offS[i]-yearS[i]<0.25,1,0)
-		TstepS2[i]<-ifelse(T.offS[i]-yearS[i]>=0.25,ifelse(T.offS[i]-yearS[i]<0.75,1,0),0)
-		TstepS3[i]<-ifelse(T.offS[i]-yearS[i]>=0.75,1,0)
-		sineS[i]<-(TstepS1[i]*(T.aveS1[SDWS[i]]-((T.aveS1[SDWS[i]]-TminS[SDWS[i]])*sin(2*3.14159265*T.offS[i]))))+
-				(TstepS2[i]*((TminS[SDWS[i]]+((TmaxS[SDWS[i]]-TminS[SDWS[i]])/2))-(((TmaxS[SDWS[i]]-TminS[SDWS[i]])/2)*sin(2*3.14159265*T.offS[i]))))+
-				(TstepS3[i]*(T.aveS2[SDWS[i]]-((TmaxS[SDWS[i]]-T.aveS2[SDWS[i]])*sin(2*3.14159265*T.offS[i]))))
+		sineS[i]<-T.aveS[site.depthidS[i]]-(AmpS[site.depthidS[i]]*sin(2*3.14159265*T.offS[i]))
 		#cacluation for freezing degree day
 		#set to zero if not freezing
 		#FreezeS[i]<-(1-step(TempS[i]))*TempS[i]
@@ -55,29 +50,22 @@ model{
 	}
 	
 	#prior for likelihood
-	for(i in 1:NSDWA){
-		T.aveA1[i]~dnorm(0,.0001)
-		T.aveA2[i]~dnorm(0,.0001)
-		TminA[i]~dunif(-60,0)
-		TmaxA[i]~dunif(0,35)
-	}
+
 	
 	for(i in 1:NsitedepthA){
 		airAR[i]~dunif(-1.1,1.1)
 		startA[i]~dunif(0,.3)
+		T.aveA[i]~dnorm(0,.001)
+		AmpA[i]~dunif(0,70)
 	}
 	#prior for likelihood
-	for(i in 1:NSDWS){
-		T.aveS1[i]~dnorm(0,.0001)
-		T.aveS2[i]~dnorm(0,.0001)
-		TmaxS[i]~dunif(0,35)	
-		TminS[i]~dunif(-60,0)
-	
-	}
+
 	
 	for(i in 1:NsitedepthS){
 		soilAR[i]~dunif(-1.1,1.1)
 		startS[i]~dunif(0,.3)
+		T.aveS[i]~dnorm(0,.001)
+		AmpS[i]~dunif(0,70)
 	}
 	#now need to calculate the predicted temperature for all air observations
 	#this is going to vary by site, wyear, and depth
