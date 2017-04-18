@@ -651,20 +651,24 @@ print("samples done done")
 Mod.out<-summary(codaobj.init)
 
 
-write.table(Mod.out$statistics, "/home/hkropp/synthesis/output_u7m3/Temp_mod7_stats.csv",
+write.table(Mod.out$statistics, "/home/hkropp/synthesis/output_u7m4/Temp_mod7_stats.csv",
 			sep=",",row.names=TRUE)
-write.table(Mod.out$quantiles, "/home/hkropp/synthesis/output_u7m3/Temp_mod7_quant.csv",
+write.table(Mod.out$quantiles, "/home/hkropp/synthesis/output_u7m4/Temp_mod7_quant.csv",
 			sep=",",row.names=TRUE)
 			
 print("summary out")	
 
-
-save(codaobj.init, file="/home/hkropp/synthesis/output_u7m3/mod7_coda.R")
+chain1<-as.matrix(codaobj.init[[1]])
+write.table(chain1,"/home/hkropp/synthesis/output_u7m4/chain1_coda.csv", sep=",")
+chain2<-as.matrix(codaobj.init[[2]])
+write.table(chain2,"/home/hkropp/synthesis/output_u7m4/chain2_coda.csv", sep=",")
+chain3<-as.matrix(codaobj.init[[3]])
+write.table(chain3,"/home/hkropp/synthesis/output_u7m4/chain3_coda.csv", sep=",")
 			
 print("coda out")	
 
 			
-mcmcplot(codaobj.init, dir="/home/hkropp/synthesis/output_u7m3")		
+mcmcplot(codaobj.init, dir="/home/hkropp/synthesis/output_u7m4")		
 #get summary and save to file
 
 print("mcmcplot out")	
