@@ -631,7 +631,7 @@ samplelist<-c("T.aveA1","T.aveA2","TminA","TmaxA","T.aveS1","T.aveS2","TmaxS","T
 
 temp.modI<-jags.model(file="/home/hkropp/github/synthesis_database/Temp_model/temperature_mod_code.r",
 						data=datalist,
-						n.adapt=10000,
+						n.adapt=3000,
 						n.chains=3)
 
 
