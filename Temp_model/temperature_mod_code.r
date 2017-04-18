@@ -2,7 +2,7 @@ model{
 	#likelihood for air temperature observations
 	for(i in 1:NobsA){
 		TempA[i]~dnorm(muA[i], tau.muA)
-		muA[i]<-T.aveA[SDWA[i]]+ (AmpAC[SDWA[i]]*cos(2*pi*T.yrA[i]))+(-AmpAS[SDWA[i]]*sin(2*pi*T.yrA[i]))
+		muA[i]<-T.aveA[SDWA[i]]+ (AmpAC[SDWA[i]]*cos(2*3.141592*T.yrA[i]))+(-AmpAS[SDWA[i]]*sin(2*3.141592*T.yrA[i]))
 		#cacluation for freezing degree day
 		#set to zero if not freezing
 		#FreezeA[i]<-(1-step(TempA[i]))*TempA[i]
@@ -14,7 +14,7 @@ model{
 	#likelihood for soil temperature observations
 	for(i in 1:NobsS){
 		TempS[i]~dnorm(muS[i], tau.muS)
-		muS[i]<-T.aveS[SDWS[i]]+ (AmpSC[SDWS[i]]*cos(2*pi*T.yrS[i]))+(-AmpSS[SDWS[i]]*sin(2*pi*T.yrS[i]))
+		muS[i]<-T.aveS[SDWS[i]]+ (AmpSC[SDWS[i]]*cos(2*3.141592*T.yrS[i]))+(-AmpSS[SDWS[i]]*sin(2*3.141592*T.yrS[i]))
 		#cacluation for freezing degree day
 		#set to zero if not freezing
 		#FreezeS[i]<-(1-step(TempS[i]))*TempS[i]
