@@ -583,11 +583,16 @@ datalist<-list(NobsA=dim(AirM2)[1], TempA=AirM2$A, T.yrA=AirM2$decdate-1991,
 				NSDWS=dim(SoilIDS2)[1], SDWS=SoilM2$SDWS, SDWA=AirM2$SDWA,
 				 NrepS=length(SoilrepsubV), SrepSub=SoilrepsubV,NrepA=length(AirrepsubV),
 				 ArepSub=AirrepsubV)
+		
+
+	#old data
 			#ASY=ASY, AEY=AEY,SSY=SSY,SEY=SEY,
 			#site.depthidS=SoilM2$SDS, AirIND=IDforCombo$SDWA,SoilIND=IDforCombo$SDWS,
 			#site.depthidA=AirM2$SDS,	yearS=floor(SoilM2$decdate-1991),Ncombo=dim(IDforCombo)[1],
 			#NsitedepthS=dim(site.depthidS)[1],NsitedepthA=dim(site.heightA)[1],
 			#,yearA=floor(AirM2$decdate-1991),
+			
+			
 samplelist<-c("T.aveA","AmpAC","AmpSC","T.aveS","AmpAS","AmpSS","sig.muA","sig.muS",
 				"TempA", "TempS","TempA.rep", "TempS.rep")
 
