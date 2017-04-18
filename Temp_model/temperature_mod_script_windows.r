@@ -607,13 +607,13 @@ for(i in 1:dim(AirIDS2)[1]){
 }
 AirrepsubV<-unlist(Airrepsub)
 
-#write.table(AirrepsubV, "/home/hkropp/synthesis/output/rep/AirrepID.csv", sep=",", row.names=FALSE)
+write.table(AirrepsubV, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod3\\output_u7\\AirrepID.csv", sep=",", row.names=FALSE)
 #print("repA_out")
-#write.table(SoilrepsubV, "/home/hkropp/synthesis/output/rep/SoilrepID.csv", sep=",", row.names=FALSE)
+write.table(SoilrepsubV, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod3\\output_u7\\SoilrepID.csv", sep=",", row.names=FALSE)
 #print("reps_out")
 #model
-write.table(AirM2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod1\\output_u7\\Tair_model.csv",sep=",",row.names=FALSE)
-write.table(SoilM2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod1\\output_u7\\Tsoil_model.csv",sep=",",row.names=FALSE)
+write.table(AirM2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod3\\output_u7\\Tair_model.csv",sep=",",row.names=FALSE)
+write.table(SoilM2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod3\\output_u7\\Tsoil_model.csv",sep=",",row.names=FALSE)
 
 
 datalist<-list(NobsA=dim(AirM2)[1], TempA=AirM2$A, site.depthidA=AirM2$SDS,T.yrA=AirM2$decdate-1991,yearA=floor(AirM2$decdate-1991),
@@ -625,7 +625,7 @@ datalist<-list(NobsA=dim(AirM2)[1], TempA=AirM2$A, site.depthidA=AirM2$SDS,T.yrA
 				 NrepS=length(SoilrepsubV), SrepSub=SoilrepsubV,NrepA=length(AirrepsubV),
 				 ArepSub=AirrepsubV, startFLAGS=startFLAGS, startFLAGA=startFLAGA)
 				
-samplelist<-c("T.aveA1","T.aveA2","TminA","TmaxA","T.aveS1","T.aveS2","TmaxS","TminS","sig.muA","sig.muS","startA","startS","Fn","Tn", 
+samplelist<-c("T.aveA","AmpA","T.aveS","AmpS","sig.muA","sig.muS","startA","startS","Fn","Tn", 
 				"TempA", "TempS","TempA.rep", "TempS.rep", "soilAR", "airAR")
 
 
@@ -648,9 +648,9 @@ print("samples done done")
 Mod.out<-summary(codaobj.init)
 
 
-write.table(Mod.out$statistics, "/home/hkropp/synthesis/output/rep/Temp_mod4r_stats.csv",
+write.table(Mod.out$statistics, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod3\\output_u7\\Temp_mod4r_stats.csv",
 			sep=",",row.names=TRUE)
-write.table(Mod.out$quantiles, "/home/hkropp/synthesis/output/rep/Temp_mod4r_quant.csv",
+write.table(Mod.out$quantiles, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod3\\output_u7\\Temp_mod4r_quant.csv",
 			sep=",",row.names=TRUE)
 			
 print("summary out")	
@@ -669,10 +669,10 @@ print("mcmcplot out")
 
 #need to write ids to table
 
-#write.table(AirIDS2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tmod4rep\\rep\\AirIDS.csv", sep=",", row.names=FALSE)
-#write.table(SoilIDS2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tmod4rep\\rep\\SoilIDS.csv", sep=",", row.names=FALSE)
+write.table(AirIDS2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod3\\output_u7\\AirIDS.csv", sep=",", row.names=FALSE)
+write.table(SoilIDS2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod3\\output_u7\\SoilIDS.csv", sep=",", row.names=FALSE)
 
-#write.table(site.heightA,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tmod4rep\\rep\\AirIDS_SD.csv", sep=",", row.names=FALSE)
-#write.table(site.depthidS,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tmod4rep\\rep\\SoilIDS_SD.csv", sep=",", row.names=FALSE)
+write.table(site.heightA,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod3\\output_u7\\AirIDS_SD.csv", sep=",", row.names=FALSE)
+write.table(site.depthidS,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod3\\output_u7\\SoilIDS_SD.csv", sep=",", row.names=FALSE)
 
-#write.table(IDforCombo, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u6\\Tmod4rep\\rep\\NfactorIDS.csv",sep=",", row.names=FALSE)
+write.table(IDforCombo, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod3\\output_u7\\NfactorIDS.csv",sep=",", row.names=FALSE)
