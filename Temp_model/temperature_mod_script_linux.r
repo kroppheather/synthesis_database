@@ -608,13 +608,13 @@ for(i in 1:dim(AirIDS2)[1]){
 }
 AirrepsubV<-unlist(Airrepsub)
 
-write.table(AirrepsubV, "/home/hkropp/synthesis/output_u7m3/AirrepID.csv", sep=",", row.names=FALSE)
+write.table(AirrepsubV, "/home/hkropp/synthesis/output_u7m4/AirrepID.csv", sep=",", row.names=FALSE)
 print("repA_out")
-write.table(SoilrepsubV, "/home/hkropp/synthesis/output_u7m3/SoilrepID.csv", sep=",", row.names=FALSE)
+write.table(SoilrepsubV, "/home/hkropp/synthesis/output_u7m4/SoilrepID.csv", sep=",", row.names=FALSE)
 print("reps_out")
 #model
-#write.table(AirM2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod2\\output_u7m2\\Tair_model.csv",sep=",",row.names=FALSE)
-#write.table(SoilM2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod2\\output_u7m2\\Tsoil_model.csv",sep=",",row.names=FALSE)
+write.table(AirM2,"/home/hkropp/synthesis/output_u7m4/Tair_model.csv",sep=",",row.names=FALSE)
+write.table(SoilM2,"/home/hkropp/synthesis/output_u7m4/Tsoil_model.csv",sep=",",row.names=FALSE)
 
 
 datalist<-list(NobsA=dim(AirM2)[1], TempA=AirM2$A, site.depthidA=AirM2$SDS,T.yrA=AirM2$decdate-1991,yearA=floor(AirM2$decdate-1991),

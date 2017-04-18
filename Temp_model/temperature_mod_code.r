@@ -3,9 +3,7 @@ model{
 
 	for(i in 1:NobsA){
 		TempA[i]~dnorm(muA[i], tau.muA)
-		T.offA[i]<-T.yrA[i]-startA[site.depthidA[i]]
-		
-		sineA[i]<-T.aveA[site.depthidA[i]]-(AmpA[site.depthidA[i]]*sin(2*3.14159265*T.offA[i]))
+		sineA[i]<-T.aveA[site.depthidA[i]]-(AmpA[site.depthidA[i]]*sin(2*3.14159265*(T.yrA[i]-startA[site.depthidA[i]])))
 		
 		#cacluation for freezing degree day
 		#set to zero if not freezing
@@ -23,8 +21,7 @@ model{
 	#likelihood for soil temperature observations
 		for(i in 1:NobsS){
 		TempS[i]~dnorm(muS[i], tau.muS)
-		T.offS[i]<-T.yrS[i]-startS[site.depthidS[i]]
-		sineS[i]<-T.aveS[site.depthidS[i]]-(AmpS[site.depthidS[i]]*sin(2*3.14159265*T.offS[i]))
+		sineS[i]<-T.aveS[site.depthidS[i]]-(AmpS[site.depthidS[i]]*sin(2*3.14159265*(T.yrS[i]-startS[site.depthidS[i]])))
 		#cacluation for freezing degree day
 		#set to zero if not freezing
 		#FreezeS[i]<-(1-step(TempS[i]))*TempS[i]
