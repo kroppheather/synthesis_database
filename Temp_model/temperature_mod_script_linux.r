@@ -595,15 +595,16 @@ IDforCombo<-join(AirIDS2,SoilIDS2, by=c("siteid","wyear"), type="inner")
 IDforCombo$Nseq<-seq(1,dim(IDforCombo)[1])
 
 #generate replicate id subset
+#temporarily decrease amount to look at
 Soilrepsub<-list()
 for(i in 1:dim(SoilIDS2)[1]){
-	Soilrepsub[[i]]<-sample(SoilM2$indexI[SoilM2$SDWS==i],5)
+	Soilrepsub[[i]]<-sample(SoilM2$indexI[SoilM2$SDWS==i],3)
 }
 SoilrepsubV<-unlist(Soilrepsub)
 
 Airrepsub<-list()
 for(i in 1:dim(AirIDS2)[1]){
-	Airrepsub[[i]]<-sample(AirM2$indexI[AirM2$SDWA==i],5)
+	Airrepsub[[i]]<-sample(AirM2$indexI[AirM2$SDWA==i],3)
 }
 AirrepsubV<-unlist(Airrepsub)
 
@@ -625,9 +626,11 @@ datalist<-list(NobsA=dim(AirM2)[1], TempA=AirM2$A, site.depthidA=AirM2$SDS,T.yrA
 				 NrepS=length(SoilrepsubV), SrepSub=SoilrepsubV,NrepA=length(AirrepsubV),
 				 ArepSub=AirrepsubV, startFLAGS=startFLAGS, startFLAGA=startFLAGA)
 				
-samplelist<-c("T.aveA1","T.aveA2","TminA","TmaxA","T.aveS1","T.aveS2","TmaxS","TminS","sig.muA","sig.muS","startA","startS","Fn","Tn", 
-				"TempA", "TempS","TempA.rep", "TempS.rep", "soilAR", "airAR")
+samplelist<-c("T.aveA","AmpA","T.aveS","AmpS","sig.muA","sig.muS","startA","startS", 
+				"TempA.rep", "TempS.rep", "soilAR", "airAR")
 
+#old samples not to monitor right away
+#"Fn","Tn","TempA", "TempS",
 
 temp.modI<-jags.model(file="/home/hkropp/github/synthesis_database/Temp_model/temperature_mod_code.r",
 						data=datalist,
