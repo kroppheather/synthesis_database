@@ -604,7 +604,7 @@ datalist<-list(NobsA=dim(AirM2)[1], TempA=AirM2$A, site.depthidA=AirM2$SDS,T.yrA
 				 ArepSub=AirrepsubV, startflagS=startFLAGS)
 				
 samplelist<-c("T.aveA1","T.aveA2","TminA","TmaxA","T.aveS1","T.aveS2","TmaxS","TminS","sig.muA","sig.muS","startA","startS",
-				 "TempS.rep","aZero","bZero")
+				 "TempS.rep","aZero","bZero","zeroC")
 
 
 temp.modI<-jags.model(file="/home/hkropp/github/synthesis_database/Temp_model/temperature_mod_code.r",
