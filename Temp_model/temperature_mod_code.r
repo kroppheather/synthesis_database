@@ -94,6 +94,10 @@ model{
 	for(i in 1:NsitedepthS){
 		startS[i]~dunif(0,.3)
 	}
+	
+	#mean for a zero curtain
+	
+	zeroC~dnorm(0,4)
 	#now need to calculate the predicted temperature for all air observations
 	#this is going to vary by site, wyear, and depth
 	#get the predicted temperature
