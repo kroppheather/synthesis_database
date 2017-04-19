@@ -568,13 +568,30 @@ for(i in 1:dim(AirIDS2)[1]){
 }
 AirrepsubV<-unlist(Airrepsub)
 
-write.table(AirrepsubV, "/home/hkropp/synthesis/output_u7m2/AirrepID.csv", sep=",", row.names=FALSE)
+
+
+#now do soil
+#now get the start and end to autoregressive series
+SoilAR<-join(site.depthidS, SoilIDCHECK, by=c("siteid", "depth"), type="left")
+#get the starting point
+AR_Sstart<-aggregate(SoilAR$SSY, by=list(SoilAR$SDS), FUN="min")
+colnames(AR_Sstart)<-c("SDS","STstart")
+#get the ending point
+AR_Send<-aggregate(SoilAR$SEY, by=list(SoilAR$SDS), FUN="max")
+colnames(AR_Send)<-c("SDS","STend")
+
+#now make sequence of flags
+startFLAGS<-rep(1, dim(SoilM2)[1])
+startFLAGS[AR_Sstart$STstart]<- -1
+
+
+write.table(AirrepsubV, "/home/hkropp/synthesis/output_u7m6/AirrepID.csv", sep=",", row.names=FALSE)
 print("repA_out")
-write.table(SoilrepsubV, "/home/hkropp/synthesis/output_u7m2/SoilrepID.csv", sep=",", row.names=FALSE)
+write.table(SoilrepsubV, "/home/hkropp/synthesis/output_u7m6/SoilrepID.csv", sep=",", row.names=FALSE)
 print("reps_out")
 #model
-#write.table(AirM2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod2\\output_u7m2\\Tair_model.csv",sep=",",row.names=FALSE)
-#write.table(SoilM2,"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod2\\output_u7m2\\Tsoil_model.csv",sep=",",row.names=FALSE)
+write.table(AirM2,"/home/hkropp/synthesis/output_u7m6/Tair_model.csv",sep=",",row.names=FALSE)
+write.table(SoilM2,"/home/hkropp/synthesis/output_u7m6/Tsoil_model.csv",sep=",",row.names=FALSE)
 
 
 datalist<-list(NobsA=dim(AirM2)[1], TempA=AirM2$A, site.depthidA=AirM2$SDS,T.yrA=AirM2$decdate-1991,yearA=floor(AirM2$decdate-1991),
@@ -584,15 +601,15 @@ datalist<-list(NobsA=dim(AirM2)[1], TempA=AirM2$A, site.depthidA=AirM2$SDS,T.yrA
 				 AirIND=IDforCombo$SDWA,SoilIND=IDforCombo$SDWS,
 				 ASY=ASY, AEY=AEY,SSY=SSY,SEY=SEY,
 				 NrepS=length(SoilrepsubV), SrepSub=SoilrepsubV,NrepA=length(AirrepsubV),
-				 ArepSub=AirrepsubV)
+				 ArepSub=AirrepsubV, startflagS=startFLAGS)
 				
-samplelist<-c("T.aveA1","T.aveA2","TminA","TmaxA","T.aveS1","T.aveS2","TmaxS","TminS","sig.muA","sig.muS","startA","startS","Fn","Tn", 
-				"TempA", "TempS","TempA.rep", "TempS.rep")
+samplelist<-c("T.aveA1","T.aveA2","TminA","TmaxA","T.aveS1","T.aveS2","TmaxS","TminS","sig.muA","sig.muS","startA","startS",
+				 "TempS.rep","aZero","bZero")
 
 
 temp.modI<-jags.model(file="/home/hkropp/github/synthesis_database/Temp_model/temperature_mod_code.r",
 						data=datalist,
-						n.adapt=5000,
+						n.adapt=3000,
 						n.chains=3)
 
 
@@ -609,20 +626,26 @@ print("samples done done")
 Mod.out<-summary(codaobj.init)
 
 
-write.table(Mod.out$statistics, "/home/hkropp/synthesis/output_u7m2/Temp_mod7_stats.csv",
+write.table(Mod.out$statistics, "/home/hkropp/synthesis/output_u7m6/Temp_mod6_stats.csv",
 			sep=",",row.names=TRUE)
-write.table(Mod.out$quantiles, "/home/hkropp/synthesis/output_u7m2/Temp_mod7_quant.csv",
+write.table(Mod.out$quantiles, "/home/hkropp/synthesis/output_u7m6/Temp_mod6_quant.csv",
 			sep=",",row.names=TRUE)
 			
 print("summary out")	
 
 
-save(codaobj.init, file="/home/hkropp/synthesis/output_u7m2/mod7_coda.R")
+
+chain1<-as.matrix(codaobj.init[[1]])
+write.table(chain1,"/home/hkropp/synthesis/output_u7m6/chain1_coda.csv", sep=",")
+chain2<-as.matrix(codaobj.init[[2]])
+write.table(chain2,"/home/hkropp/synthesis/output_u7m6/chain2_coda.csv", sep=",")
+chain3<-as.matrix(codaobj.init[[3]])
+write.table(chain3,"/home/hkropp/synthesis/output_u7m6/chain3_coda.csv", sep=",")
 			
 print("coda out")	
 
 			
-mcmcplot(codaobj.init, dir="/home/hkropp/synthesis/output_u7m2")		
+mcmcplot(codaobj.init, dir="/home/hkropp/synthesis/output_u7m6")		
 #get summary and save to file
 
 print("mcmcplot out")	
@@ -630,12 +653,12 @@ print("mcmcplot out")
 
 #need to write ids to table
 
-write.table(AirIDS2,"/home/hkropp/synthesis/output_u7m2/AirIDS.csv", sep=",", row.names=FALSE)
-write.table(SoilIDS2,"/home/hkropp/synthesis/output_u7m2/SoilIDS.csv", sep=",", row.names=FALSE)
+write.table(AirIDS2,"/home/hkropp/synthesis/output_u7m6/AirIDS.csv", sep=",", row.names=FALSE)
+write.table(SoilIDS2,"/home/hkropp/synthesis/output_u7m6/SoilIDS.csv", sep=",", row.names=FALSE)
 
-write.table(site.heightA,"/home/hkropp/synthesis/output_u7m2/AirIDS_SD.csv", sep=",", row.names=FALSE)
-write.table(site.depthidS,"/home/hkropp/synthesis/output_u7m2/SoilIDS_SD.csv", sep=",", row.names=FALSE)
+write.table(site.heightA,"/home/hkropp/synthesis/output_u7m6/AirIDS_SD.csv", sep=",", row.names=FALSE)
+write.table(site.depthidS,"/home/hkropp/synthesis/output_u7m6/SoilIDS_SD.csv", sep=",", row.names=FALSE)
 
-write.table(IDforCombo, "/home/hkropp/synthesis/output_u7m2/NfactorIDS.csv",sep=",", row.names=FALSE)
+write.table(IDforCombo, "/home/hkropp/synthesis/output_u7m6/NfactorIDS.csv",sep=",", row.names=FALSE)
 print("ID write out")	
 			
