@@ -568,7 +568,12 @@ for(i in 1:dim(AirIDS2)[1]){
 }
 AirrepsubV<-unlist(Airrepsub)
 
-
+#check to see if indes are in order
+SoilIDCHECK<-data.frame(SoilIDS2,SSY,SEY)
+SCHECK1<-SoilIDCHECK$SSY[2:dim(SoilIDCHECK)[1]]-SoilIDCHECK$SEY[1:(dim(SoilIDCHECK)[1]-1)]
+if(length(which(SCHECK1>1))!=0){
+	print("ERROR Improper join arrangement")
+}else{print("Proper join arrangement for soil and depth")}
 
 #now do soil
 #now get the start and end to autoregressive series
