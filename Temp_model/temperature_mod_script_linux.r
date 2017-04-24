@@ -655,7 +655,7 @@ temp.modI<-jags.model(file="/home/hkropp/github/synthesis_database/Temp_model/te
 
 
 print(paste("initialize done site number ",i ))						
-n.iter.i=1000
+n.iter.i=2000
 n.thin=1
 codaobj.init = coda.samples(temp.modI,variable.names=samplelist,
                        n.iter=n.iter.i, thin=n.thin)
