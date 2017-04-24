@@ -37,7 +37,6 @@ model{
 		TstepS1[i]<-ifelse(T.offS[i]-yearS[i]<0.25,1,0)
 		TstepS2[i]<-ifelse(T.offS[i]-yearS[i]>=0.25,ifelse(T.offS[i]-yearS[i]<0.75,1,0),0)
 		TstepS3[i]<-ifelse(T.offS[i]-yearS[i]>=0.75,1,0)
-		muS[i]<-X[i]*zeroC+ ((1-X[i])*sineS[i])
 		sineS[i]<-(TstepS1[i]*(T.aveS1[SDWS[i]]-((T.aveS1[SDWS[i]]-TminS[SDWS[i]])*sin(2*3.14159265*T.offS[i]))))+
 				(TstepS2[i]*((TminS[SDWS[i]]+((TmaxS[SDWS[i]]-TminS[SDWS[i]])/2))-(((TmaxS[SDWS[i]]-TminS[SDWS[i]])/2)*sin(2*3.14159265*T.offS[i]))))+
 				(TstepS3[i]*(T.aveS2[SDWS[i]]-((TmaxS[SDWS[i]]-T.aveS2[SDWS[i]])*sin(2*3.14159265*T.offS[i]))))
