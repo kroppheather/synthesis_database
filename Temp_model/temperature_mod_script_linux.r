@@ -522,148 +522,176 @@ SoilM2<-join(S.DOY, SoilS, by=c("decdate", "depth","wyear","siteid"), type="left
 
 AirM2<-join(A.DOY, AirS, by=c("decdate","height","siteid","wyear"), type="left" )
 
-
-
+############################################
+#this will need to change if 
+#using the model for temp
 
 #create index sequence
-SoilM2$indexI<-seq(1, dim(SoilM2)[1])
-AirM2$indexI<-seq(1, dim(AirM2)[1])
+#SoilM2$indexI<-seq(1, dim(SoilM2)[1])
+#AirM2$indexI<-seq(1, dim(AirM2)[1])
+
 
 #create index to some for degree days
-AYlength<-numeric(0)
-ASY<-numeric(0)
-AEY<-numeric(0)
-for(i in 1:dim(AirIDS2)[1]){
-	AYlength[i]<-length(AirM2$indexI[AirM2$SDWA==AirIDS2$SDWA[i]])
-	ASY[i]<-AirM2$indexI[AirM2$SDWA==AirIDS2$SDWA[i]][1]
-	AEY[i]<-AirM2$indexI[AirM2$SDWA==AirIDS2$SDWA[i]][AYlength[i]]
-}
+#AYlength<-numeric(0)
+#ASY<-numeric(0)
+#AEY<-numeric(0)
+#for(i in 1:dim(AirIDS2)[1]){
+#	AYlength[i]<-length(AirM2$indexI[AirM2$SDWA==AirIDS2$SDWA[i]])
+#	ASY[i]<-AirM2$indexI[AirM2$SDWA==AirIDS2$SDWA[i]][1]
+#	AEY[i]<-AirM2$indexI[AirM2$SDWA==AirIDS2$SDWA[i]][AYlength[i]]
+#}
 #create index for soil
-SYlength<-numeric(0)
-SSY<-numeric(0)
-SEY<-numeric(0)
-for(i in 1:dim(SoilIDS2)[1]){
-	SYlength[i]<-length(SoilM2$indexI[SoilM2$SDWS==SoilIDS2$SDWS[i]])
-	SSY[i]<-SoilM2$indexI[SoilM2$SDWS==SoilIDS2$SDWS[i]][1]
-	SEY[i]<-SoilM2$indexI[SoilM2$SDWS==SoilIDS2$SDWS[i]][SYlength[i]]
-}
+#SYlength<-numeric(0)
+#SSY<-numeric(0)
+#SEY<-numeric(0)
+#for(i in 1:dim(SoilIDS2)[1]){
+#	SYlength[i]<-length(SoilM2$indexI[SoilM2$SDWS==SoilIDS2$SDWS[i]])
+#	SSY[i]<-SoilM2$indexI[SoilM2$SDWS==SoilIDS2$SDWS[i]][1]
+#	SEY[i]<-SoilM2$indexI[SoilM2$SDWS==SoilIDS2$SDWS[i]][SYlength[i]]
+#}
 
 
 #Next need to create an index that says when sites should be divided
 #want to divide each soil
 #want each soil to be divided by each air combo, but only in a year
-IDforCombo<-join(AirIDS2,SoilIDS2, by=c("siteid","wyear"), type="inner")
-IDforCombo$Nseq<-seq(1,dim(IDforCombo)[1])
+#IDforCombo<-join(AirIDS2,SoilIDS2, by=c("siteid","wyear"), type="inner")
+#IDforCombo$Nseq<-seq(1,dim(IDforCombo)[1])
 
 #generate replicate id subset
-Soilrepsub<-list()
-for(i in 1:dim(SoilIDS2)[1]){
-	Soilrepsub[[i]]<-sample(SoilM2$indexI[SoilM2$SDWS==i],5)
-}
-SoilrepsubV<-unlist(Soilrepsub)
+#Soilrepsub<-list()
+#for(i in 1:dim(SoilIDS2)[1]){
+#	Soilrepsub[[i]]<-sample(SoilM2$indexI[SoilM2$SDWS==i],5)
+#}
+#SoilrepsubV<-unlist(Soilrepsub)
 
-Airrepsub<-list()
-for(i in 1:dim(AirIDS2)[1]){
-	Airrepsub[[i]]<-sample(AirM2$indexI[AirM2$SDWA==i],5)
-}
-AirrepsubV<-unlist(Airrepsub)
-
-#check to see if indes are in order
-SoilIDCHECK<-data.frame(SoilIDS2,SSY,SEY)
-SCHECK1<-SoilIDCHECK$SSY[2:dim(SoilIDCHECK)[1]]-SoilIDCHECK$SEY[1:(dim(SoilIDCHECK)[1]-1)]
-if(length(which(SCHECK1>1))!=0){
-	print("ERROR Improper join arrangement")
-}else{print("Proper join arrangement for soil and depth")}
-
-#now do soil
-#now get the start and end to autoregressive series
-SoilAR<-join(site.depthidS, SoilIDCHECK, by=c("siteid", "depth"), type="left")
-#get the starting point
-AR_Sstart<-aggregate(SoilAR$SSY, by=list(SoilAR$SDS), FUN="min")
-colnames(AR_Sstart)<-c("SDS","STstart")
-#get the ending point
-AR_Send<-aggregate(SoilAR$SEY, by=list(SoilAR$SDS), FUN="max")
-colnames(AR_Send)<-c("SDS","STend")
-
-#now make sequence of flags
-startFLAGS<-rep(1, dim(SoilM2)[1])
-startFLAGS[AR_Sstart$STstart]<- -1
+#Airrepsub<-list()
+#for(i in 1:dim(AirIDS2)[1]){
+#	Airrepsub[[i]]<-sample(AirM2$indexI[AirM2$SDWA==i],5)
+#}
+#AirrepsubV<-unlist(Airrepsub)
 
 
-write.table(AirrepsubV, "/home/hkropp/synthesis/output_u7m6/AirrepID.csv", sep=",", row.names=FALSE)
-print("repA_out")
-write.table(SoilrepsubV, "/home/hkropp/synthesis/output_u7m6/SoilrepID.csv", sep=",", row.names=FALSE)
-print("reps_out")
+#now turn the model into a a for loop 
+
+
+#write.table(AirrepsubV, "/home/hkropp/synthesis/output_u7m6/AirrepID.csv", sep=",", row.names=FALSE)
+#print("repA_out")
+#write.table(SoilrepsubV, "/home/hkropp/synthesis/output_u7m6/SoilrepID.csv", sep=",", row.names=FALSE)
+#print("reps_out")
+
+
+
+
+
 #model
-write.table(AirM2,"/home/hkropp/synthesis/output_u7m6/Tair_model.csv",sep=",",row.names=FALSE)
-write.table(SoilM2,"/home/hkropp/synthesis/output_u7m6/Tsoil_model.csv",sep=",",row.names=FALSE)
+write.table(AirM2,"/home/hkropp/synthesis/output_u7m7/Tair_model.csv",sep=",",row.names=FALSE)
+write.table(SoilM2,"/home/hkropp/synthesis/output_u7m7/Tsoil_model.csv",sep=",",row.names=FALSE)
+
+#turn Air M2 into a list
+#get the unique sites list
+sitesS<-unique(data.frame(siteid=AirM2$siteid))
+sitesS$siteUID<-seq(1,dim(sitesS)[1])
 
 
-datalist<-list(NobsA=dim(AirM2)[1], TempA=AirM2$A, site.depthidA=AirM2$SDS,T.yrA=AirM2$decdate-1991,yearA=floor(AirM2$decdate-1991),
-				NobsS=dim(SoilM2)[1], TempS=SoilM2$T,site.depthidS=SoilM2$SDS, T.yrS=SoilM2$decdate-1991,yearS=floor(SoilM2$decdate-1991),
-				NsitedepthA=dim(site.heightA)[1],NsitedepthS=dim(site.depthidS)[1], NSDWA=dim(AirIDS2)[1],
-				NSDWS=dim(SoilIDS2)[1], SDWS=SoilM2$SDWS, SDWA=AirM2$SDWA,Ncombo=dim(IDforCombo)[1],
-				 AirIND=IDforCombo$SDWA,SoilIND=IDforCombo$SDWS,
-				 ASY=ASY, AEY=AEY,SSY=SSY,SEY=SEY,
-				 NrepS=length(SoilrepsubV), SrepSub=SoilrepsubV,NrepA=length(AirrepsubV),
-				 ArepSub=AirrepsubV, startflagS=startFLAGS)
+AirSitesD<-list()
+SoilSitesD<-list()
+AirSDW<-list()
+SoilSDW<-list()
+AirSD<-list()
+SoilSD<-list()
+AirSitesD2<-list()
+AirSitesD3<-list()
+SoilSitesD2<-list()
+SoilSitesD3<-list()
+for(i in 1:dim(sitesS)[1]){
+	AirSitesD[[i]]<-AirM2[AirM2$siteid==sitesS$siteid[i],]
+	SoilSitesD[[i]]<-SoilM2[SoilM2$siteid==sitesS$siteid[i],]
+	AirSDW[[i]]<-AirIDS2[AirIDS2$siteid==sitesS$siteid[i],]
+	AirSDW[[i]]$siteSDW<-seq(1,dim(AirSDW[[i]])[1])
+	SoilSDW[[i]]<-SoilIDS2[SoilIDS2$siteid==sitesS$siteid[i],]
+	SoilSDW[[i]]$siteSDW<-seq(1,dim(SoilSDW[[i]])[1])	
+	SoilSD[[i]]<-site.depthidS[site.depthidS$siteid==sitesS$siteid[i],]
+	SoilSD[[i]]$siteSD<-seq(1,dim(SoilSD[[i]])[1])
+	AirSD[[i]]<-site.heightA[site.heightA$siteid==sitesS$siteid[i],]
+	AirSD[[i]]$siteSD<-seq(1,dim(AirSD[[i]])[1])	
+	colnames(AirSD[[i]])[3]<-"SDS"
+	AirSitesD2[[i]]<-join(AirSitesD[[i]],AirSD[[i]], by=c("siteid", "height","SDS"), type="left")
+	AirSitesD3[[i]]<-join(AirSitesD2[[i]],AirSDW[[i]], by=c("siteid","height","wyear","SDWA"), type="left")
+	SoilSitesD2[[i]]<-join(SoilSitesD[[i]],SoilSDW[[i]], by=c("siteid","depth","wyear","SDWS"),type="left")
+	SoilSitesD3[[i]]<-join(SoilSitesD2[[i]],SoilSD[[i]], by=c("siteid","depth","SDS"),type="left")
+}
+
+#need to write ids to table
+
+write.table(AirIDS2,"/home/hkropp/synthesis/output_u7m7/AirIDS.csv", sep=",", row.names=FALSE)
+write.table(SoilIDS2,"/home/hkropp/synthesis/output_u7m7/SoilIDS.csv", sep=",", row.names=FALSE)
+
+write.table(site.heightA,"/home/hkropp/synthesis/output_u7m7/AirIDS_SD.csv", sep=",", row.names=FALSE)
+write.table(site.depthidS,"/home/hkropp/synthesis/output_u7m7/SoilIDS_SD.csv", sep=",", row.names=FALSE)
+
+#write.table(IDforCombo, "/home/hkropp/synthesis/output_u7m7/NfactorIDS.csv",sep=",", row.names=FALSE)
+print("ID write out")	
+
+
+for(i in 1:dim(sitesS)[1]){
+
+
+datalist<-list(NobsA=dim(AirSitesD3[[i]])[1], TempA=AirSitesD3[[i]]$A, site.depthidA=AirSitesD3[[i]]$siteSD,
+				T.yrA=AirSitesD3[[i]]$decdate-1991,yearA=floor(AirSitesD3[[i]]$decdate-1991),
+				NobsS=dim(SoilSitesD3[[i]])[1], TempS=SoilSitesD3[[i]]$T,
+				site.depthidS=SoilSitesD3[[i]]$siteSD, T.yrS=SoilSitesD3[[i]]$decdate-1991,
+				yearS=floor(SoilSitesD3[[i]]$decdate-1991),
+				NsitedepthA=dim(AirSD[[i]])[1],NsitedepthS=dim(SoilSD[[i]])[1], NSDWA=dim(AirSDW[[i]])[1],
+				NSDWS=dim(SoilSDW[[i]])[1], SDWS=SoilSitesD3[[i]]$siteSDW, SDWA=AirSitesD3[[i]]$siteSDW))
 				
 samplelist<-c("T.aveA1","T.aveA2","TminA","TmaxA","T.aveS1","T.aveS2","TmaxS","TminS","sig.muA","sig.muS","startA","startS",
-				 "TempS.rep","aZero","bZero","zeroC")
+				 "airAR","soilAR","muS","muA")
 
-
+print(paste("start initialize site number", i))
 temp.modI<-jags.model(file="/home/hkropp/github/synthesis_database/Temp_model/temperature_mod_code.r",
 						data=datalist,
 						n.adapt=3000,
 						n.chains=3)
 
 
-print("initialize done")						
+print(paste("initialize done site number ",i ))						
 n.iter.i=1000
 n.thin=1
 codaobj.init = coda.samples(temp.modI,variable.names=samplelist,
                        n.iter=n.iter.i, thin=n.thin)
 					   
 					   
-print("samples done done")
+print(paste("samples done done site number= ", i))
 
 
 Mod.out<-summary(codaobj.init)
+dir.create(paste0("/home/hkropp/synthesis/output_u7m7/site",sitesS$siteid[i]))
 
-
-write.table(Mod.out$statistics, "/home/hkropp/synthesis/output_u7m6/Temp_mod6_stats.csv",
+write.table(Mod.out$statistics, paste0("/home/hkropp/synthesis/output_u7m7/site",sitesS$siteid[i],"Temp_mod_stats.csv"),
 			sep=",",row.names=TRUE)
-write.table(Mod.out$quantiles, "/home/hkropp/synthesis/output_u7m6/Temp_mod6_quant.csv",
+write.table(Mod.out$quantiles, paste0("/home/hkropp/synthesis/output_u7m7/site",sitesS$siteid[i],"Temp_mod_quant.csv"),
 			sep=",",row.names=TRUE)
 			
-print("summary out")	
+print(paste("summary out site number ",i)	)
 
 
 
 chain1<-as.matrix(codaobj.init[[1]])
-write.table(chain1,"/home/hkropp/synthesis/output_u7m6/chain1_coda.csv", sep=",")
+write.table(chain1,paste0("/home/hkropp/synthesis/output_u7m7/site",sitesS$siteid[i],"chain1_coda.csv"), sep=",")
 chain2<-as.matrix(codaobj.init[[2]])
-write.table(chain2,"/home/hkropp/synthesis/output_u7m6/chain2_coda.csv", sep=",")
+write.table(chain2paste0("/home/hkropp/synthesis/output_u7m7/site",sitesS$siteid[i],"chain2_coda.csv"), sep=",")
 chain3<-as.matrix(codaobj.init[[3]])
-write.table(chain3,"/home/hkropp/synthesis/output_u7m6/chain3_coda.csv", sep=",")
+write.table(chain3,paste0("/home/hkropp/synthesis/output_u7m7/site",sitesS$siteid[i],"chain3_coda.csv"), sep=",")
 			
-print("coda out")	
+print(paste("coda out site number ", i))	
 
 			
-mcmcplot(codaobj.init, dir="/home/hkropp/synthesis/output_u7m6")		
+mcmcplot(codaobj.init, dir=paste0("/home/hkropp/synthesis/output_u7m7/site",sitesS$siteid[i]))		
 #get summary and save to file
 
-print("mcmcplot out")	
+print(paste("mcmcplot out site number ", i))	
 			
 
-#need to write ids to table
 
-write.table(AirIDS2,"/home/hkropp/synthesis/output_u7m6/AirIDS.csv", sep=",", row.names=FALSE)
-write.table(SoilIDS2,"/home/hkropp/synthesis/output_u7m6/SoilIDS.csv", sep=",", row.names=FALSE)
-
-write.table(site.heightA,"/home/hkropp/synthesis/output_u7m6/AirIDS_SD.csv", sep=",", row.names=FALSE)
-write.table(site.depthidS,"/home/hkropp/synthesis/output_u7m6/SoilIDS_SD.csv", sep=",", row.names=FALSE)
-
-write.table(IDforCombo, "/home/hkropp/synthesis/output_u7m6/NfactorIDS.csv",sep=",", row.names=FALSE)
-print("ID write out")	
-			
+	
+}	

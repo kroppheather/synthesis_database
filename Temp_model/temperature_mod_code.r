@@ -1,14 +1,15 @@
 model{
 	#likelihood for air temperature observations
-	for(i in 1:NobsA){
+	for(i in 2:NobsA){
 		TempA[i]~dnorm(muA[i], tau.muA)
 		T.offA[i]<-T.yrA[i]-startA[site.depthidA[i]]
 		Tstep1[i]<-ifelse(T.offA[i]-yearA[i]<0.25,1,0)
 		Tstep2[i]<-ifelse((T.offA[i]-yearA[i])>=0.25,ifelse((T.offA[i]-yearA[i])<0.75,1,0),0)
 		Tstep3[i]<-ifelse(T.offA[i]-yearA[i]>=0.75,1,0)
-		muA[i]<-(Tstep1[i]*(T.aveA1[SDWA[i]]-((T.aveA1[SDWA[i]]-TminA[SDWA[i]])*sin(2*3.14159265*T.offA[i]))))+
+		sineA[i]<-(Tstep1[i]*(T.aveA1[SDWA[i]]-((T.aveA1[SDWA[i]]-TminA[SDWA[i]])*sin(2*3.14159265*T.offA[i]))))+
 				(Tstep2[i]*((TminA[SDWA[i]]+((TmaxA[SDWA[i]]-TminA[SDWA[i]])/2))-(((TmaxA[SDWA[i]]-TminA[SDWA[i]])/2)*sin(2*3.14159265*T.offA[i]))))+
 				(Tstep3[i]*(T.aveA2[SDWA[i]]-((TmaxA[SDWA[i]]-T.aveA2[SDWA[i]])*sin(2*3.14159265*T.offA[i]))))
+		muA[i]<-sineA[i]+(airAR[site.depthidA[i]]*(TempA[i-1]-sineA[i-1]))
 		#cacluation for freezing degree day
 		#set to zero if not freezing
 		#FreezeA[i]<-(1-step(TempA[i]))*TempA[i]
@@ -16,6 +17,18 @@ model{
 		#set to zero if not above zero
 		#ThawA[i]<-step(TempA[i])*TempA[i]		
 	}
+		TempA[1]~dnorm(muA[1], tau.muA)
+		T.offA[1]<-T.yrA[1]-startA[site.depthidA[1]]
+		Tstep1[1]<-ifelse(T.offA[1]-yearA[1]<0.25,1,0)
+		Tstep2[1]<-ifelse((T.offA[1]-yearA[1])>=0.25,ifelse((T.offA[1]-yearA[1])<0.75,1,0),0)
+		Tstep3[1]<-ifelse(T.offA[1]-yearA[1]>=0.75,1,0)
+		muA[1]<-sineA[1]
+		sineA[1]<-(Tstep1[1]*(T.aveA1[SDWA[1]]-((T.aveA1[SDWA[1]]-TminA[SDWA[1]])*sin(2*3.14159265*T.offA[1]))))+
+				(Tstep2[1]*((TminA[SDWA[1]]+((TmaxA[SDWA[1]]-TminA[SDWA[1]])/2))-(((TmaxA[SDWA[1]]-TminA[SDWA[1]])/2)*sin(2*3.14159265*T.offA[1]))))+
+				(Tstep3[1]*(T.aveA2[SDWA[1]]-((TmaxA[SDWA[1]]-T.aveA2[SDWA[1]])*sin(2*3.14159265*T.offA[1]))))	
+	
+	
+	
 	
 	#likelihood for soil temperature observations
 	for(i in 2:NobsS){
@@ -28,12 +41,7 @@ model{
 		sineS[i]<-(TstepS1[i]*(T.aveS1[SDWS[i]]-((T.aveS1[SDWS[i]]-TminS[SDWS[i]])*sin(2*3.14159265*T.offS[i]))))+
 				(TstepS2[i]*((TminS[SDWS[i]]+((TmaxS[SDWS[i]]-TminS[SDWS[i]])/2))-(((TmaxS[SDWS[i]]-TminS[SDWS[i]])/2)*sin(2*3.14159265*T.offS[i]))))+
 				(TstepS3[i]*(T.aveS2[SDWS[i]]-((TmaxS[SDWS[i]]-T.aveS2[SDWS[i]])*sin(2*3.14159265*T.offS[i]))))
-				
-		X[i]~dbern(p[i])
-		p[i]<-(step(startflagS[i])*aZero[SDWS[i]]*exp(-bZero[SDWS[i]]*abs(TempS[i-1]-0)))+
-				((1-step(startflagS[i]))*aZero[SDWS[i]]*exp(-bZero[SDWS[i]]
-				*abs((TstepS1[i]*(T.aveS1[SDWS[i]]-((T.aveS1[SDWS[i]]-TminS[SDWS[i]])*sin(2*3.14159265*(T.offS[i]-(1/365)))))))))
-		
+		muS[i]<-sineS[i]+(soilAR[site.depthidS[i]]*(TempS[i-1]-sineS[i-1])))
 		#cacluation for freezing degree day
 		#set to zero if not freezing
 		#FreezeS[i]<-(1-step(TempS[i]))*TempS[i]
@@ -47,15 +55,11 @@ model{
 		TstepS1[1]<-ifelse(T.offS[1]-yearS[1]<0.25,1,0)
 		TstepS2[1]<-ifelse(T.offS[1]-yearS[1]>=0.25,ifelse(T.offS[1]-yearS[1]<0.75,1,0),0)
 		TstepS3[1]<-ifelse(T.offS[1]-yearS[1]>=0.75,1,0)
-		muS[1]<-X[1]*zeroC+ ((1-X[1])*sineS[1])
+		muS[1]<-sineS[1]
 		sineS[1]<-(TstepS1[1]*(T.aveS1[SDWS[1]]-((T.aveS1[SDWS[1]]-TminS[SDWS[1]])*sin(2*3.14159265*T.offS[1]))))+
 				(TstepS2[1]*((TminS[SDWS[1]]+((TmaxS[SDWS[1]]-TminS[SDWS[1]])/2))-(((TmaxS[SDWS[1]]-TminS[SDWS[1]])/2)*sin(2*3.14159265*T.offS[1]))))+
 				(TstepS3[1]*(T.aveS2[SDWS[1]]-((TmaxS[SDWS[1]]-T.aveS2[SDWS[1]])*sin(2*3.14159265*T.offS[1]))))
-		X[1]~dbern(p[1])
-		p[1]<-aZero[SDWS[1]]*exp(-bZero[SDWS[1]]
-				*abs((TstepS1[1]*(T.aveS1[SDWS[1]]-((T.aveS1[SDWS[1]]-TminS[SDWS[1]])*sin(2*3.14159265*(T.offS[1]-(1/365))))))))
-					
-				
+		
 				
 	#look at a subset of replicated data since there is too much temp data to monitor
 	for(i in 1:NrepS){
@@ -77,7 +81,7 @@ model{
 	}
 	
 	for(i in 1:NsitedepthA){
-
+		airAR[i]~dunif(-1.1,1.1)
 		startA[i]~dunif(0,.3)
 	}
 	#prior for likelihood
@@ -92,6 +96,7 @@ model{
 	}
 	
 	for(i in 1:NsitedepthS){
+		soilAR[i]~dunif(-1.1,1.1)
 		startS[i]~dunif(0,.3)
 	}
 	
