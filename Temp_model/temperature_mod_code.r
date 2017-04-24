@@ -62,15 +62,6 @@ model{
 		
 				
 	#look at a subset of replicated data since there is too much temp data to monitor
-	for(i in 1:NrepS){
-		TempS.rep[i]~dnorm(muS[SrepSub[i]], tau.muS)
-	
-	}
-	
-	for(i in 1:NrepA){
-		TempA.rep[i]~dnorm(muA[ArepSub[i]], tau.muA)
-	
-	}
 	
 	#prior for likelihood
 	for(i in 1:NSDWA){
@@ -100,9 +91,6 @@ model{
 		startS[i]~dunif(0,.3)
 	}
 	
-	#mean for a zero curtain
-	
-	zeroC~dnorm(0,4)
 	#now need to calculate the predicted temperature for all air observations
 	#this is going to vary by site, wyear, and depth
 	#get the predicted temperature
