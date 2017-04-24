@@ -686,7 +686,9 @@ write.table(chain3,paste0("/home/hkropp/synthesis/output_u7m7/site",sitesS$sitei
 print(paste("coda out site number ", i))	
 
 			
-mcmcplot(codaobj.init, dir=paste0("/home/hkropp/synthesis/output_u7m7/site",sitesS$siteid[i]))		
+mcmcplot(codaobj.init, parms=c("T.aveA1","T.aveA2","TminA","TmaxA","T.aveS1","T.aveS2",
+			"TmaxS","TminS","sig.muA","sig.muS","startA","startS","airAR","soilAR"),
+			dir=paste0("/home/hkropp/synthesis/output_u7m7/site",sitesS$siteid[i]))		
 #get summary and save to file
 
 print(paste("mcmcplot out site number ", i))	
