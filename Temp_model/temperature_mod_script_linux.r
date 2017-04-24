@@ -679,7 +679,7 @@ print(paste("summary out site number ",i)	)
 chain1<-as.matrix(codaobj.init[[1]])
 write.table(chain1,paste0("/home/hkropp/synthesis/output_u7m7/site",sitesS$siteid[i],"chain1_coda.csv"), sep=",")
 chain2<-as.matrix(codaobj.init[[2]])
-write.table(chain2paste0("/home/hkropp/synthesis/output_u7m7/site",sitesS$siteid[i],"chain2_coda.csv"), sep=",")
+write.table(chain2,paste0("/home/hkropp/synthesis/output_u7m7/site",sitesS$siteid[i],"chain2_coda.csv"), sep=",")
 chain3<-as.matrix(codaobj.init[[3]])
 write.table(chain3,paste0("/home/hkropp/synthesis/output_u7m7/site",sitesS$siteid[i],"chain3_coda.csv"), sep=",")
 			
