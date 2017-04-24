@@ -41,7 +41,7 @@ model{
 		sineS[i]<-(TstepS1[i]*(T.aveS1[SDWS[i]]-((T.aveS1[SDWS[i]]-TminS[SDWS[i]])*sin(2*3.14159265*T.offS[i]))))+
 				(TstepS2[i]*((TminS[SDWS[i]]+((TmaxS[SDWS[i]]-TminS[SDWS[i]])/2))-(((TmaxS[SDWS[i]]-TminS[SDWS[i]])/2)*sin(2*3.14159265*T.offS[i]))))+
 				(TstepS3[i]*(T.aveS2[SDWS[i]]-((TmaxS[SDWS[i]]-T.aveS2[SDWS[i]])*sin(2*3.14159265*T.offS[i]))))
-		muS[i]<-sineS[i]+(soilAR[site.depthidS[i]]*(TempS[i-1]-sineS[i-1])))
+		muS[i]<-sineS[i]+(soilAR[site.depthidS[i]]*(TempS[i-1]-sineS[i-1]))
 		#cacluation for freezing degree day
 		#set to zero if not freezing
 		#FreezeS[i]<-(1-step(TempS[i]))*TempS[i]
