@@ -584,8 +584,8 @@ AirM2<-join(A.DOY, AirS, by=c("decdate","height","siteid","wyear"), type="left" 
 
 
 #model
-write.table(AirM2,"/home/hkropp/synthesis/output_u7m7/Tair_model.csv",sep=",",row.names=FALSE)
-write.table(SoilM2,"/home/hkropp/synthesis/output_u7m7/Tsoil_model.csv",sep=",",row.names=FALSE)
+write.table(AirM2,"/home/hkropp/synthesis/output_u7m8/Tair_model.csv",sep=",",row.names=FALSE)
+write.table(SoilM2,"/home/hkropp/synthesis/output_u7m8/Tsoil_model.csv",sep=",",row.names=FALSE)
 
 #turn Air M2 into a list
 #get the unique sites list
@@ -623,11 +623,11 @@ for(i in 1:dim(sitesS)[1]){
 
 #need to write ids to table
 
-write.table(AirIDS2,"/home/hkropp/synthesis/output_u7m7/AirIDS.csv", sep=",", row.names=FALSE)
-write.table(SoilIDS2,"/home/hkropp/synthesis/output_u7m7/SoilIDS.csv", sep=",", row.names=FALSE)
+write.table(AirIDS2,"/home/hkropp/synthesis/output_u7m8/AirIDS.csv", sep=",", row.names=FALSE)
+write.table(SoilIDS2,"/home/hkropp/synthesis/output_u7m8/SoilIDS.csv", sep=",", row.names=FALSE)
 
-write.table(site.heightA,"/home/hkropp/synthesis/output_u7m7/AirIDS_SD.csv", sep=",", row.names=FALSE)
-write.table(site.depthidS,"/home/hkropp/synthesis/output_u7m7/SoilIDS_SD.csv", sep=",", row.names=FALSE)
+write.table(site.heightA,"/home/hkropp/synthesis/output_u7m8/AirIDS_SD.csv", sep=",", row.names=FALSE)
+write.table(site.depthidS,"/home/hkropp/synthesis/output_u7m8/SoilIDS_SD.csv", sep=",", row.names=FALSE)
 
 #write.table(IDforCombo, "/home/hkropp/synthesis/output_u7m7/NfactorIDS.csv",sep=",", row.names=FALSE)
 print("ID write out")	
@@ -645,7 +645,7 @@ datalist<-list(NobsA=dim(AirSitesD3[[i]])[1], TempA=AirSitesD3[[i]]$A, site.dept
 				NSDWS=dim(SoilSDW[[i]])[1], SDWS=SoilSitesD3[[i]]$siteSDW, SDWA=AirSitesD3[[i]]$siteSDW)
 				
 samplelist<-c("T.aveA1","T.aveA2","TminA","TmaxA","T.aveS1","T.aveS2","TmaxS","TminS","sig.muA","sig.muS","startA","startS",
-				 "airAR","soilAR","muS","muA")
+				 "airAR","soilAR","muS","muA", "aZero", "bZero")
 
 print(paste("start initialize site number", i))
 temp.modI<-jags.model(file="/home/hkropp/github/synthesis_database/Temp_model/temperature_mod_code.r",
@@ -656,7 +656,7 @@ temp.modI<-jags.model(file="/home/hkropp/github/synthesis_database/Temp_model/te
 
 print(paste("initialize done site number ",i ))						
 n.iter.i=2000
-n.thin=1
+n.thin=10
 codaobj.init = coda.samples(temp.modI,variable.names=samplelist,
                        n.iter=n.iter.i, thin=n.thin)
 					   
@@ -665,11 +665,11 @@ print(paste("samples done done site number= ", i))
 
 
 Mod.out<-summary(codaobj.init)
-dir.create(paste0("/home/hkropp/synthesis/output_u7m7/site",sitesS$siteid[i]))
+dir.create(paste0("/home/hkropp/synthesis/output_u7m8/site",sitesS$siteid[i]))
 
-write.table(Mod.out$statistics, paste0("/home/hkropp/synthesis/output_u7m7/site",sitesS$siteid[i],"Temp_mod_stats.csv"),
+write.table(Mod.out$statistics, paste0("/home/hkropp/synthesis/output_u7m8/site",sitesS$siteid[i],"Temp_mod_stats.csv"),
 			sep=",",row.names=TRUE)
-write.table(Mod.out$quantiles, paste0("/home/hkropp/synthesis/output_u7m7/site",sitesS$siteid[i],"Temp_mod_quant.csv"),
+write.table(Mod.out$quantiles, paste0("/home/hkropp/synthesis/output_u7m8/site",sitesS$siteid[i],"Temp_mod_quant.csv"),
 			sep=",",row.names=TRUE)
 			
 print(paste("summary out site number ",i)	)
@@ -677,18 +677,18 @@ print(paste("summary out site number ",i)	)
 
 
 chain1<-as.matrix(codaobj.init[[1]])
-write.table(chain1,paste0("/home/hkropp/synthesis/output_u7m7/site",sitesS$siteid[i],"chain1_coda.csv"), sep=",")
+write.table(chain1,paste0("/home/hkropp/synthesis/output_u7m8/site",sitesS$siteid[i],"chain1_coda.csv"), sep=",")
 chain2<-as.matrix(codaobj.init[[2]])
-write.table(chain2,paste0("/home/hkropp/synthesis/output_u7m7/site",sitesS$siteid[i],"chain2_coda.csv"), sep=",")
+write.table(chain2,paste0("/home/hkropp/synthesis/output_u7m8/site",sitesS$siteid[i],"chain2_coda.csv"), sep=",")
 chain3<-as.matrix(codaobj.init[[3]])
-write.table(chain3,paste0("/home/hkropp/synthesis/output_u7m7/site",sitesS$siteid[i],"chain3_coda.csv"), sep=",")
+write.table(chain3,paste0("/home/hkropp/synthesis/output_u7m8/site",sitesS$siteid[i],"chain3_coda.csv"), sep=",")
 			
 print(paste("coda out site number ", i))	
 
 			
 mcmcplot(codaobj.init, parms=c("T.aveA1","T.aveA2","TminA","TmaxA","T.aveS1","T.aveS2",
 			"TmaxS","TminS","sig.muA","sig.muS","startA","startS","airAR","soilAR"),
-			dir=paste0("/home/hkropp/synthesis/output_u7m7/site",sitesS$siteid[i]))		
+			dir=paste0("/home/hkropp/synthesis/output_u7m8/site",sitesS$siteid[i]))		
 #get summary and save to file
 
 print(paste("mcmcplot out site number ", i))	
