@@ -281,6 +281,14 @@ for(i in 1:Nsite){
 
 
 Air<-ldply(sA,data.frame)
+#need to account for the unknown Air temp height at Prudoe bay
+#data was taken from a met station where it is likely 2m but
+#can't confirm. Going to mark as a number so doesn't get omitted
+#with the rest of nas siteid 76-92 will have a na for the air temp
+#height
+#just give a number so setting to 1
+Air$depth<-ifelse(Air$siteid>=76&Air$siteid<=92,1,Air$depth)
+#omit NA
 Airnn<-na.omit(Air)
 								
 
