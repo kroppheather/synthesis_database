@@ -611,6 +611,7 @@ AirSitesD2<-list()
 AirSitesD3<-list()
 SoilSitesD2<-list()
 SoilSitesD3<-list()
+#pull out data in data frame to a list
 for(i in 1:dim(sitesS)[1]){
 	AirSitesD[[i]]<-AirM2[AirM2$siteid==sitesS$siteid[i],]
 	SoilSitesD[[i]]<-SoilM2[SoilM2$siteid==sitesS$siteid[i],]
@@ -639,11 +640,14 @@ write.table(site.depthidS,"/home/hkropp/synthesis/output_u7m8/SoilIDS_SD.csv", s
 
 #write.table(IDforCombo, "/home/hkropp/synthesis/output_u7m7/NfactorIDS.csv",sep=",", row.names=FALSE)
 print("ID write out")	
+#designate the 	samples to run			
+samplelist<-c("T.aveA1","T.aveA2","TminA","TmaxA","T.aveS1","T.aveS2","TmaxS","TminS","sig.muA","sig.muS","startA","startS",
+				 "muS","muA", "aZero", "bZero", "zeroC")
 
 
 for(i in 1:dim(sitesS)[1]){
 
-
+#make the data list for the model
 datalist<-list(NobsA=dim(AirSitesD3[[i]])[1], TempA=AirSitesD3[[i]]$A, site.depthidA=AirSitesD3[[i]]$siteSD,
 				T.yrA=AirSitesD3[[i]]$decdate-1991,yearA=floor(AirSitesD3[[i]]$decdate-1991),
 				NobsS=dim(SoilSitesD3[[i]])[1], TempS=SoilSitesD3[[i]]$T,
@@ -651,9 +655,6 @@ datalist<-list(NobsA=dim(AirSitesD3[[i]])[1], TempA=AirSitesD3[[i]]$A, site.dept
 				yearS=floor(SoilSitesD3[[i]]$decdate-1991),
 				NsitedepthA=dim(AirSD[[i]])[1],NsitedepthS=dim(SoilSD[[i]])[1], NSDWA=dim(AirSDW[[i]])[1],
 				NSDWS=dim(SoilSDW[[i]])[1], SDWS=SoilSitesD3[[i]]$siteSDW, SDWA=AirSitesD3[[i]]$siteSDW)
-				
-samplelist<-c("T.aveA1","T.aveA2","TminA","TmaxA","T.aveS1","T.aveS2","TmaxS","TminS","sig.muA","sig.muS","startA","startS",
-				 "muS","muA", "aZero", "bZero", "zeroC")
 
 print(paste("start initialize site number", i))
 temp.modI<-jags.model(file="/home/hkropp/github/synthesis_database/Temp_model/temperature_mod_code.r",
@@ -662,7 +663,8 @@ temp.modI<-jags.model(file="/home/hkropp/github/synthesis_database/Temp_model/te
 						n.chains=3)
 
 
-print(paste("initialize done site number ",i ))						
+print(paste("initialize done site number ",i ))		
+#specify sample run				
 n.iter.i=2000
 n.thin=10
 codaobj.init = coda.samples(temp.modI,variable.names=samplelist,
@@ -671,7 +673,7 @@ codaobj.init = coda.samples(temp.modI,variable.names=samplelist,
 					   
 print(paste("samples done done site number= ", i))
 
-
+#pull out model stats
 Mod.out<-summary(codaobj.init)
 dir.create(paste0("/home/hkropp/synthesis/output_u7m8/site",sitesS$siteid[i]))
 
@@ -682,7 +684,7 @@ write.table(Mod.out$quantiles, paste0("/home/hkropp/synthesis/output_u7m8/site",
 			
 print(paste("summary out site number ",i)	)
 
-
+#save coda
 
 chain1<-as.matrix(codaobj.init[[1]])
 write.table(chain1,paste0("/home/hkropp/synthesis/output_u7m8/site",sitesS$siteid[i],"chain1_coda.csv"), sep=",")
@@ -692,7 +694,7 @@ chain3<-as.matrix(codaobj.init[[3]])
 write.table(chain3,paste0("/home/hkropp/synthesis/output_u7m8/site",sitesS$siteid[i],"chain3_coda.csv"), sep=",")
 			
 print(paste("coda out site number ", i))	
-
+#run mcmc plots on key params
 			
 mcmcplot(codaobj.init, parms=c("T.aveA1","T.aveA2","TminA","TmaxA","T.aveS1","T.aveS2",
 			"TmaxS","TminS","sig.muA","sig.muS","startA","startS","aZero", "bZero", "zeroC"),
