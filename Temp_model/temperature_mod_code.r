@@ -30,9 +30,7 @@ model{
 				(TstepS3[i]*(T.aveS2[SDWS[i]]-((TmaxS[SDWS[i]]-T.aveS2[SDWS[i]])*sin(2*3.14159265*T.offS[i]))))
 				
 		X[i]~dbern(p[i])
-		p[i]<-(step(startflagS[i])*aZero[SDWS[i]]*exp(-bZero[SDWS[i]]*abs(TempS[i-1]-0)))+
-				((1-step(startflagS[i]))*aZero[SDWS[i]]*exp(-bZero[SDWS[i]]
-				*abs((TstepS1[i]*(T.aveS1[SDWS[i]]-((T.aveS1[SDWS[i]]-TminS[SDWS[i]])*sin(2*3.14159265*(T.offS[i]-(1/365)))))))))
+		p[i]<-*aZero[SDWS[i]]*exp(-bZero[SDWS[i]]*abs(TempS[i-1]-0))
 		
 		#cacluation for freezing degree day
 		#set to zero if not freezing
