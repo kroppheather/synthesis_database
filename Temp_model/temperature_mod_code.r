@@ -52,7 +52,7 @@ model{
 				(TstepS2[1]*((TminS[SDWS[1]]+((TmaxS[SDWS[1]]-TminS[SDWS[1]])/2))-(((TmaxS[SDWS[1]]-TminS[SDWS[1]])/2)*sin(2*3.14159265*T.offS[1]))))+
 				(TstepS3[1]*(T.aveS2[SDWS[1]]-((TmaxS[SDWS[1]]-T.aveS2[SDWS[1]])*sin(2*3.14159265*T.offS[1]))))
 		X[1]~dbern(p[1])
-		p[1]<-dunif(0,1)
+		p[1]~dunif(0,1)
 					
 				
 				

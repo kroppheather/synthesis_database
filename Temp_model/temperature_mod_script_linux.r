@@ -653,7 +653,7 @@ datalist<-list(NobsA=dim(AirSitesD3[[i]])[1], TempA=AirSitesD3[[i]]$A, site.dept
 				NSDWS=dim(SoilSDW[[i]])[1], SDWS=SoilSitesD3[[i]]$siteSDW, SDWA=AirSitesD3[[i]]$siteSDW)
 				
 samplelist<-c("T.aveA1","T.aveA2","TminA","TmaxA","T.aveS1","T.aveS2","TmaxS","TminS","sig.muA","sig.muS","startA","startS",
-				 "airAR","soilAR","muS","muA", "aZero", "bZero")
+				 "muS","muA", "aZero", "bZero", "zeroC")
 
 print(paste("start initialize site number", i))
 temp.modI<-jags.model(file="/home/hkropp/github/synthesis_database/Temp_model/temperature_mod_code.r",
@@ -695,7 +695,7 @@ print(paste("coda out site number ", i))
 
 			
 mcmcplot(codaobj.init, parms=c("T.aveA1","T.aveA2","TminA","TmaxA","T.aveS1","T.aveS2",
-			"TmaxS","TminS","sig.muA","sig.muS","startA","startS","airAR","soilAR"),
+			"TmaxS","TminS","sig.muA","sig.muS","startA","startS","aZero", "bZero", "zeroC"),
 			dir=paste0("/home/hkropp/synthesis/output_u7m8/site",sitesS$siteid[i]))		
 #get summary and save to file
 
