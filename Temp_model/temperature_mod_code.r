@@ -57,15 +57,15 @@ model{
 				
 				
 	#look at a subset of replicated data since there is too much temp data to monitor
-	for(i in 1:NrepS){
-		TempS.rep[i]~dnorm(muS[SrepSub[i]], tau.muS)
+	#for(i in 1:NrepS){
+	#	TempS.rep[i]~dnorm(muS[SrepSub[i]], tau.muS)
 	
-	}
+	#}
 	
-	for(i in 1:NrepA){
-		TempA.rep[i]~dnorm(muA[ArepSub[i]], tau.muA)
+	#for(i in 1:NrepA){
+	#	TempA.rep[i]~dnorm(muA[ArepSub[i]], tau.muA)
 	
-	}
+	#}
 	
 	#prior for likelihood
 	for(i in 1:NSDWA){
