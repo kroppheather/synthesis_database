@@ -45,7 +45,7 @@ model{
 		TstepS2[1]<-ifelse(T.yrS[1]>peakWS[SDWS[1]],ifelse(T.yrS[1]<peakSS[SDWS[1]],1,0),0)
 		TstepS3[1]<-ifelse(T.yrS[1]>=peakSS[SDWS[1]],1,0)
 		muS[1]<-X[1]*zeroC+ ((1-X[1])*sineS[1])
-		sineS[1]<-(TstepS1[1]*(T.aveS1[SDWS[1]]-((T.aveS1[SDWS[1]]-TminS[SDWS[1]])*s1n(2*3.14159265*((.25/peakWS[SDWS[1]])*T.yrS[1])))))+
+		sineS[1]<-(TstepS1[1]*(T.aveS1[SDWS[1]]-((T.aveS1[SDWS[1]]-TminS[SDWS[1]])*sin(2*3.14159265*((.25/peakWS[SDWS[1]])*T.yrS[1])))))+
 				(TstepS2[1]*((TminS[SDWS[1]]+((TmaxS[SDWS[1]]-TminS[SDWS[1]])/2))-(((TmaxS[SDWS[1]]-TminS[SDWS[1]])/2)*sin(2*3.14159265*((.5/(peakSS[SDWS[1]]-peakWS[SDWS[1]]))*(T.yrS[1]-peakWS[SDWS[1]])+.25)))))+
 				(TstepS3[1]*(T.aveS2[SDWS[1]]-((TmaxS[SDWS[1]]-T.aveS2[SDWS[1]])*sin(2*3.14159265*((.25/(1-peakSS[SDWS[1]]))*(T.yrS[1]-peakSS[SDWS[1]])+.75)))))
 				
