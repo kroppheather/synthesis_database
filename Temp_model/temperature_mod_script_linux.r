@@ -652,10 +652,10 @@ for(i in 1:dim(sitesS)[1]){
 
 #make the data list for the model
 datalist<-list(NobsA=dim(AirSitesD3[[i]])[1], TempA=AirSitesD3[[i]]$A, 
-				T.yrA=AirSitesD3[[i]]$decdate-1991,
+				TdateA=AirSitesD3[[i]]$decdate-1991,yearA=AirSitesD3[[i]]$wyear-1991,
 				NobsS=dim(SoilSitesD3[[i]])[1], TempS=SoilSitesD3[[i]]$T,
-				 T.yrS=SoilSitesD3[[i]]$decdate-1991,
-				 NSDWA=dim(AirSDW[[i]])[1],
+				 TdateS=SoilSitesD3[[i]]$decdate-1991,
+				 NSDWA=dim(AirSDW[[i]])[1],yearS=SoilSitesD3[[i]]$wyear-1991,
 				NSDWS=dim(SoilSDW[[i]])[1], SDWS=SoilSitesD3[[i]]$siteSDW, SDWA=AirSitesD3[[i]]$siteSDW)
 
 print(paste("start initialize site number", i))
