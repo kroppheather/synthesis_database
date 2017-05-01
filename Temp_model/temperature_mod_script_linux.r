@@ -653,7 +653,7 @@ for(i in 1:dim(sitesS)[1]){
 
 #make the data list for the model
 datalist<-list(NobsA=dim(AirSitesD3[[i]])[1], TempA=AirSitesD3[[i]]$A, 
-				TyrA=AirSitesD3[[i]]$TyrA,
+				T.yrA=AirSitesD3[[i]]$TyrA,
 				NobsS=dim(SoilSitesD3[[i]])[1], TempS=SoilSitesD3[[i]]$T,
 				 T.yrS=SoilSitesD3[[i]]$TyrS,
 				 NSDWA=dim(AirSDW[[i]])[1],
