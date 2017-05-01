@@ -1,6 +1,6 @@
 library(plyr)
 #read in data
-setwd("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod8\\output_u7m8")
+setwd("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod7\\output_u7m7")
 
 datAI<-read.csv("AirIDS.csv")
 datSI<-read.csv("SoilIDS.csv")
