@@ -1,6 +1,6 @@
 library(plyr)
 #read in data
-setwd("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod7\\output_u7m7")
+setwd("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod8\\output_u7m8")
 
 datAI<-read.csv("AirIDS.csv")
 datSI<-read.csv("SoilIDS.csv")
@@ -59,9 +59,13 @@ for(i in 1:dim(siteall)[1]){
 
 
 datCS<-list()
+datCS2<-list()
+datCS3<-list()
 datCA<-list()
 datCSM<-list()
 datCAM<-list()
+psplit<-list()
+pEnd<-list()
 
 
 #now pull out id number
@@ -69,8 +73,12 @@ dexps2<-"\\D"
 
 #subset first to only look at soil parms
 for(i in 1:dim(siteall)[1]){
-	datCS[[i]]<-datC[[i]][datC[[i]]$parms1=="T.aveS1"|datC[[i]]$parms1=="T.aveS2"|datC[[i]]$parms1=="TmaxS"|datC[[i]]$parms1=="TminS"|datC[[i]]$parms1=="startS"|datC[[i]]$parms1=="soilAR",]
-	datCA[[i]]<-datC[[i]][datC[[i]]$parms1=="T.aveA1"|datC[[i]]$parms1=="T.aveA2"|datC[[i]]$parms1=="TmaxA"|datC[[i]]$parms1=="TminA"|datC[[i]]$parms1=="startA"|datC[[i]]$parms1=="airAR",]
+	datCS[[i]]<-datC[[i]][datC[[i]]$parms1=="T.aveS1"|datC[[i]]$parms1=="T.aveS2"|datC[[i]]$parms1=="TmaxS"|datC[[i]]$parms1=="TminS",]
+	datCS2[[i]]<-datC[[i]][datC[[i]]$parms1=="startS",]
+	datCS3[[i]]<-datC[[i]][datC[[i]]$parms1=="soilAR",]
+	datCA[[i]]<-datC[[i]][datC[[i]]$parms1=="T.aveA1"|datC[[i]]$parms1=="T.aveA2"|datC[[i]]$parms1=="TmaxA"|datC[[i]]$parms1=="TminA",]
+	psplit[[i]]<-strsplit(rownames(datCS[[i]]), "\\[")
+	
 	#now pull out mu
 	datCSM[[i]]<-datC[[i]][datC[[i]]$parms1=="muS",]
 	datCAM[[i]]<-datC[[i]][datC[[i]]$parms1=="muA",]
@@ -78,7 +86,18 @@ for(i in 1:dim(siteall)[1]){
 	datCAM[[i]]$ID<-as.numeric(gsub(dexps2,"", row.names(datCAM[[i]] )))
 	datCSM[[i]]$depth<-datSM$depth[datSM$siteid==siteall$siteid[i]]
 	datCAM[[i]]$depth<-datAM$height[datAM$siteid==siteall$siteid[i]]
+	
+}	
+	
+for(i in 1:dim(siteall)[1]){	
+	#now join with ID info
+	for(j in 1:dim(datCS[[i]])[1]){
+		if(length(psplit[[i]][[j]])>1){
+			pEnd[[i]][j]<-psplit[[i]][[j]]	
+		}else{pEnd[i]<-"NA"}
 	}
+	
+}
 
 
 
@@ -91,13 +110,12 @@ for(i in 1:dim(siteall)[1]){
 #pull out names
 #pnames<-rownames(datCS)
 #need to split because there are numbers in param names
-#psplit<-strsplit(pnames, "\\[")
+
 #pull out vector number
 #pEnd<-character(0)
-#for(i in 1:dim(datCS)[1]){
-#	if(length(psplit[[i]])>1){
-#		pEnd[i]<-psplit[[i]][2]
-#	}else{pEnd[i]<-"NA"}
+
+
+	
 
 #}
 
@@ -135,7 +153,7 @@ datSM$decdateA[datSM$siteid==1&datSM$depth==depthP[[1]][1]]
 
 for(n in 1:dim(sitesS)[1]){	
 	i<-sitesS$siteid[n]
-	jpeg(file=paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod7\\plots\\soil\\site",i,".jpg"),
+	jpeg(file=paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod8\\plots\\soil\\site",i,".jpg"),
 			width=1500,height=1000, units="px")
 	par(mai=c(2,2,2,2))
 	plot(c(0,1),c(0,1),type="n",xlim=c(min(datSM$decdateA[datSM$siteid==i]),max(datSM$decdateA[datSM$siteid==i])),
@@ -164,7 +182,7 @@ for(n in 1:dim(sitesS)[1]){
 
 for(n in 1:dim(sitesS)[1]){	
 	i<-sitesS$siteid[n]
-	jpeg(file=paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod7\\plots\\air\\site",i,".jpg"),
+	jpeg(file=paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod8\\plots\\air\\site",i,".jpg"),
 			width=1500,height=1000, units="px")
 	par(mai=c(2,2,2,2))
 	plot(c(0,1),c(0,1),type="n",xlim=c(min(datAM$decdateA[datAM$siteid==i]),max(datAM$decdateA[datAM$siteid==i])),
