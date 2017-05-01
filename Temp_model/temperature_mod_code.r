@@ -2,7 +2,6 @@ model{
 #likelihood for air temperature observations
 	for(i in 1:NobsA){
 		TempA[i]~dnorm(muA[i], tau.muA)
-		T.yrA[i]<-TdateA[i]-yearA[i]
 		Tstep1[i]<-ifelse(T.yrA[i]<=peakWA[SDWA[i]],1,0)
 		Tstep2[i]<-ifelse(T.yrA[i]>peakWA[SDWA[i]],ifelse(T.yrA[i]<peakSA[SDWA[i]],1,0),0)
 		Tstep3[i]<-ifelse(T.yrA[i]>=peakSA[SDWA[i]],1,0)
@@ -21,7 +20,6 @@ model{
 	#likelihood for soil temperature observations
 	for(i in 2:NobsS){
 		TempS[i]~dnorm(muS[i], tau.muS)
-		T.yrS[i]<-TdateS[i]-yearS[i]
 		TstepS1[i]<-ifelse(T.yrS[i]<=peakWS[SDWS[i]],1,0)
 		TstepS2[i]<-ifelse(T.yrS[i]>peakWS[SDWS[i]],ifelse(T.yrS[i]<peakSS[SDWS[i]],1,0),0)
 		TstepS3[i]<-ifelse(T.yrS[i]>=peakSS[SDWS[i]],1,0)
@@ -42,7 +40,6 @@ model{
 	}
 		
 		TempS[1]~dnorm(muS[1], tau.muS)
-		T.yrA[1]<-TdateA[1]-yearA[1]
 		TstepS1[1]<-ifelse(T.yrS[1]<=peakWS[SDWS[1]],1,0)
 		TstepS2[1]<-ifelse(T.yrS[1]>peakWS[SDWS[1]],ifelse(T.yrS[1]<peakSS[SDWS[1]],1,0),0)
 		TstepS3[1]<-ifelse(T.yrS[1]>=peakSS[SDWS[1]],1,0)

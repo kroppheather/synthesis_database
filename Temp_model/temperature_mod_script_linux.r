@@ -628,7 +628,8 @@ for(i in 1:dim(sitesS)[1]){
 	AirSitesD3[[i]]<-join(AirSitesD2[[i]],AirSDW[[i]], by=c("siteid","height","wyear","SDWA"), type="left")
 	SoilSitesD2[[i]]<-join(SoilSitesD[[i]],SoilSDW[[i]], by=c("siteid","depth","wyear","SDWS"),type="left")
 	SoilSitesD3[[i]]<-join(SoilSitesD2[[i]],SoilSD[[i]], by=c("siteid","depth","SDS"),type="left")
-	
+	SoilSitesD3[[i]]$TyrS<-SoilSitesD3[[i]]$decdate-SoilSitesD3[[i]]$wyear
+	AirSitesD3[[i]]$TyrA<-AirSitesD3[[i]]$decdate-AirSitesD3[[i]]$wyear
 	}
 
 
@@ -652,10 +653,10 @@ for(i in 1:dim(sitesS)[1]){
 
 #make the data list for the model
 datalist<-list(NobsA=dim(AirSitesD3[[i]])[1], TempA=AirSitesD3[[i]]$A, 
-				TdateA=AirSitesD3[[i]]$decdate-1991,yearA=AirSitesD3[[i]]$wyear-1991,
+				TyrA=AirSitesD3[[i]]$TyrA,
 				NobsS=dim(SoilSitesD3[[i]])[1], TempS=SoilSitesD3[[i]]$T,
-				 TdateS=SoilSitesD3[[i]]$decdate-1991,
-				 NSDWA=dim(AirSDW[[i]])[1],yearS=SoilSitesD3[[i]]$wyear-1991,
+				 T.yrS=SoilSitesD3[[i]]$TyrS,
+				 NSDWA=dim(AirSDW[[i]])[1],
 				NSDWS=dim(SoilSDW[[i]])[1], SDWS=SoilSitesD3[[i]]$siteSDW, SDWA=AirSitesD3[[i]]$siteSDW)
 
 print(paste("start initialize site number", i))
