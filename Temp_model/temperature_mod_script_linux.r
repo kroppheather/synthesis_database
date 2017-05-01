@@ -651,11 +651,10 @@ samplelist<-c("T.aveA1","T.aveA2","TminA","TmaxA","T.aveS1","T.aveS2","TmaxS","T
 for(i in 1:dim(sitesS)[1]){
 
 #make the data list for the model
-datalist<-list(NobsA=dim(AirSitesD3[[i]])[1], TempA=AirSitesD3[[i]]$A, site.depthidA=AirSitesD3[[i]]$siteSD,
-				T.yrA=AirSitesD3[[i]]$decdate-1991,yearA=floor(AirSitesD3[[i]]$decdate-1991),
+datalist<-list(NobsA=dim(AirSitesD3[[i]])[1], TempA=AirSitesD3[[i]]$A, 
+				T.yrA=AirSitesD3[[i]]$decdate-1991,
 				NobsS=dim(SoilSitesD3[[i]])[1], TempS=SoilSitesD3[[i]]$T,
-				site.depthidS=SoilSitesD3[[i]]$siteSD, T.yrS=SoilSitesD3[[i]]$decdate-1991,
-				yearS=floor(SoilSitesD3[[i]]$decdate-1991),
+				 T.yrS=SoilSitesD3[[i]]$decdate-1991,
 				NsitedepthA=dim(AirSD[[i]])[1],NsitedepthS=dim(SoilSD[[i]])[1], NSDWA=dim(AirSDW[[i]])[1],
 				NSDWS=dim(SoilSDW[[i]])[1], SDWS=SoilSitesD3[[i]]$siteSDW, SDWA=AirSitesD3[[i]]$siteSDW)
 

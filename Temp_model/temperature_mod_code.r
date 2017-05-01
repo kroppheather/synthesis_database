@@ -41,10 +41,9 @@ model{
 	}
 	
 		TempS[1]~dnorm(muS[1], tau.muS)
-		T.offS[1]<-T.yrS[1]-startS[site.depthidS[1]]
-		TstepS1[1]<-ifelse(T.offS[1]-yearS[1]<0.25,1,0)
-		TstepS2[1]<-ifelse(T.offS[1]-yearS[1]>=0.25,ifelse(T.offS[1]-yearS[1]<0.75,1,0),0)
-		TstepS3[1]<-ifelse(T.offS[1]-yearS[1]>=0.75,1,0)
+		TstepS1[1]<-ifelse(T.yrS[1]<=peakWS[SDWS[1]],1,0)
+		TstepS2[1]<-ifelse(T.yrS[1]>peakWS[SDWS[1]],ifelse(T.yrS[1]<peakSS[SDWS[1]],1,0),0)
+		TstepS3[1]<-ifelse(T.yrS[1]>=peakSS[SDWS[1]],1,0)
 		muS[1]<-X[1]*zeroC+ ((1-X[1])*sineS[1])
 		sineS[1]<-(TstepS1[1]*(T.aveS1[SDWS[1]]-((T.aveS1[SDWS[1]]-TminS[SDWS[1]])*s1n(2*3.14159265*((.25/peakWS[SDWS[1]])*T.yrS[1])))))+
 				(TstepS2[1]*((TminS[SDWS[1]]+((TmaxS[SDWS[1]]-TminS[SDWS[1]])/2))-(((TmaxS[SDWS[1]]-TminS[SDWS[1]])/2)*sin(2*3.14159265*((.5/(peakSS[SDWS[1]]-peakWS[SDWS[1]]))*(T.yrS[1]-peakWS[SDWS[1]])+.25)))))+
@@ -76,10 +75,6 @@ model{
 		peakSA[i]~dunif(.55,.9)
 	}
 	
-	for(i in 1:NsitedepthA){
-
-		startA[i]~dunif(0,.3)
-	}
 	#prior for likelihood
 	for(i in 1:NSDWS){
 		T.aveS1[i]~dnorm(0,.0001)
@@ -93,9 +88,6 @@ model{
 	
 	}
 	
-	for(i in 1:NsitedepthS){
-		startS[i]~dunif(0,.3)
-	}
 	
 	#mean for a zero curtain
 	
