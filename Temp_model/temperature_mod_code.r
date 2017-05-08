@@ -65,9 +65,11 @@ model{
 	#}
 	
 	#prior for likelihood
-	for(i in 1:NSDWA){
-		T.aveA1[i]~dnorm(0,.04)T(-15,15)
-		T.aveA2[i]~dnorm(0,.04)T(-15,15)
+	
+		T.aveA1[i]~dnorm(0,.04)
+		T.aveA2[i]~dnorm(0,.04)
+		
+	for(i in 1:NSDWA){	
 		TminA[i]~dunif(-60,0)
 		TmaxA[i]~dunif(0,35)
 		peakWA[i]~dunif(0.1,.5)

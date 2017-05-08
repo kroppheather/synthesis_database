@@ -634,7 +634,6 @@ for(i in 1:dim(sitesS)[1]){
 	Tave2IDA[[i]]<-join(Tave1IDA[[i]], IDstep3A[[i]], by=c("siteid","height","wyear2"), type="left")
 	#now join back into Air and soil data
 	SoilSitesD3[[i]]<-join(Tave2ID[[i]],SoilSitesD2[[i]], by=c("siteid","depth","wyear"), type="right")
-	
 	AirSitesD3[[i]]<-join(Tave2IDA[[i]],AirSitesD2[[i]], by=c("siteid","height","wyear"), type="right")
 	
 }
@@ -643,23 +642,38 @@ ALLSyearID<-ldply(Tave2ID,data.frame)
 ALLAyearID<-ldply(Tave2IDA,data.frame)
 
 
-#create index to some for degree days
-AYlength<-numeric(0)
-ASY<-numeric(0)
-AEY<-numeric(0)
-for(i in 1:dim(AirIDS2)[1]){
-	AYlength[i]<-length(AirM2$indexI[AirM2$SDWA==AirIDS2$SDWA[i]])
-	ASY[i]<-AirM2$indexI[AirM2$SDWA==AirIDS2$SDWA[i]][1]
-	AEY[i]<-AirM2$indexI[AirM2$SDWA==AirIDS2$SDWA[i]][AYlength[i]]
-}
+
+#############################
+###############now need to get degree days
+###############to sum over.
 #create index for soil
-SYlength<-numeric(0)
-SSY<-numeric(0)
-SEY<-numeric(0)
-for(i in 1:dim(SoilIDS2)[1]){
-	SYlength[i]<-length(SoilM2$indexI[SoilM2$SDWS==SoilIDS2$SDWS[i]])
-	SSY[i]<-SoilM2$indexI[SoilM2$SDWS==SoilIDS2$SDWS[i]][1]
-	SEY[i]<-SoilM2$indexI[SoilM2$SDWS==SoilIDS2$SDWS[i]][SYlength[i]]
+SSc<-list()
+for(i in 1:dim(sitesS)[1]){	
+	SSc[[i]]<-data.frame(SYlength=rep(0,dim(SoilSDW[[i]])[1]))
+	SSc[[i]]$SSY<-rep(0,dim(SoilSDW[[i]])[1])
+	SSc[[i]]$SEY<-rep(0,dim(SoilSDW[[i]])[1])
+	
+	for(j in 1:dim(SoilSDW[[i]])[1]){
+		SSc[[i]]$SYlength[j]<-length(SoilSitesD3[[i]]$indexI[SoilSitesD3[[i]]$siteSDW==SoilSDW[[i]]$siteSDW[j]])
+		SSc[[i]]$SSY[j]<-SoilSitesD3[[i]]$indexI[SoilSitesD3[[i]]$siteSDW==SoilSDW[[i]]$siteSDW[j]][1]
+		SSc[[i]]$SEY[j]<-SoilSitesD3[[i]]$indexI[SoilSitesD3[[i]]$siteSDW==SoilSDW[[i]]$siteSDW[j]][SSc[[i]]$SYlength[j]]
+	}
+
+}
+
+#now create index for air
+ASc<-list()
+for(i in 1:dim(sitesS)[1]){
+
+	ASc[[i]]<-data.frame(AYlength=rep(0,dim(AirSDW[[i]])[1]))
+	ASc[[i]]$ASY<-rep(0,dim(AirSDW[[i]])[1])
+	ASc[[i]]$AEY<-rep(0,dim(AirSDW[[i]])[1])
+	for(j in 1:dim(AirSDW[[i]])[1]){
+	ASc[[i]]$AYlength[j]<-length(AirSitesD3[[i]]$indexI[AirSitesD3[[i]]$siteSDW==AirSDW[[i]]$siteSDW[j]])
+	ASc[[i]]$ASY[j]<-AirSitesD3[[i]]$indexI[AirSitesD3[[i]]$siteSDW==AirSDW[[i]]$siteSDW[j]][1]
+	ASc[[i]]$AEY[j]<-AirSitesD3[[i]]$indexI[AirSitesD3[[i]]$siteSDW==AirSDW[[i]]$siteSDW[j]][ASc[[i]]$AYlength[j]]
+	}
+	
 }
 
 
