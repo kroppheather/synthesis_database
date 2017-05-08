@@ -51,7 +51,12 @@ model{
 				
 		X[1]~dbern(pstart[1])
 		
-					
+			#cacluation for freezing degree day
+		#set to zero if not freezing
+		FreezeS[1]<-(1-step(TempS[1]))*TempS[1]
+		#cacluation for thawing degree day
+		#set to zero if not above zero		
+		ThawS[1]<-step(TempS[1])*TempS[1]				
 				
 				
 	#look at a subset of replicated data since there is too much temp data to monitor
