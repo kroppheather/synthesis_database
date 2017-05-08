@@ -808,7 +808,7 @@ datalist<-list(NobsA=dim(AirSitesD3[[i]])[1], TempA=AirSitesD3[[i]]$A,
 				IDSE=SoilSitesD3[[i]]$Tave2D, startflag=SoilSitesD3[[i]]$startFlag,startSub=SoilSitesD3[[i]]$startSeq,
 				NrepS=dim(Soilrepsub[[i]])[1],NrepA=dim(Airrepsub[[i]])[1],
 				SrepSub=Soilrepsub[[i]]$repID,ArepSub=Airrepsub[[i]]$repID,
-				Nstart=dim(CHFlag[[i]])[1], SSY=SSc[[i]]$SSY,SEY=SSc[[i]]$SEY, AEY=ASc[[i]]$ASY, ASY=ASc[[i]]$AEY,
+				Nstart=dim(CHFlag[[i]])[1], SSY=SSc[[i]]$SSY,SEY=SSc[[i]]$SEY, AEY=ASc[[i]]$AEY, ASY=ASc[[i]]$ASY,
 				Ncombo=dim(IDforCombo[[i]])[1], SoilIND=IDforCombo[[i]]$siteSDW,AirIND=IDforCombo[[i]]$siteSDWA)
 
 print(paste("start initialize site number", i))
