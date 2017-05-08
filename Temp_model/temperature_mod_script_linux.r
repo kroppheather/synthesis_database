@@ -675,17 +675,21 @@ for(i in 1:dim(sitesS)[1]){
 	}
 	
 }
-
+#Need to make an index for N factors that compares each depth against each air for every year
 
 #Next need to create an index that says when sites should be divided
 #want to divide each soil
 #want each soil to be divided by each air combo, but only in a year
-#IDforCombo<-join(AirIDS2,SoilIDS2, by=c("siteid","wyear"), type="inner")
-#IDforCombo$Nseq<-seq(1,dim(IDforCombo)[1])
 
+IDforCombo<-list()
+AirSDW2<-AirSDW
+for(i in 1:dim(sitesS)[1]){
+	colnames(AirSDW2[[i]])[5]<-"siteSDWA"
+	IDforCombo[[i]]<-join(AirSDW2[[i]], SoilSDW[[i]],by=c("siteid", "wyear"), type="inner")
+	IDforCombo[[i]]$Nseq<-seq(1,dim(IDforCombo[[i]])[1])
+}
 
-
-#now turn the model into a a for loop 
+IDnCombo<-ldply(IDforCombo, data.frame)
 
 
 #write.table(AirrepsubV, "/home/hkropp/synthesis/output_u7m6/AirrepID.csv", sep=",", row.names=FALSE)
@@ -706,7 +710,7 @@ write.table(ALLSyearID,"/home/hkropp/synthesis/output_u7m9/SoilTaveIDS_SD.csv", 
 write.table(ALLAyearID,"/home/hkropp/synthesis/output_u7m9/AirTaveIDS_SD.csv", sep=",", row.names=FALSE)
 
 
-
+write.table(IDnCombo,"/home/hkropp/synthesis/output_u7m9/ncomboIDS.csv", sep=",", row.names=FALSE)
 
 
 #write.table(IDforCombo, "/home/hkropp/synthesis/output_u7m7/NfactorIDS.csv",sep=",", row.names=FALSE)
