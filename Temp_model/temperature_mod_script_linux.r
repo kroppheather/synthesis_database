@@ -532,9 +532,7 @@ AirM2<-join(A.DOY, AirS, by=c("decdate","height","siteid","wyear"), type="left" 
 
 
 
-#model
-write.table(AirM2,"/home/hkropp/synthesis/output_u7m9/Tair_model.csv",sep=",",row.names=FALSE)
-write.table(SoilM2,"/home/hkropp/synthesis/output_u7m9/Tsoil_model.csv",sep=",",row.names=FALSE)
+
 
 
 ############################################
@@ -691,33 +689,109 @@ for(i in 1:dim(sitesS)[1]){
 
 IDnCombo<-ldply(IDforCombo, data.frame)
 
+#finally need to set up a flag for when a temperature measurement should not be used in 
+#a site
+SoilSDW3<-SoilSDW
+SSc2<-SSc
+CHFlag<-list()
+for(i in 1:dim(sitesS)[1]){
+	#set up a flag if the year jumps more than one or the depth changes
+	SoilSDW3[[i]]$sFlag<-rep(0,dim(SoilSDW[[i]])[1])
+	SoilSDW3[[i]]$sFlag[1]<-1
+	if(dim(SoilSDW3[[i]])[1]>1){
+		for(j in 2:dim(SoilSDW[[i]])[1]){
+			if(SoilSDW3[[i]]$depth[j]!=SoilSDW3[[i]]$depth[j-1]|(SoilSDW3[[i]]$wyear[j]-SoilSDW3[[i]]$wyear[j-1])!=1){
+				SoilSDW3[[i]]$sFlag[j]<-1
+			}
+		}
+	}
+	#now match with the corresponding row in the data using the SSC
+	SSc2[[i]]$changeFlag<-SoilSDW3[[i]]$sFlag
+	CHFlag[[i]]<-data.frame(ToFlag=SSc2[[i]]$SSY[SSc2[[i]]$changeFlag==1])
+	CHFlag[[i]]$FlagSeq<-seq(1,dim(CHFlag[[i]])[1])
+}
+#now just need to make the flag variable in the soil
+for(i in 1:dim(sitesS)[1]){
+	SoilSitesD3[[i]]$startFlag<-rep(1, dim(SoilSitesD3[[i]])[1])
+	SoilSitesD3[[i]]$startFlag[CHFlag[[i]]$ToFlag]<- -1
+	SoilSitesD3[[i]]$startSeq<-rep(1, dim(SoilSitesD3[[i]])[1])
+	SoilSitesD3[[i]]$startSeq[CHFlag[[i]]$ToFlag]<-CHFlag[[i]]$FlagSeq
+	#now get the number of start variables as an index
+	#let the default index go to one since the first
+	#row is specifically accounted for as one
+	#and the step function will make it impossible for data to account for it
+	
+}
 
-#write.table(AirrepsubV, "/home/hkropp/synthesis/output_u7m6/AirrepID.csv", sep=",", row.names=FALSE)
-#print("repA_out")
-#write.table(SoilrepsubV, "/home/hkropp/synthesis/output_u7m6/SoilrepID.csv", sep=",", row.names=FALSE)
-#print("reps_out")
+####Sample reps per site. Sample the full data if it is less than 2000, other wise  
 
+Soilrepsub<-list()
+for(i in 1:dim(sitesS)[1]){
+	if(dim(SoilSitesD3[[i]])[1]<=2000){
+	Soilrepsub[[i]]<-data.frame(repID=SoilSitesD3[[i]]$indexI)
+	Soilrepsub[[i]]$siteid<-rep(sitesS$siteid[i], dim(Soilrepsub[[i]])[1])
+	
+	}else{if(dim(SoilSitesD3[[i]])[1]>2000){
+
+			Soilrepsub[[i]]<-data.frame(repID=sample(SoilSitesD3[[i]]$indexI,2000))
+			Soilrepsub[[i]]$siteid<-rep(sitesS$siteid[i], dim(Soilrepsub[[i]])[1])
+			
+		}
+		
+	}
+}
+
+
+Airrepsub<-list()
+for(i in 1:dim(sitesS)[1]){
+	if(dim(AirSitesD3[[i]])[1]<=2000){
+	Airrepsub[[i]]<-data.frame(repID=AirSitesD3[[i]]$indexI)
+	Airrepsub[[i]]$siteid<-rep(sitesS$siteid[i], dim(Airrepsub[[i]])[1])
+	
+	}else{if(dim(AirSitesD3[[i]])[1]>2000){
+
+			Airrepsub[[i]]<-data.frame(repID=sample(AirSitesD3[[i]]$indexI,2000))
+			Airrepsub[[i]]$siteid<-rep(sitesS$siteid[i], dim(Airrepsub[[i]])[1])
+		}
+		
+	}
+}
+
+
+#write SoilSites and air sites to table
+Airrepsubout<-ldply(Airrepsub, data.frame)
+Soilrepsubout<-ldply(Soilrepsub, data.frame)
+write.table(Airrepsubout,"/home/hkropp/synthesis/output_u7m10/AirrepIDS.csv",sep=",",row.names=FALSE)
+write.table(Soilrepsubout,"/home/hkropp/synthesis/output_u7m10/SoilrepIDS.csv",sep=",",row.names=FALSE)
+
+print("repID out")
+
+Airtowriteout<-ldply(AirSitesD3, data.frame)
+Soiltowriteout<-ldply(SoilSitesD3, data.frame)
+#model
+write.table(Airtowriteout,"/home/hkropp/synthesis/output_u7m10/Tair_model.csv",sep=",",row.names=FALSE)
+write.table(Soiltowriteout,"/home/hkropp/synthesis/output_u7m10/Tsoil_model.csv",sep=",",row.names=FALSE)
 
 
 
 
 #need to write ids to table
 
-write.table(AirIDS2,"/home/hkropp/synthesis/output_u7m9/AirIDS.csv", sep=",", row.names=FALSE)
-write.table(SoilIDS2,"/home/hkropp/synthesis/output_u7m9/SoilIDS.csv", sep=",", row.names=FALSE)
+write.table(AirIDS2,"/home/hkropp/synthesis/output_u7m10/AirIDS.csv", sep=",", row.names=FALSE)
+write.table(SoilIDS2,"/home/hkropp/synthesis/output_u7m10/SoilIDS.csv", sep=",", row.names=FALSE)
 
-write.table(ALLSyearID,"/home/hkropp/synthesis/output_u7m9/SoilTaveIDS_SD.csv", sep=",", row.names=FALSE)
-write.table(ALLAyearID,"/home/hkropp/synthesis/output_u7m9/AirTaveIDS_SD.csv", sep=",", row.names=FALSE)
-
-
-write.table(IDnCombo,"/home/hkropp/synthesis/output_u7m9/ncomboIDS.csv", sep=",", row.names=FALSE)
+write.table(ALLSyearID,"/home/hkropp/synthesis/output_u7m10/SoilTaveIDS_SD.csv", sep=",", row.names=FALSE)
+write.table(ALLAyearID,"/home/hkropp/synthesis/output_u7m10/AirTaveIDS_SD.csv", sep=",", row.names=FALSE)
 
 
-#write.table(IDforCombo, "/home/hkropp/synthesis/output_u7m7/NfactorIDS.csv",sep=",", row.names=FALSE)
+write.table(IDnCombo,"/home/hkropp/synthesis/output_u7m10/ncomboIDS.csv", sep=",", row.names=FALSE)
+
+
 print("ID write out")	
 #designate the 	samples to run			
-samplelist<-c("T.aveA1","T.aveA2","TminA","TmaxA","T.aveS1","T.aveS2","TmaxS","TminS","sig.muA","sig.muS",
-				 "muS","muA", "aZero", "bZero", "zeroC", "peakWS", "peakWA", "peakSS", "peakSA")
+samplelist<-c("T.aveA1","TminA","TmaxA","T.aveS1","TmaxS","TminS","sig.muA","sig.muS",
+				 "muS","muA", "aZero", "bZero", "zeroC", "peakWS", "peakWA", "peakSS", "peakSA",
+				 "TempS.rep", "TempA.rep","pstart","Fn", "Tn","FDDA","TDDA","TDDS","FDDS")
 
 
 for(i in 1:dim(sitesS)[1]){
@@ -729,7 +803,13 @@ datalist<-list(NobsA=dim(AirSitesD3[[i]])[1], TempA=AirSitesD3[[i]]$A,
 				 T.yrS=SoilSitesD3[[i]]$TyrS,
 				 NSDWA=dim(AirSDW[[i]])[1],
 				NSDWS=dim(SoilSDW[[i]])[1], SDWS=SoilSitesD3[[i]]$siteSDW, SDWA=AirSitesD3[[i]]$siteSDW,
-				NTaveS=dim(IDstep2[[i]])[1],NTaveA=dim(IDstep2A[[i]])[1])
+				NTaveS=dim(IDstep2[[i]])[1],NTaveA=dim(IDstep2A[[i]])[1],
+				IDAS=AirSitesD3[[i]]$Tave1IDA,IDAE=AirSitesD3[[i]]$Tave2D, IDSS=SoilSitesD3[[i]]$Tave1IDA,
+				IDSE=SoilSitesD3[[i]]$Tave2D, startflag=SoilSitesD3[[i]]$startFlag,startSub=SoilSitesD3[[i]]$startSeq,
+				NrepS=dim(Soilrepsub[[i]])[1],NrepA=dim(Airrepsub[[i]])[1],
+				SrepSub=Soilrepsub[[i]]$repID,ArepSub=Airrepsub[[i]]$repID,
+				Nstart=dim(CHFlag[[i]])[1], SSY=SSc[[i]]$SSY,SEY=SSc[[i]]$SEY, AEY=ASc[[i]]$ASY, ASY=ASc[[i]]$AEY,
+				Ncombo=dim(IDforCombo[[i]])[1], SoilIND=IDforCombo[[i]]$siteSDW,AirIND=IDforCombo[[i]]$siteSDWA)
 
 print(paste("start initialize site number", i))
 temp.modI<-jags.model(file="/home/hkropp/github/synthesis_database/Temp_model/temperature_mod_code.r",
@@ -741,7 +821,7 @@ temp.modI<-jags.model(file="/home/hkropp/github/synthesis_database/Temp_model/te
 print(paste("initialize done site number ",i ))		
 #specify sample run				
 n.iter.i=2000
-n.thin=10
+n.thin=20
 codaobj.init = coda.samples(temp.modI,variable.names=samplelist,
                        n.iter=n.iter.i, thin=n.thin)
 					   
@@ -750,11 +830,11 @@ print(paste("samples done done site number= ", i))
 
 #pull out model stats
 Mod.out<-summary(codaobj.init)
-dir.create(paste0("/home/hkropp/synthesis/output_u7m9/site",sitesS$siteid[i]))
+dir.create(paste0("/home/hkropp/synthesis/output_u7m10/site",sitesS$siteid[i]))
 
-write.table(Mod.out$statistics, paste0("/home/hkropp/synthesis/output_u7m9/site",sitesS$siteid[i],"Temp_mod_stats.csv"),
+write.table(Mod.out$statistics, paste0("/home/hkropp/synthesis/output_u7m10/site",sitesS$siteid[i],"Temp_mod_stats.csv"),
 			sep=",",row.names=TRUE)
-write.table(Mod.out$quantiles, paste0("/home/hkropp/synthesis/output_u7m9/site",sitesS$siteid[i],"Temp_mod_quant.csv"),
+write.table(Mod.out$quantiles, paste0("/home/hkropp/synthesis/output_u7m10/site",sitesS$siteid[i],"Temp_mod_quant.csv"),
 			sep=",",row.names=TRUE)
 			
 print(paste("summary out site number ",i)	)
@@ -762,18 +842,18 @@ print(paste("summary out site number ",i)	)
 #save coda
 
 chain1<-as.matrix(codaobj.init[[1]])
-write.table(chain1,paste0("/home/hkropp/synthesis/output_u7m9/site",sitesS$siteid[i],"chain1_coda.csv"), sep=",")
+write.table(chain1,paste0("/home/hkropp/synthesis/output_u7m10/site",sitesS$siteid[i],"chain1_coda.csv"), sep=",")
 chain2<-as.matrix(codaobj.init[[2]])
-write.table(chain2,paste0("/home/hkropp/synthesis/output_u7m9/site",sitesS$siteid[i],"chain2_coda.csv"), sep=",")
+write.table(chain2,paste0("/home/hkropp/synthesis/output_u7m10/site",sitesS$siteid[i],"chain2_coda.csv"), sep=",")
 chain3<-as.matrix(codaobj.init[[3]])
-write.table(chain3,paste0("/home/hkropp/synthesis/output_u7m9/site",sitesS$siteid[i],"chain3_coda.csv"), sep=",")
+write.table(chain3,paste0("/home/hkropp/synthesis/output_u7m10/site",sitesS$siteid[i],"chain3_coda.csv"), sep=",")
 			
 print(paste("coda out site number ", i))	
 #run mcmc plots on key params
 			
-mcmcplot(codaobj.init, parms=c("T.aveA1","T.aveA2","TminA","TmaxA","T.aveS1","T.aveS2",
+mcmcplot(codaobj.init, parms=c("T.aveA1","TminA","TmaxA","T.aveS1",
 			"TmaxS","TminS","sig.muA","sig.muS","aZero", "bZero", "zeroC","peakWS", "peakWA", "peakSS", "peakSA"),
-			dir=paste0("/home/hkropp/synthesis/output_u7m9/site",sitesS$siteid[i]))		
+			dir=paste0("/home/hkropp/synthesis/output_u7m10/site",sitesS$siteid[i]))		
 #get summary and save to file
 
 print(paste("mcmcplot out site number ", i))	
