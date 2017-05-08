@@ -2,7 +2,7 @@
 
 library(plyr)
 #read in data
-setwd("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod7\\output_u8m8")
+setwd("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod9\\output_u7m9")
 
 datAI<-read.csv("AirIDS.csv")
 datSI<-read.csv("SoilIDS.csv")
@@ -155,7 +155,7 @@ datSM$decdateA[datSM$siteid==1&datSM$depth==depthP[[1]][1]]
 
 for(n in 1:dim(sitesS)[1]){	
 	i<-sitesS$siteid[n]
-	jpeg(file=paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod8\\plots\\soil\\site",i,".jpg"),
+	jpeg(file=paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod9\\plots\\soil\\site",i,".jpg"),
 			width=1500,height=1000, units="px")
 	par(mai=c(2,2,2,2))
 	plot(c(0,1),c(0,1),type="n",xlim=c(min(datSM$decdateA[datSM$siteid==i]),max(datSM$decdateA[datSM$siteid==i])),
@@ -184,7 +184,7 @@ for(n in 1:dim(sitesS)[1]){
 
 for(n in 1:dim(sitesS)[1]){	
 	i<-sitesS$siteid[n]
-	jpeg(file=paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod8\\plots\\air\\site",i,".jpg"),
+	jpeg(file=paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod9\\plots\\air\\site",i,".jpg"),
 			width=1500,height=1000, units="px")
 	par(mai=c(2,2,2,2))
 	plot(c(0,1),c(0,1),type="n",xlim=c(min(datAM$decdateA[datAM$siteid==i]),max(datAM$decdateA[datAM$siteid==i])),

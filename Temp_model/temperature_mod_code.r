@@ -76,8 +76,8 @@ model{
 	
 	#prior for likelihood
 	for(i in 1:NSDWS){
-		T.aveS1[i]~dnorm(0,.0001)
-		T.aveS2[i]~dnorm(0,.0001)
+		T.aveS1[i]~dnorm(0,.004)
+		T.aveS2[i]~dnorm(0,.004)
 		TmaxS[i]~dunif(0,35)	
 		TminS[i]~dunif(-60,0)
 		aZero[i]~dunif(0,1)
