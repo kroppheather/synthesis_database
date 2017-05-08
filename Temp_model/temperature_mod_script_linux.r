@@ -530,70 +530,16 @@ SoilM2<-join(S.DOY, SoilS, by=c("decdate", "depth","wyear","siteid"), type="left
 
 AirM2<-join(A.DOY, AirS, by=c("decdate","height","siteid","wyear"), type="left" )
 
-############################################
-#this will need to change if 
-#using the model for temp
-
-#create index sequence
-#SoilM2$indexI<-seq(1, dim(SoilM2)[1])
-#AirM2$indexI<-seq(1, dim(AirM2)[1])
-
-
-#create index to some for degree days
-#AYlength<-numeric(0)
-#ASY<-numeric(0)
-#AEY<-numeric(0)
-#for(i in 1:dim(AirIDS2)[1]){
-#	AYlength[i]<-length(AirM2$indexI[AirM2$SDWA==AirIDS2$SDWA[i]])
-#	ASY[i]<-AirM2$indexI[AirM2$SDWA==AirIDS2$SDWA[i]][1]
-#	AEY[i]<-AirM2$indexI[AirM2$SDWA==AirIDS2$SDWA[i]][AYlength[i]]
-#}
-#create index for soil
-#SYlength<-numeric(0)
-#SSY<-numeric(0)
-#SEY<-numeric(0)
-#for(i in 1:dim(SoilIDS2)[1]){
-#	SYlength[i]<-length(SoilM2$indexI[SoilM2$SDWS==SoilIDS2$SDWS[i]])
-#	SSY[i]<-SoilM2$indexI[SoilM2$SDWS==SoilIDS2$SDWS[i]][1]
-#	SEY[i]<-SoilM2$indexI[SoilM2$SDWS==SoilIDS2$SDWS[i]][SYlength[i]]
-#}
-
-
-#Next need to create an index that says when sites should be divided
-#want to divide each soil
-#want each soil to be divided by each air combo, but only in a year
-#IDforCombo<-join(AirIDS2,SoilIDS2, by=c("siteid","wyear"), type="inner")
-#IDforCombo$Nseq<-seq(1,dim(IDforCombo)[1])
-
-#generate replicate id subset
-#Soilrepsub<-list()
-#for(i in 1:dim(SoilIDS2)[1]){
-#	Soilrepsub[[i]]<-sample(SoilM2$indexI[SoilM2$SDWS==i],5)
-#}
-#SoilrepsubV<-unlist(Soilrepsub)
-
-#Airrepsub<-list()
-#for(i in 1:dim(AirIDS2)[1]){
-#	Airrepsub[[i]]<-sample(AirM2$indexI[AirM2$SDWA==i],5)
-#}
-#AirrepsubV<-unlist(Airrepsub)
-
-
-#now turn the model into a a for loop 
-
-
-#write.table(AirrepsubV, "/home/hkropp/synthesis/output_u7m6/AirrepID.csv", sep=",", row.names=FALSE)
-#print("repA_out")
-#write.table(SoilrepsubV, "/home/hkropp/synthesis/output_u7m6/SoilrepID.csv", sep=",", row.names=FALSE)
-#print("reps_out")
-
-
-
 
 
 #model
 write.table(AirM2,"/home/hkropp/synthesis/output_u7m9/Tair_model.csv",sep=",",row.names=FALSE)
 write.table(SoilM2,"/home/hkropp/synthesis/output_u7m9/Tsoil_model.csv",sep=",",row.names=FALSE)
+
+
+############################################
+#this will need to change if 
+#using the model for temp
 
 #turn Air M2 into a list
 #get the unique sites list
@@ -608,29 +554,132 @@ SoilSDW<-list()
 AirSD<-list()
 SoilSD<-list()
 AirSitesD2<-list()
-AirSitesD3<-list()
 SoilSitesD2<-list()
-SoilSitesD3<-list()
+IDtest<-list()
+IDtestA<-list()
 #pull out data in data frame to a list
 for(i in 1:dim(sitesS)[1]){
+	#pull out temperature by site
 	AirSitesD[[i]]<-AirM2[AirM2$siteid==sitesS$siteid[i],]
 	SoilSitesD[[i]]<-SoilM2[SoilM2$siteid==sitesS$siteid[i],]
+	#pull out IDS by site
 	AirSDW[[i]]<-AirIDS2[AirIDS2$siteid==sitesS$siteid[i],]
 	AirSDW[[i]]$siteSDW<-seq(1,dim(AirSDW[[i]])[1])
 	SoilSDW[[i]]<-SoilIDS2[SoilIDS2$siteid==sitesS$siteid[i],]
 	SoilSDW[[i]]$siteSDW<-seq(1,dim(SoilSDW[[i]])[1])	
-	SoilSD[[i]]<-site.depthidS[site.depthidS$siteid==sitesS$siteid[i],]
-	SoilSD[[i]]$siteSD<-seq(1,dim(SoilSD[[i]])[1])
-	AirSD[[i]]<-site.heightA[site.heightA$siteid==sitesS$siteid[i],]
-	AirSD[[i]]$siteSD<-seq(1,dim(AirSD[[i]])[1])	
-	colnames(AirSD[[i]])[3]<-"SDS"
-	AirSitesD2[[i]]<-join(AirSitesD[[i]],AirSD[[i]], by=c("siteid", "height","SDS"), type="left")
-	AirSitesD3[[i]]<-join(AirSitesD2[[i]],AirSDW[[i]], by=c("siteid","height","wyear","SDWA"), type="left")
-	SoilSitesD2[[i]]<-join(SoilSitesD[[i]],SoilSDW[[i]], by=c("siteid","depth","wyear","SDWS"),type="left")
-	SoilSitesD3[[i]]<-join(SoilSitesD2[[i]],SoilSD[[i]], by=c("siteid","depth","SDS"),type="left")
-	SoilSitesD3[[i]]$TyrS<-SoilSitesD3[[i]]$decdate-SoilSitesD3[[i]]$wyear
-	AirSitesD3[[i]]$TyrA<-AirSitesD3[[i]]$decdate-AirSitesD3[[i]]$wyear
+	#join IDs to data to get site ids
+	AirSitesD2[[i]]<-join(AirSitesD[[i]],AirSDW[[i]], by=c("siteid","height","wyear","SDWA"), type="left")
+	SoilSitesD2[[i]]<-join(SoilSitesD[[i]],SoilSDW[[i]], by=c("siteid","depth","SDWS"),type="left")
+	SoilSitesD2[[i]]$TyrS<-SoilSitesD2[[i]]$decdate-SoilSitesD2[[i]]$wyear
+	AirSitesD2[[i]]$TyrA<-AirSitesD2[[i]]$decdate-AirSitesD2[[i]]$wyear
+	SoilSitesD2[[i]]$indexI<-seq(1,dim(SoilSitesD2[[i]])[1])
+	AirSitesD2[[i]]$indexI<-seq(1,dim(AirSitesD2[[i]])[1])
+	#now get the year for the tave2
+	IDtest[[i]]<-SoilSDW[[i]][,1:3]
+	IDtest[[i]]$wyear2<-SoilSDW[[i]]$wyear+1
+	#for air
+	IDtestA[[i]]<-AirSDW[[i]][,1:3]
+	IDtestA[[i]]$wyear2<-AirSDW[[i]]$wyear+1
 	}
+
+#get all unique years in  a possible depth and year combination
+IDstep2<-list()
+IDstep3<-list()
+IDstep2A<-list()
+IDstep3A<-list()
+for(i in 1:dim(sitesS)[1]){	
+		#get all possible unique years for a start and end
+		IDstep2[[i]]<-unique(data.frame(siteid=c(IDtest[[i]]$siteid,IDtest[[i]]$siteid), 
+										depth=c(IDtest[[i]]$depth,IDtest[[i]]$depth),
+										wyear=c(IDtest[[i]]$wyear,IDtest[[i]]$wyear2)))
+		#order
+		IDstep2[[i]]<-IDstep2[[i]][order(IDstep2[[i]]$depth,IDstep2[[i]]$wyear),]
+		#create a sequence for the number of years we estimate the Temp at the beginning
+		IDstep2[[i]]$Tave1ID<-seq(1, dim(IDstep2[[i]])[1])
+		#duplicate with matching names for end year
+		IDstep3[[i]]<-IDstep2[[i]]
+		colnames(IDstep3[[i]])[3]<-"wyear2"
+		colnames(IDstep3[[i]])[4]<-"Tave2D"
+		##now for air
+		#get all possible unique years for a start and end
+		IDstep2A[[i]]<-unique(data.frame(siteid=c(IDtestA[[i]]$siteid,IDtestA[[i]]$siteid), 
+										height=c(IDtestA[[i]]$height,IDtest[[i]]$height),
+										wyear=c(IDtestA[[i]]$wyear,IDtestA[[i]]$wyear2)))
+		#order
+		IDstep2A[[i]]<-IDstep2A[[i]][order(IDstep2A[[i]]$height,IDstep2A[[i]]$wyear),]
+		#create a sequence for the number of years we estimate the Temp at the beginning
+		IDstep2A[[i]]$Tave1IDA<-seq(1, dim(IDstep2A[[i]])[1])
+		#duplicate with matching names for end year
+		IDstep3A[[i]]<-IDstep2A[[i]]
+		colnames(IDstep3A[[i]])[3]<-"wyear2"
+		colnames(IDstep3A[[i]])[4]<-"Tave2D"	
+}
+
+#now join to an ID table for getting Tave 1 IDS
+Tave1ID<-list()
+Tave2ID<-list()
+Tave1IDA<-list()
+Tave2IDA<-list()
+SoilSitesD3<-list()
+AirSitesD3<-list()
+for(i in 1:dim(sitesS)[1]){	
+	#this will add an id for Tave 1
+	Tave1ID[[i]]<-join(IDtest[[i]], IDstep2[[i]], by=c("siteid","depth","wyear"), type="left")
+	#this will add an id for Tave 2
+	Tave2ID[[i]]<-join(Tave1ID[[i]], IDstep3[[i]], by=c("siteid","depth","wyear2"), type="left")
+	##now for air
+		#this will add an id for Tave 1
+	Tave1IDA[[i]]<-join(IDtestA[[i]], IDstep2A[[i]], by=c("siteid","height","wyear"), type="left")
+	#this will add an id for Tave 2
+	Tave2IDA[[i]]<-join(Tave1IDA[[i]], IDstep3A[[i]], by=c("siteid","height","wyear2"), type="left")
+	#now join back into Air and soil data
+	SoilSitesD3[[i]]<-join(Tave2ID[[i]],SoilSitesD2[[i]], by=c("siteid","depth","wyear"), type="right")
+	
+	AirSitesD3[[i]]<-join(Tave2IDA[[i]],AirSitesD2[[i]], by=c("siteid","height","wyear"), type="right")
+	
+}
+
+ALLSyearID<-ldply(Tave2ID,data.frame)
+ALLAyearID<-ldply(Tave2IDA,data.frame)
+
+
+#create index to some for degree days
+AYlength<-numeric(0)
+ASY<-numeric(0)
+AEY<-numeric(0)
+for(i in 1:dim(AirIDS2)[1]){
+	AYlength[i]<-length(AirM2$indexI[AirM2$SDWA==AirIDS2$SDWA[i]])
+	ASY[i]<-AirM2$indexI[AirM2$SDWA==AirIDS2$SDWA[i]][1]
+	AEY[i]<-AirM2$indexI[AirM2$SDWA==AirIDS2$SDWA[i]][AYlength[i]]
+}
+#create index for soil
+SYlength<-numeric(0)
+SSY<-numeric(0)
+SEY<-numeric(0)
+for(i in 1:dim(SoilIDS2)[1]){
+	SYlength[i]<-length(SoilM2$indexI[SoilM2$SDWS==SoilIDS2$SDWS[i]])
+	SSY[i]<-SoilM2$indexI[SoilM2$SDWS==SoilIDS2$SDWS[i]][1]
+	SEY[i]<-SoilM2$indexI[SoilM2$SDWS==SoilIDS2$SDWS[i]][SYlength[i]]
+}
+
+
+#Next need to create an index that says when sites should be divided
+#want to divide each soil
+#want each soil to be divided by each air combo, but only in a year
+#IDforCombo<-join(AirIDS2,SoilIDS2, by=c("siteid","wyear"), type="inner")
+#IDforCombo$Nseq<-seq(1,dim(IDforCombo)[1])
+
+
+
+#now turn the model into a a for loop 
+
+
+#write.table(AirrepsubV, "/home/hkropp/synthesis/output_u7m6/AirrepID.csv", sep=",", row.names=FALSE)
+#print("repA_out")
+#write.table(SoilrepsubV, "/home/hkropp/synthesis/output_u7m6/SoilrepID.csv", sep=",", row.names=FALSE)
+#print("reps_out")
+
+
 
 
 
@@ -639,8 +688,12 @@ for(i in 1:dim(sitesS)[1]){
 write.table(AirIDS2,"/home/hkropp/synthesis/output_u7m9/AirIDS.csv", sep=",", row.names=FALSE)
 write.table(SoilIDS2,"/home/hkropp/synthesis/output_u7m9/SoilIDS.csv", sep=",", row.names=FALSE)
 
-write.table(site.heightA,"/home/hkropp/synthesis/output_u7m9/AirIDS_SD.csv", sep=",", row.names=FALSE)
-write.table(site.depthidS,"/home/hkropp/synthesis/output_u7m9/SoilIDS_SD.csv", sep=",", row.names=FALSE)
+write.table(ALLSyearID,"/home/hkropp/synthesis/output_u7m9/SoilTaveIDS_SD.csv", sep=",", row.names=FALSE)
+write.table(ALLAyearID,"/home/hkropp/synthesis/output_u7m9/AirTaveIDS_SD.csv", sep=",", row.names=FALSE)
+
+
+
+
 
 #write.table(IDforCombo, "/home/hkropp/synthesis/output_u7m7/NfactorIDS.csv",sep=",", row.names=FALSE)
 print("ID write out")	
@@ -657,7 +710,8 @@ datalist<-list(NobsA=dim(AirSitesD3[[i]])[1], TempA=AirSitesD3[[i]]$A,
 				NobsS=dim(SoilSitesD3[[i]])[1], TempS=SoilSitesD3[[i]]$T,
 				 T.yrS=SoilSitesD3[[i]]$TyrS,
 				 NSDWA=dim(AirSDW[[i]])[1],
-				NSDWS=dim(SoilSDW[[i]])[1], SDWS=SoilSitesD3[[i]]$siteSDW, SDWA=AirSitesD3[[i]]$siteSDW)
+				NSDWS=dim(SoilSDW[[i]])[1], SDWS=SoilSitesD3[[i]]$siteSDW, SDWA=AirSitesD3[[i]]$siteSDW,
+				NTaveS=dim(IDstep2[[i]])[1],NTaveA=dim(IDstep2A[[i]])[1])
 
 print(paste("start initialize site number", i))
 temp.modI<-jags.model(file="/home/hkropp/github/synthesis_database/Temp_model/temperature_mod_code.r",

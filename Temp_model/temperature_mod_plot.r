@@ -117,15 +117,7 @@ for(i in 1:dim(siteall)[1]){
 	
 }	
 	
-for(i in 1:dim(siteall)[1]){	
-	#now join with ID info
-	for(j in 1:dim(datCS[[i]])[1]){
-		if(length(psplit[[i]][[j]])>1){
-			pEnd[[i]][j]<-psplit[[i]][[j]]	
-		}else{pEnd[i]<-"NA"}
-	}
-	
-}
+
 
 
 
