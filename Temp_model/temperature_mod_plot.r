@@ -60,34 +60,60 @@ for(i in 1:dim(siteall)[1]){
 }
 
 
-datCS<-list()
-datCS2<-list()
-datCS3<-list()
-datCA<-list()
+datT1<-list()
+datT2<-list()
+datMax<-list()
+datMin<-list()
+datWpeak<-list()
+datSpeak<-list()
+
 datCSM<-list()
 datCAM<-list()
-psplit<-list()
-pEnd<-list()
-
 
 #now pull out id number
 dexps2<-"\\D"
 
 #subset first to only look at soil parms
 for(i in 1:dim(siteall)[1]){
-	datCS[[i]]<-datC[[i]][datC[[i]]$parms1=="T.aveS1"|datC[[i]]$parms1=="T.aveS2"|datC[[i]]$parms1=="TmaxS"|datC[[i]]$parms1=="TminS",]
-	datCS2[[i]]<-datC[[i]][datC[[i]]$parms1=="startS",]
-	datCS3[[i]]<-datC[[i]][datC[[i]]$parms1=="soilAR",]
-	datCA[[i]]<-datC[[i]][datC[[i]]$parms1=="T.aveA1"|datC[[i]]$parms1=="T.aveA2"|datC[[i]]$parms1=="TmaxA"|datC[[i]]$parms1=="TminA",]
-	psplit[[i]]<-strsplit(rownames(datCS[[i]]), "\\[")
+	datT1[[i]]<-datC[[i]][datC[[i]]$parms1=="T.aveS1",]
+	datT1[[i]]$siteSDW<-seq(1,dim(datT1[[i]])[1])
+	datT2[[i]]<-datC[[i]][datC[[i]]$parms1=="T.aveS2",]
+	datT2[[i]]$siteSDW<-seq(1,dim(datT2[[i]])[1])
+	datMax[[i]]<-datC[[i]][datC[[i]]$parms1=="TmaxS",]
+	datMax[[i]]$siteSDW<-seq(1,dim(datMax[[i]])[1])
+	datMin[[i]]<-datC[[i]][datC[[i]]$parms1=="TminS",]
+	datMin[[i]]$siteSDW<-seq(1,dim(datMin[[i]])[1])
+	datWpeak[[i]]<-datC[[i]][datC[[i]]$parms1=="peakWS",]
+	datWpeak[[i]]$siteSDW<-seq(1,dim(datWpeak[[i]])[1])
+	datSpeak[[i]]<-datC[[i]][datC[[i]]$parms1=="peakSS",]	
+	datSpeak[[i]]$siteSDW<-seq(1,dim(datSpeak[[i]])[1])
 	
+	datT1[[i]]<-join(datT1[[i]],SoilSDW[[i]], by="siteSDW", type="left")
+	datT2[[i]]<-join(datT2[[i]],SoilSDW[[i]], by="siteSDW", type="left")
+	datMax[[i]]<-join(datMax[[i]],SoilSDW[[i]], by="siteSDW", type="left")
+	datWpeak[[i]]<-join(datWpeak[[i]],SoilSDW[[i]], by="siteSDW", type="left")
+	datMin[[i]]<-join(datMin[[i]],SoilSDW[[i]], by="siteSDW", type="left")
+	datSpeak[[i]]<-join(datSpeak[[i]],SoilSDW[[i]], by="siteSDW", type="left")
+	
+	}
+	
+	datTave1<-ldply(datT1,data.frame)
+	datTave2<-ldply(datT2,data.frame)
+	datTmin<-ldply(datMin,data.frame)
+	datTmax<-ldply(datMax,data.frame)
+	datWpeak<-ldply(datWpeak,data.frame)
+	datSpeak<-ldply(datSpeak,data.frame)
+	
+
 	#now pull out mu
+	
+for(i in 1:dim(siteall)[1]){
 	datCSM[[i]]<-datC[[i]][datC[[i]]$parms1=="muS",]
 	datCAM[[i]]<-datC[[i]][datC[[i]]$parms1=="muA",]
+	datCSM[[i]]$depth<-datSM$depth[datSM$siteid==siteall$siteid[i]]
+	datCAM[[i]]$depth<-datAM$height[datAM$siteid==siteall$siteid[i]]	
 	datCSM[[i]]$ID<-as.numeric(gsub(dexps2,"", row.names(datCSM[[i]] )))
 	datCAM[[i]]$ID<-as.numeric(gsub(dexps2,"", row.names(datCAM[[i]] )))
-	datCSM[[i]]$depth<-datSM$depth[datSM$siteid==siteall$siteid[i]]
-	datCAM[[i]]$depth<-datAM$height[datAM$siteid==siteall$siteid[i]]
 	
 }	
 	
