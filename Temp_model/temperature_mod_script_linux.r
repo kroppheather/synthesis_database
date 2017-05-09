@@ -814,13 +814,13 @@ datalist<-list(NobsA=dim(AirSitesD3[[i]])[1], TempA=AirSitesD3[[i]]$A,
 print(paste("start initialize site number", i))
 temp.modI<-jags.model(file="/home/hkropp/github/synthesis_database/Temp_model/temperature_mod_code.r",
 						data=datalist,
-						n.adapt=3000,
+						n.adapt=4000,
 						n.chains=3)
 
 
 print(paste("initialize done site number ",i ))		
 #specify sample run				
-n.iter.i=2000
+n.iter.i=40000
 n.thin=20
 codaobj.init = coda.samples(temp.modI,variable.names=samplelist,
                        n.iter=n.iter.i, thin=n.thin)
