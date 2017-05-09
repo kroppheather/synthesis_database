@@ -118,6 +118,8 @@ model{
 	for(i in 1:NSDWS){
 		FDDS[i]<-sum(FreezeS[SSY[i]:SEY[i]])
 		TDDS[i]<-sum(ThawS[SSY[i]:SEY[i]])
+		DayZero[i]<-sum(X[SSY[i]:SEY[i]])
+		
 	}	
 	
 	#now calculate N factors

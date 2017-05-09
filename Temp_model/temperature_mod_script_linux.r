@@ -791,7 +791,7 @@ print("ID write out")
 #designate the 	samples to run			
 samplelist<-c("T.aveA1","TminA","TmaxA","T.aveS1","TmaxS","TminS","sig.muA","sig.muS",
 				 "muS","muA", "aZero", "bZero", "zeroC", "peakWS", "peakWA", "peakSS", "peakSA",
-				 "TempS.rep", "TempA.rep","pstart","Fn", "Tn","FDDA","TDDA","TDDS","FDDS")
+				 "TempS.rep", "TempA.rep","pstart","Fn", "Tn","FDDA","TDDA","TDDS","FDDS", "DayZero")
 
 
 for(i in 1:dim(sitesS)[1]){
