@@ -118,7 +118,7 @@ for(i in 1:p1dim){
 	datNthaw[[i]]$Nseq<-seq(1,dim(datNthaw[[i]])[1])
 	#
 	datNfreeze[[i]]<-datC[[i]][datC[[i]]$parms1=="Fn",]
-	datNfreeze[[i]]$Nseq<-seq(1,dim(datNthaw[[i]])[1])	
+	datNfreeze[[i]]$Nseq<-seq(1,dim(datNfreeze[[i]])[1])	
 
 	#now join with ids
 	datT1t1[[i]]<-join(datT1p1[[i]],SoilTA[[i]], by="Tave1ID", type="inner")
@@ -303,18 +303,20 @@ text(-20,25, paste("y=",round(fitair$coefficients[1],2), "+",round(fitair$coeffi
 
 #########################################################
 ##now need to export the parameters of interest:
+#only export values needed
+freezeN<-data.frame(datNfreeze[,1:2], pc2.5=datNfreeze[,5],pc97.5=datNfreeze[,9],
+					datNfreeze[,12:14],depth=datNfreeze[,17])
 
 
+thawN<-data.frame(datNthaw[,1:2], pc2.5=datNthaw[,5],pc97.5=datNthaw[,9],
+					datNthaw[,12:14],depth=datNthaw[,17])
 
+zeroC<-data.frame(datZero[,1:2], pc2.5=datZero[,5],pc97.5=datZero[,9],
+					datZero[,12:14])
 
-
-
-	datTave1<-ldply(datT1t1,data.frame)
-	datTave2<-ldply(datT1t2,data.frame)
 	datTmin<-ldply(datMin,data.frame)
 	datTmax<-ldply(datMax,data.frame)
 	datWpeak<-ldply(datWpeak,data.frame)
 	datSpeak<-ldply(datSpeak,data.frame)
-	datZero<-ldply(datZero, data.frame)
-	datNfreeze<-ldply(datNfreeze, data.frame)
-	datNthaw<-ldply(datNthaw, data.frame)
+
+
