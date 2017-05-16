@@ -52,6 +52,7 @@ SoilSDW<-list()
 
 AirTA<-list()
 SoilTA<-list()
+datNIS<-list()
 
 for(i in 1:p1dim){
 
@@ -63,6 +64,9 @@ for(i in 1:p1dim){
 	
 	AirTA[[i]]<-datAT[datAT$siteid==siteall$siteid[i],]
 	SoilTA[[i]]<-datST[datST$siteid==siteall$siteid[i],]
+	
+	#pull out N factor IDs by site
+	datNIS[[i]]<-datNI[datNI$siteid==siteall$siteid[i],]
 }
 
 
@@ -77,6 +81,9 @@ datMax<-list()
 datMin<-list()
 datWpeak<-list()
 datSpeak<-list()
+datZero<-list()
+datNfreeze<-list()
+datNthaw<-list()
 
 datCSM<-list()
 datCAM<-list()
@@ -103,6 +110,16 @@ for(i in 1:p1dim){
 	datWpeak[[i]]$siteSDW<-seq(1,dim(datWpeak[[i]])[1])
 	datSpeak[[i]]<-datC[[i]][datC[[i]]$parms1=="peakSS",]	
 	datSpeak[[i]]$siteSDW<-seq(1,dim(datSpeak[[i]])[1])
+	#zero curtain
+	datZero[[i]]<-datC[[i]][datC[[i]]$parms1=="DayZero",]
+	datZero[[i]]$siteSDW<-seq(1,dim(datZero[[i]])[1])
+	#Nfactor
+	datNthaw[[i]]<-datC[[i]][datC[[i]]$parms1=="Tn",]
+	datNthaw[[i]]$Nseq<-seq(1,dim(datNthaw[[i]])[1])
+	#
+	datNfreeze[[i]]<-datC[[i]][datC[[i]]$parms1=="Fn",]
+	datNfreeze[[i]]$Nseq<-seq(1,dim(datNthaw[[i]])[1])	
+
 	#now join with ids
 	datT1t1[[i]]<-join(datT1p1[[i]],SoilTA[[i]], by="Tave1ID", type="inner")
 	datT1t2[[i]]<-join(datT1p2[[i]],SoilTA[[i]], by="Tave2D", type="inner")
@@ -110,7 +127,9 @@ for(i in 1:p1dim){
 	datWpeak[[i]]<-join(datWpeak[[i]],SoilSDW[[i]], by="siteSDW", type="left")
 	datMin[[i]]<-join(datMin[[i]],SoilSDW[[i]], by="siteSDW", type="left")
 	datSpeak[[i]]<-join(datSpeak[[i]],SoilSDW[[i]], by="siteSDW", type="left")
-	
+	datZero[[i]]<-join(datZero[[i]],SoilSDW[[i]], by="siteSDW", type="left")
+	datNthaw[[i]]<-join(datNthaw[[i]], datNIS[[i]], by="Nseq", type="left")
+	datNfreeze[[i]]<-join(datNfreeze[[i]], datNIS[[i]], by="Nseq", type="left")
 	}
 	
 	datTave1<-ldply(datT1t1,data.frame)
@@ -119,8 +138,12 @@ for(i in 1:p1dim){
 	datTmax<-ldply(datMax,data.frame)
 	datWpeak<-ldply(datWpeak,data.frame)
 	datSpeak<-ldply(datSpeak,data.frame)
-	
+	datZero<-ldply(datZero, data.frame)
+	datNfreeze<-ldply(datNfreeze, data.frame)
+	datNthaw<-ldply(datNthaw, data.frame)
 
+	
+	
 	#now pull out mu
 	
 for(i in 1:p1dim){
@@ -259,7 +282,7 @@ p1CSR<-ldply(datCSR, data.frame)
 p1CAR<-ldply(datCAR, data.frame)
 
 
-########make plots
+########make plots of model fit
 
 par(mfrow=c(1,2))
 plot(p1soilO$Tobs, p1CSR$Mean, pch=19, ylim=c(-40,30), xlim=c(-40,30), 
@@ -278,6 +301,20 @@ summary(fitair)
 abline(fitair, lwd=2, col="cornflowerblue", lty=2)
 text(-20,25, paste("y=",round(fitair$coefficients[1],2), "+",round(fitair$coefficients[2],2),"Tobs"), cex=1.5)
 
+#########################################################
+##now need to export the parameters of interest:
 
 
 
+
+
+
+	datTave1<-ldply(datT1t1,data.frame)
+	datTave2<-ldply(datT1t2,data.frame)
+	datTmin<-ldply(datMin,data.frame)
+	datTmax<-ldply(datMax,data.frame)
+	datWpeak<-ldply(datWpeak,data.frame)
+	datSpeak<-ldply(datSpeak,data.frame)
+	datZero<-ldply(datZero, data.frame)
+	datNfreeze<-ldply(datNfreeze, data.frame)
+	datNthaw<-ldply(datNthaw, data.frame)
