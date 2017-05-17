@@ -763,7 +763,7 @@ for(i in 1:dim(sitesS)[1]){
 #renaming everything to be run two
 Airrepsubout<-ldply(Airrepsub, data.frame)
 Soilrepsubout<-ldply(Soilrepsub, data.frame)
-write.table(Airrepsubout,"/home/hkropp/synthesis/output_u7m10r4/AirrepIDS.csv",sep=",",row.names=FALSE)
+write.table(Airrepsubout,"/local/synthesis/output_u7m10r4/AirrepIDS.csv",sep=",",row.names=FALSE)
 write.table(Soilrepsubout,"/home/hkropp/synthesis/output_u7m10r4/SoilrepIDS.csv",sep=",",row.names=FALSE)
 
 print("repID out")
@@ -771,22 +771,22 @@ print("repID out")
 Airtowriteout<-ldply(AirSitesD3, data.frame)
 Soiltowriteout<-ldply(SoilSitesD3, data.frame)
 #model
-write.table(Airtowriteout,"/home/hkropp/synthesis/output_u7m10r4/Tair_model.csv",sep=",",row.names=FALSE)
-write.table(Soiltowriteout,"/home/hkropp/synthesis/output_u7m10r4/Tsoil_model.csv",sep=",",row.names=FALSE)
+write.table(Airtowriteout,"/local/synthesis/output_u7m10r4/Tair_model.csv",sep=",",row.names=FALSE)
+write.table(Soiltowriteout,"/local/synthesis/output_u7m10r4/Tsoil_model.csv",sep=",",row.names=FALSE)
 
 
 
 
 #need to write ids to table
 
-write.table(AirIDS2,"/home/hkropp/synthesis/output_u7m10r4/AirIDS.csv", sep=",", row.names=FALSE)
-write.table(SoilIDS2,"/home/hkropp/synthesis/output_u7m10r4/SoilIDS.csv", sep=",", row.names=FALSE)
+write.table(AirIDS2,"/local/synthesis/output_u7m10r4/AirIDS.csv", sep=",", row.names=FALSE)
+write.table(SoilIDS2,"/local/synthesis/output_u7m10r4/SoilIDS.csv", sep=",", row.names=FALSE)
 
-write.table(ALLSyearID,"/home/hkropp/synthesis/output_u7m10r4/SoilTaveIDS_SD.csv", sep=",", row.names=FALSE)
-write.table(ALLAyearID,"/home/hkropp/synthesis/output_u7m10r4/AirTaveIDS_SD.csv", sep=",", row.names=FALSE)
+write.table(ALLSyearID,"/local/synthesis/output_u7m10r4/SoilTaveIDS_SD.csv", sep=",", row.names=FALSE)
+write.table(ALLAyearID,"/local/synthesis/output_u7m10r4/AirTaveIDS_SD.csv", sep=",", row.names=FALSE)
 
 
-write.table(IDnCombo,"/home/hkropp/synthesis/output_u7m10r4/ncomboIDS.csv", sep=",", row.names=FALSE)
+write.table(IDnCombo,"/local/synthesis/output_u7m10r4/ncomboIDS.csv", sep=",", row.names=FALSE)
 
 
 print("ID write out")	
@@ -832,11 +832,11 @@ print(paste("samples done done site number= ", i))
 
 #pull out model stats
 Mod.out<-summary(codaobj.init)
-dir.create(paste0("/home/hkropp/synthesis/output_u7m10r4/site",sitesS$siteid[i]))
+dir.create(paste0("/local/synthesis/output_u7m10r4/site",sitesS$siteid[i]))
 
-write.table(Mod.out$statistics, paste0("/home/hkropp/synthesis/output_u7m10r4/site",sitesS$siteid[i],"Temp_mod_stats.csv"),
+write.table(Mod.out$statistics, paste0("/local/synthesis/output_u7m10r4/site",sitesS$siteid[i],"Temp_mod_stats.csv"),
 			sep=",",row.names=TRUE)
-write.table(Mod.out$quantiles, paste0("/home/hkropp/synthesis/output_u7m10r4/site",sitesS$siteid[i],"Temp_mod_quant.csv"),
+write.table(Mod.out$quantiles, paste0("/local/synthesis/output_u7m10r4/site",sitesS$siteid[i],"Temp_mod_quant.csv"),
 			sep=",",row.names=TRUE)
 			
 print(paste("summary out site number ",i)	)
@@ -844,18 +844,18 @@ print(paste("summary out site number ",i)	)
 #save coda
 
 chain1<-as.matrix(codaobj.init[[1]])
-write.table(chain1,paste0("/home/hkropp/synthesis/output_u7m10r4/site",sitesS$siteid[i],"chain1_coda.csv"), sep=",")
+write.table(chain1,paste0("/local/synthesis/output_u7m10r4/site",sitesS$siteid[i],"chain1_coda.csv"), sep=",")
 chain2<-as.matrix(codaobj.init[[2]])
-write.table(chain2,paste0("/home/hkropp/synthesis/output_u7m10r4/site",sitesS$siteid[i],"chain2_coda.csv"), sep=",")
+write.table(chain2,paste0("/local/synthesis/output_u7m10r4/site",sitesS$siteid[i],"chain2_coda.csv"), sep=",")
 chain3<-as.matrix(codaobj.init[[3]])
-write.table(chain3,paste0("/home/hkropp/synthesis/output_u7m10r4/site",sitesS$siteid[i],"chain3_coda.csv"), sep=",")
+write.table(chain3,paste0("/local/synthesis/output_u7m10r4/site",sitesS$siteid[i],"chain3_coda.csv"), sep=",")
 			
 print(paste("coda out site number ", i))	
 #run mcmc plots on key params
 			
 mcmcplot(codaobj.init, parms=c("T.aveA1","TminA","TmaxA","T.aveS1",
 			"TmaxS","TminS","sig.muA","sig.muS","aZero", "bZero", "zeroC","peakWS", "peakWA", "peakSS", "peakSA"),
-			dir=paste0("/home/hkropp/synthesis/output_u7m10r4/site",sitesS$siteid[i]))		
+			dir=paste0("/local/synthesis/output_u7m10r4/site",sitesS$siteid[i]))		
 #get summary and save to file
 
 print(paste("mcmcplot out site number ", i))	
