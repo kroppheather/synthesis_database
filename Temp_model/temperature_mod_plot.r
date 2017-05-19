@@ -18,27 +18,66 @@ datSM<-read.csv("Tsoil_model.csv")
 datSM$decdateA<-datSM$decdate-1991
 datAM$decdateA<-datAM$decdate-1991
 
-datSRp1<-read.csv("SoilrepIDS.csv")
-datARp1<-read.csv("AirrepIDS.csv")
+#set up directories for all model output
+WDR<-c("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod10p1\\output_u7m10",
+"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod10p2",
+"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod10p3",
+"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod10p4\\output_u7m10r4")
+
+
+
+#indicate start and last dims of site runs
+startdim<-c(1,20,35,69)
+enddim<-c(19,34,68,104)
+
+
 
 #get a list of the sites that should be expected
 siteall<-data.frame(siteid=unique(datSI$siteid))
 siteall$siteUI<-seq(1,dim(siteall)[1])
 
 
+
+#now organize rep IDS, need to pull correct ones for the site
+#in the run it is actually used in
+
+#read in model output from first part
+siterun<-ifelse(siteall$siteUI<=enddim[1],1,
+			ifelse(siteall$siteUI>enddim[1]&siteall$siteUI<=enddim[2],2,
+			ifelse(siteall$siteUI>enddim[2]&siteall$siteUI<=enddim[3],3,4)))
+
+datSRALL<-list()
+datARALL<-list()
+
+for(i in 1:length(startdim)){
+	datSRALL[[i]]<-read.csv(paste0(WDR[i],"\\SoilrepIDS.csv"))
+	datARALL[[i]]<-read.csv(paste0(WDR[i],"\\AirrepIDS.csv"))
+}
+
+#get the correct IDS for each site
+darSR<-list()
+datAR<-list()
+for(i in 1:dim(siteall)[1]){
+	datSR[[i]]<-datSRALL[[siterun[i]]][datSRALL[[siterun[i]]]$siteid==siteall$siteid[i],]
+	datAR[[i]]<-datARALL[[siterun[i]]][datARALL[[siterun[i]]]$siteid==siteall$siteid[i],]
+}
+
+datSRdf<-ldply(datSR, data.frame)
+datARdf<-ldply(datAR, data.frame)
+
 #expression to remove bracket and vector number from parm names
 dexps<-"\\[*[[:digit:]]*\\]"
 
 
-p1dim<-19
 
-#read in model output from first part
+
+
 datM<-list()
 datQ<-list()
 datC<-list()
-for(i in 1:p1dim){
-	datM[[i]]<-read.csv(paste0("site",siteall$siteid[i],"Temp_mod_stats.csv"))
-	datQ[[i]]<-read.csv(paste0("site",siteall$siteid[i],"Temp_mod_quant.csv"))
+for(i in 1:dim(siteall)[1]){
+	datM[[i]]<-read.csv(paste0(WDR[siterun[i]],"//site",siteall$siteid[i],"Temp_mod_stats.csv"))
+	datQ[[i]]<-read.csv(paste0(WDR[siterun[i]],"//site",siteall$siteid[i],"Temp_mod_quant.csv"))
 	#join means and quantiles
 	datC[[i]]<-cbind(datM[[i]],datQ[[i]])
 	#make parms vectors
@@ -54,7 +93,7 @@ AirTA<-list()
 SoilTA<-list()
 datNIS<-list()
 
-for(i in 1:p1dim){
+for(i in 1:dim(siteall)[1]){
 
 	AirSDW[[i]]<-datAI[datAI$siteid==siteall$siteid[i],]
 	AirSDW[[i]]$siteSDW<-seq(1,dim(AirSDW[[i]])[1])
@@ -92,7 +131,7 @@ datCAM<-list()
 dexps2<-"\\D"
 
 #subset first to only look at soil parms
-for(i in 1:p1dim){
+for(i in 1:dim(siteall)[1]){
 	#beginning of year
 	datT1p1[[i]]<-datC[[i]][datC[[i]]$parms1=="T.aveS1",]
 	datT1p1[[i]]$Tave1ID<-seq(1,dim(datT1p1[[i]])[1])
@@ -146,7 +185,7 @@ for(i in 1:p1dim){
 	
 	#now pull out mu
 	
-for(i in 1:p1dim){
+for(i in 1:dim(siteall)[1]){
 	datCSM[[i]]<-datC[[i]][datC[[i]]$parms1=="muS",]
 	datCAM[[i]]<-datC[[i]][datC[[i]]$parms1=="muA",]
 	datCSM[[i]]$depth<-datSM$depth[datSM$siteid==siteall$siteid[i]]
@@ -170,7 +209,7 @@ depthPA<-list()
 wyearPA<-list()
 #set up depths and colors for depths in each site
 colP<-c(terrain.colors(7),heat.colors(10),topo.colors(10))
-for(i in 1:p1dim){
+for(i in 1:dim(siteall)[1]){
 	depthP[[i]]<-unique(datSI$depth[datSI$siteid==sitesS$siteid[i]])
 	wyearP[[i]]<-unique(datSI$wyear[datSI$siteid==sitesS$siteid[i]])
 	depthPA[[i]]<-unique(datAI$height[datAI$siteid==sitesS$siteid[i]])
@@ -184,9 +223,9 @@ datSM$decdateA[datSM$siteid==1&datSM$depth==depthP[[1]][1]]
 
 
 
-for(n in 1:p1dim){
+for(n in 1:dim(siteall)[1]){
 	i<-sitesS$siteid[n]
-	jpeg(file=paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod10p1\\plots\\soil\\site",i,".jpg"),
+	jpeg(file=paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod10C\\plots\\soil\\site",i,".jpg"),
 			width=1500,height=1000, units="px")
 	par(mai=c(2,2,2,2))
 	plot(c(0,1),c(0,1),type="n",xlim=c(min(datSM$decdateA[datSM$siteid==i]),max(datSM$decdateA[datSM$siteid==i])),
@@ -213,9 +252,9 @@ for(n in 1:p1dim){
 #now plot air
 
 
-for(n in 1:p1dim){
+for(n in 1:dim(siteall)[1]){
 	i<-sitesS$siteid[n]
-	jpeg(file=paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod10p1\\plots\\air\\site",i,".jpg"),
+	jpeg(file=paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod10C\\plots\\air\\site",i,".jpg"),
 			width=1500,height=1000, units="px")
 	par(mai=c(2,2,2,2))
 	plot(c(0,1),c(0,1),type="n",xlim=c(min(datAM$decdateA[datAM$siteid==i]),max(datAM$decdateA[datAM$siteid==i])),
@@ -244,11 +283,7 @@ for(n in 1:p1dim){
 #############now look at replicated data
 
 #need to pull out matching temp data
-datSMp1<-datSM[datSM$siteid<=siteall$siteid[p1dim],]
-datAMp1<-datAM[datAM$siteid<=siteall$siteid[p1dim],]
 
-datARp1S<-datARp1[datARp1$siteid<=siteall$siteid[p1dim],]
-datSRp1S<-datSRp1[datSRp1$siteid<=siteall$siteid[p1dim],]
 #now subset the temperatures based on ids
 datobsS<-list()
 datobsA<-list()
@@ -259,12 +294,12 @@ datobsA1<-list()
 datCSR<-list()
 datCAR<-list()
 
-for(i in 1:p1dim){
+for(i in 1:dim(siteall)[1]){
 	#pull out data and ids for each site
-	datobsS[[i]]<-datSMp1$T[datSMp1$siteid==siteall$siteid[i]]
-	datobsA[[i]]<-datAMp1$A[datAMp1$siteid==siteall$siteid[i]]
-	IDsubS[[i]]<-datSRp1S$repID[datSRp1S$siteid==siteall$siteid[i]]
-	IDsubA[[i]]<-datARp1S$repID[datARp1S$siteid==siteall$siteid[i]]
+	datobsS[[i]]<-datSM$T[datSM$siteid==siteall$siteid[i]]
+	datobsA[[i]]<-datAM$A[datAM$siteid==siteall$siteid[i]]
+	IDsubS[[i]]<-datSR[[i]]$repID
+	IDsubA[[i]]<-datAR[[i]]$repID
 	#now subset each site
 	datobsS1[[i]]<-data.frame(Tobs=datobsS[[i]][IDsubS[[i]]])
 	datobsS1[[i]]$siteid<-rep(siteall$siteid[i],length(datobsS1[[i]]))
@@ -292,7 +327,7 @@ fitsoil<-lm(p1CSR$Mean~p1soilO$Tobs)
 summary(fitsoil)
 abline(fitsoil, lwd=2, col="cornflowerblue", lty=2)
 text(-20,25, paste("y=",round(fitsoil$coefficients[1],2), "+",round(fitsoil$coefficients[2],2),"Tobs"), cex=1.5)
-
+text(-20,20, paste("R2=", round(summary(fitsoil)$r.squared,3)), cex=1.5)
 plot(p1airO$Aobs, p1CAR$Mean, pch=19, ylim=c(-50,30), xlim=c(-50,30), 
 	ylab="Air Temperature Predicted (C)", xlab="Air Temperature Obs")
 abline(0,1, col="red", lwd=2)
@@ -300,7 +335,7 @@ fitair<-lm(p1CAR$Mean~p1airO$Aobs)
 summary(fitair)
 abline(fitair, lwd=2, col="cornflowerblue", lty=2)
 text(-20,25, paste("y=",round(fitair$coefficients[1],2), "+",round(fitair$coefficients[2],2),"Tobs"), cex=1.5)
-
+text(-20,20, paste("R2=", round(summary(fitair)$r.squared,3)), cex=1.5)
 #########################################################
 ##now need to export the parameters of interest:
 #only export values needed
