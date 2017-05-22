@@ -181,8 +181,34 @@ for(i in 1:dim(siteall)[1]){
 	datNfreeze<-ldply(datNfreeze, data.frame)
 	datNthaw<-ldply(datNthaw, data.frame)
 
+#subset first to only look at air parms
+datMaxA<-list()
+datMinA<-list()
+datWpeakA<-list()
+datSpeakA<-list()
+
+for(i in 1:dim(siteall)[1]){	
+	#max
+	datMaxA[[i]]<-datC[[i]][datC[[i]]$parms1=="TmaxA",]
+	datMaxA[[i]]$siteSDW<-seq(1,dim(datMaxA[[i]])[1])
+	#min
+	datMinA[[i]]<-datC[[i]][datC[[i]]$parms1=="TminA",]
+	datMinA[[i]]$siteSDW<-seq(1,dim(datMinA[[i]])[1])
+	#peak timing
+	datWpeakA[[i]]<-datC[[i]][datC[[i]]$parms1=="peakWA",]
+	datWpeakA[[i]]$siteSDW<-seq(1,dim(datWpeakA[[i]])[1])
+	datSpeakA[[i]]<-datC[[i]][datC[[i]]$parms1=="peakSA",]	
+	datSpeakA[[i]]$siteSDW<-seq(1,dim(datSpeakA[[i]])[1])
 	
-	
+	datMaxA[[i]]<-join(datMaxA[[i]],AirSDW[[i]], by="siteSDW", type="left")
+	datWpeakA[[i]]<-join(datWpeakA[[i]],AirSDW[[i]], by="siteSDW", type="left")
+	datMinA[[i]]<-join(datMinA[[i]],AirSDW[[i]], by="siteSDW", type="left")
+	datSpeakA[[i]]<-join(datSpeakA[[i]],AirSDW[[i]], by="siteSDW", type="left")
+}
+	datTminA<-ldply(datMinA,data.frame)
+	datTmaxA<-ldply(datMaxA,data.frame)
+	datWpeakA<-ldply(datWpeakA,data.frame)
+	datSpeakA<-ldply(datSpeakA,data.frame)
 	#now pull out mu
 	
 for(i in 1:dim(siteall)[1]){
@@ -340,18 +366,48 @@ text(-20,20, paste("R2=", round(summary(fitair)$r.squared,3)), cex=1.5)
 ##now need to export the parameters of interest:
 #only export values needed
 freezeN<-data.frame(datNfreeze[,1:2], pc2.5=datNfreeze[,5],pc97.5=datNfreeze[,9],
-					datNfreeze[,12:14],depth=datNfreeze[,17])
+					datNfreeze[,12:14],depth=datNfreeze[,17],parm=datNfreeze$parms1)
 
 
 thawN<-data.frame(datNthaw[,1:2], pc2.5=datNthaw[,5],pc97.5=datNthaw[,9],
-					datNthaw[,12:14],depth=datNthaw[,17])
+					datNthaw[,12:14],depth=datNthaw[,17],parm=datNthaw$parms1)
+					
+Nfactor<-rbind(freezeN,thawN)
 
 zeroC<-data.frame(datZero[,1:2], pc2.5=datZero[,5],pc97.5=datZero[,9],
-					datZero[,12:14])
+					datZero[,12:14],parm=datZero$parms1)
 
-	datTmin<-ldply(datMin,data.frame)
-	datTmax<-ldply(datMax,data.frame)
-	datWpeak<-ldply(datWpeak,data.frame)
-	datSpeak<-ldply(datSpeak,data.frame)
+					
+Speak<-data.frame(datSpeak[,1:2], pc2.5=datSpeak[,5],pc97.5=datSpeak[,9],
+					datSpeak[,12:14],parm=datSpeak$parms1)			
+					
+Wpeak<-data.frame(datWpeak[,1:2], pc2.5=datWpeak[,5],pc97.5=datWpeak[,9],
+					datWpeak[,12:14],parm=datWpeak$parms1)							
 
 
+Tmin<-data.frame(datTmin[,1:2], pc2.5=datTmin[,5],pc97.5=datTmin[,9],
+					datTmin[,12:14],parm=datTmin$parms1)					
+
+Tmax<-data.frame(datTmax[,1:2], pc2.5=datTmax[,5],pc97.5=datTmax[,9],
+				datTmax[,12:14],parm=datTmax$parms1)				
+
+SoilParm<-rbind(zeroC,Speak,Wpeak,Tmin,Tmax)				
+
+SpeakA<-data.frame(datSpeakA[,1:2], pc2.5=datSpeakA[,5],pc97.5=datSpeakA[,9],
+					datSpeakA[,12:14],parm=datSpeakA$parms1)			
+					
+WpeakA<-data.frame(datWpeakA[,1:2], pc2.5=datWpeakA[,5],pc97.5=datWpeakA[,9],
+					datWpeakA[,12:14],parm=datWpeakA$parms1)							
+
+
+TminA<-data.frame(datTminA[,1:2], pc2.5=datTminA[,5],pc97.5=datTminA[,9],
+					datTminA[,12:14],parm=datTminA$parms1)					
+
+TmaxA<-data.frame(datTmaxA[,1:2], pc2.5=datTmaxA[,5],pc97.5=datTmaxA[,9],
+				datTmaxA[,12:14],parm=datTmaxA$parms1)		
+
+AirParm<-rbind(SpeakA, WpeakA,TminA,TmaxA)
+
+write.table(Nfactor, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\nfactor.csv", sep=",", row.names=FALSE)
+write.table(SoilParm, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\soilParm.csv", sep=",", row.names=FALSE)
+write.table(AirParm, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\airParm.csv", sep=",", row.names=FALSE)
