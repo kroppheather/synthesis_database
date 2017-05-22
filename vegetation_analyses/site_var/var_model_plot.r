@@ -1,6 +1,8 @@
 #######################################################
 ########this script reads in output from model 10 #####
 ########and plots data and empirical mdoel output #####
+########that looks at variation across vegetation #####
+########community types                           #####
 #######################################################
 
 library(plyr)
