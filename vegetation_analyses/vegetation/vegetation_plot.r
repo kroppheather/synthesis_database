@@ -177,10 +177,16 @@ Gram.c<-data.frame(FuncType=Gram.c$FuncType, siteid=Gram.c$siteid, gram.pc=Gram.
 datR<-read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\region.csv")
 colnames(datR)[1]<-"siteid"
 
+datVC<-read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\vegeClass.csv")
+
+colnames(datVC)[1]<-"siteid"
+
+className<-c("herb barren",	"gramminoid tundra", "tussock tundra",	
+			"shrub tundra",	"gramminoid wetland", "needleleaf deciduous",
+				"needleleaf evergreen", "mixed conifer decidous")
 
 
-
-Coverall<-list(Shrub.c,Moss.c, Gram.c, Ground.c, datR, Biome)
+Coverall<-list(Shrub.c,Moss.c, Gram.c, Ground.c, datR, Biome, datVC)
 CoverC<-join_all(Coverall,by="siteid", type="left")
 
 datNF<-join(datNF, CoverC, by="siteid", type="left")
@@ -218,10 +224,20 @@ regID<-regID[regID$region!=3,]
 regID$regUID<-seq(1,dim(regID)[1])
 regID$nameF<-c("Alaska","Canada", "Islands")
 
+#get unique vegetation class
 
+vegID<-data.frame(vegeID=unique(NFV$class))
+vegID$name<-className[vegID$vegeID]
+vegID<-vegID[order(vegID$vegeID),]
+
+
+#turn variables into a list
+varAll<-list(NFV,NTV,TmaxV,TminV,DZV)
+
+######################################################
+######################################################
 #plot depth, shrub, moss by region
 
-#then by biome depth, shrub, moss by region
 
 ##############################################
 ########Freezing N factor
@@ -803,16 +819,123 @@ ab<-layout(matrix(seq(1,12), ncol=4, byrow=FALSE),
 dev.off()
 
 
+###############################################################
+#######now look at vegetation vs plant community type
+#(NFV,NTV,TmaxV,TminV,DZV)
 
+wb<-40
+hb<-40
+nlow=c(0,0,0,-40,0)
+nhigh=c(1.7,1.7,25,-8,240)
+nameV<-c("nfreeze_vege","nthaw_vege","Tmax_vege","Tmin_vege","zero_vege")
+labelV<-c("Freeze n-factor", "Thaw n-factor", "Soil temperature maximum", 
+			"Soil temperature minimum", "Days in zero mean")
+axisL<-c(0,0,0,-40,0)
+axisH<-c(1.5,1.5,20,-10,220)
+axisI<-c(.5,.5,5,10,20)
 
-#################################################################
-######try comparing any level of ice disturbance across vege type or region
+for(k in 1:length(nlow)){
+jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\plot\\vege\\",nameV[k],".jpg"), width=7500,height=10000)	
 
+	ab<-layout(matrix(seq(1,28), ncol=4, byrow=FALSE),
+				width=c(rep(lcm(wb),28)),
+				height=c(rep(lcm(hb),28)))
 
+	#depth
+	for(i in 1:dim(vegID)[1]){
+	par(mai=c(0,0,0,0))
+		plot(c(0,1),c(0,1), type="n",xlim=c(-1,21), ylim=c(nlow[k],nhigh[k]), xlab=" ", 
+				ylab=" ", xaxs="i", yaxs="i", axes=FALSE)
+		points(varAll[[k]]$depth[varAll[[k]]$class==vegID$vegeID[i]],
+				varAll[[k]]$Mean[varAll[[k]]$class==vegID$vegeID[i]],
+				pch=19, col="wheat4", cex=15 )	
+		arrows(varAll[[k]]$depth[varAll[[k]]$class==vegID$vegeID[i]],
+				varAll[[k]]$pc2.5[varAll[[k]]$class==vegID$vegeID[i]],
+				varAll[[k]]$depth[varAll[[k]]$class==vegID$vegeID[i]],
+				varAll[[k]]$pc97.5[varAll[[k]]$class==vegID$vegeID[i]],lwd=5,code=0)
+		mtext(paste(vegID$name[i]), cex=8, line=20,side=2)
+		axis(2, seq(axisL[k],axisH[k],by=axisI[k]), cex.axis=12, las=2, lwd.ticks=8)
+		if(i==dim(vegID)[1]){
+			axis(1, seq(0,18, by=3), cex.axis=12, lwd.ticks=8,padj=1)
+			mtext("Depth (cm)",side=1, line=20, cex=10)
+			mtext(paste(labelV[k]), outer=TRUE, side=2, line=-100,cex=10)
+		
+		}
+		box(which="plot")
+	}
+	#shrub
+		for(i in 1:dim(vegID)[1]){
+		par(mai=c(0,0,0,0))
+		plot(c(0,1),c(0,1), type="n",xlim=c(0,80), ylim=c(nlow[k],nhigh[k]), xlab=" ", 
+				ylab=" ", xaxs="i", yaxs="i", axes=FALSE)
+		points(varAll[[k]]$shrub.pc[varAll[[k]]$class==vegID$vegeID[i]],
+				varAll[[k]]$Mean[varAll[[k]]$class==vegID$vegeID[i]],
+				pch=19, col="wheat4", cex=15 )	
+		arrows(varAll[[k]]$shrub.pc[varAll[[k]]$class==vegID$vegeID[i]],
+				varAll[[k]]$pc2.5[varAll[[k]]$class==vegID$vegeID[i]],
+				varAll[[k]]$shrub.pc[varAll[[k]]$class==vegID$vegeID[i]],
+				varAll[[k]]$pc97.5[varAll[[k]]$class==vegID$vegeID[i]],lwd=5,code=0)
+		
 
+		if(i==dim(vegID)[1]){
+			axis(1, seq(0,80, by=20), cex.axis=12, lwd.ticks=8,padj=1)
+			mtext("Shrub % cover",side=1, line=20, cex=10)
 
+		
+		}
+		box(which="plot")
+	}
 
+		#moss
+		for(i in 1:dim(vegID)[1]){
+		par(mai=c(0,0,0,0))
+		plot(c(0,1),c(0,1), type="n",xlim=c(0,80), ylim=c(nlow[k],nhigh[k]), xlab=" ", 
+				ylab=" ", xaxs="i", yaxs="i", axes=FALSE)
+		points(varAll[[k]]$moss.pc[varAll[[k]]$class==vegID$vegeID[i]],
+				varAll[[k]]$Mean[varAll[[k]]$class==vegID$vegeID[i]],
+				pch=19, col="wheat4", cex=15 )	
+		arrows(varAll[[k]]$moss.pc[varAll[[k]]$class==vegID$vegeID[i]],
+				varAll[[k]]$pc2.5[varAll[[k]]$class==vegID$vegeID[i]],
+				varAll[[k]]$moss.pc[varAll[[k]]$class==vegID$vegeID[i]],
+				varAll[[k]]$pc97.5[varAll[[k]]$class==vegID$vegeID[i]],lwd=5,code=0)
+		
 
+		if(i==dim(vegID)[1]){
+			axis(1, seq(0,80, by=20), cex.axis=12, lwd.ticks=8,padj=1)
+			mtext("Moss % cover",side=1, line=20, cex=10)
+
+		
+		}
+		box(which="plot")
+	}
+	#air
+		for(i in 1:dim(vegID)[1]){
+		par(mai=c(0,0,0,0))
+			plot(c(0,1),c(0,1), type="n",xlim=c(min(varAll[[k]]$pc2.5A)-1,max(varAll[[k]]$pc97.5A)+1),
+				ylim=c(nlow[k],nhigh[k]), xlab=" ", 
+					ylab=" ", xaxs="i", yaxs="i", axes=FALSE)
+			points(varAll[[k]]$MeanA[varAll[[k]]$class==vegID$vegeID[i]],
+					varAll[[k]]$Mean[varAll[[k]]$class==vegID$vegeID[i]],
+					pch=19, col="wheat4", cex=15 )	
+			arrows(varAll[[k]]$MeanA[varAll[[k]]$class==vegID$vegeID[i]],
+					varAll[[k]]$pc2.5[varAll[[k]]$class==vegID$vegeID[i]],
+					varAll[[k]]$MeanA[varAll[[k]]$class==vegID$vegeID[i]],
+					varAll[[k]]$pc97.5[varAll[[k]]$class==vegID$vegeID[i]],lwd=5,code=0)
+			arrows(varAll[[k]]$pc2.5A[varAll[[k]]$class==vegID$vegeID[i]],
+					varAll[[k]]$Mean[varAll[[k]]$class==vegID$vegeID[i]],
+					varAll[[k]]$pc97.5A[varAll[[k]]$class==vegID$vegeID[i]],
+					varAll[[k]]$Mean[varAll[[k]]$class==vegID$vegeID[i]],lwd=5,code=0)
+			
+			if(i==dim(vegID)[1]){
+				axis(1, seq(-50,50, by=10), cex.axis=12, lwd.ticks=8,padj=1)
+				mtext("Air Temperature",side=1, line=20, cex=10)
+
+		
+		}
+		box(which="plot")
+	}
+	dev.off()
+}
 
 
 
