@@ -120,15 +120,23 @@ data.name<-c("nfreeze","nthaw","Tmax","Tmin","Peakmax","Peakmin","DayZero")
 
 wb<-40
 hb<-40
-nlow=c(0,0,0,-40,0)
-nhigh=c(1.7,1.7,25,-8,240)
-nameV<-c("nfreeze_vege","nthaw_vege","Tmax_vege","Tmin_vege","zero_vege")
+nlow=c(0,0,0,-40,.6,0,0)
+nhigh=c(1.7,1.7,25,0,1,.6,240)
+nameV<-c("nfreeze_vege","nthaw_vege","Tmax_vege","Tmin_vege","peakMax","peakMin", "zero_vege")
 labelV<-c("Freeze n-factor", "Thaw n-factor", "Soil temperature maximum", 
-			"Soil temperature minimum", "Days in zero mean")
-axisL<-c(0,0,0,-40,0)
-axisH<-c(1.5,1.5,20,-10,220)
-axisI<-c(.5,.5,5,10,20)
-
+			"Soil temperature minimum","Soil temperature maximum time",
+			"Soil temperature minimum time","Days in zero mean")
+Xlabel<-c("Air temperature minimum","Air temperature maximum",
+		"Air temperature maximum","Air temperature minimum",
+		"Air temperature maximum timing","Air temperature minimum timing","Air temperature minimum")			
+axisL<-c(0,0,0,-40,.6,.1,0)
+axisH<-c(1.5,1.5,20,-10,.9,.6,220)
+axisI<-c(.5,.5,5,10,.1,.1,20)
+axisXL<-c(-40,0,0,-40,.6,.1,-40)
+axisXH<-c(-10,25,25,-10,.9,.6,-10)
+axisXI<-c(10,5,5,10,.1,.1,10)
+nhighX<-c(-40,0,0,-40,.5,0,-40)
+nlowX<-c(-8,30,30,-8,1,.6,-8)
 
 for(k in 1:length(nlow)){
 jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\plot\\var\\",nameV[k],".jpg"), width=10000,height=5000)	
@@ -156,7 +164,7 @@ ab<-layout(matrix(seq(1,16), ncol=8, byrow=TRUE),
 		}
 		
 		if(i==1){
-		mtext(paste(labelV[k]), side=2, cex=10, line=25 )	
+		mtext(paste(labelV[k]), side=2, cex=10, line=-25, outer=TRUE )	
 		axis(2, seq(axisL[k],axisH[k], by=axisI[k]), cex.axis=12, lwd.ticks=8, las=2)
 		}
 		axis(3, seq(0,15, by=5),cex.axis=12, lwd.ticks=8) 
@@ -176,7 +184,7 @@ ab<-layout(matrix(seq(1,16), ncol=8, byrow=TRUE),
 #now plot air temp	
 	for(i in 1:length(className)){
 	par(mai=c(0,0,0,0))
-		plot(c(0,1),c(0,1), type="n", xlim=c(min(datAll[[k]]$pc2.5A[datAll[[k]]$class==i]-1),max(datAll[[k]]$pc97.5A[datAll[[k]]$class==i]+1)), 
+		plot(c(0,1),c(0,1), type="n", xlim=c(nlowX[k],nhighX[k]), 
 			ylim=c(nlow[k],nhigh[k]), axes=FALSE,
 			xlab=" ",ylab=" ", xaxs="i", yaxs="i")
 		for(j in 1:dim(regInClass[[i]])[1]){		
@@ -200,18 +208,93 @@ ab<-layout(matrix(seq(1,16), ncol=8, byrow=TRUE),
 		if(i==1){
 		axis(2, seq(axisL[k],axisH[k], by=axisI[k]), cex.axis=12, lwd.ticks=8, las=2)
 		}
-		axis(1, seq(-40,0, by=5),cex.axis=12, lwd.ticks=8,padj=1) 
+		axis(1, seq(axisXL[k],axisXH[k], by=axisXI[k]),cex.axis=12, lwd.ticks=8,padj=1) 
 		
 		box(which="plot")
 		mtext(paste(className[i]), cex=8, line=22, side=1)
 	}	
 	
-	mtext("Minimum Air Temperature (Tmin, C)", outer=TRUE, line=-100, cex=10, side=1 )		
+	mtext(paste(Xlabel[k]), outer=TRUE, line=-100, cex=10, side=1 )		
 	mtext("Depth (cm)", outer=TRUE, line=-100, cex=10, side=3 )	
 
 dev.off()
 
 
 }
+
+
+#see if Tmin and Tpeak and Zero day correspond:
+
+jpeg("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\plot\\var\\TminComp.jpg", width=10000,height=5000)	
+ab<-layout(matrix(seq(1,16), ncol=8, byrow=TRUE),
+			width=c(lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),
+			lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb)),
+
+			height=c(lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb),
+			lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb)))
+
+#plot peak
+	for(i in 1:length(className)){
+	par(mai=c(0,0,0,0))
+		plot(c(0,1),c(0,1), type="n", xlim=c(nlow[6],nhigh[6]), ylim=c(nlow[4],nhigh[4]), axes=FALSE,
+			xlab=" ",ylab=" ", xaxs="i", yaxs="i")
+		
+			points(datAll[[6]]$Mean[datAll[[6]]$class==i], 
+				datAll[[4]]$Mean[datAll[[4]]$class==i], pch=19,
+					col="wheat4", cex=15)	
+			arrows(datAll[[6]]$Mean[datAll[[6]]$class==i], 
+			datAll[[4]]$pc2.5[datAll[[4]]$class==i], 
+			datAll[[6]]$Mean[datAll[[6]]$class==i], 	
+			datAll[[4]]$pc97.5[datAll[[4]]$class==i],lwd=5, code=0)
+			
+			arrows(datAll[[6]]$pc2.5[datAll[[6]]$class==i], 
+			datAll[[4]]$Mean[datAll[[4]]$class==i], 
+			datAll[[6]]$pc97.5[datAll[[6]]$class==i], 	
+			datAll[[4]]$Mean[datAll[[4]]$class==i],lwd=5, code=0)		
+
+		mtext(paste(className[i]), cex=8, line=22, side=1)
+		if(i==1){
+		mtext(paste(labelV[4]), side=2, cex=10, line=-25, outer=TRUE )	
+		axis(2, seq(axisL[4],axisH[4], by=axisI[4]), cex.axis=12, lwd.ticks=8, las=2)
+		}
+		axis(3, seq(axisL[6],axisH[6], by=axisI[6]),cex.axis=12, lwd.ticks=8) 
+
+		box(which="plot")
+		
+					
+	}
+	
+#plot zero days
+	for(i in 1:length(className)){
+	par(mai=c(0,0,0,0))
+		plot(c(0,1),c(0,1), type="n", xlim=c(nlow[7],nhigh[7]), ylim=c(nlow[4],nhigh[4]), axes=FALSE,
+			xlab=" ",ylab=" ", xaxs="i", yaxs="i")
+		
+			points(datAll[[7]]$Mean[datAll[[7]]$class==i], 
+				datAll[[4]]$Mean[datAll[[4]]$class==i], pch=19,
+					col="wheat4", cex=15)	
+			arrows(datAll[[7]]$Mean[datAll[[7]]$class==i], 
+			datAll[[4]]$pc2.5[datAll[[4]]$class==i], 
+			datAll[[7]]$Mean[datAll[[7]]$class==i], 	
+			datAll[[4]]$pc97.5[datAll[[4]]$class==i],lwd=5, code=0)
+			
+			arrows(datAll[[7]]$pc2.5[datAll[[7]]$class==i], 
+			datAll[[4]]$Mean[datAll[[4]]$class==i], 
+			datAll[[7]]$pc97.5[datAll[[7]]$class==i], 	
+			datAll[[4]]$Mean[datAll[[4]]$class==i],lwd=5, code=0)		
+
+		
+		if(i==1){
+		axis(2, seq(axisL[4],axisH[4], by=axisI[4]), cex.axis=12, lwd.ticks=8, las=2)
+		mtext(paste(Xlabel[6]), outer=TRUE, line=-100, cex=10, side=3 )	
+		mtext(paste(Xlabel[7]), outer=TRUE, line=-100, cex=10, side=1 )	
+		}
+		axis(1, seq(axisL[7],axisH[7], by=axisI[7]),cex.axis=12, lwd.ticks=8,padj=1) 
+
+		box(which="plot")
+		
+					
+	}
+dev.off()	
 
 
