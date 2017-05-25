@@ -324,7 +324,7 @@ ab<-layout(matrix(seq(1,16), ncol=8, byrow=TRUE),
 		if(i==1){
 		axis(2, seq(axisL[4],axisH[4], by=axisI[4]), cex.axis=12, lwd.ticks=8, las=2)
 		mtext(paste(Xlabel[6]), outer=TRUE, line=-100, cex=10, side=3 )	
-		mtext(paste(Xlabel[7]), outer=TRUE, line=-100, cex=10, side=1 )	
+		mtext("Days in Zero Model", outer=TRUE, line=-100, cex=10, side=1 )	
 		}
 		axis(1, seq(axisL[7],axisH[7], by=axisI[7]),cex.axis=12, lwd.ticks=8,padj=1) 
 
