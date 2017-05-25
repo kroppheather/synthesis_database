@@ -299,6 +299,47 @@ for(i in 1:5){
 	TexM[i]<-round(mean(varAll[[i]]$MeanA),roundI[i])
 
 }
+#biome region model
+#############################################
+data.name<-c("nfreeze","nthaw","Tmax","Tmin","DayZero")
+dexps<-"\\[*[[:digit:]]*\\]"
+
+datStr<-list()
+datQr<-list()
+datCr<-list()
+b1pr<-list()
+b2pr<-list()
+b3pr<-list()
+b4pr<-list()
+b5pr<-list()
+repXr<-list()
+b2Sigr<-list()
+b3Sigr<-list()
+b4Sigr<-list()
+b5Sigr<-list()
+#read in model output
+for(i in 1:length(data.name)){
+	datStr[[i]]<-read.csv(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\model\\vege\\biomeReg\\mod1\\",data.name[i],"Temp_mod_stats.csv"))
+	datQr[[i]]<-read.csv(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\model\\vege\\biomeReg\\mod1\\",data.name[i],"Temp_mod_quant.csv"))
+	datCr[[i]]<-cbind(datStr[[i]],datQr[[i]])
+	#make parms vectors
+	datCr[[i]]$parms1<-gsub(dexps,"",rownames(datCr[[i]]))
+	b1pr[[i]]<-datCr[[i]][datCr[[i]]$parms=="b1",]
+	b2pr[[i]]<-datCr[[i]][datCr[[i]]$parms=="b2",]
+	b3pr[[i]]<-datCr[[i]][datCr[[i]]$parms=="b3",]
+	b4pr[[i]]<-datCr[[i]][datCr[[i]]$parms=="b4",]
+	b5pr[[i]]<-datCr[[i]][datCr[[i]]$parms=="b5",]
+	repXr[[i]]<-datCr[[i]][datCr[[i]]$parms=="rep.Xobs",]
+	#create a flag to indicate significance
+	b2Sigr[[i]]<-ifelse(b2pr[[i]]$X2.5.<0&b2pr[[i]]$X97.5.>0,0,
+				ifelse(b2pr[[i]]$X2.5.>0&b2pr[[i]]$X97.5.<0,0,1))
+	b3Sigr[[i]]<-ifelse(b3pr[[i]]$X2.5.<0&b3pr[[i]]$X97.5.>0,0,
+				ifelse(b3pr[[i]]$X2.5.>0&b3pr[[i]]$X97.5.<0,0,1))	
+	b4Sigr[[i]]<-ifelse(b4pr[[i]]$X2.5.<0&b4pr[[i]]$X97.5.>0,0,
+				ifelse(b4pr[[i]]$X2.5.>0&b4pr[[i]]$X97.5.<0,0,1))	
+	b5Sigr[[i]]<-ifelse(b5pr[[i]]$X2.5.<0&b5pr[[i]]$X97.5.>0,0,
+				ifelse(b5pr[[i]]$X2.5.>0&b5pr[[i]]$X97.5.<0,0,1))	
+	}
 
 
 
@@ -820,6 +861,22 @@ jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\
 	par(mai=c(0,0,0,0))
 		plot(c(0,1),c(0,1), type="n",xlim=c(-1,21), ylim=c(nlow[k],nhigh[k]), xlab=" ", 
 				ylab=" ", xaxs="i", yaxs="i", axes=FALSE)
+		
+				#regression CI
+		if(b2Sigr[[k]][i]==1){
+			polygon(c(seq(0,20, by=.1),rev(seq(0,20, by=.1))), 
+				c(b1pr[[k]]$X2.5.[i]+(b2pr[[k]]$X2.5.[i]*seq(0,20, by=.1)),
+				rev(b1pr[[k]]$X97.5.[i]+(b2pr[[k]]$X97.5.[i]*seq(0,20, by=.1)))),
+				col="grey85",border=FALSE)		
+			}else{
+				polygon(c(seq(0,20, by=.1),rev(seq(0,20, by=.1))), 
+				c(rep(b1pr[[k]]$X2.5.[i],length(seq(0,20, by=.1))),
+				rev(rep(b1pr[[k]]$X97.5.[i],length(seq(0,20, by=.1))))),
+				col="grey85",border=FALSE)	
+			
+			}
+		
+		
 		points(varAll[[k]]$depth[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],
 				varAll[[k]]$Mean[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],
 				pch=19, col="slategray3", cex=15 )	
@@ -827,6 +884,13 @@ jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\
 				varAll[[k]]$pc2.5[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],
 				varAll[[k]]$depth[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],
 				varAll[[k]]$pc97.5[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],lwd=5,code=0)
+		#regression line
+		if(b2Sigr[[k]][i]==1){
+		points(seq(0,20, by=.1),b1pr[[k]]$Mean[i]+(b2pr[[k]]$Mean[i]*seq(0,20, by=.1)), type="l", lwd=5)
+		}else{
+			points(seq(0,20, by=.1),rep(b1pr[[k]]$Mean[i], length(seq(0,20, by=.1))), type="l", lwd=5, lty=2)
+			}	
+
 		mtext(paste(bioReg$biome[i]), cex=8, line=20,side=2)
 		mtext(paste(bioReg$nameF[i]), cex=8, line=35,side=2)
 		axis(2, seq(axisL[k],axisH[k],by=axisI[k]), cex.axis=12, las=2, lwd.ticks=8)
@@ -843,6 +907,22 @@ jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\
 		par(mai=c(0,0,0,0))
 		plot(c(0,1),c(0,1), type="n",xlim=c(0,80), ylim=c(nlow[k],nhigh[k]), xlab=" ", 
 				ylab=" ", xaxs="i", yaxs="i", axes=FALSE)
+		
+		
+				#regression CI
+		if(b4Sigr[[k]][i]==1){
+			polygon(c(seq(0,80, by=.1),rev(seq(0,80, by=.1))), 
+				c(b1pr[[k]]$X2.5.[i]+(b4pr[[k]]$X2.5.[i]*seq(0,80, by=.1)),
+				rev(b1pr[[k]]$X97.5.[i]+(b4pr[[k]]$X97.5.[i]*seq(0,80, by=.1)))),
+				col="grey85",border=FALSE)		
+			}else{
+				polygon(c(seq(0,80, by=.1),rev(seq(0,80, by=.1))), 
+				c(rep(b1pr[[k]]$X2.5.[i],length(seq(0,80, by=.1))),
+				rev(rep(b1pr[[k]]$X97.5.[i],length(seq(0,80, by=.1))))),
+				col="grey85",border=FALSE)	
+			
+			}
+		
 		points(varAll[[k]]$shrub.pc[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],
 				varAll[[k]]$Mean[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],
 				pch=19, col="slategray3", cex=15 )	
@@ -851,7 +931,11 @@ jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\
 				varAll[[k]]$shrub.pc[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],
 				varAll[[k]]$pc97.5[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],lwd=5,code=0)
 		
-
+		if(b4Sigr[[k]][i]==1){
+		points(seq(0,80, by=.1),b1pr[[k]]$Mean[i]+(b4pr[[k]]$Mean[i]*seq(0,80, by=.1)), type="l", lwd=5)
+		}else{
+			points(seq(0,80, by=.1),rep(b1pr[[k]]$Mean[i], length(seq(0,80, by=.1))), type="l", lwd=5, lty=2)
+			}
 		if(i==dim(bioReg)[1]){
 			axis(1, seq(0,60, by=20), cex.axis=12, lwd.ticks=8,padj=1)
 			mtext("Shrub % cover",side=1, line=20, cex=10)
@@ -866,6 +950,19 @@ jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\
 		par(mai=c(0,0,0,0))
 		plot(c(0,1),c(0,1), type="n",xlim=c(0,80), ylim=c(nlow[k],nhigh[k]), xlab=" ", 
 				ylab=" ", xaxs="i", yaxs="i", axes=FALSE)
+				if(b4Sigr[[k]][i]==1){
+		polygon(c(seq(0,80, by=.1),rev(seq(0,80, by=.1))), 
+				c(b1pr[[k]]$X2.5.[i]+(b5pr[[k]]$X2.5.[i]*seq(0,80, by=.1)),
+				rev(b1pr[[k]]$X97.5.[i]+(b5pr[[k]]$X97.5.[i]*seq(0,80, by=.1)))),
+				col="grey85",border=FALSE)		
+			}else{
+				polygon(c(seq(0,80, by=.1),rev(seq(0,80, by=.1))), 
+				c(rep(b1pr[[k]]$X2.5.[i],length(seq(0,80, by=.1))),
+				rev(rep(b1pr[[k]]$X97.5.[i],length(seq(0,80, by=.1))))),
+				col="grey85",border=FALSE)	
+			
+			}
+		
 		points(varAll[[k]]$moss.pc[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],
 				varAll[[k]]$Mean[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],
 				pch=19, col="slategray3", cex=15 )	
@@ -873,7 +970,11 @@ jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\
 				varAll[[k]]$pc2.5[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],
 				varAll[[k]]$moss.pc[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],
 				varAll[[k]]$pc97.5[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],lwd=5,code=0)
-		
+				if(b4Sigr[[k]][i]==1){
+		points(seq(0,80, by=.1),b1pr[[k]]$Mean[i]+(b5pr[[k]]$Mean[i]*seq(0,80, by=.1)), type="l", lwd=5)
+		}else{
+			points(seq(0,80, by=.1),rep(b1pr[[k]]$Mean[i], length(seq(0,80, by=.1))), type="l", lwd=5, lty=2)
+			}
 
 		if(i==dim(bioReg)[1]){
 			axis(1, seq(0,80, by=20), cex.axis=12, lwd.ticks=8,padj=1)
@@ -889,6 +990,44 @@ jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\
 			plot(c(0,1),c(0,1), type="n",xlim=c(min(varAll[[k]]$pc2.5A)-1,max(varAll[[k]]$pc97.5A)+1),
 				ylim=c(nlow[k],nhigh[k]), xlab=" ", 
 					ylab=" ", xaxs="i", yaxs="i", axes=FALSE)
+			
+			
+	toplothigh<-ifelse(seq(min(varAll[[k]]$pc2.5A),
+						max(varAll[[k]]$pc97.5A), by=.1)<=TexM[k],
+						b1pr[[k]]$X2.5.[i]+(b3pr[[k]]$X2.5.[i]*(seq(min(varAll[[k]]$pc2.5A),
+						max(varAll[[k]]$pc97.5A), by=.1)-TexM[k])),
+						b1pr[[k]]$X97.5.[i]+(b3pr[[k]]$X97.5.[i]*(seq(min(varAll[[k]]$pc2.5A),
+						max(varAll[[k]]$pc97.5A), by=.1)-TexM[k])))
+		
+		toplotlow<-ifelse(seq(min(varAll[[k]]$pc2.5A),
+						max(varAll[[k]]$pc97.5A), by=.1)<=TexM[k],
+						b1pr[[k]]$X97.5.[i]+(b3pr[[k]]$X97.5.[i]*(seq(min(varAll[[k]]$pc2.5A),
+						max(varAll[[k]]$pc97.5A), by=.1)-TexM[k])),
+						b1pr[[k]]$X2.5.[i]+(b3pr[[k]]$X2.5.[i]*(seq(min(varAll[[k]]$pc2.5A),
+						max(varAll[[k]]$pc97.5A), by=.1)-TexM[k])))
+		
+		if(b3Sigr[[k]][i]==1){
+		polygon(c(seq(min(varAll[[k]]$pc2.5A),
+						max(varAll[[k]]$pc97.5A), by=.1),
+						rev(seq(min(varAll[[k]]$pc2.5A),
+						max(varAll[[k]]$pc97.5A), by=.1))), 
+				c(toplotlow,
+				rev(toplothigh)),
+				col="grey85",border=FALSE)		
+		}else{
+		
+		polygon(c(seq(min(varAll[[k]]$pc2.5A),
+						max(varAll[[k]]$pc97.5A), by=.1),
+						rev(seq(min(varAll[[k]]$pc2.5A),
+						max(varAll[[k]]$pc97.5A), by=.1))), 
+				c(rep(b1pr[[k]]$X2.5.[i], length(seq(min(varAll[[k]]$pc2.5A),
+						max(varAll[[k]]$pc97.5A), by=.1))),
+				rev(rep(b1pr[[k]]$X97.5.[i], length(seq(min(varAll[[k]]$pc2.5A),
+						max(varAll[[k]]$pc97.5A), by=.1))))),col="grey85",border=FALSE)
+		}	
+			
+			
+			
 			points(varAll[[k]]$MeanA[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],
 					varAll[[k]]$Mean[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],
 					pch=19, col="slategray3", cex=15 )	
@@ -901,6 +1040,21 @@ jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\
 					varAll[[k]]$pc97.5A[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],
 					varAll[[k]]$Mean[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],lwd=5,code=0)
 			
+			
+			if(b3Sigr[[k]][i]==1){
+			points(seq(min(varAll[[k]]$pc2.5A),
+						max(varAll[[k]]$pc97.5A), by=.1),
+			b1pr[[k]]$Mean[i]+(b3pr[[k]]$Mean[i]*
+			(seq(min(varAll[[k]]$pc2.5A),
+						max(varAll[[k]]$pc97.5A), by=.1)-TexM[k])), type="l", lwd=5)
+		}else{
+		points(seq(min(varAll[[k]]$pc2.5A),
+						max(varAll[[k]]$pc97.5A), by=.1),
+				rep(b1pr[[k]]$Mean[i],length(seq(min(varAll[[k]]$pc2.5A),
+					max(varAll[[k]]$pc97.5A), by=.1))),
+						type="l",lty=2, lwd=5)
+			
+		}	
 			if(i==dim(bioReg)[1]){
 				axis(1, seq(-50,50, by=5), cex.axis=12, lwd.ticks=8,padj=1)
 				mtext("Air Temperature",side=1, line=20, cex=10)
