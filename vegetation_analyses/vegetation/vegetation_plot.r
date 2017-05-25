@@ -230,593 +230,144 @@ vegID<-data.frame(vegeID=unique(NFV$class))
 vegID$name<-className[vegID$vegeID]
 vegID<-vegID[order(vegID$vegeID),]
 
+#get unique biome table
 
+biomeID<-data.frame(biome=unique(NFV$biome))
+biomeID$bioID<-seq(1,dim(biomeID)[1])
 #turn variables into a list
 varAll<-list(NFV,NTV,TmaxV,TminV,DZV)
+
+#see how many observations by biome x region
+bioReg<-aggregate(NFV$Mean, by=list(NFV$biome,NFV$region), FUN="length")
+colnames(bioReg)<-c("biome","region","count")
+#do not include E Russia data because only one point in region x bio
+bioReg<-bioReg[bioReg$count>1,]
+bioReg$nameF<-c("Alaska","Alaska","Canada", "Islands")
 
 ######################################################
 ######################################################
 #plot depth, shrub, moss by region
 
 
-##############################################
-########Freezing N factor
-
-
-wb<-40
-hb<-40
-nlowT=0
-nhighT=1.7
-
-
-
-
-jpeg("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\plot\\vege\\nfreeze_region.jpg", width=6000,height=5000)	
-ab<-layout(matrix(seq(1,12), ncol=4, byrow=FALSE),
-			width=c(lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),
-			lcm(wb),lcm(wb),lcm(wb),lcm(wb)),
-
-			height=c(lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb),
-			lcm(hb),lcm(hb),lcm(hb),lcm(hb)))
-
-#depth 
-#plot each region
-	for(i in 1:dim(regID)[1]){
-		par(mai=c(0,0,0,0))
-		plot(c(0,1),c(0,1), type="n", xlim=c(-1,21), ylim=c(nlowT,nhighT), axes=FALSE,
-		 xlab=" ", ylab=" ", xaxs="i", yaxs="i")
-		points(NFV$depth[NFV$region==regID$region[i]],NFV$Mean[NFV$region==regID$region[i]],
-				pch=19, cex=15, col="lavenderblush4")
-		arrows(NFV$depth[NFV$region==regID$region[i]],
-				NFV$pc2.5[NFV$region==regID$region[i]],
-				NFV$depth[NFV$region==regID$region[i]],
-				NFV$pc97.5[NFV$region==regID$region[i]], lwd=5,code=0)
-		axis(2, seq(0,1.5, by=.5),cex.axis=12, lwd.ticks=8)
-		box(which="plot")
-		if(i==dim(regID)[1]){
-		axis(1, seq(0,18, by=3),cex.axis=12, lwd.ticks=8, padj=1)
-		mtext("Freezing n-factor", side=2, outer=TRUE, line=-50, cex=10)
-		mtext("Depth (cm)", side=1,  line=20, cex=10)
-		}
-		
-
-
-	}
-	
-#shrub 	
-	for(i in 1:dim(regID)[1]){
-		par(mai=c(0,0,0,0))
-		plot(c(0,1),c(0,1), type="n", xlim=c(0,80), ylim=c(nlowT,nhighT), axes=FALSE,
-			 xlab=" ", ylab=" ", xaxs="i", yaxs="i")
-		points(NFV$shrub.pc[NFV$region==regID$region[i]],NFV$Mean[NFV$region==regID$region[i]],
-				pch=19, cex=15, col="lavenderblush4")
-		arrows(NFV$shrub.pc[NFV$region==regID$region[i]],
-				NFV$pc2.5[NFV$region==regID$region[i]],
-				NFV$shrub.pc[NFV$region==regID$region[i]],
-				NFV$pc97.5[NFV$region==regID$region[i]], lwd=5,code=0)
-		
-		box(which="plot")
-		if(i==dim(regID)[1]){
-		axis(1, seq(0,60, by=20),cex.axis=12, lwd.ticks=8, padj=1)
-		mtext("Shrub % Cover", side=1,  line=20, cex=10)
-		}
-		
-
-
-	}
-
-#moss
-	for(i in 1:dim(regID)[1]){
-		par(mai=c(0,0,0,0))
-		plot(c(0,1),c(0,1), type="n", xlim=c(0,80), ylim=c(nlowT,nhighT), axes=FALSE,
-			 xlab=" ", ylab=" ", xaxs="i", yaxs="i")
-		points(NFV$moss.pc[NFV$region==regID$region[i]],NFV$Mean[NFV$region==regID$region[i]],
-				pch=19, cex=15, col="lavenderblush4")
-		arrows(NFV$moss.pc[NFV$region==regID$region[i]],
-				NFV$pc2.5[NFV$region==regID$region[i]],
-				NFV$moss.pc[NFV$region==regID$region[i]],
-				NFV$pc97.5[NFV$region==regID$region[i]], lwd=5,code=0)
-		box(which="plot")
-		if(i==dim(regID)[1]){
-		axis(1, seq(0,60, by=20),cex.axis=12, lwd.ticks=8, padj=1)
-		mtext("Moss % Cover", side=1,  line=20, cex=10)
-		}
-		
-
-
-	}
-#moss
-	for(i in 1:dim(regID)[1]){
-		par(mai=c(0,0,0,0))
-		plot(c(0,1),c(0,1), type="n", xlim=c(-35,-8), ylim=c(nlowT,nhighT), axes=FALSE,
-			 xlab=" ", ylab=" ", xaxs="i", yaxs="i")
-		points(NFV$MeanA[NFV$region==regID$region[i]],NFV$Mean[NFV$region==regID$region[i]],
-				pch=19, cex=15, col="lavenderblush4")
-		arrows(NFV$MeanA[NFV$region==regID$region[i]],
-				NFV$pc2.5[NFV$region==regID$region[i]],
-				NFV$MeanA[NFV$region==regID$region[i]],
-				NFV$pc97.5[NFV$region==regID$region[i]], lwd=5,code=0)
-				
-		arrows(NFV$pc2.5A[NFV$region==regID$region[i]],
-				NFV$Mean[NFV$region==regID$region[i]],
-				NFV$pc97.5A[NFV$region==regID$region[i]],
-				NFV$Mean[NFV$region==regID$region[i]], lwd=5,code=0)
-
-		box(which="plot")
-		if(i==dim(regID)[1]){
-		axis(1, seq(-30,-10, by=10),cex.axis=12, lwd.ticks=8, padj=1)
-		mtext("Air T min", side=1,  line=20, cex=10)
-		}
-		
-
-
-	}
-dev.off()
-
-
-
-#################################################
-########thawing N factor
-
+###############################################################
+#######now look at vegetation vs region
+#(NFV,NTV,TmaxV,TminV,DZV)
 
 wb<-40
 hb<-40
-nlowT=0
-nhighT=1.7
+nlow=c(0,0,0,-40,0)
+nhigh=c(1.7,1.7,25,-8,240)
+nameV<-c("nfreeze_vege","nthaw_vege","Tmax_vege","Tmin_vege","zero_vege")
+labelV<-c("Freeze n-factor", "Thaw n-factor", "Soil temperature maximum", 
+			"Soil temperature minimum", "Days in zero mean")
+axisL<-c(0,0,0,-40,0)
+axisH<-c(1.5,1.5,20,-10,220)
+axisI<-c(.5,.5,5,10,20)
 
+for(k in 1:length(nlow)){
+jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\plot\\vege\\region",nameV[k],".jpg"), width=6500,height=6500)	
 
+	ab<-layout(matrix(seq(1,12), ncol=4, byrow=FALSE),
+				width=c(rep(lcm(wb),12)),
+				height=c(rep(lcm(hb),12)))
 
-
-jpeg("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\plot\\vege\\nthaw_region.jpg", width=6000,height=5000)	
-ab<-layout(matrix(seq(1,12), ncol=4, byrow=FALSE),
-			width=c(lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),
-			lcm(wb),lcm(wb),lcm(wb),lcm(wb)),
-
-			height=c(lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb),
-			lcm(hb),lcm(hb),lcm(hb),lcm(hb)))
-
-#depth 
-#plot each region
+	#depth
 	for(i in 1:dim(regID)[1]){
-		par(mai=c(0,0,0,0))
-		plot(c(0,1),c(0,1), type="n", xlim=c(-1,21), ylim=c(nlowT,nhighT), axes=FALSE,
-		 xlab=" ", ylab=" ", xaxs="i", yaxs="i")
-		points(NTV$depth[NTV$region==regID$region[i]],NTV$Mean[NTV$region==regID$region[i]],
-				pch=19, cex=15, col="lavenderblush4")
-		arrows(NTV$depth[NTV$region==regID$region[i]],
-				NTV$pc2.5[NTV$region==regID$region[i]],
-				NTV$depth[NTV$region==regID$region[i]],
-				NTV$pc97.5[NTV$region==regID$region[i]], lwd=5,code=0)
-		axis(2, seq(0,1.5, by=.5),cex.axis=12, lwd.ticks=8)
-		box(which="plot")
+	par(mai=c(0,0,0,0))
+		plot(c(0,1),c(0,1), type="n",xlim=c(-1,21), ylim=c(nlow[k],nhigh[k]), xlab=" ", 
+				ylab=" ", xaxs="i", yaxs="i", axes=FALSE)
+		points(varAll[[k]]$depth[varAll[[k]]$region==regID$region[i]],
+				varAll[[k]]$Mean[varAll[[k]]$region==regID$region[i]],
+				pch=19, col="slategray3", cex=15 )	
+		arrows(varAll[[k]]$depth[varAll[[k]]$region==regID$region[i]],
+				varAll[[k]]$pc2.5[varAll[[k]]$region==regID$region[i]],
+				varAll[[k]]$depth[varAll[[k]]$region==regID$region[i]],
+				varAll[[k]]$pc97.5[varAll[[k]]$region==regID$region[i]],lwd=5,code=0)
+		mtext(paste(regID$nameF[i]), cex=8, line=20,side=2)
+		axis(2, seq(axisL[k],axisH[k],by=axisI[k]), cex.axis=12, las=2, lwd.ticks=8)
 		if(i==dim(regID)[1]){
-		axis(1, seq(0,18, by=3),cex.axis=12, lwd.ticks=8, padj=1)
-		mtext("Freezing n-factor", side=2, outer=TRUE, line=-50, cex=10)
-		mtext("Depth (cm)", side=1,  line=20, cex=10)
-		}
+			axis(1, seq(0,18, by=3), cex.axis=12, lwd.ticks=8,padj=1)
+			mtext("Depth (cm)",side=1, line=20, cex=10)
+			mtext(paste(labelV[k]), outer=TRUE, side=2, line=-50,cex=10)
 		
-
-
+		}
+		box(which="plot")
 	}
-	
-#shrub 	
-	for(i in 1:dim(regID)[1]){
+	#shrub
+		for(i in 1:dim(regID)[1]){
 		par(mai=c(0,0,0,0))
-		plot(c(0,1),c(0,1), type="n", xlim=c(0,80), ylim=c(nlowT,nhighT), axes=FALSE,
-			 xlab=" ", ylab=" ", xaxs="i", yaxs="i")
-		points(NTV$shrub.pc[NTV$region==regID$region[i]],NTV$Mean[NTV$region==regID$region[i]],
-				pch=19, cex=15, col="lavenderblush4")
-		arrows(NTV$shrub.pc[NTV$region==regID$region[i]],
-				NTV$pc2.5[NTV$region==regID$region[i]],
-				NTV$shrub.pc[NTV$region==regID$region[i]],
-				NTV$pc97.5[NTV$region==regID$region[i]], lwd=5,code=0)
+		plot(c(0,1),c(0,1), type="n",xlim=c(0,80), ylim=c(nlow[k],nhigh[k]), xlab=" ", 
+				ylab=" ", xaxs="i", yaxs="i", axes=FALSE)
+		points(varAll[[k]]$shrub.pc[varAll[[k]]$region==regID$region[i]],
+				varAll[[k]]$Mean[varAll[[k]]$region==regID$region[i]],
+				pch=19, col="slategray3", cex=15 )	
+		arrows(varAll[[k]]$shrub.pc[varAll[[k]]$region==regID$region[i]],
+				varAll[[k]]$pc2.5[varAll[[k]]$region==regID$region[i]],
+				varAll[[k]]$shrub.pc[varAll[[k]]$region==regID$region[i]],
+				varAll[[k]]$pc97.5[varAll[[k]]$region==regID$region[i]],lwd=5,code=0)
 		
-		box(which="plot")
+
 		if(i==dim(regID)[1]){
-		axis(1, seq(0,60, by=20),cex.axis=12, lwd.ticks=8, padj=1)
-		mtext("Shrub % Cover", side=1,  line=20, cex=10)
-		}
+			axis(1, seq(0,60, by=20), cex.axis=12, lwd.ticks=8,padj=1)
+			mtext("Shrub % cover",side=1, line=20, cex=10)
+
 		
-
-
-	}
-
-#moss
-	for(i in 1:dim(regID)[1]){
-		par(mai=c(0,0,0,0))
-		plot(c(0,1),c(0,1), type="n", xlim=c(0,80), ylim=c(nlowT,nhighT), axes=FALSE,
-			 xlab=" ", ylab=" ", xaxs="i", yaxs="i")
-		points(NTV$moss.pc[NTV$region==regID$region[i]],NTV$Mean[NTV$region==regID$region[i]],
-				pch=19, cex=15, col="lavenderblush4")
-		arrows(NTV$moss.pc[NTV$region==regID$region[i]],
-				NTV$pc2.5[NTV$region==regID$region[i]],
-				NTV$moss.pc[NTV$region==regID$region[i]],
-				NTV$pc97.5[NTV$region==regID$region[i]], lwd=5,code=0)
+		}
 		box(which="plot")
-		if(i==dim(regID)[1]){
-		axis(1, seq(0,60, by=20),cex.axis=12, lwd.ticks=8, padj=1)
-		mtext("Moss % Cover", side=1,  line=20, cex=10)
-		}
-		
-
-
-	}
-#air
-	for(i in 1:dim(regID)[1]){
-		par(mai=c(0,0,0,0))
-		plot(c(0,1),c(0,1), type="n", xlim=c(0,20), ylim=c(nlowT,nhighT), axes=FALSE,
-			 xlab=" ", ylab=" ", xaxs="i", yaxs="i")
-		points(NTV$MeanA[NTV$region==regID$region[i]],NTV$Mean[NTV$region==regID$region[i]],
-				pch=19, cex=15, col="lavenderblush4")
-		arrows(NTV$MeanA[NTV$region==regID$region[i]],
-				NTV$pc2.5[NTV$region==regID$region[i]],
-				NTV$MeanA[NTV$region==regID$region[i]],
-				NTV$pc97.5[NTV$region==regID$region[i]], lwd=5,code=0)
-				
-		arrows(NTV$pc2.5A[NTV$region==regID$region[i]],
-				NTV$Mean[NTV$region==regID$region[i]],
-				NTV$pc97.5A[NTV$region==regID$region[i]],
-				NTV$Mean[NTV$region==regID$region[i]], lwd=5,code=0)
-
-		box(which="plot")
-		if(i==dim(regID)[1]){
-		axis(1, seq(0,20, by=10),cex.axis=12, lwd.ticks=8, padj=1)
-		mtext("Air T max", side=1,  line=20, cex=10)
-		}
-		
-
-
-	}
-dev.off()
-
-
-
-#################################################
-########tmax
-
-
-wb<-40
-hb<-40
-nlowT=0
-nhighT=20
-
-
-
-
-jpeg("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\plot\\vege\\tmax_region.jpg", width=6000,height=5000)	
-ab<-layout(matrix(seq(1,12), ncol=4, byrow=FALSE),
-			width=c(lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),
-			lcm(wb),lcm(wb),lcm(wb),lcm(wb)),
-
-			height=c(lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb),
-			lcm(hb),lcm(hb),lcm(hb),lcm(hb)))
-
-#depth 
-#plot each region
-	for(i in 1:dim(regID)[1]){
-		par(mai=c(0,0,0,0))
-		plot(c(0,1),c(0,1), type="n", xlim=c(-1,21), ylim=c(nlowT,nhighT), axes=FALSE,
-		 xlab=" ", ylab=" ", xaxs="i", yaxs="i")
-		points(TmaxV$depth[TmaxV$region==regID$region[i]],TmaxV$Mean[TmaxV$region==regID$region[i]],
-				pch=19, cex=15, col="lavenderblush4")
-		arrows(TmaxV$depth[TmaxV$region==regID$region[i]],
-				TmaxV$pc2.5[TmaxV$region==regID$region[i]],
-				TmaxV$depth[TmaxV$region==regID$region[i]],
-				TmaxV$pc97.5[TmaxV$region==regID$region[i]], lwd=5,code=0)
-		axis(2, seq(0,15, by=5),cex.axis=12, lwd.ticks=8, las=2)
-		box(which="plot")
-		if(i==dim(regID)[1]){
-		axis(1, seq(0,18, by=3),cex.axis=12, lwd.ticks=8, padj=1)
-		mtext("Freezing n-factor", side=2, outer=TRUE, line=-50, cex=10)
-		mtext("Depth (cm)", side=1,  line=20, cex=10)
-		}
-		
-
-
-	}
-	
-#shrub 	
-	for(i in 1:dim(regID)[1]){
-		par(mai=c(0,0,0,0))
-		plot(c(0,1),c(0,1), type="n", xlim=c(0,80), ylim=c(nlowT,nhighT), axes=FALSE,
-			 xlab=" ", ylab=" ", xaxs="i", yaxs="i")
-		points(TmaxV$shrub.pc[TmaxV$region==regID$region[i]],TmaxV$Mean[TmaxV$region==regID$region[i]],
-				pch=19, cex=15, col="lavenderblush4")
-		arrows(TmaxV$shrub.pc[TmaxV$region==regID$region[i]],
-				TmaxV$pc2.5[TmaxV$region==regID$region[i]],
-				TmaxV$shrub.pc[TmaxV$region==regID$region[i]],
-				TmaxV$pc97.5[TmaxV$region==regID$region[i]], lwd=5,code=0)
-		
-		box(which="plot")
-		if(i==dim(regID)[1]){
-		axis(1, seq(0,60, by=20),cex.axis=12, lwd.ticks=8, padj=1)
-		mtext("Shrub % Cover", side=1,  line=20, cex=10)
-		}
-		
-
-
 	}
 
-#moss
-	for(i in 1:dim(regID)[1]){
+		#moss
+		for(i in 1:dim(regID)[1]){
 		par(mai=c(0,0,0,0))
-		plot(c(0,1),c(0,1), type="n", xlim=c(0,80), ylim=c(nlowT,nhighT), axes=FALSE,
-			 xlab=" ", ylab=" ", xaxs="i", yaxs="i")
-		points(TmaxV$moss.pc[TmaxV$region==regID$region[i]],TmaxV$Mean[TmaxV$region==regID$region[i]],
-				pch=19, cex=15, col="lavenderblush4")
-		arrows(TmaxV$moss.pc[TmaxV$region==regID$region[i]],
-				TmaxV$pc2.5[TmaxV$region==regID$region[i]],
-				TmaxV$moss.pc[TmaxV$region==regID$region[i]],
-				TmaxV$pc97.5[TmaxV$region==regID$region[i]], lwd=5,code=0)
-		box(which="plot")
-		if(i==dim(regID)[1]){
-		axis(1, seq(0,60, by=20),cex.axis=12, lwd.ticks=8, padj=1)
-		mtext("Moss % Cover", side=1,  line=20, cex=10)
-		}
+		plot(c(0,1),c(0,1), type="n",xlim=c(0,80), ylim=c(nlow[k],nhigh[k]), xlab=" ", 
+				ylab=" ", xaxs="i", yaxs="i", axes=FALSE)
+		points(varAll[[k]]$moss.pc[varAll[[k]]$region==regID$region[i]],
+				varAll[[k]]$Mean[varAll[[k]]$region==regID$region[i]],
+				pch=19, col="slategray3", cex=15 )	
+		arrows(varAll[[k]]$moss.pc[varAll[[k]]$region==regID$region[i]],
+				varAll[[k]]$pc2.5[varAll[[k]]$region==regID$region[i]],
+				varAll[[k]]$moss.pc[varAll[[k]]$region==regID$region[i]],
+				varAll[[k]]$pc97.5[varAll[[k]]$region==regID$region[i]],lwd=5,code=0)
 		
 
+		if(i==dim(regID)[1]){
+			axis(1, seq(0,80, by=20), cex.axis=12, lwd.ticks=8,padj=1)
+			mtext("Moss % cover",side=1, line=20, cex=10)
 
+		
+		}
+		box(which="plot")
 	}
-#air
-	for(i in 1:dim(regID)[1]){
+	#air
+		for(i in 1:dim(regID)[1]){
 		par(mai=c(0,0,0,0))
-		plot(c(0,1),c(0,1), type="n", xlim=c(0,20), ylim=c(nlowT,nhighT), axes=FALSE,
-			 xlab=" ", ylab=" ", xaxs="i", yaxs="i")
-		points(TmaxV$MeanA[TmaxV$region==regID$region[i]],TmaxV$Mean[TmaxV$region==regID$region[i]],
-				pch=19, cex=15, col="lavenderblush4")
-		arrows(TmaxV$MeanA[TmaxV$region==regID$region[i]],
-				TmaxV$pc2.5[TmaxV$region==regID$region[i]],
-				TmaxV$MeanA[TmaxV$region==regID$region[i]],
-				TmaxV$pc97.5[TmaxV$region==regID$region[i]], lwd=5,code=0)
-				
-		arrows(TmaxV$pc2.5A[TmaxV$region==regID$region[i]],
-				TmaxV$Mean[TmaxV$region==regID$region[i]],
-				TmaxV$pc97.5A[TmaxV$region==regID$region[i]],
-				TmaxV$Mean[TmaxV$region==regID$region[i]], lwd=5,code=0)
+			plot(c(0,1),c(0,1), type="n",xlim=c(min(varAll[[k]]$pc2.5A)-1,max(varAll[[k]]$pc97.5A)+1),
+				ylim=c(nlow[k],nhigh[k]), xlab=" ", 
+					ylab=" ", xaxs="i", yaxs="i", axes=FALSE)
+			points(varAll[[k]]$MeanA[varAll[[k]]$region==regID$region[i]],
+					varAll[[k]]$Mean[varAll[[k]]$region==regID$region[i]],
+					pch=19, col="slategray3", cex=15 )	
+			arrows(varAll[[k]]$MeanA[varAll[[k]]$region==regID$region[i]],
+					varAll[[k]]$pc2.5[varAll[[k]]$region==regID$region[i]],
+					varAll[[k]]$MeanA[varAll[[k]]$region==regID$region[i]],
+					varAll[[k]]$pc97.5[varAll[[k]]$region==regID$region[i]],lwd=5,code=0)
+			arrows(varAll[[k]]$pc2.5A[varAll[[k]]$region==regID$region[i]],
+					varAll[[k]]$Mean[varAll[[k]]$region==regID$region[i]],
+					varAll[[k]]$pc97.5A[varAll[[k]]$region==regID$region[i]],
+					varAll[[k]]$Mean[varAll[[k]]$region==regID$region[i]],lwd=5,code=0)
+			
+			if(i==dim(regID)[1]){
+				axis(1, seq(-50,50, by=5), cex.axis=12, lwd.ticks=8,padj=1)
+				mtext("Air Temperature",side=1, line=20, cex=10)
 
-		box(which="plot")
-		if(i==dim(regID)[1]){
-		axis(1, seq(0,20, by=10),cex.axis=12, lwd.ticks=8, padj=1)
-		mtext("Air T max", side=1,  line=20, cex=10)
+		
 		}
-		
-
-
-	}
-dev.off()
-
-
-
-###########################################
-########Tmin
-
-
-
-wb<-40
-hb<-40
-nlowT=-35
-nhighT=0
-
-
-
-
-jpeg("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\plot\\vege\\tmin_region.jpg", width=6000,height=5000)	
-ab<-layout(matrix(seq(1,12), ncol=4, byrow=FALSE),
-			width=c(lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),
-			lcm(wb),lcm(wb),lcm(wb),lcm(wb)),
-
-			height=c(lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb),
-			lcm(hb),lcm(hb),lcm(hb),lcm(hb)))
-
-#depth 
-#plot each region
-	for(i in 1:dim(regID)[1]){
-		par(mai=c(0,0,0,0))
-		plot(c(0,1),c(0,1), type="n", xlim=c(-1,21), ylim=c(nlowT,nhighT), axes=FALSE,
-		 xlab=" ", ylab=" ", xaxs="i", yaxs="i")
-		points(TminV$depth[TminV$region==regID$region[i]],TminV$Mean[TminV$region==regID$region[i]],
-				pch=19, cex=15, col="lavenderblush4")
-		arrows(TminV$depth[TminV$region==regID$region[i]],
-				TminV$pc2.5[TminV$region==regID$region[i]],
-				TminV$depth[TminV$region==regID$region[i]],
-				TminV$pc97.5[TminV$region==regID$region[i]], lwd=5,code=0)
-		axis(2, seq(-35,-5, by=5),cex.axis=12, lwd.ticks=8, las=2)
 		box(which="plot")
-		if(i==dim(regID)[1]){
-		axis(1, seq(0,18, by=3),cex.axis=12, lwd.ticks=8, padj=1)
-		mtext("Tmin ", side=2, outer=TRUE, line=-50, cex=10)
-		mtext("Depth (cm)", side=1,  line=20, cex=10)
-		}
-		
-
-
 	}
-	
-#shrub 	
-	for(i in 1:dim(regID)[1]){
-		par(mai=c(0,0,0,0))
-		plot(c(0,1),c(0,1), type="n", xlim=c(0,80), ylim=c(nlowT,nhighT), axes=FALSE,
-			 xlab=" ", ylab=" ", xaxs="i", yaxs="i")
-		points(TminV$shrub.pc[TminV$region==regID$region[i]],TminV$Mean[TminV$region==regID$region[i]],
-				pch=19, cex=15, col="lavenderblush4")
-		arrows(TminV$shrub.pc[TminV$region==regID$region[i]],
-				TminV$pc2.5[TminV$region==regID$region[i]],
-				TminV$shrub.pc[TminV$region==regID$region[i]],
-				TminV$pc97.5[TminV$region==regID$region[i]], lwd=5,code=0)
-		
-		box(which="plot")
-		if(i==dim(regID)[1]){
-		axis(1, seq(0,60, by=20),cex.axis=12, lwd.ticks=8, padj=1)
-		mtext("Shrub % Cover", side=1,  line=20, cex=10)
-		}
-		
+	dev.off()
+}
 
 
-	}
-
-#moss
-	for(i in 1:dim(regID)[1]){
-		par(mai=c(0,0,0,0))
-		plot(c(0,1),c(0,1), type="n", xlim=c(0,80), ylim=c(nlowT,nhighT), axes=FALSE,
-			 xlab=" ", ylab=" ", xaxs="i", yaxs="i")
-		points(TminV$moss.pc[TminV$region==regID$region[i]],TminV$Mean[TminV$region==regID$region[i]],
-				pch=19, cex=15, col="lavenderblush4")
-		arrows(TminV$moss.pc[TminV$region==regID$region[i]],
-				TminV$pc2.5[TminV$region==regID$region[i]],
-				TminV$moss.pc[TminV$region==regID$region[i]],
-				TminV$pc97.5[TminV$region==regID$region[i]], lwd=5,code=0)
-		box(which="plot")
-		if(i==dim(regID)[1]){
-		axis(1, seq(0,60, by=20),cex.axis=12, lwd.ticks=8, padj=1)
-		mtext("Moss % Cover", side=1,  line=20, cex=10)
-		}
-		
-
-
-	}
-#air
-	for(i in 1:dim(regID)[1]){
-		par(mai=c(0,0,0,0))
-		plot(c(0,1),c(0,1), type="n", xlim=c(-35,0), ylim=c(nlowT,nhighT), axes=FALSE,
-			 xlab=" ", ylab=" ", xaxs="i", yaxs="i")
-		points(TminV$MeanA[TminV$region==regID$region[i]],TminV$Mean[TminV$region==regID$region[i]],
-				pch=19, cex=15, col="lavenderblush4")
-		arrows(TminV$MeanA[TminV$region==regID$region[i]],
-				TminV$pc2.5[TminV$region==regID$region[i]],
-				TminV$MeanA[TminV$region==regID$region[i]],
-				TminV$pc97.5[TminV$region==regID$region[i]], lwd=5,code=0)
-				
-		arrows(TminV$pc2.5A[TminV$region==regID$region[i]],
-				TminV$Mean[TminV$region==regID$region[i]],
-				TminV$pc97.5A[TminV$region==regID$region[i]],
-				TminV$Mean[TminV$region==regID$region[i]], lwd=5,code=0)
-
-		box(which="plot")
-		if(i==dim(regID)[1]){
-		axis(1, seq(-30,-5, by=5),cex.axis=12, lwd.ticks=8, padj=1)
-		mtext("Air T max", side=1,  line=20, cex=10)
-		}
-		
-
-
-	}
-dev.off()
-
-
-###########################################
-########Zero days
-
-
-
-wb<-40
-hb<-40
-nlowT=0
-nhighT=240
-
-
-
-
-jpeg("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\plot\\vege\\zero_region.jpg", width=6000,height=5000)	
-ab<-layout(matrix(seq(1,12), ncol=4, byrow=FALSE),
-			width=c(lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),
-			lcm(wb),lcm(wb),lcm(wb),lcm(wb)),
-
-			height=c(lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb),lcm(hb),
-			lcm(hb),lcm(hb),lcm(hb),lcm(hb)))
-
-#depth 
-#plot each region
-	for(i in 1:dim(regID)[1]){
-		par(mai=c(0,0,0,0))
-		plot(c(0,1),c(0,1), type="n", xlim=c(-1,21), ylim=c(nlowT,nhighT), axes=FALSE,
-		 xlab=" ", ylab=" ", xaxs="i", yaxs="i")
-		points(DZV$depth[DZV$region==regID$region[i]],DZV$Mean[DZV$region==regID$region[i]],
-				pch=19, cex=15, col="lavenderblush4")
-		arrows(DZV$depth[DZV$region==regID$region[i]],
-				DZV$pc2.5[DZV$region==regID$region[i]],
-				DZV$depth[DZV$region==regID$region[i]],
-				DZV$pc97.5[DZV$region==regID$region[i]], lwd=5,code=0)
-		axis(2, seq(0,220, by=20),cex.axis=12, lwd.ticks=8, las=2)
-		box(which="plot")
-		if(i==dim(regID)[1]){
-		axis(1, seq(0,18, by=3),cex.axis=12, lwd.ticks=8, padj=1)
-		mtext("Days in Zero model ", side=2, outer=TRUE, line=-50, cex=10)
-		mtext("Depth (cm)", side=1,  line=20, cex=10)
-		}
-		
-
-
-	}
-	
-#shrub 	
-	for(i in 1:dim(regID)[1]){
-		par(mai=c(0,0,0,0))
-		plot(c(0,1),c(0,1), type="n", xlim=c(0,80), ylim=c(nlowT,nhighT), axes=FALSE,
-			 xlab=" ", ylab=" ", xaxs="i", yaxs="i")
-		points(DZV$shrub.pc[DZV$region==regID$region[i]],DZV$Mean[DZV$region==regID$region[i]],
-				pch=19, cex=15, col="lavenderblush4")
-		arrows(DZV$shrub.pc[DZV$region==regID$region[i]],
-				DZV$pc2.5[DZV$region==regID$region[i]],
-				DZV$shrub.pc[DZV$region==regID$region[i]],
-				DZV$pc97.5[DZV$region==regID$region[i]], lwd=5,code=0)
-		
-		box(which="plot")
-		if(i==dim(regID)[1]){
-		axis(1, seq(0,60, by=20),cex.axis=12, lwd.ticks=8, padj=1)
-		mtext("Shrub % Cover", side=1,  line=20, cex=10)
-		}
-		
-
-
-	}
-
-#moss
-	for(i in 1:dim(regID)[1]){
-		par(mai=c(0,0,0,0))
-		plot(c(0,1),c(0,1), type="n", xlim=c(0,80), ylim=c(nlowT,nhighT), axes=FALSE,
-			 xlab=" ", ylab=" ", xaxs="i", yaxs="i")
-		points(DZV$moss.pc[DZV$region==regID$region[i]],DZV$Mean[DZV$region==regID$region[i]],
-				pch=19, cex=15, col="lavenderblush4")
-		arrows(DZV$moss.pc[DZV$region==regID$region[i]],
-				DZV$pc2.5[DZV$region==regID$region[i]],
-				DZV$moss.pc[DZV$region==regID$region[i]],
-				DZV$pc97.5[DZV$region==regID$region[i]], lwd=5,code=0)
-		box(which="plot")
-		if(i==dim(regID)[1]){
-		axis(1, seq(0,60, by=20),cex.axis=12, lwd.ticks=8, padj=1)
-		mtext("Moss % Cover", side=1,  line=20, cex=10)
-		}
-		
-
-
-	}
-#air
-	for(i in 1:dim(regID)[1]){
-		par(mai=c(0,0,0,0))
-		plot(c(0,1),c(0,1), type="n", xlim=c(-35,0), ylim=c(nlowT,nhighT), axes=FALSE,
-			 xlab=" ", ylab=" ", xaxs="i", yaxs="i")
-		points(DZV$MeanA[DZV$region==regID$region[i]],DZV$Mean[DZV$region==regID$region[i]],
-				pch=19, cex=15, col="lavenderblush4")
-		arrows(DZV$MeanA[DZV$region==regID$region[i]],
-				DZV$pc2.5[DZV$region==regID$region[i]],
-				DZV$MeanA[DZV$region==regID$region[i]],
-				DZV$pc97.5[DZV$region==regID$region[i]], lwd=5,code=0)
-				
-		arrows(DZV$pc2.5A[DZV$region==regID$region[i]],
-				DZV$Mean[DZV$region==regID$region[i]],
-				DZV$pc97.5A[DZV$region==regID$region[i]],
-				DZV$Mean[DZV$region==regID$region[i]], lwd=5,code=0)
-
-		box(which="plot")
-		if(i==dim(regID)[1]){
-		axis(1, seq(-30,-5, by=5),cex.axis=12, lwd.ticks=8, padj=1)
-		mtext("Air T min", side=1,  line=20, cex=10)
-		}
-		
-
-
-	}
-dev.off()
 
 
 ###############################################################
@@ -848,7 +399,7 @@ jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\
 				ylab=" ", xaxs="i", yaxs="i", axes=FALSE)
 		points(varAll[[k]]$depth[varAll[[k]]$class==vegID$vegeID[i]],
 				varAll[[k]]$Mean[varAll[[k]]$class==vegID$vegeID[i]],
-				pch=19, col="wheat4", cex=15 )	
+				pch=19, col="slategray3", cex=15 )	
 		arrows(varAll[[k]]$depth[varAll[[k]]$class==vegID$vegeID[i]],
 				varAll[[k]]$pc2.5[varAll[[k]]$class==vegID$vegeID[i]],
 				varAll[[k]]$depth[varAll[[k]]$class==vegID$vegeID[i]],
@@ -870,7 +421,7 @@ jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\
 				ylab=" ", xaxs="i", yaxs="i", axes=FALSE)
 		points(varAll[[k]]$shrub.pc[varAll[[k]]$class==vegID$vegeID[i]],
 				varAll[[k]]$Mean[varAll[[k]]$class==vegID$vegeID[i]],
-				pch=19, col="wheat4", cex=15 )	
+				pch=19, col="slategray3", cex=15 )	
 		arrows(varAll[[k]]$shrub.pc[varAll[[k]]$class==vegID$vegeID[i]],
 				varAll[[k]]$pc2.5[varAll[[k]]$class==vegID$vegeID[i]],
 				varAll[[k]]$shrub.pc[varAll[[k]]$class==vegID$vegeID[i]],
@@ -893,7 +444,7 @@ jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\
 				ylab=" ", xaxs="i", yaxs="i", axes=FALSE)
 		points(varAll[[k]]$moss.pc[varAll[[k]]$class==vegID$vegeID[i]],
 				varAll[[k]]$Mean[varAll[[k]]$class==vegID$vegeID[i]],
-				pch=19, col="wheat4", cex=15 )	
+				pch=19, col="slategray3", cex=15 )	
 		arrows(varAll[[k]]$moss.pc[varAll[[k]]$class==vegID$vegeID[i]],
 				varAll[[k]]$pc2.5[varAll[[k]]$class==vegID$vegeID[i]],
 				varAll[[k]]$moss.pc[varAll[[k]]$class==vegID$vegeID[i]],
@@ -916,7 +467,7 @@ jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\
 					ylab=" ", xaxs="i", yaxs="i", axes=FALSE)
 			points(varAll[[k]]$MeanA[varAll[[k]]$class==vegID$vegeID[i]],
 					varAll[[k]]$Mean[varAll[[k]]$class==vegID$vegeID[i]],
-					pch=19, col="wheat4", cex=15 )	
+					pch=19, col="slategray3", cex=15 )	
 			arrows(varAll[[k]]$MeanA[varAll[[k]]$class==vegID$vegeID[i]],
 					varAll[[k]]$pc2.5[varAll[[k]]$class==vegID$vegeID[i]],
 					varAll[[k]]$MeanA[varAll[[k]]$class==vegID$vegeID[i]],
@@ -938,4 +489,243 @@ jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\
 }
 
 
+###################################################################################
+##########Not enough data across many vegetation communities so just look
+##########at biomes
+
+
+wb<-40
+hb<-40
+nlow=c(0,0,0,-35,0)
+nhigh=c(1.7,1.7,25,0,240)
+nameV<-c("nfreeze_vege","nthaw_vege","Tmax_vege","Tmin_vege","zero_vege")
+labelV<-c("Freeze n-factor", "Thaw n-factor", "Soil temperature maximum", 
+			"Soil temperature minimum", "Days in zero mean")
+axisL<-c(0,0,0,-40,0)
+axisH<-c(1.5,1.5,20,-10,220)
+axisI<-c(.5,.5,5,10,20)
+
+for(k in 1:length(nlow)){
+jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\plot\\vege\\biome",nameV[k],".jpg"), width=6500,height=4500)	
+
+	ab<-layout(matrix(seq(1,8), ncol=4, byrow=FALSE),
+				width=c(rep(lcm(wb),8)),
+				height=c(rep(lcm(hb),8)))
+
+	#depth
+	for(i in 1:dim(biomeID)[1]){
+	par(mai=c(0,0,0,0))
+		plot(c(0,1),c(0,1), type="n",xlim=c(-1,21), ylim=c(nlow[k],nhigh[k]), xlab=" ", 
+				ylab=" ", xaxs="i", yaxs="i", axes=FALSE)
+		points(varAll[[k]]$depth[varAll[[k]]$biome==biomeID$biome[i]],
+				varAll[[k]]$Mean[varAll[[k]]$biome==biomeID$biome[i]],
+				pch=19, col="slategray3", cex=15 )	
+		arrows(varAll[[k]]$depth[varAll[[k]]$biome==biomeID$biome[i]],
+				varAll[[k]]$pc2.5[varAll[[k]]$biome==biomeID$biome[i]],
+				varAll[[k]]$depth[varAll[[k]]$biome==biomeID$biome[i]],
+				varAll[[k]]$pc97.5[varAll[[k]]$biome==biomeID$biome[i]],lwd=5,code=0)
+		mtext(paste(biomeID$biome[i]), cex=8, line=20,side=2)
+		axis(2, seq(axisL[k],axisH[k],by=axisI[k]), cex.axis=12, las=2, lwd.ticks=8)
+		if(i==dim(biomeID)[1]){
+			axis(1, seq(0,18, by=3), cex.axis=12, lwd.ticks=8,padj=1)
+			mtext("Depth (cm)",side=1, line=20, cex=10)
+			mtext(paste(labelV[k]), outer=TRUE, side=2, line=-50,cex=10)
+		
+		}
+		box(which="plot")
+	}
+	#shrub
+		for(i in 1:dim(biomeID)[1]){
+		par(mai=c(0,0,0,0))
+		plot(c(0,1),c(0,1), type="n",xlim=c(0,80), ylim=c(nlow[k],nhigh[k]), xlab=" ", 
+				ylab=" ", xaxs="i", yaxs="i", axes=FALSE)
+		points(varAll[[k]]$shrub.pc[varAll[[k]]$biome==biomeID$biome[i]],
+				varAll[[k]]$Mean[varAll[[k]]$biome==biomeID$biome[i]],
+				pch=19, col="slategray3", cex=15 )	
+		arrows(varAll[[k]]$shrub.pc[varAll[[k]]$biome==biomeID$biome[i]],
+				varAll[[k]]$pc2.5[varAll[[k]]$biome==biomeID$biome[i]],
+				varAll[[k]]$shrub.pc[varAll[[k]]$biome==biomeID$biome[i]],
+				varAll[[k]]$pc97.5[varAll[[k]]$biome==biomeID$biome[i]],lwd=5,code=0)
+		
+
+		if(i==dim(biomeID)[1]){
+			axis(1, seq(0,60, by=20), cex.axis=12, lwd.ticks=8,padj=1)
+			mtext("Shrub % cover",side=1, line=20, cex=10)
+
+		
+		}
+		box(which="plot")
+	}
+
+		#moss
+		for(i in 1:dim(biomeID)[1]){
+		par(mai=c(0,0,0,0))
+		plot(c(0,1),c(0,1), type="n",xlim=c(0,80), ylim=c(nlow[k],nhigh[k]), xlab=" ", 
+				ylab=" ", xaxs="i", yaxs="i", axes=FALSE)
+		points(varAll[[k]]$moss.pc[varAll[[k]]$biome==biomeID$biome[i]],
+				varAll[[k]]$Mean[varAll[[k]]$biome==biomeID$biome[i]],
+				pch=19, col="slategray3", cex=15 )	
+		arrows(varAll[[k]]$moss.pc[varAll[[k]]$biome==biomeID$biome[i]],
+				varAll[[k]]$pc2.5[varAll[[k]]$biome==biomeID$biome[i]],
+				varAll[[k]]$moss.pc[varAll[[k]]$biome==biomeID$biome[i]],
+				varAll[[k]]$pc97.5[varAll[[k]]$biome==biomeID$biome[i]],lwd=5,code=0)
+		
+
+		if(i==dim(biomeID)[1]){
+			axis(1, seq(0,80, by=20), cex.axis=12, lwd.ticks=8,padj=1)
+			mtext("Moss % cover",side=1, line=20, cex=10)
+
+		
+		}
+		box(which="plot")
+	}
+	#air
+		for(i in 1:dim(biomeID)[1]){
+		par(mai=c(0,0,0,0))
+			plot(c(0,1),c(0,1), type="n",xlim=c(min(varAll[[k]]$pc2.5A)-1,max(varAll[[k]]$pc97.5A)+1),
+				ylim=c(nlow[k],nhigh[k]), xlab=" ", 
+					ylab=" ", xaxs="i", yaxs="i", axes=FALSE)
+			points(varAll[[k]]$MeanA[varAll[[k]]$biome==biomeID$biome[i]],
+					varAll[[k]]$Mean[varAll[[k]]$biome==biomeID$biome[i]],
+					pch=19, col="slategray3", cex=15 )	
+			arrows(varAll[[k]]$MeanA[varAll[[k]]$biome==biomeID$biome[i]],
+					varAll[[k]]$pc2.5[varAll[[k]]$biome==biomeID$biome[i]],
+					varAll[[k]]$MeanA[varAll[[k]]$biome==biomeID$biome[i]],
+					varAll[[k]]$pc97.5[varAll[[k]]$biome==biomeID$biome[i]],lwd=5,code=0)
+			arrows(varAll[[k]]$pc2.5A[varAll[[k]]$biome==biomeID$biome[i]],
+					varAll[[k]]$Mean[varAll[[k]]$biome==biomeID$biome[i]],
+					varAll[[k]]$pc97.5A[varAll[[k]]$biome==biomeID$biome[i]],
+					varAll[[k]]$Mean[varAll[[k]]$biome==biomeID$biome[i]],lwd=5,code=0)
+			
+			if(i==dim(biomeID)[1]){
+				axis(1, seq(-50,50, by=5), cex.axis=12, lwd.ticks=8,padj=1)
+				mtext("Air Temperature",side=1, line=20, cex=10)
+
+		
+		}
+		box(which="plot")
+	}
+	dev.off()
+}
+
+
+###################################################################################
+##########Look up biome but break up biomes by geographical regions
+##########at biomes
+
+
+wb<-40
+hb<-40
+nlow=c(0,0,0,-35,0)
+nhigh=c(1.7,1.7,25,0,240)
+nameV<-c("nfreeze_vege","nthaw_vege","Tmax_vege","Tmin_vege","zero_vege")
+labelV<-c("Freeze n-factor", "Thaw n-factor", "Soil temperature maximum", 
+			"Soil temperature minimum", "Days in zero mean")
+axisL<-c(0,0,0,-40,0)
+axisH<-c(1.5,1.5,20,-10,220)
+axisI<-c(.5,.5,5,10,20)
+
+for(k in 1:length(nlow)){
+jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\plot\\vege\\biomeReg",nameV[k],".jpg"), width=6500,height=6500)	
+
+	ab<-layout(matrix(seq(1,16), ncol=4, byrow=FALSE),
+				width=c(rep(lcm(wb),16)),
+				height=c(rep(lcm(hb),16)))
+
+	#depth
+	for(i in 1:dim(bioReg)[1]){
+	par(mai=c(0,0,0,0))
+		plot(c(0,1),c(0,1), type="n",xlim=c(-1,21), ylim=c(nlow[k],nhigh[k]), xlab=" ", 
+				ylab=" ", xaxs="i", yaxs="i", axes=FALSE)
+		points(varAll[[k]]$depth[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],
+				varAll[[k]]$Mean[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],
+				pch=19, col="slategray3", cex=15 )	
+		arrows(varAll[[k]]$depth[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],
+				varAll[[k]]$pc2.5[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],
+				varAll[[k]]$depth[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],
+				varAll[[k]]$pc97.5[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],lwd=5,code=0)
+		mtext(paste(bioReg$biome[i]), cex=8, line=20,side=2)
+		mtext(paste(bioReg$nameF[i]), cex=8, line=35,side=2)
+		axis(2, seq(axisL[k],axisH[k],by=axisI[k]), cex.axis=12, las=2, lwd.ticks=8)
+		if(i==dim(bioReg)[1]){
+			axis(1, seq(0,18, by=3), cex.axis=12, lwd.ticks=8,padj=1)
+			mtext("Depth (cm)",side=1, line=20, cex=10)
+			mtext(paste(labelV[k]), outer=TRUE, side=2, line=-50,cex=10)
+		
+		}
+		box(which="plot")
+	}
+	#shrub
+		for(i in 1:dim(bioReg)[1]){
+		par(mai=c(0,0,0,0))
+		plot(c(0,1),c(0,1), type="n",xlim=c(0,80), ylim=c(nlow[k],nhigh[k]), xlab=" ", 
+				ylab=" ", xaxs="i", yaxs="i", axes=FALSE)
+		points(varAll[[k]]$shrub.pc[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],
+				varAll[[k]]$Mean[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],
+				pch=19, col="slategray3", cex=15 )	
+		arrows(varAll[[k]]$shrub.pc[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],
+				varAll[[k]]$pc2.5[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],
+				varAll[[k]]$shrub.pc[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],
+				varAll[[k]]$pc97.5[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],lwd=5,code=0)
+		
+
+		if(i==dim(bioReg)[1]){
+			axis(1, seq(0,60, by=20), cex.axis=12, lwd.ticks=8,padj=1)
+			mtext("Shrub % cover",side=1, line=20, cex=10)
+
+		
+		}
+		box(which="plot")
+	}
+
+		#moss
+		for(i in 1:dim(bioReg)[1]){
+		par(mai=c(0,0,0,0))
+		plot(c(0,1),c(0,1), type="n",xlim=c(0,80), ylim=c(nlow[k],nhigh[k]), xlab=" ", 
+				ylab=" ", xaxs="i", yaxs="i", axes=FALSE)
+		points(varAll[[k]]$moss.pc[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],
+				varAll[[k]]$Mean[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],
+				pch=19, col="slategray3", cex=15 )	
+		arrows(varAll[[k]]$moss.pc[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],
+				varAll[[k]]$pc2.5[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],
+				varAll[[k]]$moss.pc[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],
+				varAll[[k]]$pc97.5[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],lwd=5,code=0)
+		
+
+		if(i==dim(bioReg)[1]){
+			axis(1, seq(0,80, by=20), cex.axis=12, lwd.ticks=8,padj=1)
+			mtext("Moss % cover",side=1, line=20, cex=10)
+
+		
+		}
+		box(which="plot")
+	}
+	#air
+		for(i in 1:dim(bioReg)[1]){
+		par(mai=c(0,0,0,0))
+			plot(c(0,1),c(0,1), type="n",xlim=c(min(varAll[[k]]$pc2.5A)-1,max(varAll[[k]]$pc97.5A)+1),
+				ylim=c(nlow[k],nhigh[k]), xlab=" ", 
+					ylab=" ", xaxs="i", yaxs="i", axes=FALSE)
+			points(varAll[[k]]$MeanA[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],
+					varAll[[k]]$Mean[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],
+					pch=19, col="slategray3", cex=15 )	
+			arrows(varAll[[k]]$MeanA[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],
+					varAll[[k]]$pc2.5[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],
+					varAll[[k]]$MeanA[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],
+					varAll[[k]]$pc97.5[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],lwd=5,code=0)
+			arrows(varAll[[k]]$pc2.5A[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],
+					varAll[[k]]$Mean[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],
+					varAll[[k]]$pc97.5A[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],
+					varAll[[k]]$Mean[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],lwd=5,code=0)
+			
+			if(i==dim(bioReg)[1]){
+				axis(1, seq(-50,50, by=5), cex.axis=12, lwd.ticks=8,padj=1)
+				mtext("Air Temperature",side=1, line=20, cex=10)
+
+		
+		}
+		box(which="plot")
+	}
+	dev.off()
+}
 
