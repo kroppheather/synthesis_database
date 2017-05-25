@@ -13,8 +13,8 @@ model{
 	#regression for depth, air extreme and vege
 	#in next step airM needs error model to account for uncertainty
 	#in the air parameters
-	mu[i]<-b1[vegeC[i]]+b2[vegeC[i]]*depth[i]+b3[vegeC[i]]*(airM[i]-airM.bar)+b4[vegeC[i]]*shrubC[i]
-			+b5[vegeC[i]]*mossC[i]
+	mu[i]<-b1[vegeC[i]]+b2[vegeC[i]]*depth[i]+b3[vegeC[i]]*(airM[i]-airM.bar)+b4[vegeC[i]]*(shrubC[i]-.25)
+			+b5[vegeC[i]]*(mossC[i]-.25)
 	#standard deviation model to include uncertainty from
 	#temperature missing data and variation in nf for 
 	#each vegetation type

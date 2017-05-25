@@ -356,19 +356,19 @@ for(i in 1:5){
 	Mod.out<-summary(codaobj.init)
 
 	write.table(Mod.out$statistics, 
-			paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\model\\vege\\biomeReg\\mod1\\",data.name[i],"Temp_mod_stats.csv"),
+			paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\model\\vege\\biomeReg\\mod2\\",data.name[i],"Temp_mod_stats.csv"),
 			sep=",",row.names=TRUE)
-	write.table(Mod.out$quantiles, paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\model\\vege\\biomeReg\\mod1\\",data.name[i],"Temp_mod_quant.csv"),
+	write.table(Mod.out$quantiles, paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\model\\vege\\biomeReg\\mod2\\",data.name[i],"Temp_mod_quant.csv"),
 			sep=",",row.names=TRUE)
 			
 print(paste("summary out data ",i)	)
 
 
 #run mcmc plots on key params
-dir.create(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\model\\vege\\biomeReg\\mod1\\",data.name[i]))	
+dir.create(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\model\\vege\\biomeReg\\mod2\\",data.name[i]))	
 
 mcmcplot(codaobj.init, parms=c("b1","b2","b3","b4","b5","sigV"),
-			dir=paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\model\\vege\\biomeReg\\mod1\\",data.name[i]))		
+			dir=paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\model\\vege\\biomeReg\\mod2\\",data.name[i]))		
 #get summary and save to file
 
 print(paste("mcmcplot out data ", i))	
