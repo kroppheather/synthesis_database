@@ -270,8 +270,8 @@ b4Sig<-list()
 b5Sig<-list()
 #read in model output
 for(i in 1:length(data.name)){
-	datSt[[i]]<-read.csv(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\model\\vege\\biome\\mod1\\",data.name[i],"Temp_mod_stats.csv"))
-	datQ[[i]]<-read.csv(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\model\\vege\\biome\\mod1\\",data.name[i],"Temp_mod_quant.csv"))
+	datSt[[i]]<-read.csv(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\model\\vege\\biome\\mod3\\",data.name[i],"Temp_mod_stats.csv"))
+	datQ[[i]]<-read.csv(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\model\\vege\\biome\\mod3\\",data.name[i],"Temp_mod_quant.csv"))
 	datC[[i]]<-cbind(datSt[[i]],datQ[[i]])
 	#make parms vectors
 	datC[[i]]$parms1<-gsub(dexps,"",rownames(datC[[i]]))
@@ -319,8 +319,8 @@ b4Sigr<-list()
 b5Sigr<-list()
 #read in model output
 for(i in 1:length(data.name)){
-	datStr[[i]]<-read.csv(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\model\\vege\\biomeReg\\mod2\\",data.name[i],"Temp_mod_stats.csv"))
-	datQr[[i]]<-read.csv(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\model\\vege\\biomeReg\\mod2\\",data.name[i],"Temp_mod_quant.csv"))
+	datStr[[i]]<-read.csv(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\model\\vege\\biomeReg\\mod3\\",data.name[i],"Temp_mod_stats.csv"))
+	datQr[[i]]<-read.csv(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\model\\vege\\biomeReg\\mod3\\",data.name[i],"Temp_mod_quant.csv"))
 	datCr[[i]]<-cbind(datStr[[i]],datQr[[i]])
 	#make parms vectors
 	datCr[[i]]$parms1<-gsub(dexps,"",rownames(datCr[[i]]))
@@ -668,8 +668,8 @@ jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\
 		#regression CI
 		if(b4Sig[[k]][i]==1){
 			polygon(c(seq(0,80, by=.1),rev(seq(0,80, by=.1))), 
-				c(b1p[[k]]$X2.5.[i]+(b4p[[k]]$X2.5.[i]*seq(0,80, by=.1)),
-				rev(b1p[[k]]$X97.5.[i]+(b4p[[k]]$X97.5.[i]*seq(0,80, by=.1)))),
+				c(b1p[[k]]$X2.5.[i]+(b4p[[k]]$X2.5.[i]*(seq(0,80, by=.1)-25)),
+				rev(b1p[[k]]$X97.5.[i]+(b4p[[k]]$X97.5.[i]*(seq(0,80, by=.1)-25)))),
 				col="grey85",border=FALSE)		
 			}else{
 				polygon(c(seq(0,80, by=.1),rev(seq(0,80, by=.1))), 
@@ -689,7 +689,7 @@ jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\
 		
 		#regression line
 		if(b4Sig[[k]][i]==1){
-		points(seq(0,80, by=.1),b1p[[k]]$Mean[i]+(b4p[[k]]$Mean[i]*seq(0,80, by=.1)), type="l", lwd=5)
+		points(seq(0,80, by=.1),b1p[[k]]$Mean[i]+(b4p[[k]]$Mean[i]*(seq(0,80, by=.1)-25)), type="l", lwd=5)
 		}else{
 			points(seq(0,80, by=.1),rep(b1p[[k]]$Mean[i], length(seq(0,80, by=.1))), type="l", lwd=5, lty=2)
 			}
@@ -710,8 +710,8 @@ jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\
 		#regression CI
 		if(b5Sig[[k]][i]==1){
 			polygon(c(seq(0,80, by=.1),rev(seq(0,80, by=.1))), 
-				c(b1p[[k]]$X2.5.[i]+(b5p[[k]]$X2.5.[i]*seq(0,80, by=.1)),
-				rev(b1p[[k]]$X97.5.[i]+(b5p[[k]]$X97.5.[i]*seq(0,80, by=.1)))),
+				c(b1p[[k]]$X2.5.[i]+(b5p[[k]]$X2.5.[i]*(seq(0,80, by=.1)-25)),
+				rev(b1p[[k]]$X97.5.[i]+(b5p[[k]]$X97.5.[i]*(seq(0,80, by=.1)-25)))),
 				col="grey85",border=FALSE)		
 			}else{
 				polygon(c(seq(0,80, by=.1),rev(seq(0,80, by=.1))), 
@@ -731,7 +731,7 @@ jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\
 		
 		#regression line
 		if(b5Sig[[k]][i]==1){
-		points(seq(0,80, by=.1),b1p[[k]]$Mean[i]+(b5p[[k]]$Mean[i]*seq(0,80, by=.1)), type="l", lwd=5)
+		points(seq(0,80, by=.1),b1p[[k]]$Mean[i]+(b5p[[k]]$Mean[i]*(seq(0,80, by=.1)-25)), type="l", lwd=5)
 		}else{
 			points(seq(0,80, by=.1),rep(b1p[[k]]$Mean[i], length(seq(0,80, by=.1))), type="l", lwd=5, lty=2)
 			}
@@ -1066,3 +1066,64 @@ jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\
 	dev.off()
 }
 
+
+#################################################################
+######### goodness of fit plots for continuous vege #############
+#################################################################
+
+#biome only
+nlow=c(0,0,0,-40,0)
+nhigh=c(1.7,1.7,25,0,240)
+nameV<-c("nfreeze_vege","nthaw_vege","Tmax_vege","Tmin_vege", "zero_vege")
+labelV<-c("Freeze n-factor", "Thaw n-factor", "Soil temperature maximum", 
+			"Soil temperature minimum","Days in zero mean")			
+axisL<-c(0,0,0,-40,0)
+axisH<-c(1.5,1.5,20,0,220)
+axisI<-c(.5,.5,5,10,20)
+ADD<-c(.4,.4,7,9,50)
+for(k in 1:length(nlow)){
+jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\plot\\vege\\VCfitbiome",nameV[k],".jpg"), width=1000,height=1000)
+	par(mai=c(3,3,3,3))
+	plot(c(0,1),c(0,1), type="n", xlim=c(nlow[k],nhigh[k]), ylim=c(nlow[k],nhigh[k]),
+		xlab=" ",ylab=" ", xaxs="i", yaxs="i", axes=FALSE)
+	points(varAll[[k]]$Mean[varAll[[i]]$region!=3],repX[[k]]$Mean, pch=19, cex=2)
+	axis(1, seq(axisL[k],axisH[k], by=axisI[k]), cex.axis=2)
+	axis(2, seq(axisL[k],axisH[k], by=axisI[k]), cex.axis=2, las=2)
+	mtext(paste("Observed", labelV[k]), side=1,line=5, cex=2)
+	mtext(paste("Predicted", labelV[k]), side=2,line=5, cex=2)
+	fit<-lm(repX[[k]]$Mean~varAll[[k]]$Mean[varAll[[i]]$region!=3])
+	abline(fit, lwd=2, lty=3)
+	abline(0,1, lwd=2, col="red")
+	text(nlow[k]+ADD[k],nhigh[k]-ADD[k], paste("y=",round(fit$coefficients[1],2),"+",round(fit$coefficients[2],2),"Observed"), cex=1.5)
+	text(nlow[k]+ADD[k],nhigh[k]-(ADD[k]+(ADD[k]*.2)), paste("R2=",round(summary(fit)$r.squared,2)), cex=1.5)
+dev.off()
+}	
+
+
+#biome region
+nlow=c(0,0,0,-40,0)
+nhigh=c(1.7,1.7,25,0240)
+nameV<-c("nfreeze_vege","nthaw_vege","Tmax_vege","Tmin_vege", "zero_vege")
+labelV<-c("Freeze n-factor", "Thaw n-factor", "Soil temperature maximum", 
+			"Soil temperature minimum","Days in zero mean")			
+axisL<-c(0,0,0,-40,0)
+axisH<-c(1.5,1.5,20,0,220)
+axisI<-c(.5,.5,5,10,20)
+ADD<-c(.4,.4,7,9,50)
+for(k in 1:length(nlow)){
+jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\plot\\vege\\VCfitbioReg",nameV[k],".jpg"), width=1000,height=1000)
+	par(mai=c(3,3,3,3))
+	plot(c(0,1),c(0,1), type="n", xlim=c(nlow[k],nhigh[k]), ylim=c(nlow[k],nhigh[k]),
+		xlab=" ",ylab=" ", xaxs="i", yaxs="i", axes=FALSE)
+	points(varAll[[k]]$Mean,repXr[[k]]$Mean, pch=19, cex=2)
+	axis(1, seq(axisL[k],axisH[k], by=axisI[k]), cex.axis=2)
+	axis(2, seq(axisL[k],axisH[k], by=axisI[k]), cex.axis=2, las=2)
+	mtext(paste("Observed", labelV[k]), side=1,line=5, cex=2)
+	mtext(paste("Predicted", labelV[k]), side=2,line=5, cex=2)
+	fit<-lm(repXr[[k]]$Mean~varAll[[k]]$Mean)
+	abline(fit, lwd=2, lty=3)
+	abline(0,1, lwd=2, col="red")
+	text(nlow[k]+ADD[k],nhigh[k]-ADD[k], paste("y=",round(fit$coefficients[1],2),"+",round(fit$coefficients[2],2),"Observed"), cex=1.5)
+	text(nlow[k]+ADD[k],nhigh[k]-(ADD[k]+(ADD[k]*.2)), paste("R2=",round(summary(fit)$r.squared,2)), cex=1.5)
+dev.off()
+}	
