@@ -319,8 +319,8 @@ b4Sigr<-list()
 b5Sigr<-list()
 #read in model output
 for(i in 1:length(data.name)){
-	datStr[[i]]<-read.csv(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\model\\vege\\biomeReg\\mod1\\",data.name[i],"Temp_mod_stats.csv"))
-	datQr[[i]]<-read.csv(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\model\\vege\\biomeReg\\mod1\\",data.name[i],"Temp_mod_quant.csv"))
+	datStr[[i]]<-read.csv(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\model\\vege\\biomeReg\\mod2\\",data.name[i],"Temp_mod_stats.csv"))
+	datQr[[i]]<-read.csv(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\model\\vege\\biomeReg\\mod2\\",data.name[i],"Temp_mod_quant.csv"))
 	datCr[[i]]<-cbind(datStr[[i]],datQr[[i]])
 	#make parms vectors
 	datCr[[i]]$parms1<-gsub(dexps,"",rownames(datCr[[i]]))
@@ -912,8 +912,8 @@ jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\
 				#regression CI
 		if(b4Sigr[[k]][i]==1){
 			polygon(c(seq(0,80, by=.1),rev(seq(0,80, by=.1))), 
-				c(b1pr[[k]]$X2.5.[i]+(b4pr[[k]]$X2.5.[i]*seq(0,80, by=.1)),
-				rev(b1pr[[k]]$X97.5.[i]+(b4pr[[k]]$X97.5.[i]*seq(0,80, by=.1)))),
+				c(b1pr[[k]]$X2.5.[i]+(b4pr[[k]]$X2.5.[i]*(seq(0,80, by=.1)-25)),
+				rev(b1pr[[k]]$X97.5.[i]+(b4pr[[k]]$X97.5.[i]*(seq(0,80, by=.1)-25)))),
 				col="grey85",border=FALSE)		
 			}else{
 				polygon(c(seq(0,80, by=.1),rev(seq(0,80, by=.1))), 
@@ -932,7 +932,7 @@ jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\
 				varAll[[k]]$pc97.5[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],lwd=5,code=0)
 		
 		if(b4Sigr[[k]][i]==1){
-		points(seq(0,80, by=.1),b1pr[[k]]$Mean[i]+(b4pr[[k]]$Mean[i]*seq(0,80, by=.1)), type="l", lwd=5)
+		points(seq(0,80, by=.1),b1pr[[k]]$Mean[i]+(b4pr[[k]]$Mean[i]*(seq(0,80, by=.1)-25)), type="l", lwd=5)
 		}else{
 			points(seq(0,80, by=.1),rep(b1pr[[k]]$Mean[i], length(seq(0,80, by=.1))), type="l", lwd=5, lty=2)
 			}
@@ -952,8 +952,8 @@ jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\
 				ylab=" ", xaxs="i", yaxs="i", axes=FALSE)
 				if(b4Sigr[[k]][i]==1){
 		polygon(c(seq(0,80, by=.1),rev(seq(0,80, by=.1))), 
-				c(b1pr[[k]]$X2.5.[i]+(b5pr[[k]]$X2.5.[i]*seq(0,80, by=.1)),
-				rev(b1pr[[k]]$X97.5.[i]+(b5pr[[k]]$X97.5.[i]*seq(0,80, by=.1)))),
+				c(b1pr[[k]]$X2.5.[i]+(b5pr[[k]]$X2.5.[i]*(seq(0,80, by=.1)-25)),
+				rev(b1pr[[k]]$X97.5.[i]+(b5pr[[k]]$X97.5.[i]*(seq(0,80, by=.1)-25)))),
 				col="grey85",border=FALSE)		
 			}else{
 				polygon(c(seq(0,80, by=.1),rev(seq(0,80, by=.1))), 
@@ -971,7 +971,7 @@ jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\
 				varAll[[k]]$moss.pc[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],
 				varAll[[k]]$pc97.5[varAll[[k]]$biome==bioReg$biome[i]&varAll[[k]]$region==bioReg$region[i]],lwd=5,code=0)
 				if(b4Sigr[[k]][i]==1){
-		points(seq(0,80, by=.1),b1pr[[k]]$Mean[i]+(b5pr[[k]]$Mean[i]*seq(0,80, by=.1)), type="l", lwd=5)
+		points(seq(0,80, by=.1),b1pr[[k]]$Mean[i]+(b5pr[[k]]$Mean[i]*(seq(0,80, by=.1)-25)), type="l", lwd=5)
 		}else{
 			points(seq(0,80, by=.1),rep(b1pr[[k]]$Mean[i], length(seq(0,80, by=.1))), type="l", lwd=5, lty=2)
 			}
