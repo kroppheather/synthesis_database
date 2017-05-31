@@ -908,12 +908,18 @@ jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\
 		plot(c(0,1),c(0,1), type="n",xlim=c(0,80), ylim=c(nlow[k],nhigh[k]), xlab=" ", 
 				ylab=" ", xaxs="i", yaxs="i", axes=FALSE)
 		
-		
+		toplothighS<-ifelse(seq(0,80, by=.1)<=25,
+						b1pr[[k]]$X2.5.[i]+(b4pr[[k]]$X2.5.[i]*(seq(min(0,80, by=.1)-25))),
+						b1pr[[k]]$X97.5.[i]+(b4pr[[k]]$X97.5.[i]*(seq(min(0,80, by=.1)-25))))
+		toplotlowS<-ifelse(seq(0,80, by=.1)<=25,
+						b1pr[[k]]$X97.5.[i]+(b4pr[[k]]$X97.5.[i]*(seq(min(0,80, by=.1)-25))),
+						b1pr[[k]]$X2.5.[i]+(b4pr[[k]]$X2.5.[i]*(seq(min(0,80, by=.1)-25))))		
+
 				#regression CI
 		if(b4Sigr[[k]][i]==1){
 			polygon(c(seq(0,80, by=.1),rev(seq(0,80, by=.1))), 
-				c(b1pr[[k]]$X2.5.[i]+(b4pr[[k]]$X2.5.[i]*(seq(0,80, by=.1)-25)),
-				rev(b1pr[[k]]$X97.5.[i]+(b4pr[[k]]$X97.5.[i]*(seq(0,80, by=.1)-25)))),
+				c(toplotlowS,
+				rev(toplothighS)),
 				col="grey85",border=FALSE)		
 			}else{
 				polygon(c(seq(0,80, by=.1),rev(seq(0,80, by=.1))), 
@@ -1102,7 +1108,7 @@ dev.off()
 
 #biome region
 nlow=c(0,0,0,-40,0)
-nhigh=c(1.7,1.7,25,0240)
+nhigh=c(1.7,1.7,25,0,240)
 nameV<-c("nfreeze_vege","nthaw_vege","Tmax_vege","Tmin_vege", "zero_vege")
 labelV<-c("Freeze n-factor", "Thaw n-factor", "Soil temperature maximum", 
 			"Soil temperature minimum","Days in zero mean")			
@@ -1115,12 +1121,12 @@ jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\
 	par(mai=c(3,3,3,3))
 	plot(c(0,1),c(0,1), type="n", xlim=c(nlow[k],nhigh[k]), ylim=c(nlow[k],nhigh[k]),
 		xlab=" ",ylab=" ", xaxs="i", yaxs="i", axes=FALSE)
-	points(varAll[[k]]$Mean,repXr[[k]]$Mean, pch=19, cex=2)
+	points(varAll[[k]]$Mean[varAll[[k]]$region!=3],repXr[[k]]$Mean, pch=19, cex=2)
 	axis(1, seq(axisL[k],axisH[k], by=axisI[k]), cex.axis=2)
 	axis(2, seq(axisL[k],axisH[k], by=axisI[k]), cex.axis=2, las=2)
 	mtext(paste("Observed", labelV[k]), side=1,line=5, cex=2)
 	mtext(paste("Predicted", labelV[k]), side=2,line=5, cex=2)
-	fit<-lm(repXr[[k]]$Mean~varAll[[k]]$Mean)
+	fit<-lm(repXr[[k]]$Mean~varAll[[k]]$Mean[varAll[[k]]$region!=3])
 	abline(fit, lwd=2, lty=3)
 	abline(0,1, lwd=2, col="red")
 	text(nlow[k]+ADD[k],nhigh[k]-ADD[k], paste("y=",round(fit$coefficients[1],2),"+",round(fit$coefficients[2],2),"Observed"), cex=1.5)
