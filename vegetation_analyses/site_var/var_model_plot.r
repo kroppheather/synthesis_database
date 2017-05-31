@@ -53,6 +53,8 @@ datDZ<-datS1[datS1$parm=="DayZero",]
 datPS<-datS1[datS1$parm=="peakSS",]
 datPW<-datS1[datS1$parm=="peakWS",]
 
+
+
 #now seperate out air to match
 datTmaxA<-datA[datA$parm=="TmaxA",]
 colnames(datTmaxA)[1:4]<-paste0(colnames(datTmaxA)[1:4],"A")
@@ -116,7 +118,7 @@ data.name<-c("nfreeze","nthaw","Tmax","Tmin","Peakmax","Peakmin","DayZero")
 #############################################
 data.name<-c("nfreeze","nthaw","Tmax","Tmin","Peakmax","Peakmin","DayZero")
 dexps<-"\\[*[[:digit:]]*\\]"
-
+dexps2<-"[^[:alpha:]]"
 datSt<-list()
 datQ<-list()
 datC<-list()
@@ -126,13 +128,16 @@ b3p<-list()
 repX<-list()
 b2Sig<-list()
 b3Sig<-list()
+muD<-list()
+muA<-list()
 #read in model output
 for(i in 1:length(data.name)){
-	datSt[[i]]<-read.csv(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\model\\var\\mod1\\",data.name[i],"Temp_mod_stats.csv"))
-	datQ[[i]]<-read.csv(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\model\\var\\mod1\\",data.name[i],"Temp_mod_quant.csv"))
+	datSt[[i]]<-read.csv(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\model\\var\\mod2\\",data.name[i],"Temp_mod_stats.csv"))
+	datQ[[i]]<-read.csv(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\model\\var\\mod2\\",data.name[i],"Temp_mod_quant.csv"))
 	datC[[i]]<-cbind(datSt[[i]],datQ[[i]])
 	#make parms vectors
-	datC[[i]]$parms1<-gsub(dexps,"",rownames(datC[[i]]))
+	datC[[i]]$parms<-gsub(dexps,"",rownames(datC[[i]]))
+	datC[[i]]$parms2<-gsub(dexps2,"",rownames(datC[[i]]))
 	b1p[[i]]<-datC[[i]][datC[[i]]$parms=="b1",]
 	b2p[[i]]<-datC[[i]][datC[[i]]$parms=="b2",]
 	b3p[[i]]<-datC[[i]][datC[[i]]$parms=="b3",]
@@ -142,9 +147,24 @@ for(i in 1:length(data.name)){
 				ifelse(b2p[[i]]$X2.5.>0&b2p[[i]]$X97.5.<0,0,1))
 	b3Sig[[i]]<-ifelse(b3p[[i]]$X2.5.<0&b3p[[i]]$X97.5.>0,0,
 				ifelse(b3p[[i]]$X2.5.>0&b3p[[i]]$X97.5.<0,0,1))	
-	
+				
+				
+	muD[[i]]<-datC[[i]][datC[[i]]$parms2=="mudepth",]	
+	muD[[i]]$vegeC<-rep(seq(1,8),each=100)
+	muA[[i]]<-datC[[i]][datC[[i]]$parms2=="muair",]
+	muA[[i]]$vegeC<-rep(seq(1,8),each=100)
 	}
 
+depthseq<-seq(0,20,length.out=100)
+
+
+airseq<-list(seq(-40,-10,length.out=100),
+			seq(0,25,length.out=100),
+			seq(0,25,length.out=100),
+			seq(-40,-10,length.out=100),
+			seq(.6,1,length.out=100),
+			seq(.1,.6,length.out=100),
+			seq(-40,-10,length.out=100))
 
 
 
@@ -362,7 +382,7 @@ toplotlow<-numeric(0)
 toplothigh<-numeric(0)
 
 for(k in 1:length(nlow)){
-jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\plot\\var\\VCreg",nameV[k],".jpg"), width=10000,height=5000)	
+jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\plot\\var\\vegeClass\\",nameV[k],".jpg"), width=10000,height=5000)	
 ab<-layout(matrix(seq(1,16), ncol=8, byrow=TRUE),
 			width=c(lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),
 			lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb),lcm(wb)),
@@ -376,20 +396,19 @@ ab<-layout(matrix(seq(1,16), ncol=8, byrow=TRUE),
 		plot(c(0,1),c(0,1), type="n", xlim=c(-1,21), ylim=c(nlow[k],nhigh[k]), axes=FALSE,
 			xlab=" ",ylab=" ", xaxs="i", yaxs="i")		
 			if(b2Sig[[k]][i]==1){
-			polygon(c(seq(0,20, by=.1),rev(seq(0,20, by=.1))), 
-				c(b1p[[k]]$X2.5.[i]+(b2p[[k]]$X2.5.[i]*seq(0,20, by=.1)),
-				rev(b1p[[k]]$X97.5.[i]+(b2p[[k]]$X97.5.[i]*seq(0,20, by=.1)))),
-				col="grey85",border=FALSE)		
+			polygon(c(depthseq, rev(depthseq)),
+					c(muD[[k]]$X2.5.[muD[[k]]$vegeC==i], rev(muD[[k]]$X97.5.[muD[[k]]$vegeC==i])),col="grey85",border=FALSE)
+			
+			
 			}else{
-				polygon(c(seq(0,20, by=.1),rev(seq(0,20, by=.1))), 
-				c(rep(b1p[[k]]$X2.5.[i],length(seq(0,20, by=.1))),
-				rev(rep(b1p[[k]]$X97.5.[i],length(seq(0,20, by=.1))))),
-				col="grey85",border=FALSE)	
+			polygon(c(depthseq, rev(depthseq)),
+					c(rep(b1p[[k]]$X2.5.[i],length(depthseq)),
+					rep( b1p[[k]]$X97.5.[i],length(depthseq))),col="grey85",border=FALSE)
 			
 			}
 			points(datAll[[k]]$depth[datAll[[k]]$class==i], 
 				datAll[[k]]$Mean[datAll[[k]]$class==i], pch=19,
-					col="wheat4", cex=15)	
+					col="slategray3", cex=15)	
 			
 			
 			arrows(datAll[[k]]$depth[datAll[[k]]$class==i], 
@@ -398,9 +417,9 @@ ab<-layout(matrix(seq(1,16), ncol=8, byrow=TRUE),
 			datAll[[k]]$pc97.5[datAll[[k]]$class==i],lwd=5, code=0)
 			
 		if(b2Sig[[k]][i]==1){
-		points(seq(0,20, by=.1),b1p[[k]]$Mean[i]+(b2p[[k]]$Mean[i]*seq(0,20, by=.1)), type="l", lwd=5)
+		points(depthseq,muD[[k]]$Mean[muD[[k]]$vegeC==i], type="l", lwd=5)
 		}else{
-			points(seq(0,20, by=.1),rep(b1p[[k]]$Mean[i], length(seq(0,20, by=.1))), type="l", lwd=5, lty=2)
+			points(depthseq,rep(b1p[[k]]$Mean[i], length(depthseq)), type="l", lwd=5, lty=2)
 			}
 		
 		if(i==1){
@@ -421,43 +440,21 @@ ab<-layout(matrix(seq(1,16), ncol=8, byrow=TRUE),
 							max(datAll[[k]]$pc97.5A[datAll[[k]]$class==i]+ADD[k])), 
 			ylim=c(nlow[k],nhigh[k]), axes=FALSE,
 			xlab=" ",ylab=" ", xaxs="i", yaxs="i")		
-		toplothigh<-ifelse(seq(min(datAll[[k]]$pc2.5A[datAll[[k]]$class==i])-ADD[k],
-						max(datAll[[k]]$pc97.5A[datAll[[k]]$class==i]+ADD[k]), by=.1)<=TexM[k],
-						b1p[[k]]$X2.5.[i]+(b3p[[k]]$X2.5.[i]*(seq(min(datAll[[k]]$pc2.5A[datAll[[k]]$class==i])-ADD[k],
-						max(datAll[[k]]$pc97.5A[datAll[[k]]$class==i]+ADD[k]), by=.1)-TexM[k])),
-						b1p[[k]]$X97.5.[i]+(b3p[[k]]$X97.5.[i]*(seq(min(datAll[[k]]$pc2.5A[datAll[[k]]$class==i])-ADD[k],
-						max(datAll[[k]]$pc97.5A[datAll[[k]]$class==i]+ADD[k]), by=.1)-TexM[k])))
-		
-		toplotlow<-ifelse(seq(min(datAll[[k]]$pc2.5A[datAll[[k]]$class==i])-ADD[k],
-						max(datAll[[k]]$pc97.5A[datAll[[k]]$class==i]+ADD[k]), by=.1)<=TexM[k],
-						b1p[[k]]$X97.5.[i]+(b3p[[k]]$X97.5.[i]*(seq(min(datAll[[k]]$pc2.5A[datAll[[k]]$class==i])-ADD[k],
-						max(datAll[[k]]$pc97.5A[datAll[[k]]$class==i]+ADD[k]), by=.1)-TexM[k])),
-						b1p[[k]]$X2.5.[i]+(b3p[[k]]$X2.5.[i]*(seq(min(datAll[[k]]$pc2.5A[datAll[[k]]$class==i])-ADD[k],
-						max(datAll[[k]]$pc97.5A[datAll[[k]]$class==i]+ADD[k]), by=.1)-TexM[k])))
-		
 		if(b3Sig[[k]][i]==1){
-		polygon(c(seq(min(datAll[[k]]$pc2.5A[datAll[[k]]$class==i])-ADD[k],
-						max(datAll[[k]]$pc97.5A[datAll[[k]]$class==i]+ADD[k]), by=.1),
-						rev(seq(min(datAll[[k]]$pc2.5A[datAll[[k]]$class==i])-ADD[k],
-						max(datAll[[k]]$pc97.5A[datAll[[k]]$class==i]+ADD[k]), by=.1))), 
-				c(toplotlow,
-				rev(toplothigh)),
-				col="grey85",border=FALSE)		
-		}else{
-		
-		polygon(c(seq(min(datAll[[k]]$pc2.5A[datAll[[k]]$class==i])-ADD[k],
-						max(datAll[[k]]$pc97.5A[datAll[[k]]$class==i]+ADD[k]), by=.1),
-						rev(seq(min(datAll[[k]]$pc2.5A[datAll[[k]]$class==i])-ADD[k],
-						max(datAll[[k]]$pc97.5A[datAll[[k]]$class==i]+ADD[k]), by=.1))), 
-				c(rep(b1p[[k]]$X2.5.[i], length(seq(min(datAll[[k]]$pc2.5A[datAll[[k]]$class==i])-ADD[k],
-						max(datAll[[k]]$pc97.5A[datAll[[k]]$class==i]+ADD[k]), by=.1))),
-				rev(rep(b1p[[k]]$X97.5.[i], length(seq(min(datAll[[k]]$pc2.5A[datAll[[k]]$class==i])-ADD[k],
-						max(datAll[[k]]$pc97.5A[datAll[[k]]$class==i]+ADD[k]), by=.1))))),col="grey85",border=FALSE)
-		}	
+			polygon(c(airseq[[k]], rev(airseq[[k]])),
+					c(muA[[k]]$X2.5.[muA[[k]]$vegeC==i], rev(muA[[k]]$X97.5.[muA[[k]]$vegeC==i])),col="grey85",border=FALSE)
+			
+			
+			}else{
+			polygon(c(airseq[[k]], rev(airseq[[k]])),
+					c(rep(b1p[[k]]$X2.5.[i],length(airseq[[k]])),
+					rep(b1p[[k]]$X97.5.[i],length(airseq[[k]]))),col="grey85",border=FALSE)
+			
+			}
 		
 		points(datAll[[k]]$MeanA[datAll[[k]]$class==i], 
 			datAll[[k]]$Mean[datAll[[k]]$class==i], pch=19,
-				col="wheat4", cex=15)
+				col="slategray3", cex=15)
 		#arrows for y		
 		arrows(datAll[[k]]$MeanA[datAll[[k]]$class==i], 
 			datAll[[k]]$pc2.5[datAll[[k]]$class==i], 
@@ -469,20 +466,14 @@ ab<-layout(matrix(seq(1,16), ncol=8, byrow=TRUE),
 			datAll[[k]]$pc97.5A[datAll[[k]]$class==i], 	
 			datAll[[k]]$Mean[datAll[[k]]$class==i],lwd=5, code=0)
 			#	
-		if(b3Sig[[k]][i]==1){
-			points(seq(min(datAll[[k]]$pc2.5A[datAll[[k]]$class==i])-ADD[k],
-						max(datAll[[k]]$pc97.5A[datAll[[k]]$class==i]+ADD[k]), by=.1),
-			b1p[[k]]$Mean[i]+(b3p[[k]]$Mean[i]*
-			(seq(min(datAll[[k]]$pc2.5A[datAll[[k]]$class==i])-ADD[k],
-						max(datAll[[k]]$pc97.5A[datAll[[k]]$class==i]+ADD[k]), by=.1)-TexM[k])), type="l", lwd=5)
-		}else{
-		points(seq(min(datAll[[k]]$pc2.5A[datAll[[k]]$class==i])-ADD[k],
-						max(datAll[[k]]$pc97.5A[datAll[[k]]$class==i]+ADD[k]), by=.1),
-				rep(b1p[[k]]$Mean[i],length(seq(min(datAll[[k]]$pc2.5A[datAll[[k]]$class==i])-ADD[k],
-						max(datAll[[k]]$pc97.5A[datAll[[k]]$class==i]+ADD[k]), by=.1))),
-						type="l",lty=2, lwd=5)
+
 		
-		}
+		
+		if(b3Sig[[k]][i]==1){
+		points(airseq[[k]],muA[[k]]$Mean[muA[[k]]$vegeC==i], type="l", lwd=5)
+		}else{
+			points(airseq[[k]],rep(b1p[[k]]$Mean[i], length(airseq[[k]])), type="l", lwd=5, lty=2)
+			}
 		if(i==1){
 		axis(2, seq(axisL[k],axisH[k], by=axisI[k]), cex.axis=12, lwd.ticks=8, las=2)
 		}
@@ -512,7 +503,7 @@ axisH<-c(1.5,1.5,20,0,1,.6,220)
 axisI<-c(.5,.5,5,10,.1,.1,20)
 ADD<-c(.4,.4,7,9,.12,.12,50)
 for(k in 1:length(nlow)){
-jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\plot\\var\\VCfit",nameV[k],".jpg"), width=1000,height=1000)
+jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\plot\\var\\fit\\",nameV[k],".jpg"), width=1000,height=1000)
 	par(mai=c(3,3,3,3))
 	plot(c(0,1),c(0,1), type="n", xlim=c(nlow[k],nhigh[k]), ylim=c(nlow[k],nhigh[k]),
 		xlab=" ",ylab=" ", xaxs="i", yaxs="i", axes=FALSE)
