@@ -271,6 +271,23 @@ for(i in 1:5){
 	varAll[[i]]<-varAll[[i]][varAll[[i]]$region!=3,]
 
 }
+
+
+depthseq<-seq(0,20,length.out=100)
+
+
+airseq<-list(seq(-40,-10,length.out=100),
+			seq(0,25,length.out=100),
+			seq(0,25,length.out=100),
+			seq(-40,-10,length.out=100),
+			seq(.6,1,length.out=100),
+			seq(.1,.6,length.out=100),
+			seq(-40,-10,length.out=100))
+			
+pcseq<-seq(0,80, length.out=100)
+
+
+
 ####################################################################
 ####### get model runs ready. Run a model for each dataset  ########
 ####################################################################
@@ -328,13 +345,16 @@ print(paste("mcmcplot out data ", i))
 
 ##############Now run biome x region
 
-samplelist<-c("b1","b2","b3","b4","b5","sigM","sigV","rep.Xobs")
+samplelist<-c("b1","b2","b3","b4","b5","sigM","sigV","rep.Xobs","mudepth","muair","mushrub","mumoss")
 
 for(i in 1:5){
 	datalist<-list(Nobs=dim(varAll[[i]])[1], Xobs=varAll[[i]]$Mean,
 					vegeC=varAll[[i]]$bioregID, depth=varAll[[i]]$depth,
 					airM=varAll[[i]]$MeanA,airM.bar=TexM[i],shrubC=varAll[[i]]$shrub.pc,
-					mossC=varAll[[i]]$moss.pc,meas.sig=varAll[[i]]$SD, Nvege=4)
+					mossC=varAll[[i]]$moss.pc,meas.sig=varAll[[i]]$SD, Nvege=4,
+					depthseq=depthseq,
+					Ndepth=length(depthseq), airseq=airseq[[i]],
+					Nair=length(airseq[[i]]),pcseq=pcseq,Npc=length(pcseq))
 	
 	
 	X.modI<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\vegetation_analyses\\vegetation\\vegetation_model_code.r",
@@ -344,8 +364,8 @@ for(i in 1:5){
 					
 	print(paste("initialize data ",i ))		
 	#specify sample run				
-	n.iter.i=500000
-	n.thin=25
+	n.iter.i=40000
+	n.thin=20
 	codaobj.init = coda.samples(X.modI,variable.names=samplelist,
                        n.iter=n.iter.i, thin=n.thin)
 					   
@@ -356,19 +376,19 @@ for(i in 1:5){
 	Mod.out<-summary(codaobj.init)
 
 	write.table(Mod.out$statistics, 
-			paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\model\\vege\\biomeReg\\mod3\\",data.name[i],"Temp_mod_stats.csv"),
+			paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\model\\vege\\biomeReg\\mod4\\",data.name[i],"Temp_mod_stats.csv"),
 			sep=",",row.names=TRUE)
-	write.table(Mod.out$quantiles, paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\model\\vege\\biomeReg\\mod3\\",data.name[i],"Temp_mod_quant.csv"),
+	write.table(Mod.out$quantiles, paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\model\\vege\\biomeReg\\mod4\\",data.name[i],"Temp_mod_quant.csv"),
 			sep=",",row.names=TRUE)
 			
 print(paste("summary out data ",i)	)
 
 
 #run mcmc plots on key params
-dir.create(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\model\\vege\\biomeReg\\mod3\\",data.name[i]))	
+dir.create(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\model\\vege\\biomeReg\\mod4\\",data.name[i]))	
 
 mcmcplot(codaobj.init, parms=c("b1","b2","b3","b4","b5","sigV"),
-			dir=paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\model\\vege\\biomeReg\\mod3\\",data.name[i]))		
+			dir=paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\model\\vege\\biomeReg\\mod4\\",data.name[i]))		
 #get summary and save to file
 
 print(paste("mcmcplot out data ", i))	

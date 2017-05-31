@@ -602,7 +602,7 @@ nameV<-c("nfreeze_vege","nthaw_vege","Tmax_vege","Tmin_vege","zero_vege")
 labelV<-c("Freeze n-factor", "Thaw n-factor", "Soil temperature maximum", 
 			"Soil temperature minimum", "Days in zero mean")
 axisL<-c(0,0,0,-40,0)
-axisH<-c(1.5,1.5,20,-10,220)
+axisH<-c(1.5,1.5,20,-10,20)
 axisI<-c(.5,.5,5,10,20)
 
 for(k in 1:length(nlow)){

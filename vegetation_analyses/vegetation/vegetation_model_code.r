@@ -23,6 +23,27 @@ model{
 	rep.Xobs[i]~dnorm(mu[i], tauM[i])
 	}
 	
+	for(i in 1:Ndepth){
+		for(j in 1:Nvege ){
+			mudepth[i,j]<-b1[j]+b2[j]*depthseq[i]
+		}
+	}
+	
+	for(i in 1:Nair){
+		for(j in 1:Nvege ){
+		muair[i,j]<-b1[j]+b3[j]*(airseq[i]-airM.bar)
+		}
+	}
+	for(i in 1:Npc){
+		for(j in 1:Nvege ){
+		mushrub[i,j]<-b1[j]+b3[j]*(pcseq[i]-25)
+		mumoss[i,j]<-b1[j]+b3[j]*(pcseq[i]-25)
+		
+		}
+	}
+	
+	
+	
 	#define priors for the model
 	for(i in 1:Nvege){
 	
