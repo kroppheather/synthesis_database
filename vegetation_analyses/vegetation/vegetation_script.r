@@ -294,7 +294,7 @@ pcseq<-seq(0,80, length.out=100)
 
 ##############Start by running the model for biome only
 
-samplelist<-c("b1","b2","b3","b4","b5","sigM","sigV","rep.Xobs""mudepth","muair","mushrub","mumoss")
+samplelist<-c("b1","b2","b3","b4","b5","sigM","sigV","rep.Xobs","mudepth","muair","mushrub","mumoss")
 
 for(i in 1:5){
 	datalist<-list(Nobs=dim(varAll[[i]])[1], Xobs=varAll[[i]]$Mean,
