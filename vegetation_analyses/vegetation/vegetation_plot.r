@@ -254,7 +254,7 @@ bioReg$nameF<-c("Alaska","Alaska","Canada", "Islands")
 #############################################
 data.name<-c("nfreeze","nthaw","Tmax","Tmin","DayZero")
 dexps<-"\\[*[[:digit:]]*\\]"
-
+dexps2<-"[^[:alpha:]]"
 datSt<-list()
 datQ<-list()
 datC<-list()
@@ -268,13 +268,19 @@ b2Sig<-list()
 b3Sig<-list()
 b4Sig<-list()
 b5Sig<-list()
+muDb<-list()
+muAb<-list()
+muSb<-list()
+muMb<-list()
+
 #read in model output
 for(i in 1:length(data.name)){
-	datSt[[i]]<-read.csv(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\model\\vege\\biome\\mod3\\",data.name[i],"Temp_mod_stats.csv"))
-	datQ[[i]]<-read.csv(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\model\\vege\\biome\\mod3\\",data.name[i],"Temp_mod_quant.csv"))
+	datSt[[i]]<-read.csv(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\model\\vege\\biome\\mod4\\",data.name[i],"Temp_mod_stats.csv"))
+	datQ[[i]]<-read.csv(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\model\\vege\\biome\\mod4\\",data.name[i],"Temp_mod_quant.csv"))
 	datC[[i]]<-cbind(datSt[[i]],datQ[[i]])
 	#make parms vectors
-	datC[[i]]$parms1<-gsub(dexps,"",rownames(datC[[i]]))
+	datC[[i]]$parms<-gsub(dexps,"",rownames(datC[[i]]))
+	datC[[i]]$parms2<-gsub(dexps2,"",rownames(datC[[i]]))
 	b1p[[i]]<-datC[[i]][datC[[i]]$parms=="b1",]
 	b2p[[i]]<-datC[[i]][datC[[i]]$parms=="b2",]
 	b3p[[i]]<-datC[[i]][datC[[i]]$parms=="b3",]
@@ -290,6 +296,16 @@ for(i in 1:length(data.name)){
 				ifelse(b4p[[i]]$X2.5.>0&b4p[[i]]$X97.5.<0,0,1))	
 	b5Sig[[i]]<-ifelse(b5p[[i]]$X2.5.<0&b5p[[i]]$X97.5.>0,0,
 				ifelse(b5p[[i]]$X2.5.>0&b5p[[i]]$X97.5.<0,0,1))	
+				
+	muDb[[i]]<-datC[[i]][datC[[i]]$parms2=="mudepth",]	
+	muDb[[i]]$vegeC<-rep(seq(1,2),each=100)
+	muAb[[i]]<-datC[[i]][datC[[i]]$parms2=="muair",]
+	muAb[[i]]$vegeC<-rep(seq(1,2),each=100)
+	muSb[[i]]<-datC[[i]][datC[[i]]$parms2=="mushrub",]
+	muSb[[i]]$vegeC<-rep(seq(1,2),each=100)	
+	muMb[[i]]<-datC[[i]][datC[[i]]$parms2=="mumoss",]
+	muMb[[i]]$vegeC<-rep(seq(1,2),each=100)				
+				
 	}
 
 
@@ -632,7 +648,7 @@ axisH<-c(1.5,1.5,20,-10,20)
 axisI<-c(.5,.5,5,10,20)
 
 for(k in 1:length(nlow)){
-jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\plot\\vege\\biome",nameV[k],".jpg"), width=6500,height=4500)	
+jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\plot\\vege\\biome\\",nameV[k],".jpg"), width=6500,height=4500)	
 
 	ab<-layout(matrix(seq(1,8), ncol=4, byrow=FALSE),
 				width=c(rep(lcm(wb),8)),
@@ -644,22 +660,18 @@ jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\
 		plot(c(0,1),c(0,1), type="n",xlim=c(-1,21), ylim=c(nlow[k],nhigh[k]), xlab=" ", 
 				ylab=" ", xaxs="i", yaxs="i", axes=FALSE)
 		#regression CI
-		
-		
-		if(b2Sig[[k]][i]==1){
-			polygon(c(seq(0,20, by=.1),rev(seq(0,20, by=.1))), 
-				c(b1p[[k]]$X2.5.[i]+(b2p[[k]]$X2.5.[i]*seq(0,20, by=.1)),
-				rev(b1p[[k]]$X97.5.[i]+(b2p[[k]]$X97.5.[i]*seq(0,20, by=.1)))),
-				col="grey85",border=FALSE)		
+			if(b2Sig[[k]][i]==1){
+			polygon(c(depthseq, rev(depthseq)),
+					c(muDb[[k]]$X2.5.[muDb[[k]]$vegeC==i], rev(muDb[[k]]$X97.5.[muDb[[k]]$vegeC==i])),col="grey85",border=FALSE)
+			
+			
 			}else{
-				polygon(c(seq(0,20, by=.1),rev(seq(0,20, by=.1))), 
-				c(rep(b1p[[k]]$X2.5.[i],length(seq(0,20, by=.1))),
-				rev(rep(b1p[[k]]$X97.5.[i],length(seq(0,20, by=.1))))),
-				col="grey85",border=FALSE)	
+			polygon(c(depthseq, rev(depthseq)),
+					c(rep(b1p[[k]]$X2.5.[i],length(depthseq)),
+					rep( b1p[[k]]$X97.5.[i],length(depthseq))),col="grey85",border=FALSE)
 			
 			}
-				
-				
+		
 				
 		points(varAll[[k]]$depth[varAll[[k]]$biome==biomeID$biome[i]],
 				varAll[[k]]$Mean[varAll[[k]]$biome==biomeID$biome[i]],
@@ -672,10 +684,13 @@ jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\
 		axis(2, seq(axisL[k],axisH[k],by=axisI[k]), cex.axis=12, las=2, lwd.ticks=8)
 		#regression line
 		if(b2Sig[[k]][i]==1){
-		points(seq(0,20, by=.1),b1p[[k]]$Mean[i]+(b2p[[k]]$Mean[i]*seq(0,20, by=.1)), type="l", lwd=5)
+		points(depthseq,muDb[[k]]$Mean[muDb[[k]]$vegeC==i], type="l", lwd=5)
 		}else{
-			points(seq(0,20, by=.1),rep(b1p[[k]]$Mean[i], length(seq(0,20, by=.1))), type="l", lwd=5, lty=2)
-			}		
+			points(depthseq,rep(b1p[[k]]$Mean[i], length(depthseq)), type="l", lwd=5, lty=2)
+			}
+
+
+			
 		if(i==dim(biomeID)[1]){
 			axis(1, seq(0,18, by=3), cex.axis=12, lwd.ticks=8,padj=1)
 			mtext("Depth (cm)",side=1, line=20, cex=10)
@@ -693,19 +708,19 @@ jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\
 		plot(c(0,1),c(0,1), type="n",xlim=c(0,80), ylim=c(nlow[k],nhigh[k]), xlab=" ", 
 				ylab=" ", xaxs="i", yaxs="i", axes=FALSE)
 		
-		#regression CI
+		
 		if(b4Sig[[k]][i]==1){
-			polygon(c(seq(0,80, by=.1),rev(seq(0,80, by=.1))), 
-				c(b1p[[k]]$X2.5.[i]+(b4p[[k]]$X2.5.[i]*(seq(0,80, by=.1)-25)),
-				rev(b1p[[k]]$X97.5.[i]+(b4p[[k]]$X97.5.[i]*(seq(0,80, by=.1)-25)))),
-				col="grey85",border=FALSE)		
+			polygon(c(pcseq, rev(pcseq)),
+					c(muSb[[k]]$X2.5.[muSb[[k]]$vegeC==i], rev(muSb[[k]]$X97.5.[muSb[[k]]$vegeC==i])),col="grey85",border=FALSE)
+			
+			
 			}else{
-				polygon(c(seq(0,80, by=.1),rev(seq(0,80, by=.1))), 
-				c(rep(b1p[[k]]$X2.5.[i],length(seq(0,80, by=.1))),
-				rev(rep(b1p[[k]]$X97.5.[i],length(seq(0,80, by=.1))))),
-				col="grey85",border=FALSE)	
+			polygon(c(pcseq, rev(pcseq)),
+					c(rep(b1p[[k]]$X2.5.[i],length(pcseq)),
+					rep( b1p[[k]]$X97.5.[i],length(pcseq))),col="grey85",border=FALSE)
 			
 			}
+		
 		
 		points(varAll[[k]]$shrub.pc[varAll[[k]]$biome==biomeID$biome[i]],
 				varAll[[k]]$Mean[varAll[[k]]$biome==biomeID$biome[i]],
@@ -717,9 +732,9 @@ jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\
 		
 		#regression line
 		if(b4Sig[[k]][i]==1){
-		points(seq(0,80, by=.1),b1p[[k]]$Mean[i]+(b4p[[k]]$Mean[i]*(seq(0,80, by=.1)-25)), type="l", lwd=5)
+		points(pcseq,muSb[[k]]$Mean[muSb[[k]]$vegeC==i], type="l", lwd=5)
 		}else{
-			points(seq(0,80, by=.1),rep(b1p[[k]]$Mean[i], length(seq(0,80, by=.1))), type="l", lwd=5, lty=2)
+			points(pcseq,rep(b1p[[k]]$Mean[i], length(pcseq)), type="l", lwd=5, lty=2)
 			}
 		if(i==dim(biomeID)[1]){
 			axis(1, seq(0,60, by=20), cex.axis=12, lwd.ticks=8,padj=1)
@@ -737,15 +752,14 @@ jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\
 				ylab=" ", xaxs="i", yaxs="i", axes=FALSE)
 		#regression CI
 		if(b5Sig[[k]][i]==1){
-			polygon(c(seq(0,80, by=.1),rev(seq(0,80, by=.1))), 
-				c(b1p[[k]]$X2.5.[i]+(b5p[[k]]$X2.5.[i]*(seq(0,80, by=.1)-25)),
-				rev(b1p[[k]]$X97.5.[i]+(b5p[[k]]$X97.5.[i]*(seq(0,80, by=.1)-25)))),
-				col="grey85",border=FALSE)		
+			polygon(c(pcseq, rev(pcseq)),
+					c(muMb[[k]]$X2.5.[muMb[[k]]$vegeC==i], rev(muMb[[k]]$X97.5.[muMb[[k]]$vegeC==i])),col="grey85",border=FALSE)
+			
+			
 			}else{
-				polygon(c(seq(0,80, by=.1),rev(seq(0,80, by=.1))), 
-				c(rep(b1p[[k]]$X2.5.[i],length(seq(0,80, by=.1))),
-				rev(rep(b1p[[k]]$X97.5.[i],length(seq(0,80, by=.1))))),
-				col="grey85",border=FALSE)	
+			polygon(c(pcseq, rev(pcseq)),
+					c(rep(b1p[[k]]$X2.5.[i],length(pcseq)),
+					rep( b1p[[k]]$X97.5.[i],length(pcseq))),col="grey85",border=FALSE)
 			
 			}
 		
@@ -757,11 +771,10 @@ jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\
 				varAll[[k]]$moss.pc[varAll[[k]]$biome==biomeID$biome[i]],
 				varAll[[k]]$pc97.5[varAll[[k]]$biome==biomeID$biome[i]],lwd=5,code=0)
 		
-		#regression line
 		if(b5Sig[[k]][i]==1){
-		points(seq(0,80, by=.1),b1p[[k]]$Mean[i]+(b5p[[k]]$Mean[i]*(seq(0,80, by=.1)-25)), type="l", lwd=5)
+		points(pcseq,muMb[[k]]$Mean[muMb[[k]]$vegeC==i], type="l", lwd=5)
 		}else{
-			points(seq(0,80, by=.1),rep(b1p[[k]]$Mean[i], length(seq(0,80, by=.1))), type="l", lwd=5, lty=2)
+			points(pcseq,rep(b1p[[k]]$Mean[i], length(pcseq)), type="l", lwd=5, lty=2)
 			}
 			
 		if(i==dim(biomeID)[1]){
@@ -781,45 +794,17 @@ jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\
 				ylim=c(nlow[k],nhigh[k]), xlab=" ", 
 					ylab=" ", xaxs="i", yaxs="i", axes=FALSE)
 			
-			
-		toplothigh<-ifelse(seq(min(varAll[[k]]$pc2.5A),
-						max(varAll[[k]]$pc97.5A), by=.1)<=TexM[k],
-						b1p[[k]]$X2.5.[i]+(b3p[[k]]$X2.5.[i]*(seq(min(varAll[[k]]$pc2.5A),
-						max(varAll[[k]]$pc97.5A), by=.1)-TexM[k])),
-						b1p[[k]]$X97.5.[i]+(b3p[[k]]$X97.5.[i]*(seq(min(varAll[[k]]$pc2.5A),
-						max(varAll[[k]]$pc97.5A), by=.1)-TexM[k])))
-		
-		toplotlow<-ifelse(seq(min(varAll[[k]]$pc2.5A),
-						max(varAll[[k]]$pc97.5A), by=.1)<=TexM[k],
-						b1p[[k]]$X97.5.[i]+(b3p[[k]]$X97.5.[i]*(seq(min(varAll[[k]]$pc2.5A),
-						max(varAll[[k]]$pc97.5A), by=.1)-TexM[k])),
-						b1p[[k]]$X2.5.[i]+(b3p[[k]]$X2.5.[i]*(seq(min(varAll[[k]]$pc2.5A),
-						max(varAll[[k]]$pc97.5A), by=.1)-TexM[k])))
-		
 		if(b3Sig[[k]][i]==1){
-		polygon(c(seq(min(varAll[[k]]$pc2.5A),
-						max(varAll[[k]]$pc97.5A), by=.1),
-						rev(seq(min(varAll[[k]]$pc2.5A),
-						max(varAll[[k]]$pc97.5A), by=.1))), 
-				c(toplotlow,
-				rev(toplothigh)),
-				col="grey85",border=FALSE)		
-		}else{
-		
-		polygon(c(seq(min(varAll[[k]]$pc2.5A),
-						max(varAll[[k]]$pc97.5A), by=.1),
-						rev(seq(min(varAll[[k]]$pc2.5A),
-						max(varAll[[k]]$pc97.5A), by=.1))), 
-				c(rep(b1p[[k]]$X2.5.[i], length(seq(min(varAll[[k]]$pc2.5A),
-						max(varAll[[k]]$pc97.5A), by=.1))),
-				rev(rep(b1p[[k]]$X97.5.[i], length(seq(min(varAll[[k]]$pc2.5A),
-						max(varAll[[k]]$pc97.5A), by=.1))))),col="grey85",border=FALSE)
-		}	
+			polygon(c(airseq[[k]], rev(airseq[[k]])),
+					c(muAb[[k]]$X2.5.[muAb[[k]]$vegeC==i], rev(muAb[[k]]$X97.5.[muAb[[k]]$vegeC==i])),col="grey85",border=FALSE)
 			
 			
+			}else{
+			polygon(c(airseq[[k]], rev(airseq[[k]])),
+					c(rep(b1p[[k]]$X2.5.[i],length(airseq[[k]])),
+					rep( b1p[[k]]$X97.5.[i],length(airseq[[k]]))),col="grey85",border=FALSE)
 			
-			
-			
+			}	
 			
 			points(varAll[[k]]$MeanA[varAll[[k]]$biome==biomeID$biome[i]],
 					varAll[[k]]$Mean[varAll[[k]]$biome==biomeID$biome[i]],
@@ -833,22 +818,11 @@ jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\
 					varAll[[k]]$pc97.5A[varAll[[k]]$biome==biomeID$biome[i]],
 					varAll[[k]]$Mean[varAll[[k]]$biome==biomeID$biome[i]],lwd=5,code=0)
 			
-			
-			
 		if(b3Sig[[k]][i]==1){
-			points(seq(min(varAll[[k]]$pc2.5A),
-						max(varAll[[k]]$pc97.5A), by=.1),
-			b1p[[k]]$Mean[i]+(b3p[[k]]$Mean[i]*
-			(seq(min(varAll[[k]]$pc2.5A),
-						max(varAll[[k]]$pc97.5A), by=.1)-TexM[k])), type="l", lwd=5)
+		points(airseq[[k]],muAb[[k]]$Mean[muAb[[k]]$vegeC==i], type="l", lwd=5)
 		}else{
-		points(seq(min(varAll[[k]]$pc2.5A),
-						max(varAll[[k]]$pc97.5A), by=.1),
-				rep(b1p[[k]]$Mean[i],length(seq(min(varAll[[k]]$pc2.5A),
-					max(varAll[[k]]$pc97.5A), by=.1))),
-						type="l",lty=2, lwd=5)
-			
-		}	
+			points(airseq[[k]],rep(b1p[[k]]$Mean[i], length(airseq[[k]])), type="l", lwd=5, lty=2)
+			}
 			if(i==dim(biomeID)[1]){
 				axis(1, seq(-50,50, by=5), cex.axis=12, lwd.ticks=8,padj=1)
 				mtext("Air Temperature",side=1, line=20, cex=10)

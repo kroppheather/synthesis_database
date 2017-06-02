@@ -298,7 +298,7 @@ ab<-layout(matrix(seq(1,16), ncol=8, byrow=TRUE),
 		
 			points(datAll[[6]]$Mean[datAll[[6]]$class==i], 
 				datAll[[4]]$Mean[datAll[[4]]$class==i], pch=19,
-					col="wheat4", cex=15)	
+					col="slategray3", cex=15)	
 			arrows(datAll[[6]]$Mean[datAll[[6]]$class==i], 
 			datAll[[4]]$pc2.5[datAll[[4]]$class==i], 
 			datAll[[6]]$Mean[datAll[[6]]$class==i], 	
@@ -329,7 +329,7 @@ ab<-layout(matrix(seq(1,16), ncol=8, byrow=TRUE),
 		
 			points(datAll[[7]]$Mean[datAll[[7]]$class==i], 
 				datAll[[4]]$Mean[datAll[[4]]$class==i], pch=19,
-					col="wheat4", cex=15)	
+					col="slategray3", cex=15)	
 			arrows(datAll[[7]]$Mean[datAll[[7]]$class==i], 
 			datAll[[4]]$pc2.5[datAll[[4]]$class==i], 
 			datAll[[7]]$Mean[datAll[[7]]$class==i], 	
