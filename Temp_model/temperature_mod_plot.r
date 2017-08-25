@@ -251,7 +251,7 @@ datSM$decdateA[datSM$siteid==1&datSM$depth==depthP[[1]][1]]
 
 for(n in 1:dim(siteall)[1]){
 	i<-sitesS$siteid[n]
-	jpeg(file=paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod10C\\plots\\soil\\site",i,".jpg"),
+	jpeg(file=paste0("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u7m11\\plots\\soil\\site",i,".jpg"),
 			width=1500,height=1000, units="px")
 	par(mai=c(2,2,2,2))
 	plot(c(0,1),c(0,1),type="n",xlim=c(min(datSM$decdateA[datSM$siteid==i]),max(datSM$decdateA[datSM$siteid==i])),
@@ -280,7 +280,7 @@ for(n in 1:dim(siteall)[1]){
 
 for(n in 1:dim(siteall)[1]){
 	i<-sitesS$siteid[n]
-	jpeg(file=paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod10C\\plots\\air\\site",i,".jpg"),
+	jpeg(file=paste0("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u7m11\\plots\\air\\site",i,".jpg"),
 			width=1500,height=1000, units="px")
 	par(mai=c(2,2,2,2))
 	plot(c(0,1),c(0,1),type="n",xlim=c(min(datAM$decdateA[datAM$siteid==i]),max(datAM$decdateA[datAM$siteid==i])),
