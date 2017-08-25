@@ -27,9 +27,20 @@
 source("c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\vegetation_analyses\\temp_parm_extract.r")
 
 
-
 ###########################################
 ## read in soil moisture data from the db##
 ###########################################
+#read in soil moisture
+datVW <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\soil_moist.csv", na.strings=c("NaN","NA")) 
 
-datSM<-read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\soil_moist.csv", na.strings=c("NaN","NA")) 
+#read in soil dataset
+Sdesc <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\soil.csv", na.strings=c("NaN","NA"))
+
+#get a count of daily observations per site, year, depth
+
+VWcount <- aggregate(datVW$swc, by=list(datVW$year_sm, datVW$sw_depth,datVW$site_id), FUN="length")
+colnames(VWcount) <- c("year", "depth", "siteid", "count")
+
+#get the unique number of sites with data
+
+VWsiteall <- unique(VWcount$siteid)
