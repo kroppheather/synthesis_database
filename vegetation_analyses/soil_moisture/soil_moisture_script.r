@@ -148,7 +148,7 @@ NswcMonth <- join(NswcMonth, VWAugO, by=c("wyear", "siteid"), type="left")
 
 NswcMonth <- join(NswcMonth, VWSeptO, by=c("wyear", "siteid"), type="left")
 
-plot(NswcMonth$vwcAug[NswcMonth$parm=="Tn"],NswcMonth$Mean[NswcMonth$parm=="Tn"], pch=19)
+
 
 #now look at soil temp parms
 
@@ -159,3 +159,8 @@ TswcMonth <- join(Tsub, VWJuneO, by=c("wyear", "siteid"), type="left")
 TswcMonth <-join(TswcMonth, VWJulyO, by=c("wyear", "siteid"), type="left")
 TswcMonth <-join(TswcMonth, VWAugO, by=c("wyear", "siteid"), type="left")
 TswcMonth <-join(TswcMonth, VWSeptO, by=c("wyear", "siteid"), type="left")
+
+
+#see how average soil moisture matches up with some current stats
+plot(NswcMonth$vwcAug[NswcMonth$parm=="Tn"],NswcMonth$Mean[NswcMonth$parm=="Tn"], pch=19)
+plot(TswcMonth$vwcJune[TswcMonth$parm=="peakSS"],TswcMonth$Mean[TswcMonth$parm=="peakSS"], pch=19)
