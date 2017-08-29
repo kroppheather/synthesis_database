@@ -821,7 +821,8 @@ datalist<-list(NobsA=dim(AirSitesD3[[i]])[1], TempA=AirSitesD3[[i]]$A,
 				SrepSub=Soilrepsub[[i]]$repID,ArepSub=Airrepsub[[i]]$repID,
 				Nstart=dim(CHFlag[[i]])[1], SSY=SSc[[i]]$SSY,SEY=SSc[[i]]$SEY, AEY=ASc[[i]]$AEY, ASY=ASc[[i]]$ASY,
 				Ncombo=dim(IDforCombo[[i]])[1], SoilIND=IDforCombo[[i]]$siteSDW,AirIND=IDforCombo[[i]]$siteSDWA)
-
+dir.create(paste0("/local/synthesis/deep_sites/run1/sitesp2/site",sitesS$siteid[i]))	
+print(paste("directory made for site ", i))
 print(paste("start initialize site number", i))
 temp.modI<-jags.model(file="/home/hkropp/github/synthesis_database/Deep_Temp/Deep_temp_sites_code_p2.r",
 						data=datalist,
