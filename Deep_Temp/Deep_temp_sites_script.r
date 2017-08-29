@@ -861,7 +861,7 @@ write.table(chain3,paste0("/local/synthesis/deep_sites/run1/sitesp1/site",sitesS
 			
 print(paste("coda out site number ", i))	
 #run mcmc plots on key params
-			
+dir.create(paste0("/local/synthesis/deep_sites/run1/sitesp1/site",sitesS$siteid[i]))			
 mcmcplot(codaobj.init, parms=c("T.aveA1","TminA","TmaxA","T.aveS1",
 			"TmaxS","TminS","sig.muA","sig.muS","aZero", "bZero", "zeroC","peakWS", "peakWA", "peakSS", "peakSA"),
 			dir=paste0("/local/synthesis/deep_sites/run1/sitesp1/site",sitesS$siteid[i]))		
