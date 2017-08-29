@@ -821,7 +821,8 @@ datalist<-list(NobsA=dim(AirSitesD3[[i]])[1], TempA=AirSitesD3[[i]]$A,
 				SrepSub=Soilrepsub[[i]]$repID,ArepSub=Airrepsub[[i]]$repID,
 				Nstart=dim(CHFlag[[i]])[1], SSY=SSc[[i]]$SSY,SEY=SSc[[i]]$SEY, AEY=ASc[[i]]$AEY, ASY=ASc[[i]]$ASY,
 				Ncombo=dim(IDforCombo[[i]])[1], SoilIND=IDforCombo[[i]]$siteSDW,AirIND=IDforCombo[[i]]$siteSDWA)
-
+dir.create(paste0("/local/synthesis/deep_sites/run1/sitesp1/site",sitesS$siteid[i]))	
+print(paste("directory made for site ", i))
 print(paste("start initialize site number", i))
 temp.modI<-jags.model(file="/home/hkropp/github/synthesis_database/Deep_Temp/Deep_temp_sites_code.r",
 						data=datalist,
@@ -861,7 +862,7 @@ write.table(chain3,paste0("/local/synthesis/deep_sites/run1/sitesp1/site",sitesS
 			
 print(paste("coda out site number ", i))	
 #run mcmc plots on key params
-dir.create(paste0("/local/synthesis/deep_sites/run1/sitesp1/site",sitesS$siteid[i]))			
+		
 mcmcplot(codaobj.init, parms=c("T.aveA1","TminA","TmaxA","T.aveS1",
 			"TmaxS","TminS","sig.muA","sig.muS","aZero", "bZero", "zeroC","peakWS", "peakWA", "peakSS", "peakSA"),
 			dir=paste0("/local/synthesis/deep_sites/run1/sitesp1/site",sitesS$siteid[i]))		
