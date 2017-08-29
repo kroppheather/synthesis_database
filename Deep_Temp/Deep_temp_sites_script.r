@@ -491,14 +491,14 @@ SOILIDNEWALL<-join(SoilIDS2, site.depthidS, by=c("siteid", "depth"), type="left"
 all.wdoyA<-list()
 for(i in 1:dim(AirIDS2)[1]){
 	if(leap_year(AirIDS2$wyear[i])){
-		all.wdoyA[[i]]<-data.frame(wdoy=c(rep(AirIDS2$wyear[i],366)+seq(1/366.5,366/366.5,length.out=366)),
+		all.wdoyA[[i]]<-data.frame(wdoy=c(rep(AirIDS2$wyear[i],366)+seq(0/366.5,365/366,length.out=366)),
 									wyear=rep(AirIDS2$wyear[i],366),
 									siteid=rep(AirIDS2$siteid[i],366),
 									height=rep(AirIDS2$height[i],366),
 									SDWA=rep(AirIDS2$SDWA[i],366),
 									SDS=rep(AIRIDNEWALL$SDA[i],366))
 	}else{
-		all.wdoyA[[i]]<-data.frame(wdoy=c(rep(AirIDS2$wyear[i],365)+seq(1/365.5,365/365.5,length.out=365)),
+		all.wdoyA[[i]]<-data.frame(wdoy=c(rep(AirIDS2$wyear[i],365)+seq(0/365.5,364/365,length.out=365)),
 									wyear=rep(AirIDS2$wyear[i],365),
 									siteid=rep(AirIDS2$siteid[i],365),
 									height=rep(AirIDS2$height[i],365),
@@ -512,14 +512,14 @@ A.DOY<-ldply(all.wdoyA)
 all.wdoyS<-list()
 for(i in 1:dim(SoilIDS2)[1]){
 	if(leap_year(SoilIDS2$wyear[i])){
-		all.wdoyS[[i]]<-data.frame(wdoy=c(rep(SoilIDS2$wyear[i],366)+seq(1/366.5,366/366.5,length.out=366)),
+		all.wdoyS[[i]]<-data.frame(wdoy=c(rep(SoilIDS2$wyear[i],366)+seq(0/366.5,365/366,length.out=366)),
 									wyear=rep(SoilIDS2$wyear[i],366),
 									siteid=rep(SoilIDS2$siteid[i],366),
 									depth=rep(SoilIDS2$depth[i],366),
 									SDWS=rep(SoilIDS2$SDWS[i],366),
 									SDS=rep(SOILIDNEWALL$SDS[i],366))
 	}else{
-		all.wdoyS[[i]]<-data.frame(wdoy=c(rep(SoilIDS2$wyear[i],365)+seq(1/365.5,365/365.5,length.out=365)),
+		all.wdoyS[[i]]<-data.frame(wdoy=c(rep(SoilIDS2$wyear[i],365)+seq(0/365.5,364/365,length.out=365)),
 									wyear=rep(SoilIDS2$wyear[i],365),
 									siteid=rep(SoilIDS2$siteid[i],365),
 									depth=rep(SoilIDS2$depth[i],365),
