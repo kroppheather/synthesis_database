@@ -2,7 +2,7 @@
 
 library(plyr)
 #read in data
-setwd("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod10p1\\output_u7m10")
+setwd("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u7m11\\output_u7m11r1")
 
 datAI<-read.csv("AirIDS.csv")
 datSI<-read.csv("SoilIDS.csv")
@@ -19,16 +19,14 @@ datSM$decdateA<-datSM$decdate-1991
 datAM$decdateA<-datAM$decdate-1991
 
 #set up directories for all model output
-WDR<-c("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod10p1\\output_u7m10",
-"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod10p2",
-"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod10p3",
-"c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\Tmod10p4\\output_u7m10r4")
+WDR<-c("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u7m11\\output_u7m11r1",
+"c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u7m11\\output_u7m11r2")
 
-
+Nruns <- 2
 
 #indicate start and last dims of site runs
-startdim<-c(1,20,35,69)
-enddim<-c(19,34,68,104)
+startdim<-c(1,53)
+enddim<-c(52,104)
 
 
 
@@ -42,9 +40,10 @@ siteall$siteUI<-seq(1,dim(siteall)[1])
 #in the run it is actually used in
 
 #read in model output from first part
-siterun<-ifelse(siteall$siteUI<=enddim[1],1,
-			ifelse(siteall$siteUI>enddim[1]&siteall$siteUI<=enddim[2],2,
-			ifelse(siteall$siteUI>enddim[2]&siteall$siteUI<=enddim[3],3,4)))
+#calculate the run lengh
+rleng<-enddim-(startdim-1)
+#set up a site run id
+siterun <- rep(seq(1,Nruns),times=rleng)
 
 datSRALL<-list()
 datARALL<-list()
@@ -55,7 +54,7 @@ for(i in 1:length(startdim)){
 }
 
 #get the correct IDS for each site
-darSR<-list()
+datSR<-list()
 datAR<-list()
 for(i in 1:dim(siteall)[1]){
 	datSR[[i]]<-datSRALL[[siterun[i]]][datSRALL[[siterun[i]]]$siteid==siteall$siteid[i],]
@@ -247,8 +246,6 @@ for(i in 1:dim(siteall)[1]){
 #create predicted points
 datSM$decdateA[datSM$siteid==1&datSM$depth==depthP[[1]][1]]
 
-
-
 for(n in 1:dim(siteall)[1]){
 	i<-sitesS$siteid[n]
 	jpeg(file=paste0("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u7m11\\plots\\soil\\site",i,".jpg"),
@@ -363,51 +360,44 @@ abline(fitair, lwd=2, col="cornflowerblue", lty=2)
 text(-20,25, paste("y=",round(fitair$coefficients[1],2), "+",round(fitair$coefficients[2],2),"Tobs"), cex=1.5)
 text(-20,20, paste("R2=", round(summary(fitair)$r.squared,3)), cex=1.5)
 #########################################################
-##now need to export the parameters of interest:
-#only export values needed
-freezeN<-data.frame(datNfreeze[,1:2], pc2.5=datNfreeze[,5],pc97.5=datNfreeze[,9],
-					datNfreeze[,12:14],depth=datNfreeze[,17],parm=datNfreeze$parms1)
 
 
-thawN<-data.frame(datNthaw[,1:2], pc2.5=datNthaw[,5],pc97.5=datNthaw[,9],
-					datNthaw[,12:14],depth=datNthaw[,17],parm=datNthaw$parms1)
-					
-Nfactor<-rbind(freezeN,thawN)
 
-zeroC<-data.frame(datZero[,1:2], pc2.5=datZero[,5],pc97.5=datZero[,9],
-					datZero[,12:14],parm=datZero$parms1)
+##################################################################
+##################################################################
+# make a plot of a few sites for an example plot that looks nicer
+#than the rough plots above to check for 
 
-					
-Speak<-data.frame(datSpeak[,1:2], pc2.5=datSpeak[,5],pc97.5=datSpeak[,9],
-					datSpeak[,12:14],parm=datSpeak$parms1)			
-					
-Wpeak<-data.frame(datWpeak[,1:2], pc2.5=datWpeak[,5],pc97.5=datWpeak[,9],
-					datWpeak[,12:14],parm=datWpeak$parms1)							
+#start by looking at site 79
+	n<-sitesS$siteun[sitesS$siteid==79]
 
+	i<-79
+	jpeg(file=paste0("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u7m11\\nice_plots\\soil\\site",i,".jpg"),
+			width=1500,height=1000, units="px")
+	par(mai=c(2,2,2,2))
+	plot(c(0,1),c(0,1),type="n",xlim=c(min(datSM$decdateA[datSM$siteid==i]),max(datSM$decdateA[datSM$siteid==i])),
+								ylim=c(min(na.omit(datSM$T[datSM$siteid==i])),max(na.omit(datSM$T[datSM$siteid==i]))),
+								xlab="Water Year since 1991", ylab="Temperature", cex.axis=2, cex.lab=3)
+		for(j in 1:length(depthP[[n]])){	
+		polygon(c(datSM$decdateA[datSM$siteid==i&datSM$depth==depthP[[n]][j]],
+					rev(datSM$decdateA[datSM$siteid==i&datSM$depth==depthP[[n]][j]])),
+				c(datCSM[[n]]$X2.5.[datCSM[[n]]$depth==depthP[[n]][j]],
+					rev(datCSM[[n]]$X97.5.[datCSM[[n]]$depth==depthP[[n]][j]])), col=rgb(193/255,193/255,193/255,.9))	
+		
+		}
+	for(j in 1:length(depthP[[n]])){
+		points(datSM$decdateA[datSM$siteid==i&datSM$depth==depthP[[n]][j]],
+				datSM$T[datSM$siteid==i&datSM$depth==depthP[[n]][j]],
+				pch=19, col="grey48")
+		points(datSM$decdateA[datSM$siteid==i&datSM$depth==depthP[[n]][j]],
+				datCSM[[n]]$Mean[datCSM[[n]]$depth==depthP[[n]][j]],
+				col="gray0",type="l",lwd=2,lty=1)
 
-Tmin<-data.frame(datTmin[,1:2], pc2.5=datTmin[,5],pc97.5=datTmin[,9],
-					datTmin[,12:14],parm=datTmin$parms1)					
+	}
 
-Tmax<-data.frame(datTmax[,1:2], pc2.5=datTmax[,5],pc97.5=datTmax[,9],
-				datTmax[,12:14],parm=datTmax$parms1)				
+	legend(min(na.omit(datSM$decdateA[datSM$siteid==i]))+.001,max(na.omit(datSM$T[datSM$siteid==i]))-.25, paste("depth=", depthP[[n]]),
+			col=colP[1:length(depthP[[n]])],pch=19, bty="n", cex=3)
+			
+	text(min(datSM$decdateA[datSM$siteid==i])+2,max(datSM$T[datSM$siteid==i])-2, paste("siteid=", sitesS$siteid[n]), cex=3)
+	dev.off()
 
-SoilParm<-rbind(zeroC,Speak,Wpeak,Tmin,Tmax)				
-
-SpeakA<-data.frame(datSpeakA[,1:2], pc2.5=datSpeakA[,5],pc97.5=datSpeakA[,9],
-					datSpeakA[,12:14],parm=datSpeakA$parms1)			
-					
-WpeakA<-data.frame(datWpeakA[,1:2], pc2.5=datWpeakA[,5],pc97.5=datWpeakA[,9],
-					datWpeakA[,12:14],parm=datWpeakA$parms1)							
-
-
-TminA<-data.frame(datTminA[,1:2], pc2.5=datTminA[,5],pc97.5=datTminA[,9],
-					datTminA[,12:14],parm=datTminA$parms1)					
-
-TmaxA<-data.frame(datTmaxA[,1:2], pc2.5=datTmaxA[,5],pc97.5=datTmaxA[,9],
-				datTmaxA[,12:14],parm=datTmaxA$parms1)		
-
-AirParm<-rbind(SpeakA, WpeakA,TminA,TmaxA)
-
-write.table(Nfactor, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\nfactor.csv", sep=",", row.names=FALSE)
-write.table(SoilParm, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\soilParm.csv", sep=",", row.names=FALSE)
-write.table(AirParm, "c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\airParm.csv", sep=",", row.names=FALSE)
