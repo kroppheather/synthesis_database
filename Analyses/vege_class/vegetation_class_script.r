@@ -154,4 +154,12 @@ print(paste("summary out data ",i)	)
 
 #run mcmc plots on key params
 dir.create(paste0("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\shallow\\vege_class\\model1\\",data.name[i]))	
-			}
+
+mcmcplot(codaobj.init, parms=c("b1","b2","b3","sigV"),
+			dir=paste0("c:\\Users\\hkropp\\Google Drive\\raw_data\\analysis_u7\\mod10_out\\model\\var\\mod2\\",data.name[i]))		
+#get summary and save to file
+
+print(paste("mcmcplot out data ", i))			
+
+
+		}
