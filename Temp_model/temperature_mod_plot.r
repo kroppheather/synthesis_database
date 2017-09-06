@@ -375,29 +375,29 @@ text(-20,20, paste("R2=", round(summary(fitair)$r.squared,3)), cex=1.5)
 	jpeg(file=paste0("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u7m11\\nice_plots\\soil\\site",i,".jpg"),
 			width=1500,height=1000, units="px")
 	par(mai=c(2,2,2,2))
-	plot(c(0,1),c(0,1),type="n",xlim=c(min(datSM$decdateA[datSM$siteid==i]),max(datSM$decdateA[datSM$siteid==i])),
-								ylim=c(min(na.omit(datSM$T[datSM$siteid==i])),max(na.omit(datSM$T[datSM$siteid==i]))),
-								xlab="Water Year since 1991", ylab="Temperature", cex.axis=2, cex.lab=3)
-		for(j in 1:length(depthP[[n]])){	
-		polygon(c(datSM$decdateA[datSM$siteid==i&datSM$depth==depthP[[n]][j]],
-					rev(datSM$decdateA[datSM$siteid==i&datSM$depth==depthP[[n]][j]])),
-				c(datCSM[[n]]$X2.5.[datCSM[[n]]$depth==depthP[[n]][j]],
-					rev(datCSM[[n]]$X97.5.[datCSM[[n]]$depth==depthP[[n]][j]])), col=rgb(193/255,193/255,193/255,.9))	
+	plot(c(0,1),c(0,1),type="n",xlim=c(min(datSM$decdateA[datSM$siteid==i]+1991),max(datSM$decdateA[datSM$siteid==i]+1991)),
+								ylim=c(min(na.omit(datSM$T[datSM$siteid==i])),15),axes=FALSE,
+								xlab=" ", ylab=" " )
 		
-		}
 	for(j in 1:length(depthP[[n]])){
-		points(datSM$decdateA[datSM$siteid==i&datSM$depth==depthP[[n]][j]],
+		points(datSM$decdateA[datSM$siteid==i&datSM$depth==depthP[[n]][j]]+1991,
 				datSM$T[datSM$siteid==i&datSM$depth==depthP[[n]][j]],
-				pch=19, col="grey48")
-		points(datSM$decdateA[datSM$siteid==i&datSM$depth==depthP[[n]][j]],
+				pch=19, col="tomato3", cex=2)
+		points(datSM$decdateA[datSM$siteid==i&datSM$depth==depthP[[n]][j]]+1991,
 				datCSM[[n]]$Mean[datCSM[[n]]$depth==depthP[[n]][j]],
-				col="gray0",type="l",lwd=2,lty=1)
+				col="gray20",type="l",lwd=7,lty=1)
 
 	}
-
-	legend(min(na.omit(datSM$decdateA[datSM$siteid==i]))+.001,max(na.omit(datSM$T[datSM$siteid==i]))-.25, paste("depth=", depthP[[n]]),
-			col=colP[1:length(depthP[[n]])],pch=19, bty="n", cex=3)
+	mtext("Water year", side=1, line=5, cex=4)
+	mtext("Temperature (C) ", side=2, line=6, cex=4)
+	axis(1, seq(2011.5,2015.5, by=.5), rep(" ", 9),cex.axis=3,lwd.ticks=2)
+	axis(2, seq(-30,20, by=5), cex.axis=3, las=2,lwd.ticks=2)
+	mtext("2012", side=1, line=2, cex=3, at=2012)
+	mtext("2013", side=1, line=2, cex=3, at=2013)
+	mtext("2014", side=1, line=2, cex=3, at=2014)
+	mtext("2015", side=1, line=2, cex=3, at=2015)
+	legend(2013.5,-18, c("observed daily average temperature","model mean daily average temperature"),
+				pch=c(19, NA), lty=c(NA,1), lwd=c(NA,6), col=c("tomato3", "gray20"), cex=2.5, bty="n")
 			
-	text(min(datSM$decdateA[datSM$siteid==i])+2,max(datSM$T[datSM$siteid==i])-2, paste("siteid=", sitesS$siteid[n]), cex=3)
 	dev.off()
 
