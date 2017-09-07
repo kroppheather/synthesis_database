@@ -135,7 +135,7 @@ wb <- 35
 hb <- 50
 
 #get the maximum depth to plot
-yu <- 0
+yu <- -1
 yh <- 310
 #datNF,datNT,datTmax,datTmin,datPS,datPW,datDZ
 xl <- c(0,0,-1,-40,.5,0,0)
@@ -146,7 +146,7 @@ yi <- -50
 xla <- c(0,0,0,-35,.5,0,0)
 xha <-  c(1.5,1.5,18,-5,.9,.5,200)
 xi <- c(.3,.3,3,10,.1,.1,50)
-xl1 <-c(.8,.8,10,-15,.7,.3,200)
+xl1 <-c(.8,.8,10,-25,.7,.3,200)
 yl1 <-c(250,250,250,250,250,250,250)
 dataType <- c("Freezing n-factor", "Thawing n-factor", "Temperature maximum (C)", "Temperature minimum (C)",
 				"Time of temperature maximum", "Time of temperature minimum", "Number of days in zero model")
@@ -181,8 +181,8 @@ plot(c(0,1), c(0,1), xlim= c(xl[k],xh[k]), ylim= c(yh,yu), xlab = " ", ylab = " 
 	legend(xl1[k],yl1[k], c(paste(colVCT$CName[colVCT$Vclass==9]),paste(colVCT$CName[colVCT$Vclass==7])), 
 				col=c(colVCT$coli[colVCT$Vclass==9],colVCT$coli[colVCT$Vclass==7]), pch=19, lwd=4, cex=5, bty="n")
 	mtext("Boreal", side=3, cex=7, line=3)
-	mtext(paste(dataType[k]), side=1, outer=TRUE, line=-8, cex=7)
-	mtext("Depth (cm)", side=2, outer=TRUE, cex=7, line=-19)
+	mtext(paste(dataType[k]), side=1, outer=TRUE, line=-15, cex=7)
+	mtext("Depth (cm)", side=2, outer=TRUE, cex=7, line=-25)
 par(mai=c(0,0,0,0))	
 plot(c(0,1), c(0,1), xlim= c(xl[k],xh[k]), ylim= c(yh,yu), xlab = " ", ylab = " ", axes=FALSE,
 		xaxs="i", yaxs="i", type="n")
