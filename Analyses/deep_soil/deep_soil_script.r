@@ -103,6 +103,23 @@ datDZ<-join(datDZ,datTminA, by=c("siteid","wyear"), type="left")
 
 datAll<-list(datNF,datNT,datTmax,datTmin,datPS,datPW,datDZ)
 
+#pull out a unique table of depth, site, biome ect
+
+IDsTable <- unique(data.frame(siteid=datNF$siteid, wyear=datNF$wyear, depth=datNF$depth,
+						Vclass=datNF$Vclass, biome=datNF$biome))
 
 
-###########
+
+##############
+#start by looking at n factors across depth with each biome seperated
+wb <- 20
+hb <- 25
+
+#get the maximum depth to plot
+yh <- max()
+
+ab <- layout (matrix(seq(1,2), ncol=2), width=rep(lcm(wb), 2), height=rep(lcm(hb), 2))
+layout.show(ab)
+
+plot(c(0,1), c(0,1),  
+
