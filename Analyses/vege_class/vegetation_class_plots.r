@@ -270,6 +270,66 @@ ab<-layout(matrix(seq(1,Nclass*2), ncol=Nclass, byrow=TRUE), width=rep(lcm(wb), 
 	dev.off()
 	}
 	
-
-
 	
+#######################################################################
+## calculate the R2:
+#now make a goodness of fit plot
+nlow=c(0,0,0,-40,.6,0,0)
+nhigh=c(1.7,1.7,25,0,1,.6,240)
+nameV<-c("nfreeze_vege","nthaw_vege","Tmax_vege","Tmin_vege","peakMax","peakMin", "zero_vege")
+labelV<-c("Freeze n-factor", "Thaw n-factor", "Soil temperature maximum", 
+			"Soil temperature minimum","Soil temperature maximum time",
+			"Soil temperature minimum time","Days in zero mean")			
+axisL<-c(0,0,0,-40,.5,0,0)
+axisH<-c(1.5,1.5,20,0,1,.6,220)
+axisI<-c(.5,.5,5,10,.1,.1,20)
+ADD<-c(.4,.4,7,9,.12,.12,50)
+for(k in 1:length(nlow)){
+jpeg(paste0("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\shallow\\vege_class\\model1\\analysis_plot\\fit",nameV[k],".jpg"), width=1000,height=1000)
+	par(mai=c(3,3,3,3))
+	plot(c(0,1),c(0,1), type="n", xlim=c(nlow[k],nhigh[k]), ylim=c(nlow[k],nhigh[k]),
+		xlab=" ",ylab=" ", xaxs="i", yaxs="i", axes=FALSE)
+	points(datAll[[k]]$Mean,repX[[k]]$Mean, pch=19, cex=2)
+	axis(1, seq(axisL[k],axisH[k], by=axisI[k]), cex.axis=2)
+	axis(2, seq(axisL[k],axisH[k], by=axisI[k]), cex.axis=2, las=2)
+	mtext(paste("Observed", labelV[k]), side=1,line=5, cex=2)
+	mtext(paste("Predicted", labelV[k]), side=2,line=5, cex=2)
+	fit<-lm(repX[[k]]$Mean~datAll[[k]]$Mean)
+	abline(fit, lwd=2, lty=3)
+	abline(0,1, lwd=2, col="red")
+	text(nlow[k]+ADD[k],nhigh[k]-ADD[k], paste("y=",round(fit$coefficients[1],2),"+",round(fit$coefficients[2],2),"Observed"), cex=1.5)
+	text(nlow[k]+ADD[k],nhigh[k]-(ADD[k]+(ADD[k]*.2)), paste("R2=",round(summary(fit)$r.squared,2)), cex=1.5)
+dev.off()
+}
+	
+	
+
+#####################################################################
+#### do a simple comparison to see if cedible intervals overlap for significance
+#### pairwise differences need to be calculated in code but don't have time to 
+#### rerun before ATM
+	
+	b2Sig<-list()
+	for(k in 1:3){
+	Sig <- matrix(rep(NA,9*9), ncol=9)
+	colnames(Sig)<-VclassNames 
+	rownames(Sig)<-VclassNames 
+	#create pair wise matrix
+	for(i in 1:9){
+		for(j in 1:9){
+		Sig[i,j]<- ifelse(b2p[[k]]$Mean[i]<b2p[[k]]$X2.5[j]|b2p[[k]]$Mean[i]>b2p[[k]]$X97.5[j],1,0)
+		
+		
+		}
+	}
+	b2Sig[[k]]<-Sig
+	}
+	
+	
+	
+#make a legend plot
+
+plot(c(0,10), c(0,10), axes=FALSE, xlab=" ", ylab=" ", type="n")
+
+legend(1,10, c("significant multiple regression slope", "non-sigificant multiple regression slope ", "regression mean credible interval", "intercept for centered model"),
+			col=c("black","black","grey85", "royalblue2"), pch=c(NA,NA,15,NA), lty=c(1,2,NA,3), lwd=2, bty="n", cex=2)
