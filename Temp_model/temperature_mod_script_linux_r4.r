@@ -388,7 +388,7 @@ SoilS$wdoy<-ifelse(SoilS$leapid==1&SoilS$doy<=274, SoilS$doy+92,
 		ifelse(SoilS$leapid==0&SoilS$doy>273,SoilS$doy-273,NA))))
 #the .01 is added because day 273 needs to be included in the water year, but if it 
 #is exactly one that bumps it to the first day of the water year.
-SoilS$wdoyP<-ifelse(leap_year(SoilS$wyear)==TRUE, SoilS$wdoy/366.5,SoilS$wdoy/365.5 )
+SoilS$wdoyP<-ifelse(leap_year(SoilS$wyear)==TRUE, (SoilS$wdoy-1)/366,(SoilS$wdoy-1)/365 )
 
 #now add to the year		
 				
@@ -412,7 +412,7 @@ AirS$wdoy<-ifelse(AirS$leapid==1&AirS$doy<=274, AirS$doy+92,
 		ifelse(AirS$leapid==0&AirS$doy>273,AirS$doy-273,NA))))
 #the .01 is added because day 273 needs to be included in the water year, but if it 
 #is exactly one that bumps it to the first day of the water year.
-AirS$wdoyP<-ifelse(leap_year(AirS$wyear)==TRUE, AirS$wdoy/366.5,AirS$wdoy/365.5 )
+AirS$wdoyP<-ifelse(leap_year(AirS$wyear)==TRUE, (AirS$wdoy-1)/366,(AirS$wdoy-1)/365 )
 
 #now add to the year		
 				
