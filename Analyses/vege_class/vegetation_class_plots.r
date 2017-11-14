@@ -48,6 +48,7 @@ datTmin<-SoilParmV[SoilParmV$parm=="TminS",]
 datDZ<-SoilParmV[SoilParmV$parm=="DayZero",]
 datPS<-SoilParmV[SoilParmV$parm=="peakSS",]
 datPW<-SoilParmV[SoilParmV$parm=="peakWS",]
+datTaveS <-SoilParmV[SoilParmV$parm=="T.aveS1",]
 
 #now seperate out air to match
 datTmaxA<-AirParm[AirParm$parm=="TmaxA",]
@@ -58,6 +59,9 @@ datPSA<-AirParm[AirParm$parm=="peakSA",]
 colnames(datPSA)[1:4]<-paste0(colnames(datPSA)[1:4],"A")
 datPWA<-AirParm[AirParm$parm=="peakWA",]
 colnames(datPWA)[1:4]<-paste0(colnames(datPWA)[1:4],"A")
+datTaveA<-AirParm[AirParm$parm=="T.aveA1",]
+colnames(datTaveA)[1:4]<-paste0(colnames(datTaveA)[1:4],"A")
+
 
 #now combine air measure with matching parm
 datNF<-join(datNF, datTminA, by=c("siteid","height","wyear"), type="left")
@@ -71,17 +75,19 @@ datPW<-join(datPW,datPWA,by=c("siteid","wyear"), type="left")
 
 datDZ<-join(datDZ,datTminA, by=c("siteid","wyear"), type="left")
 
-datAll<-list(datNF,datNT,datTmax,datTmin,datPS,datPW,datDZ)
+datAve <- join(datTaveS,datTaveA, by=c("siteid","wyear"), type="left")
+
+datAll<-list(datNF,datNT,datTmax,datTmin,datPS,datPW,datDZ, datAve)
 
 #get the average Air value for covariate centering
-roundI<-c(0,0,0,0,2,2,0)
+roundI<-c(0,0,0,0,2,2,0,0)
 TexM<-numeric(0)
-for(i in 1:7){
+for(i in 1:8){
 	TexM[i]<-round(mean(datAll[[i]]$MeanA),roundI[i])
 
 }
 
-data.name<-c("nfreeze","nthaw","Tmax","Tmin","Peakmax","Peakmin","DayZero")
+data.name<-c("nfreeze","nthaw","Tmax","Tmin","Peakmax","Peakmin","DayZero", "Tave")
 
 #sequences for plotting mu
 
@@ -333,3 +339,12 @@ plot(c(0,10), c(0,10), axes=FALSE, xlab=" ", ylab=" ", type="n")
 
 legend(1,10, c("significant multiple regression slope", "non-sigificant multiple regression slope ", "regression mean credible interval", "intercept for centered model"),
 			col=c("black","black","grey85", "royalblue2"), pch=c(NA,NA,15,NA), lty=c(1,2,NA,3), lwd=2, bty="n", cex=2)
+			
+			
+			
+#####################################################################
+#########look at patterns in shallow surface temperature
+plot()
+
+			
+			

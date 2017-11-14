@@ -483,14 +483,14 @@ SOILIDNEWALL<-join(SoilIDS2, site.depthidS, by=c("siteid", "depth"), type="left"
 all.wdoyA<-list()
 for(i in 1:dim(AirIDS2)[1]){
 	if(leap_year(AirIDS2$wyear[i])){
-		all.wdoyA[[i]]<-data.frame(wdoy=c(rep(AirIDS2$wyear[i],366)+seq(1/366.5,366/366.5,length.out=366)),
+		all.wdoyA[[i]]<-data.frame(wdoy=c(rep(AirIDS2$wyear[i],366)+seq(0/366,365/366,length.out=366)),
 									wyear=rep(AirIDS2$wyear[i],366),
 									siteid=rep(AirIDS2$siteid[i],366),
 									height=rep(AirIDS2$height[i],366),
 									SDWA=rep(AirIDS2$SDWA[i],366),
 									SDS=rep(AIRIDNEWALL$SDA[i],366))
 	}else{
-		all.wdoyA[[i]]<-data.frame(wdoy=c(rep(AirIDS2$wyear[i],365)+seq(1/365.5,365/365.5,length.out=365)),
+		all.wdoyA[[i]]<-data.frame(wdoy=c(rep(AirIDS2$wyear[i],365)+seq(0/365,364/365,length.out=365)),
 									wyear=rep(AirIDS2$wyear[i],365),
 									siteid=rep(AirIDS2$siteid[i],365),
 									height=rep(AirIDS2$height[i],365),
@@ -504,14 +504,14 @@ A.DOY<-ldply(all.wdoyA)
 all.wdoyS<-list()
 for(i in 1:dim(SoilIDS2)[1]){
 	if(leap_year(SoilIDS2$wyear[i])){
-		all.wdoyS[[i]]<-data.frame(wdoy=c(rep(SoilIDS2$wyear[i],366)+seq(1/366.5,366/366.5,length.out=366)),
+		all.wdoyS[[i]]<-data.frame(wdoy=c(rep(SoilIDS2$wyear[i],366)+seq(0/366,365/366,length.out=366)),
 									wyear=rep(SoilIDS2$wyear[i],366),
 									siteid=rep(SoilIDS2$siteid[i],366),
 									depth=rep(SoilIDS2$depth[i],366),
 									SDWS=rep(SoilIDS2$SDWS[i],366),
 									SDS=rep(SOILIDNEWALL$SDS[i],366))
 	}else{
-		all.wdoyS[[i]]<-data.frame(wdoy=c(rep(SoilIDS2$wyear[i],365)+seq(1/365.5,365/365.5,length.out=365)),
+		all.wdoyS[[i]]<-data.frame(wdoy=c(rep(SoilIDS2$wyear[i],365)+seq(0/365,364/365,length.out=365)),
 									wyear=rep(SoilIDS2$wyear[i],365),
 									siteid=rep(SoilIDS2$siteid[i],365),
 									depth=rep(SoilIDS2$depth[i],365),
@@ -763,37 +763,38 @@ for(i in 1:dim(sitesS)[1]){
 #renaming everything to be run two
 Airrepsubout<-ldply(Airrepsub, data.frame)
 Soilrepsubout<-ldply(Soilrepsub, data.frame)
-write.table(Airrepsubout,"/local/synthesis/output_u7m11r1/AirrepIDS.csv",sep=",",row.names=FALSE)
-write.table(Soilrepsubout,"/local/synthesis/output_u7m11r1/SoilrepIDS.csv",sep=",",row.names=FALSE)
+write.table(Airrepsubout,"/local/synthesis/output_u7m12r1/AirrepIDS.csv",sep=",",row.names=FALSE)
+write.table(Soilrepsubout,"/local/synthesis/output_u7m12r1/SoilrepIDS.csv",sep=",",row.names=FALSE)
 
 print("repID out")
 
 Airtowriteout<-ldply(AirSitesD3, data.frame)
 Soiltowriteout<-ldply(SoilSitesD3, data.frame)
 #model
-write.table(Airtowriteout,"/local/synthesis/output_u7m11r1/Tair_model.csv",sep=",",row.names=FALSE)
-write.table(Soiltowriteout,"/local/synthesis/output_u7m11r1/Tsoil_model.csv",sep=",",row.names=FALSE)
+write.table(Airtowriteout,"/local/synthesis/output_u7m12r1/Tair_model.csv",sep=",",row.names=FALSE)
+write.table(Soiltowriteout,"/local/synthesis/output_u7m12r1/Tsoil_model.csv",sep=",",row.names=FALSE)
 
 
 
 
 #need to write ids to table
 
-write.table(AirIDS2,"/local/synthesis/output_u7m11r1/AirIDS.csv", sep=",", row.names=FALSE)
-write.table(SoilIDS2,"/local/synthesis/output_u7m11r1/SoilIDS.csv", sep=",", row.names=FALSE)
+write.table(AirIDS2,"/local/synthesis/output_u7m12r1/AirIDS.csv", sep=",", row.names=FALSE)
+write.table(SoilIDS2,"/local/synthesis/output_u7m12r1/SoilIDS.csv", sep=",", row.names=FALSE)
 
-write.table(ALLSyearID,"/local/synthesis/output_u7m11r1/SoilTaveIDS_SD.csv", sep=",", row.names=FALSE)
-write.table(ALLAyearID,"/local/synthesis/output_u7m11r1/AirTaveIDS_SD.csv", sep=",", row.names=FALSE)
+write.table(ALLSyearID,"/local/synthesis/output_u7m12r1/SoilTaveIDS_SD.csv", sep=",", row.names=FALSE)
+write.table(ALLAyearID,"/local/synthesis/output_u7m12r1/AirTaveIDS_SD.csv", sep=",", row.names=FALSE)
 
 
-write.table(IDnCombo,"/local/synthesis/output_u7m11r1/ncomboIDS.csv", sep=",", row.names=FALSE)
+write.table(IDnCombo,"/local/synthesis/output_u7m12r1/ncomboIDS.csv", sep=",", row.names=FALSE)
 
 
 print("ID write out")	
 #designate the 	samples to run			
 samplelist<-c("T.aveA1","TminA","TmaxA","T.aveS1","TmaxS","TminS","sig.muA","sig.muS",
 				 "muS","muA", "aZero", "bZero", "zeroC", "peakWS", "peakWA", "peakSS", "peakSA",
-				 "TempS.rep", "TempA.rep","pstart","Fn", "Tn","FDDA","TDDA","TDDS","FDDS", "DayZero")
+				 "TempS.rep", "TempA.rep","pstart","Fn", "Tn","FDDA","TDDA","TDDS","FDDS", "DayZero",
+				 "TaverageS","TaverageA")
 
 
 #for(i in 1:dim(sitesS)[1]){
@@ -832,11 +833,11 @@ print(paste("samples done done site number= ", i))
 
 #pull out model stats
 Mod.out<-summary(codaobj.init)
-dir.create(paste0("/local/synthesis/output_u7m11r1/site",sitesS$siteid[i]))
+dir.create(paste0("/local/synthesis/output_u7m12r1/site",sitesS$siteid[i]))
 
-write.table(Mod.out$statistics, paste0("/local/synthesis/output_u7m11r1/site",sitesS$siteid[i],"Temp_mod_stats.csv"),
+write.table(Mod.out$statistics, paste0("/local/synthesis/output_u7m12r1/site",sitesS$siteid[i],"Temp_mod_stats.csv"),
 			sep=",",row.names=TRUE)
-write.table(Mod.out$quantiles, paste0("/local/synthesis/output_u7m11r1/site",sitesS$siteid[i],"Temp_mod_quant.csv"),
+write.table(Mod.out$quantiles, paste0("/local/synthesis/output_u7m12r1/site",sitesS$siteid[i],"Temp_mod_quant.csv"),
 			sep=",",row.names=TRUE)
 			
 print(paste("summary out site number ",i)	)
@@ -844,18 +845,18 @@ print(paste("summary out site number ",i)	)
 #save coda
 
 chain1<-as.matrix(codaobj.init[[1]])
-write.table(chain1,paste0("/local/synthesis/output_u7m11r1/site",sitesS$siteid[i],"chain1_coda.csv"), sep=",")
+write.table(chain1,paste0("/local/synthesis/output_u7m12r1/site",sitesS$siteid[i],"chain1_coda.csv"), sep=",")
 chain2<-as.matrix(codaobj.init[[2]])
-write.table(chain2,paste0("/local/synthesis/output_u7m11r1/site",sitesS$siteid[i],"chain2_coda.csv"), sep=",")
+write.table(chain2,paste0("/local/synthesis/output_u7m12r1/site",sitesS$siteid[i],"chain2_coda.csv"), sep=",")
 chain3<-as.matrix(codaobj.init[[3]])
-write.table(chain3,paste0("/local/synthesis/output_u7m11r1/site",sitesS$siteid[i],"chain3_coda.csv"), sep=",")
+write.table(chain3,paste0("/local/synthesis/output_u7m12r1/site",sitesS$siteid[i],"chain3_coda.csv"), sep=",")
 			
 print(paste("coda out site number ", i))	
 #run mcmc plots on key params
 			
 mcmcplot(codaobj.init, parms=c("T.aveA1","TminA","TmaxA","T.aveS1",
 			"TmaxS","TminS","sig.muA","sig.muS","aZero", "bZero", "zeroC","peakWS", "peakWA", "peakSS", "peakSA"),
-			dir=paste0("/local/synthesis/output_u7m11r1/site",sitesS$siteid[i]))		
+			dir=paste0("/local/synthesis/output_u7m12r1/site",sitesS$siteid[i]))		
 #get summary and save to file
 
 print(paste("mcmcplot out site number ", i))	

@@ -114,12 +114,13 @@ model{
 	for(i in 1:NSDWA){
 		FDDA[i]<-sum(FreezeA[ASY[i]:AEY[i]])
 		TDDA[i]<-sum(ThawA[ASY[i]:AEY[i]])
+		TaverageA[i]<-mean(TempA[ASY[i]:AEY[i]])
 	}		
 	for(i in 1:NSDWS){
 		FDDS[i]<-sum(FreezeS[SSY[i]:SEY[i]])
 		TDDS[i]<-sum(ThawS[SSY[i]:SEY[i]])
 		DayZero[i]<-sum(X[SSY[i]:SEY[i]])
-		
+		TaverageS[i] <- mean(TempS[SSY[i]:SEY[i]])
 	}	
 	
 	#now calculate N factors

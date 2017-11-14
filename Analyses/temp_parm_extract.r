@@ -64,8 +64,8 @@ datSM <- read.csv(paste0(dataWD,"\\Tsoil_model.csv"))
 datSM$decdateA <- datSM$decdate-1991
 datAM$decdateA <- datAM$decdate-1991
 
-
-
+datAveIS <- read.csv(paste0(dataWD,"\\IDaveoutS.csv"))
+datAveIA <- read.csv(paste0(dataWD,"\\IDaveoutA.csv"))
 #get a list of the sites that should be expected
 siteall <- data.frame(siteid=unique(datSI$siteid))
 siteall$siteUI <- seq(1,dim(siteall)[1])
@@ -122,6 +122,8 @@ SoilSDW<-list()
 AirTA<-list()
 SoilTA<-list()
 datNIS<-list()
+datAvAID <- list()
+datAvSID <-list()
 
 for(i in 1:dim(siteall)[1]){
 
@@ -136,6 +138,10 @@ for(i in 1:dim(siteall)[1]){
 	
 	#pull out N factor IDs by site
 	datNIS[[i]]<-datNI[datNI$siteid==siteall$siteid[i],]
+	#ave IDs
+	datAvSID[[i]] <- datAveIS[datAveIS$siteid==siteall$siteid[i],]
+	datAvAID[[i]] <- datAveIA[datAveIA$siteid==siteall$siteid[i],]
+	
 }
 
 
@@ -153,6 +159,10 @@ datSpeak<-list()
 datZero<-list()
 datNfreeze<-list()
 datNthaw<-list()
+datTaveA <- list()
+datTaveS <- list()
+datSTav<- list()
+datATav<- list()
 
 datCSM<-list()
 datCAM<-list()
@@ -162,12 +172,7 @@ dexps2<-"\\D"
 
 #subset first to only look at soil parms
 for(i in 1:dim(siteall)[1]){
-	#beginning of year
-	datT1p1[[i]]<-datC[[i]][datC[[i]]$parms1=="T.aveS1",]
-	datT1p1[[i]]$Tave1ID<-seq(1,dim(datT1p1[[i]])[1])
-	#end of year temp
-	datT1p2[[i]]<-datC[[i]][datC[[i]]$parms1=="T.aveS1",]
-	datT1p2[[i]]$Tave2D<-seq(1,dim(datT1p2[[i]])[1])
+
 	#max
 	datMax[[i]]<-datC[[i]][datC[[i]]$parms1=="TmaxS",]
 	datMax[[i]]$siteSDW<-seq(1,dim(datMax[[i]])[1])
@@ -187,11 +192,13 @@ for(i in 1:dim(siteall)[1]){
 	datNthaw[[i]]$Nseq<-seq(1,dim(datNthaw[[i]])[1])
 	#
 	datNfreeze[[i]]<-datC[[i]][datC[[i]]$parms1=="Fn",]
-	datNfreeze[[i]]$Nseq<-seq(1,dim(datNfreeze[[i]])[1])	
+	datNfreeze[[i]]$Nseq<-seq(1,dim(datNfreeze[[i]])[1])
 
+
+	
+	
 	#now join with ids
-	datT1t1[[i]]<-join(datT1p1[[i]],SoilTA[[i]], by="Tave1ID", type="inner")
-	datT1t2[[i]]<-join(datT1p2[[i]],SoilTA[[i]], by="Tave2D", type="inner")
+
 	datMax[[i]]<-join(datMax[[i]],SoilSDW[[i]], by="siteSDW", type="left")
 	datWpeak[[i]]<-join(datWpeak[[i]],SoilSDW[[i]], by="siteSDW", type="left")
 	datMin[[i]]<-join(datMin[[i]],SoilSDW[[i]], by="siteSDW", type="left")
@@ -199,17 +206,18 @@ for(i in 1:dim(siteall)[1]){
 	datZero[[i]]<-join(datZero[[i]],SoilSDW[[i]], by="siteSDW", type="left")
 	datNthaw[[i]]<-join(datNthaw[[i]], datNIS[[i]], by="Nseq", type="left")
 	datNfreeze[[i]]<-join(datNfreeze[[i]], datNIS[[i]], by="Nseq", type="left")
+	datATav[[i]] <- join(datTaveA[[i]], datAvAID[[i]], by="Tave1IDA", type="left")
+	datSTav[[i]] <- join(datTaveS[[i]], datAvSID[[i]], by="Tave1ID", type="left")
+	
 	}
 	
-	datTave1<-ldply(datT1t1,data.frame)
-	datTave2<-ldply(datT1t2,data.frame)
+
 	datTmin<-ldply(datMin,data.frame)
 	datTmax<-ldply(datMax,data.frame)
 	datWpeak<-ldply(datWpeak,data.frame)
 	datSpeak<-ldply(datSpeak,data.frame)
 	datZero<-ldply(datZero, data.frame)
 	datNfreeze<-ldply(datNfreeze, data.frame)
-	datNthaw<-ldply(datNthaw, data.frame)
 
 #subset first to only look at air parms
 datMaxA<-list()
@@ -279,9 +287,12 @@ Tmin<-data.frame(datTmin[,1:2], pc2.5=datTmin[,5],pc97.5=datTmin[,9],
 					datTmin[,12:14],parm=datTmin$parms1)					
 
 Tmax<-data.frame(datTmax[,1:2], pc2.5=datTmax[,5],pc97.5=datTmax[,9],
-				datTmax[,12:14],parm=datTmax$parms1)				
+				datTmax[,12:14],parm=datTmax$parms1)
 
-SoilParm<-rbind(zeroC,Speak,Wpeak,Tmin,Tmax)				
+Tave<- data.frame(datTaS[,1:2],pc2.5=datTaS[,5],pc97.5=datTaS[,9],
+				datTaS[,12:14],parm=datTaS$parms1)				
+
+SoilParm<-rbind(zeroC,Speak,Wpeak,Tmin,Tmax, Tave)				
 
 SpeakA<-data.frame(datSpeakA[,1:2], pc2.5=datSpeakA[,5],pc97.5=datSpeakA[,9],
 					datSpeakA[,12:14],parm=datSpeakA$parms1)			
@@ -296,4 +307,7 @@ TminA<-data.frame(datTminA[,1:2], pc2.5=datTminA[,5],pc97.5=datTminA[,9],
 TmaxA<-data.frame(datTmaxA[,1:2], pc2.5=datTmaxA[,5],pc97.5=datTmaxA[,9],
 				datTmaxA[,12:14],parm=datTmaxA$parms1)		
 
-AirParm<-rbind(SpeakA, WpeakA,TminA,TmaxA)
+TaveA <- data.frame(datTaA[,1:2],pc2.5=datTaA[,5],pc97.5=datTaA[,9],
+				datTaA[,12:14],parm=datTaA$parms1)					
+AirParm<-rbind(SpeakA, WpeakA,TminA,TmaxA, TaveA)
+
