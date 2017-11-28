@@ -856,7 +856,7 @@ print(paste("coda out site number ", i))
 			
 mcmcplot(codaobj.init, parms=c("T.aveA1","TminA","TmaxA","T.aveS1",
 			"TmaxS","TminS","sig.muA","sig.muS","aZero", "bZero", "zeroC","peakWS", "peakWA", "peakSS", "peakSA"),
-			dir=paste0("/local/synthesis/output_u7m12r3/site",sitesS$siteid[i]))		
+			dir=paste0("/local/synthesis/output_u7m12r4/site",sitesS$siteid[i]))		
 #get summary and save to file
 
 print(paste("mcmcplot out site number ", i))	
