@@ -10,7 +10,7 @@ library(xtable)
 library(mcmcplots)
 
 # set working directory
-setwd("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_4")
+setwd("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_5")
 #read in soil temperature
 datS<-read.table("soil_temp.csv", sep=",", header=TRUE, na.string=c("NaN"))
 #read in air temperature
@@ -19,3 +19,5 @@ datA<-read.table("air_temp.csv", sep=",", header=TRUE, na.string=c("NaN"))
 colnames(datA)<-c("air_id", "doy_st","year_st","air_t","air_height","site_id")
 #read in site info
 siteinf<-read.table("siteinfo.csv", sep=",", header=TRUE, na.string=c("NaN"))
+#read in model run status
+modrun <- read.csv("site_model_status.csv")

@@ -2,6 +2,12 @@
 ##########################################################################
 ########### Data organization and plotting for all temp obs ##############
 ##########################################################################
+########### Update 1/31/18. Many sites have good temperature##############
+########### model runs. Some sites have poor mixing and need##############
+########### more thinning. There is also a new data addition##############
+########### This script does not rerun temperature models   ##############
+########### for sites that don't need it.                   ##############
+##########################################################################
 library(plyr,lib.loc="/home/hkropp/R")
 library(lubridate,lib.loc="/home/hkropp/R")
 library(rjags)
@@ -11,7 +17,7 @@ library(mcmcplots,lib.loc="/home/hkropp/R")
 
 
 # set working directory
-setwd("/home/hkropp/synthesis/data_u7")
+setwd("/home/hkropp/synthesis/data_u8/backup_5")
 #read in soil temperature
 datS<-read.table("soil_temp.csv", sep=",", header=TRUE, na.string=c("NaN"))
 #read in air temperature
@@ -20,7 +26,8 @@ datA<-read.table("air_temp.csv", sep=",", header=TRUE, na.string=c("NaN"))
 colnames(datA)<-c("air_id", "doy_st","year_st","air_t","air_height","site_id")
 #read in site info
 siteinf<-read.table("siteinfo.csv", sep=",", header=TRUE, na.string=c("NaN"))
-
+#read in model run info
+modrun <- read.csv("site_model_status.csv")
 
 #get number of sites
 Nsite<-dim(siteinf)[1]
@@ -763,30 +770,30 @@ for(i in 1:dim(sitesS)[1]){
 #renaming everything to be run two
 Airrepsubout<-ldply(Airrepsub, data.frame)
 Soilrepsubout<-ldply(Soilrepsub, data.frame)
-write.table(Airrepsubout,"/local/synthesis/output_u7m12r1/AirrepIDS.csv",sep=",",row.names=FALSE)
-write.table(Soilrepsubout,"/local/synthesis/output_u7m12r1/SoilrepIDS.csv",sep=",",row.names=FALSE)
+write.table(Airrepsubout,"/local/synthesis/output_u8m12Br1/AirrepIDS.csv",sep=",",row.names=FALSE)
+write.table(Soilrepsubout,"/local/synthesis/output_u8m12Br1/SoilrepIDS.csv",sep=",",row.names=FALSE)
 
 print("repID out")
 
 Airtowriteout<-ldply(AirSitesD3, data.frame)
 Soiltowriteout<-ldply(SoilSitesD3, data.frame)
 #model
-write.table(Airtowriteout,"/local/synthesis/output_u7m12r1/Tair_model.csv",sep=",",row.names=FALSE)
-write.table(Soiltowriteout,"/local/synthesis/output_u7m12r1/Tsoil_model.csv",sep=",",row.names=FALSE)
+write.table(Airtowriteout,"/local/synthesis/output_u8m12Br1/Tair_model.csv",sep=",",row.names=FALSE)
+write.table(Soiltowriteout,"/local/synthesis/output_u8m12Br1/Tsoil_model.csv",sep=",",row.names=FALSE)
 
 
 
 
 #need to write ids to table
 
-write.table(AirIDS2,"/local/synthesis/output_u7m12r1/AirIDS.csv", sep=",", row.names=FALSE)
-write.table(SoilIDS2,"/local/synthesis/output_u7m12r1/SoilIDS.csv", sep=",", row.names=FALSE)
+write.table(AirIDS2,"/local/synthesis/output_u8m12Br1/AirIDS.csv", sep=",", row.names=FALSE)
+write.table(SoilIDS2,"/local/synthesis/output_u8m12Br1/SoilIDS.csv", sep=",", row.names=FALSE)
 
-write.table(ALLSyearID,"/local/synthesis/output_u7m12r1/SoilTaveIDS_SD.csv", sep=",", row.names=FALSE)
-write.table(ALLAyearID,"/local/synthesis/output_u7m12r1/AirTaveIDS_SD.csv", sep=",", row.names=FALSE)
+write.table(ALLSyearID,"/local/synthesis/output_u8m12Br1/SoilTaveIDS_SD.csv", sep=",", row.names=FALSE)
+write.table(ALLAyearID,"/local/synthesis/output_u8m12Br1/AirTaveIDS_SD.csv", sep=",", row.names=FALSE)
 
 
-write.table(IDnCombo,"/local/synthesis/output_u7m12r1/ncomboIDS.csv", sep=",", row.names=FALSE)
+write.table(IDnCombo,"/local/synthesis/output_u8m12Br1/ncomboIDS.csv", sep=",", row.names=FALSE)
 
 
 print("ID write out")	
@@ -796,9 +803,15 @@ samplelist<-c("T.aveA1","TminA","TmaxA","T.aveS1","TmaxS","TminS","sig.muA","sig
 				 "TempS.rep", "TempA.rep","pstart","Fn", "Tn","FDDA","TDDA","TDDS","FDDS", "DayZero",
 				 "TaverageS","TaverageA")
 
+#rerun sites that aren't new data but just need a longer run time.
+#all sites 222 and below
+modtoRunDF <- sitesS[sitesS$siteid<=222,]
+modrun <- 	join(modtoRunDF, modrun, by=c("siteid"), type="full")		
+modReRun <- modrun[is.na(modrun$model.run),] 
 
+				 
 #for(i in 1:dim(sitesS)[1]){
-for(i in 1:52){
+for(i in modReRun$siteUID){
 #make the data list for the model
 datalist<-list(NobsA=dim(AirSitesD3[[i]])[1], TempA=AirSitesD3[[i]]$A, 
 				T.yrA=AirSitesD3[[i]]$TyrA,
@@ -817,14 +830,14 @@ datalist<-list(NobsA=dim(AirSitesD3[[i]])[1], TempA=AirSitesD3[[i]]$A,
 print(paste("start initialize site number", i))
 temp.modI<-jags.model(file="/home/hkropp/github/synthesis_database/Temp_model/temperature_mod_code.r",
 						data=datalist,
-						n.adapt=7000,
+						n.adapt=12000,
 						n.chains=3)
 
 
 print(paste("initialize done site number ",i ))		
 #specify sample run				
-n.iter.i=40000
-n.thin=20
+n.iter.i=70000
+n.thin=35
 codaobj.init = coda.samples(temp.modI,variable.names=samplelist,
                        n.iter=n.iter.i, thin=n.thin)
 					   
@@ -833,11 +846,11 @@ print(paste("samples done done site number= ", i))
 
 #pull out model stats
 Mod.out<-summary(codaobj.init)
-dir.create(paste0("/local/synthesis/output_u7m12r1/site",sitesS$siteid[i]))
+dir.create(paste0("/local/synthesis/output_u8m12Br1/site",modReRun$siteid[i]))
 
-write.table(Mod.out$statistics, paste0("/local/synthesis/output_u7m12r1/site",sitesS$siteid[i],"Temp_mod_stats.csv"),
+write.table(Mod.out$statistics, paste0("/local/synthesis/output_u8m12Br1/site",modReRun$siteid[i],"Temp_mod_stats.csv"),
 			sep=",",row.names=TRUE)
-write.table(Mod.out$quantiles, paste0("/local/synthesis/output_u7m12r1/site",sitesS$siteid[i],"Temp_mod_quant.csv"),
+write.table(Mod.out$quantiles, paste0("/local/synthesis/output_u8m12Br1/site",modReRun$siteid[i],"Temp_mod_quant.csv"),
 			sep=",",row.names=TRUE)
 			
 print(paste("summary out site number ",i)	)
@@ -845,18 +858,18 @@ print(paste("summary out site number ",i)	)
 #save coda
 
 chain1<-as.matrix(codaobj.init[[1]])
-write.table(chain1,paste0("/local/synthesis/output_u7m12r1/site",sitesS$siteid[i],"chain1_coda.csv"), sep=",")
+write.table(chain1,paste0("/local/synthesis/output_u8m12Br1/site",modReRun$siteid[i],"chain1_coda.csv"), sep=",")
 chain2<-as.matrix(codaobj.init[[2]])
-write.table(chain2,paste0("/local/synthesis/output_u7m12r1/site",sitesS$siteid[i],"chain2_coda.csv"), sep=",")
+write.table(chain2,paste0("/local/synthesis/output_u8m12Br1/site",modReRun$siteid[i],"chain2_coda.csv"), sep=",")
 chain3<-as.matrix(codaobj.init[[3]])
-write.table(chain3,paste0("/local/synthesis/output_u7m12r1/site",sitesS$siteid[i],"chain3_coda.csv"), sep=",")
+write.table(chain3,paste0("/local/synthesis/output_u8m12Br1/site",modReRun$siteid[i],"chain3_coda.csv"), sep=",")
 			
 print(paste("coda out site number ", i))	
 #run mcmc plots on key params
 			
 mcmcplot(codaobj.init, parms=c("T.aveA1","TminA","TmaxA","T.aveS1",
 			"TmaxS","TminS","sig.muA","sig.muS","aZero", "bZero", "zeroC","peakWS", "peakWA", "peakSS", "peakSA"),
-			dir=paste0("/local/synthesis/output_u7m12r1/site",sitesS$siteid[i]))		
+			dir=paste0("/local/synthesis/output_u8m12Br1/site",modReRun$siteid[i]))		
 #get summary and save to file
 
 print(paste("mcmcplot out site number ", i))	
