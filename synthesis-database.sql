@@ -112,13 +112,8 @@ CREATE TABLE soil_temp (stemp_id INTEGER PRIMARY KEY, doy_st NUMERIC, year_st NU
 --contributor
 INSERT INTO contributor(ctbr_id, ctbr_name,institution,email) VALUES (1, 'Britta Sannel','Stockholm University','britta.sannel@natgeo.su.se'); 
 --site infor
-INSERT INTO siteinfo(site_id,site_name,lat,lon,loc,MAAT,Dist_hist,Dist_type,Vege_z,PF_Zone,ctbr_id,date_range,elev) VALUES
-(1,'Tavvavuoma T2', 68.4621,20.90205,'Tavvavuoma Sweden',-2.1,'NA','NA','tundra','sporadic',1,'daily 2006 -2013',555);
-UPDATE siteinfo SET year_beg=2006 WHERE site_id=1;
-UPDATE siteinfo SET year_end=2013 WHERE site_id=1;
-UPDATE siteinfo SET day_beg=1 WHERE site_id=1;
-UPDATE siteinfo SET day_end=365 WHERE site_id=1;
-
+INSERT INTO siteinfo(site_id,site_name,lat,lon,loc,MAAT,Dist_type,Vege_z,PF_Zone,ctbr_id,elev,year_beg,year_end,day_beg,day_end,dist_hist) VALUES
+(1,'Tavvavuoma T2', 68.4621,20.90205,'Tavvavuoma Sweden',-2.1,'NA','tundra','sporadic',1,555,2006,2013,1,365,'NaN');
 
 
 --reference info
@@ -143,7 +138,7 @@ UPDATE siteinfo SET dist_hist='NaN' WHERE site_id=1;
 
 --add more contributor
 --(ctbr_id, ctbr_name,institution,email)
-\copy contributor(ctbr_id, ctbr_name,institution,email) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\contributor_u1.csv' DELIMITER ',' CSV HEADER
+\copy contributor(ctbr_id, ctbr_name,institution,email) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u1\contributor_u1.csv' DELIMITER ',' CSV HEADER
 
 UPDATE contributor SET ctbr_name='Jon O Donnell' WHERE ctbr_id=2;
 UPDATE contributor SET institution='National Park Service Arctic Network' WHERE ctbr_id=2;
@@ -153,25 +148,25 @@ UPDATE contributor SET ctbr_name='Elena Blanc-Betes' WHERE ctbr_id=3;
 UPDATE contributor SET institution='Univ. of Illinois at Chicago' WHERE ctbr_id=3;
 UPDATE contributor SET email='blanc.elena@gmail.com' WHERE ctbr_id=3;
 
-\copy siteinfo(site_id,site_name,lat,lon,loc,MAAT,Dist_type,Vege_z,PF_Zone,ctbr_id,elev,year_beg,year_end,day_beg,day_end,dist_hist) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\site_info.csv' DELIMITER ',' CSV HEADER QUOTE '"'
+\copy siteinfo(site_id,site_name,lat,lon,loc,MAAT,Dist_type,Vege_z,PF_Zone,ctbr_id,elev,year_beg,year_end,day_beg,day_end,dist_hist) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u1\site_info.csv' DELIMITER ',' CSV HEADER QUOTE '"'
 
-\copy soil(soil_id,soil_class,soil_drain,sand,clay,silt,organic_thick,site_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\soil_u1.csv' DELIMITER ',' CSV HEADER QUOTE '"'
+\copy soil(soil_id,soil_class,soil_drain,sand,clay,silt,organic_thick,site_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u1\soil_u1.csv' DELIMITER ',' CSV HEADER QUOTE '"'
 DELETE FROM soil WHERE soil_id=2;
 DELETE FROM soil WHERE soil_id=3;
 DELETE FROM soil WHERE soil_id=4;
 DELETE FROM soil WHERE soil_id=5;
 
-\copy  refinfo(ref_id,authors,title,journal,dateid,pages,ctbr_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\refinfo_u1.csv' DELIMITER ',' CSV HEADER QUOTE '"'
+\copy  refinfo(ref_id,authors,title,journal,dateid,pages,ctbr_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u1\refinfo_u1.csv' DELIMITER ',' CSV HEADER QUOTE '"'
 
-\copy  refrel(refrel_id,site_id,ref_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\refrel_u1.csv' DELIMITER ',' CSV HEADER QUOTE '"'
+\copy  refrel(refrel_id,site_id,ref_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u1\refrel_u1.csv' DELIMITER ',' CSV HEADER QUOTE '"'
 
-\copy  soilc(soilc_id,soilc,soilc_dep,site_id,c_year,c_doy) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\soilc_u1.csv' DELIMITER ',' CSV HEADER QUOTE '"'
+\copy  soilc(soilc_id,soilc,soilc_dep,site_id,c_year,c_doy) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u1\soilc_u1.csv' DELIMITER ',' CSV HEADER QUOTE '"'
 
-\copy moss(moss_id,mlt,moss_name,doy_m,year_m,site_id)FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\moss_u1.csv' DELIMITER ',' CSV HEADER QUOTE '"'
-\copy spec_list(specl_id,spec_name,site_id,spl_funcT) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\splist_u1.csv' DELIMITER ',' CSV HEADER QUOTE '"'
-\copy soil_moist(sm_id,doy_sm,year_sm,SWC,sw_depth,sm_type,site_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\soil_moist_u1.csv' DELIMITER ',' CSV HEADER QUOTE '"'
-\copy soil_temp(stemp_id,doy_st,year_st,soil_t,st_depth,site_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\soilTu1.csv' DELIMITER ',' CSV HEADER QUOTE '"'
-\copy air_temp(air_id,doy_ai,year_ai,air_t,air_height,site_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\airT_u1.csv' DELIMITER ',' CSV HEADER QUOTE '"'
+\copy moss(moss_id,mlt,moss_name,doy_m,year_m,site_id)FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u1\moss_u1.csv' DELIMITER ',' CSV HEADER QUOTE '"'
+\copy spec_list(specl_id,spec_name,site_id,spl_funcT) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u1\splist_u1.csv' DELIMITER ',' CSV HEADER QUOTE '"'
+\copy soil_moist(sm_id,doy_sm,year_sm,SWC,sw_depth,sm_type,site_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u1\soil_moist_u1.csv' DELIMITER ',' CSV HEADER QUOTE '"'
+\copy soil_temp(stemp_id,doy_st,year_st,soil_t,st_depth,site_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u1\soilTu1.csv' DELIMITER ',' CSV HEADER QUOTE '"'
+\copy air_temp(air_id,doy_ai,year_ai,air_t,air_height,site_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u1\airT_u1.csv' DELIMITER ',' CSV HEADER QUOTE '"'
 
 \copy contributor(ctbr_id, ctbr_name,institution,email) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u2\contrib_u2.csv' DELIMITER ',' CSV HEADER QUOTE '"'
 \copy siteinfo(site_id,site_name,lat,lon,loc,MAAT,Dist_type,Vege_z,PF_Zone,ctbr_id,elev,year_beg,year_end,day_beg,day_end,dist_hist) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u2\site_in_u2.csv' DELIMITER ',' CSV HEADER QUOTE '"'
@@ -228,10 +223,10 @@ DELETE FROM soil WHERE soil_id=5;
 --the data files were fixed and now need to be deleted and re-added to the database
 --soil
 DELETE FROM soil_temp;
-\copy soil_temp(stemp_id,doy_st,year_st,soil_t,st_depth,site_id)  FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\soil_temp_fix_a_U4.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
+\copy soil_temp(stemp_id,doy_st,year_st,soil_t,st_depth,site_id)  FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u4\soil_temp_fix_a_U4.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
 --air
 DELETE FROM air_temp;
-\copy air_temp(air_id,doy_ai,year_ai,air_t,air_height,site_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\air_temp_fix_a4.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
+\copy air_temp(air_id,doy_ai,year_ai,air_t,air_height,site_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u4\air_temp_fix_a4.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
 
 --upload number 5
 \copy contributor(ctbr_id, ctbr_name,institution,email) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u5\contributer_u5.csv' DELIMITER ',' CSV HEADER QUOTE '"'
@@ -248,6 +243,8 @@ DELETE FROM air_temp;
 \copy soil_moist(sm_id,doy_sm,year_sm,SWC,sw_depth,sm_type,site_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u5\soil_moist_u5.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
 \copy soil_temp(stemp_id,doy_st,year_st,soil_t,st_depth,site_id)  FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u5\soilT_u5.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
 \copy air_temp(air_id,doy_ai,year_ai,air_t,air_height,site_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\db_upload_files\u5\air_T_u5.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
+
+
 --export tables as csv for R
 \copy contributor TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_2\contributor.csv' DELIMITER ',' CSV  HEADER;
 \copy siteinfo TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_2\siteinfo.csv' DELIMITER ',' CSV  HEADER;
@@ -270,6 +267,8 @@ DELETE FROM air_temp;
 --fix duplicate air
 DELETE FROM air_temp;
 \copy air_temp(air_id,doy_ai,year_ai,air_t,air_height,site_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\backup_2\air_temp_fix_u5.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
+
+
 \copy air_temp TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_2\air_temp_fix_u5_out.csv' DELIMITER ',' CSV  HEADER;
 
 
@@ -314,10 +313,12 @@ DELETE FROM air_temp;
 --fix duplicate air  temp
 DELETE FROM air_temp;
 \copy air_temp(air_id,doy_ai,year_ai,air_t,air_height,site_id) FROM 'c:\\Users\hkropp\Google Drive\raw_data\backup_3\air_temp_fixed_u6.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
+
 \copy air_temp TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_3\air_temp_fixed_u6_out.csv' DELIMITER ',' CSV  HEADER;
 --fix soil temp
 DELETE FROM soil_temp;
 \copy soil_temp(stemp_id,doy_st,year_st,soil_t,st_depth,site_id)  FROM 'c:\\Users\hkropp\Google Drive\raw_data\backup_3\soil_temp_fixed_u6f.csv'  DELIMITER ',' CSV HEADER QUOTE '"'
+
 \copy soil_temp TO 'c:\\Users\hkropp\Google Drive\raw_data\backup_3\soil_temp_fixed_u6_out.csv' DELIMITER ',' CSV  HEADER;
 
 --start upload 7
