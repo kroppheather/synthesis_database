@@ -811,8 +811,9 @@ modReRun <- modrun[is.na(modrun$model.run),]
 
 				 
 #for(i in 1:dim(sitesS)[1]){
-for(i in modReRun$siteUID){
+for(k in 1:dim(modReRun)[1]){
 #make the data list for the model
+	i <- modReRun$siteUID[k]
 datalist<-list(NobsA=dim(AirSitesD3[[i]])[1], TempA=AirSitesD3[[i]]$A, 
 				T.yrA=AirSitesD3[[i]]$TyrA,
 				NobsS=dim(SoilSitesD3[[i]])[1], TempS=SoilSitesD3[[i]]$T,
@@ -846,11 +847,11 @@ print(paste("samples done done site number= ", i))
 
 #pull out model stats
 Mod.out<-summary(codaobj.init)
-dir.create(paste0("/local/synthesis/output_u8m12Br1/site",modReRun$siteid[i]))
+dir.create(paste0("/local/synthesis/output_u8m12Br1/site",modReRun$siteid[k]))
 
-write.table(Mod.out$statistics, paste0("/local/synthesis/output_u8m12Br1/site",modReRun$siteid[i],"Temp_mod_stats.csv"),
+write.table(Mod.out$statistics, paste0("/local/synthesis/output_u8m12Br1/site",modReRun$siteid[k],"Temp_mod_stats.csv"),
 			sep=",",row.names=TRUE)
-write.table(Mod.out$quantiles, paste0("/local/synthesis/output_u8m12Br1/site",modReRun$siteid[i],"Temp_mod_quant.csv"),
+write.table(Mod.out$quantiles, paste0("/local/synthesis/output_u8m12Br1/site",modReRun$siteid[k],"Temp_mod_quant.csv"),
 			sep=",",row.names=TRUE)
 			
 print(paste("summary out site number ",i)	)
@@ -858,18 +859,18 @@ print(paste("summary out site number ",i)	)
 #save coda
 
 chain1<-as.matrix(codaobj.init[[1]])
-write.table(chain1,paste0("/local/synthesis/output_u8m12Br1/site",modReRun$siteid[i],"chain1_coda.csv"), sep=",")
+write.table(chain1,paste0("/local/synthesis/output_u8m12Br1/site",modReRun$siteid[k],"chain1_coda.csv"), sep=",")
 chain2<-as.matrix(codaobj.init[[2]])
-write.table(chain2,paste0("/local/synthesis/output_u8m12Br1/site",modReRun$siteid[i],"chain2_coda.csv"), sep=",")
+write.table(chain2,paste0("/local/synthesis/output_u8m12Br1/site",modReRun$siteid[k],"chain2_coda.csv"), sep=",")
 chain3<-as.matrix(codaobj.init[[3]])
-write.table(chain3,paste0("/local/synthesis/output_u8m12Br1/site",modReRun$siteid[i],"chain3_coda.csv"), sep=",")
+write.table(chain3,paste0("/local/synthesis/output_u8m12Br1/site",modReRun$siteid[k],"chain3_coda.csv"), sep=",")
 			
 print(paste("coda out site number ", i))	
 #run mcmc plots on key params
 			
 mcmcplot(codaobj.init, parms=c("T.aveA1","TminA","TmaxA","T.aveS1",
 			"TmaxS","TminS","sig.muA","sig.muS","aZero", "bZero", "zeroC","peakWS", "peakWA", "peakSS", "peakSA"),
-			dir=paste0("/local/synthesis/output_u8m12Br1/site",modReRun$siteid[i]))		
+			dir=paste0("/local/synthesis/output_u8m12Br1/site",modReRun$siteid[k]))		
 #get summary and save to file
 
 print(paste("mcmcplot out site number ", i))	
