@@ -26,28 +26,53 @@ library(plyr)
 ############################
 ##Model run specifications##
 ############################
-
-#specify the number of runs
-Nruns <- 2
-
-#set up directories for all model output
-WDR <- c("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u7m11\\output_u7m11r1",
-        "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u7m11\\output_u7m11r2"
-)
+#read in model run file
+mrunF <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_5\\site_model_statusr2.csv")
+#get the unique runs
+AllmrunF <- data.frame(model.run=unique(mrunF$model.run))
 
 
-#indicate starting siteID of each run 
-startdim <- c(1,53)
-#last siteID of each run
-enddim <- c(52,104)
+#if in model run 12:
+# sites below 21 are in r1
+# sites above 21 and below 47 are in r4
+# sites 48 - 74 are in r3
+# sites 75- 210 are in r4
 
+#set up directory depending on the run
+
+WDR <- ifelse(mrunF$model.run=="m12"&mrunF$siteid <=21, "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u7m12\\r1\\output_u7m12r1",
+			ifelse(mrunF$model.run=="m12"&mrunF$siteid >21&mrunF$siteid<=47, "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u7m12\\r4\\output_u7m12r4",
+			ifelse(mrunF$model.run=="m12"&mrunF$siteid >47&mrunF$siteid<=74, "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u7m12\\r3\\output_u7m12r3",
+			ifelse(mrunF$model.run=="m12"&mrunF$siteid >74&mrunF$siteid<=210, "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u7m12\\r2\\output_u7m12r2",
+			ifelse(mrunF$model.run=="m12Br1", "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u8m12B\\r1\\output_u8m12Br1",
+			"c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u8m12B\\r2\\output_u8m12Br2")))))			
+mrunF$WDR <- WDR
+#run id 
+
+mrunF$runID <- ifelse(mrunF$model.run=="m12"&mrunF$siteid <=21,1,
+			ifelse(mrunF$model.run=="m12"&mrunF$siteid >21&mrunF$siteid<=47, 2,
+			ifelse(mrunF$model.run=="m12"&mrunF$siteid >47&mrunF$siteid<=74, 3,
+			ifelse(mrunF$model.run=="m12"&mrunF$siteid >74&mrunF$siteid<=210,4,
+			ifelse(mrunF$model.run=="m12Br1", 5,
+			6)))))
+
+WDRI <- c ("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u7m12\\r1\\output_u7m12r1",
+			"c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u7m12\\r4\\output_u7m12r4",
+			 "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u7m12\\r3\\output_u7m12r3",
+			 "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u7m12\\r2\\output_u7m12r2",
+			"c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u8m12B\\r1\\output_u8m12Br1",
+			"c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u8m12B\\r2\\output_u8m12Br2")	
+
+
+Nruns <- length(WDRI)			
 ############################
 ##Read in data            ##
 ############################
 
 #working directory for data
-#always refer to first model run
-dataWD <- WDR[1]
+#always refer to last model run
+#where data from additional sites will be
+dataWD <- WDRI[6]
 
 #read in data
 datAI <- read.csv(paste0(dataWD,"\\AirIDS.csv"))
@@ -64,36 +89,30 @@ datSM <- read.csv(paste0(dataWD,"\\Tsoil_model.csv"))
 datSM$decdateA <- datSM$decdate-1991
 datAM$decdateA <- datAM$decdate-1991
 
-datAveIS <- read.csv(paste0(dataWD,"\\IDaveoutS.csv"))
-datAveIA <- read.csv(paste0(dataWD,"\\IDaveoutA.csv"))
+datAveIS <- read.csv(paste0(dataWD,"\\SoilTaveIDS_SD.csv"))
+datAveIA <- read.csv(paste0(dataWD,"\\AirTaveIDS_SD.csv"))
 #get a list of the sites that should be expected
 siteall <- data.frame(siteid=unique(datSI$siteid))
 siteall$siteUI <- seq(1,dim(siteall)[1])
-
 
 #now organize rep IDS, need to pull correct ones for the site
 #in the run it is actually used in
 
 
-#calculate the run lengh
-rleng<-enddim-(startdim-1)
-#set up a site run id
-siterun <- rep(seq(1,Nruns),times=rleng)
-
 datSRALL<-list()
 datARALL<-list()
 
 for(i in 1:Nruns){
-	datSRALL[[i]]<-read.csv(paste0(WDR[i],"\\SoilrepIDS.csv"))
-	datARALL[[i]]<-read.csv(paste0(WDR[i],"\\AirrepIDS.csv"))
+	datSRALL[[i]]<-read.csv(paste0(WDRI[i],"\\SoilrepIDS.csv"))
+	datARALL[[i]]<-read.csv(paste0(WDRI[i],"\\AirrepIDS.csv"))
 }
 
 #get the correct IDS for each site generated in the site run
 datSR<-list()
 datAR<-list()
-for(i in 1:dim(siteall)[1]){
-	datSR[[i]]<-datSRALL[[siterun[i]]][datSRALL[[siterun[i]]]$siteid==siteall$siteid[i],]
-	datAR[[i]]<-datARALL[[siterun[i]]][datARALL[[siterun[i]]]$siteid==siteall$siteid[i],]
+for(i in 1:dim(mrunF)[1]){
+	datSR[[i]]<-datSRALL[[mrunF$runID[i]]][datSRALL[[mrunF$runID[i]]]$siteid==mrunF$siteid[i],]
+	datAR[[i]]<-datARALL[[mrunF$runID[i]]][datARALL[[mrunF$runID[i]]]$siteid==mrunF$siteid[i],]
 }
 
 datSRdf<-ldply(datSR, data.frame)
@@ -105,9 +124,9 @@ dexps<-"\\[*[[:digit:]]*\\]"
 datM<-list()
 datQ<-list()
 datC<-list()
-for(i in 1:dim(siteall)[1]){
-	datM[[i]]<-read.csv(paste0(WDR[siterun[i]],"\\site",siteall$siteid[i],"Temp_mod_stats.csv"))
-	datQ[[i]]<-read.csv(paste0(WDR[siterun[i]],"\\site",siteall$siteid[i],"Temp_mod_quant.csv"))
+for(i in 1:dim(mrunF)[1]){
+	datM[[i]]<-read.csv(paste0(mrunF$WDR[i],"\\site",mrunF$siteid[i],"Temp_mod_stats.csv"))
+	datQ[[i]]<-read.csv(paste0(mrunF$WDR[i],"\\site",mrunF$siteid[i],"Temp_mod_quant.csv"))
 	#join means and quantiles
 	datC[[i]]<-cbind(datM[[i]],datQ[[i]])
 	#make parms vectors
@@ -125,22 +144,22 @@ datNIS<-list()
 datAvAID <- list()
 datAvSID <-list()
 
-for(i in 1:dim(siteall)[1]){
+for(i in 1:dim(mrunF)[1]){
 
-	AirSDW[[i]]<-datAI[datAI$siteid==siteall$siteid[i],]
+	AirSDW[[i]]<-datAI[datAI$siteid==mrunF$siteid[i],]
 	AirSDW[[i]]$siteSDW<-seq(1,dim(AirSDW[[i]])[1])
 	
-	SoilSDW[[i]]<-datSI[datSI$siteid==siteall$siteid[i],]
+	SoilSDW[[i]]<-datSI[datSI$siteid==mrunF$siteid[i],]
 	SoilSDW[[i]]$siteSDW<-seq(1,dim(SoilSDW[[i]])[1])
 	
-	AirTA[[i]]<-datAT[datAT$siteid==siteall$siteid[i],]
-	SoilTA[[i]]<-datST[datST$siteid==siteall$siteid[i],]
+	AirTA[[i]]<-datAT[datAT$siteid==mrunF$siteid[i],]
+	SoilTA[[i]]<-datST[datST$siteid==mrunF$siteid[i],]
 	
 	#pull out N factor IDs by site
-	datNIS[[i]]<-datNI[datNI$siteid==siteall$siteid[i],]
+	datNIS[[i]]<-datNI[datNI$siteid==mrunF$siteid[i],]
 	#ave IDs
-	datAvSID[[i]] <- datAveIS[datAveIS$siteid==siteall$siteid[i],]
-	datAvAID[[i]] <- datAveIA[datAveIA$siteid==siteall$siteid[i],]
+	datAvSID[[i]] <- datAveIS[datAveIS$siteid==mrunF$siteid[i],]
+	datAvAID[[i]] <- datAveIA[datAveIA$siteid==mrunF$siteid[i],]
 	
 }
 
@@ -159,8 +178,7 @@ datSpeak<-list()
 datZero<-list()
 datNfreeze<-list()
 datNthaw<-list()
-datTaveA <- list()
-datTaveS <- list()
+datTaverageS <- list()
 datSTav<- list()
 datATav<- list()
 
@@ -171,7 +189,7 @@ datCAM<-list()
 dexps2<-"\\D"
 
 #subset first to only look at soil parms
-for(i in 1:dim(siteall)[1]){
+for(i in 1:dim(mrunF)[1]){
 
 	#max
 	datMax[[i]]<-datC[[i]][datC[[i]]$parms1=="TmaxS",]
@@ -193,9 +211,9 @@ for(i in 1:dim(siteall)[1]){
 	#
 	datNfreeze[[i]]<-datC[[i]][datC[[i]]$parms1=="Fn",]
 	datNfreeze[[i]]$Nseq<-seq(1,dim(datNfreeze[[i]])[1])
-
-
-	
+	#average temperature
+	datTaverageS[[i]]<-datC[[i]][datC[[i]]$parms1=="TaverageS",]
+	datTaverageS[[i]]$siteSDW <- seq(1,dim(datTaverageS[[i]])[1])
 	
 	#now join with ids
 
@@ -206,8 +224,7 @@ for(i in 1:dim(siteall)[1]){
 	datZero[[i]]<-join(datZero[[i]],SoilSDW[[i]], by="siteSDW", type="left")
 	datNthaw[[i]]<-join(datNthaw[[i]], datNIS[[i]], by="Nseq", type="left")
 	datNfreeze[[i]]<-join(datNfreeze[[i]], datNIS[[i]], by="Nseq", type="left")
-	datATav[[i]] <- join(datTaveA[[i]], datAvAID[[i]], by="Tave1IDA", type="left")
-	datSTav[[i]] <- join(datTaveS[[i]], datAvSID[[i]], by="Tave1ID", type="left")
+	datTaverageS[[i]] <- join(datTaverageS[[i]],SoilSDW[[i]], by="siteSDW", type="left")
 	
 	}
 	
@@ -218,14 +235,16 @@ for(i in 1:dim(siteall)[1]){
 	datSpeak<-ldply(datSpeak,data.frame)
 	datZero<-ldply(datZero, data.frame)
 	datNfreeze<-ldply(datNfreeze, data.frame)
-
+	datNthaw<-ldply(datNthaw, data.frame)
+	datAverageS <- ldply(datTaverageS, data.frame)
 #subset first to only look at air parms
 datMaxA<-list()
 datMinA<-list()
 datWpeakA<-list()
 datSpeakA<-list()
+datTaverageA <- list()
 
-for(i in 1:dim(siteall)[1]){	
+for(i in 1:dim(mrunF)[1]){	
 	#max
 	datMaxA[[i]]<-datC[[i]][datC[[i]]$parms1=="TmaxA",]
 	datMaxA[[i]]$siteSDW<-seq(1,dim(datMaxA[[i]])[1])
@@ -237,19 +256,25 @@ for(i in 1:dim(siteall)[1]){
 	datWpeakA[[i]]$siteSDW<-seq(1,dim(datWpeakA[[i]])[1])
 	datSpeakA[[i]]<-datC[[i]][datC[[i]]$parms1=="peakSA",]	
 	datSpeakA[[i]]$siteSDW<-seq(1,dim(datSpeakA[[i]])[1])
+	#average temperature
+	datTaverageA[[i]]<-datC[[i]][datC[[i]]$parms1=="TaverageA",]
+	datTaverageA[[i]]$siteSDW <- seq(1,dim(datTaverageA[[i]])[1])	
+	
 	
 	datMaxA[[i]]<-join(datMaxA[[i]],AirSDW[[i]], by="siteSDW", type="left")
 	datWpeakA[[i]]<-join(datWpeakA[[i]],AirSDW[[i]], by="siteSDW", type="left")
 	datMinA[[i]]<-join(datMinA[[i]],AirSDW[[i]], by="siteSDW", type="left")
 	datSpeakA[[i]]<-join(datSpeakA[[i]],AirSDW[[i]], by="siteSDW", type="left")
+	datTaverageA[[i]] <- join(datTaverageA[[i]],AirSDW[[i]], by="siteSDW", type="left")
 }
 	datTminA<-ldply(datMinA,data.frame)
 	datTmaxA<-ldply(datMaxA,data.frame)
 	datWpeakA<-ldply(datWpeakA,data.frame)
 	datSpeakA<-ldply(datSpeakA,data.frame)
+	datAverageA <- ldply(datTaverageA, data.frame)
 	#now pull out mu
 	
-for(i in 1:dim(siteall)[1]){
+for(i in 1:dim(mrunF)[1]){
 	datCSM[[i]]<-datC[[i]][datC[[i]]$parms1=="muS",]
 	datCAM[[i]]<-datC[[i]][datC[[i]]$parms1=="muA",]
 	datCSM[[i]]$depth<-datSM$depth[datSM$siteid==siteall$siteid[i]]
@@ -288,9 +313,8 @@ Tmin<-data.frame(datTmin[,1:2], pc2.5=datTmin[,5],pc97.5=datTmin[,9],
 
 Tmax<-data.frame(datTmax[,1:2], pc2.5=datTmax[,5],pc97.5=datTmax[,9],
 				datTmax[,12:14],parm=datTmax$parms1)
-
-Tave<- data.frame(datTaS[,1:2],pc2.5=datTaS[,5],pc97.5=datTaS[,9],
-				datTaS[,12:14],parm=datTaS$parms1)				
+Tave <- data.frame(datAverageS[,1:2], pc2.5=datAverageS[,5],pc97.5=datAverageS[,9],
+				datAverageS[,12:14],parm=datAverageS$parms1)
 
 SoilParm<-rbind(zeroC,Speak,Wpeak,Tmin,Tmax, Tave)				
 
@@ -307,7 +331,8 @@ TminA<-data.frame(datTminA[,1:2], pc2.5=datTminA[,5],pc97.5=datTminA[,9],
 TmaxA<-data.frame(datTmaxA[,1:2], pc2.5=datTmaxA[,5],pc97.5=datTmaxA[,9],
 				datTmaxA[,12:14],parm=datTmaxA$parms1)		
 
-TaveA <- data.frame(datTaA[,1:2],pc2.5=datTaA[,5],pc97.5=datTaA[,9],
-				datTaA[,12:14],parm=datTaA$parms1)					
+TaveA <-data.frame(datAverageA[,1:2], pc2.5=datAverageA[,5],pc97.5=datAverageA[,9],
+				datAverageA[,12:14],parm=datAverageA$parms1)
+				
 AirParm<-rbind(SpeakA, WpeakA,TminA,TmaxA, TaveA)
 
