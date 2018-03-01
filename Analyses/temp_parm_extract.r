@@ -16,7 +16,8 @@
 ##########################################################
 ### Outputs: dataframes of parameters with mean, sd,   ###
 ### CI, and all accompanying IDs and info              ###
-### dataframes are Nfactor, SoilParm, AirParm          ###
+### dataframes are Nfactor, SoilParm, AirParm,         ###
+### AirRepID,SoilRepID                                 ###
 ##########################################################
 ##########################################################
 
@@ -336,3 +337,7 @@ TaveA <-data.frame(datAverageA[,1:2], pc2.5=datAverageA[,5],pc97.5=datAverageA[,
 				
 AirParm<-rbind(SpeakA, WpeakA,TminA,TmaxA, TaveA)
 
+AirRepID <- datARdf
+SoilRepID <- datSRdf
+
+rm(list=setdiff(ls(), c("AirParm", "SoilParm","Nfactor", "AirRepID","SoilRepID")))
