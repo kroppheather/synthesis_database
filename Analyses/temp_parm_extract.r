@@ -17,7 +17,7 @@
 ### Outputs: dataframes of parameters with mean, sd,   ###
 ### CI, and all accompanying IDs and info              ###
 ### dataframes are Nfactor, SoilParm, AirParm,         ###
-### AirRepID,SoilRepID                                 ###
+### AirRepID,SoilRepID, datCSM, datCAM (lists)         ###
 ##########################################################
 ##########################################################
 
@@ -182,7 +182,8 @@ datNthaw<-list()
 datTaverageS <- list()
 datSTav<- list()
 datATav<- list()
-
+datAreps <- list()
+datSreps <- list()
 datCSM<-list()
 datCAM<-list()
 
@@ -227,7 +228,10 @@ for(i in 1:dim(mrunF)[1]){
 	datNfreeze[[i]]<-join(datNfreeze[[i]], datNIS[[i]], by="Nseq", type="left")
 	datTaverageS[[i]] <- join(datTaverageS[[i]],SoilSDW[[i]], by="siteSDW", type="left")
 	
-	}
+	#pull out reps
+	datAreps[[i]] <- datC[[i]][datC[[i]]$parms1=="TempA.rep",]
+	datSreps[[i]] <- datC[[i]][datC[[i]]$parms1=="TempS.rep",]
+}
 	
 
 	datTmin<-ldply(datMin,data.frame)
@@ -238,6 +242,11 @@ for(i in 1:dim(mrunF)[1]){
 	datNfreeze<-ldply(datNfreeze, data.frame)
 	datNthaw<-ldply(datNthaw, data.frame)
 	datAverageS <- ldply(datTaverageS, data.frame)
+	datSreps <- ldply(datSreps)
+	datAreps <- ldply(datAreps)
+	
+	
+	
 #subset first to only look at air parms
 datMaxA<-list()
 datMinA<-list()
@@ -278,8 +287,8 @@ for(i in 1:dim(mrunF)[1]){
 for(i in 1:dim(mrunF)[1]){
 	datCSM[[i]]<-datC[[i]][datC[[i]]$parms1=="muS",]
 	datCAM[[i]]<-datC[[i]][datC[[i]]$parms1=="muA",]
-	datCSM[[i]]$depth<-datSM$depth[datSM$siteid==siteall$siteid[i]]
-	datCAM[[i]]$depth<-datAM$height[datAM$siteid==siteall$siteid[i]]	
+	datCSM[[i]]$depth<-datSM$depth[datSM$siteid==mrunF$siteid[i]]
+	datCAM[[i]]$depth<-datAM$height[datAM$siteid==mrunF$siteid[i]]	
 	datCSM[[i]]$ID<-as.numeric(gsub(dexps2,"", row.names(datCSM[[i]] )))
 	datCAM[[i]]$ID<-as.numeric(gsub(dexps2,"", row.names(datCAM[[i]] )))
 	
@@ -337,7 +346,9 @@ TaveA <-data.frame(datAverageA[,1:2], pc2.5=datAverageA[,5],pc97.5=datAverageA[,
 				
 AirParm<-rbind(SpeakA, WpeakA,TminA,TmaxA, TaveA)
 
-AirRepID <- datARdf
-SoilRepID <- datSRdf
+#join rep id with replicate data
 
-rm(list=setdiff(ls(), c("AirParm", "SoilParm","Nfactor", "AirRepID","SoilRepID")))
+AirRepID <- cbind(datARdf, datAreps)
+SoilRepID <- cbind(datSRdf, datSreps)
+
+rm(list=setdiff(ls(), c("AirParm", "SoilParm","Nfactor", "AirRepID","SoilRepID", "datCSM", "datCAM")))
