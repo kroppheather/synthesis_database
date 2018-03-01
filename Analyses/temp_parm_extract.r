@@ -351,4 +351,5 @@ AirParm<-rbind(SpeakA, WpeakA,TminA,TmaxA, TaveA)
 AirRepID <- cbind(datARdf, datAreps)
 SoilRepID <- cbind(datSRdf, datSreps)
 
-rm(list=setdiff(ls(), c("AirParm", "SoilParm","Nfactor", "AirRepID","SoilRepID", "datCSM", "datCAM")))
+rm(list=setdiff(ls(), c("AirParm", "SoilParm","Nfactor", "AirRepID","SoilRepID", "datCSM", "datCAM","datAM", "datSM",
+						"datAT","datST","datNI","datAI","datSI")))
