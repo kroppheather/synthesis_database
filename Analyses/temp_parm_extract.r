@@ -28,7 +28,7 @@ library(plyr)
 ##Model run specifications##
 ############################
 #read in model run file
-mrunF <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_5\\site_model_statusr2.csv")
+mrunF <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_5\\site_model_statusr3.csv")
 #get the unique runs
 AllmrunF <- data.frame(model.run=unique(mrunF$model.run))
 
@@ -46,7 +46,8 @@ WDR <- ifelse(mrunF$model.run=="m12"&mrunF$siteid <=21, "c:\\Users\\hkropp\\Goog
 			ifelse(mrunF$model.run=="m12"&mrunF$siteid >47&mrunF$siteid<=74, "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u7m12\\r3\\output_u7m12r3",
 			ifelse(mrunF$model.run=="m12"&mrunF$siteid >74&mrunF$siteid<=210, "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u7m12\\r2\\output_u7m12r2",
 			ifelse(mrunF$model.run=="m12Br1", "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u8m12B\\r1\\output_u8m12Br1",
-			"c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u8m12B\\r2\\output_u8m12Br2")))))			
+			ifelse(mrunF$model.run=="m12Br2","c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u8m12B\\r2\\output_u8m12Br2",
+			"c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u8m12B\\r3\\output_u8m12Br3"))))))			
 mrunF$WDR <- WDR
 #run id 
 
@@ -55,14 +56,15 @@ mrunF$runID <- ifelse(mrunF$model.run=="m12"&mrunF$siteid <=21,1,
 			ifelse(mrunF$model.run=="m12"&mrunF$siteid >47&mrunF$siteid<=74, 3,
 			ifelse(mrunF$model.run=="m12"&mrunF$siteid >74&mrunF$siteid<=210,4,
 			ifelse(mrunF$model.run=="m12Br1", 5,
-			6)))))
+			ifelse(mrunF$model.run=="m12Br2",6,7))))))
 
 WDRI <- c ("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u7m12\\r1\\output_u7m12r1",
 			"c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u7m12\\r4\\output_u7m12r4",
 			 "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u7m12\\r3\\output_u7m12r3",
 			 "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u7m12\\r2\\output_u7m12r2",
 			"c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u8m12B\\r1\\output_u8m12Br1",
-			"c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u8m12B\\r2\\output_u8m12Br2")	
+			"c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u8m12B\\r2\\output_u8m12Br2",
+			"c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u8m12B\\r3\\output_u8m12Br3")	
 
 
 Nruns <- length(WDRI)			
@@ -73,7 +75,7 @@ Nruns <- length(WDRI)
 #working directory for data
 #always refer to last model run
 #where data from additional sites will be
-dataWD <- WDRI[6]
+dataWD <- WDRI[7]
 
 #read in data
 datAI <- read.csv(paste0(dataWD,"\\AirIDS.csv"))
