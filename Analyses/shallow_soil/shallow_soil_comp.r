@@ -62,7 +62,7 @@ for(i in 1:dim(compI)[1]){
 		}else{
 			abline(h=summary(fit[[i]])$coefficients[1,1], lwd=2, col="red", lty=3)
 		}
-		
+		mtext(paste("p=",round(summary(fit[[i]])$coefficients[2,4],3)), side=3, line=6, cex=2) 
 		mtext(paste("R2 =",round(summary(fit[[i]])$r.squared,3)), side=3, line=3, cex=2) 
 		mtext(paste(parmV[compI$c2[i]],"=",round(summary(fit[[i]])$coefficients[1,1],3), " + ", round(summary(fit[[i]])$coefficients[2,1],3),"x",parmV[compI$c1[i]]), side=3, line=1, cex=2)
 		
