@@ -28,7 +28,7 @@ library(plyr)
 ##Model run specifications##
 ############################
 #read in model run file
-mrunF <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_5\\site_model_statusr3.csv")
+mrunF <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_5\\site_model_statusr4.csv")
 #get the unique runs
 AllmrunF <- data.frame(model.run=unique(mrunF$model.run))
 
