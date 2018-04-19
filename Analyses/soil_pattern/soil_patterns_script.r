@@ -32,6 +32,13 @@ datV <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\vege_clas
 datVI <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\vegeID.csv")
 
 #######################################
+#####libraries                    ##### 
+#######################################
+library(rjags)
+library(coda)
+library(mcmcplots)
+
+#######################################
 #####set directories              ##### 
 #######################################
 
@@ -67,25 +74,6 @@ for(i in 1:length(parmV)){
 	SoilL[[i]] <- SoilParm[SoilParm$parm==parmV[i],]
 
 }
-
-
-
-#######################################
-#####set up model run             ##### 
-#######################################
-
-
-
-
-
-
-
-#######################################
-#####make plot of data            ##### 
-#######################################
-
-#make figure for soil comparisons
-
 #pull out only revelevant comparisons that are meaningful
 
 #Tmin vs Tave
@@ -94,13 +82,71 @@ for(i in 1:length(parmV)){
 #Tmax vs Tave
 #Tmax vs pmax
 #pmin vs Tmax
-
 #set up comparisions
 #x values
 xcomp <- c(6,5,3,6,2)
 ycomp <- c(4,4,4,5,5)
 
+#######################################
+#####set up model run             ##### 
+#######################################
+#data frame of all observations
+SoilCompDF <- data.frame(xobs = c(SoilL[[xcomp[1]]]$Mean,SoilL[[xcomp[2]]]$Mean,SoilL[[xcomp[3]]]$Mean,SoilL[[xcomp[4]]]$Mean,SoilL[[xcomp[5]]]$Mean),
+						yobs= c(SoilL[[ycomp[1]]]$Mean,SoilL[[ycomp[2]]]$Mean,SoilL[[ycomp[3]]]$Mean,SoilL[[ycomp[4]]]$Mean,SoilL[[ycomp[5]]]$Mean),
+						xSD=c(SoilL[[xcomp[1]]]$SD,SoilL[[xcomp[2]]]$SD,SoilL[[xcomp[3]]]$SD,SoilL[[xcomp[4]]]$SD,SoilL[[xcomp[5]]]$SD),
+						ySD=c(SoilL[[ycomp[1]]]$SD,SoilL[[ycomp[2]]]$SD,SoilL[[ycomp[3]]]$SD,SoilL[[ycomp[4]]]$SD,SoilL[[ycomp[5]]]$SD),
+						vegeClass = c(SoilL[[xcomp[1]]]$vegeclass,SoilL[[xcomp[2]]]$vegeclass,SoilL[[xcomp[3]]]$vegeclass,SoilL[[xcomp[4]]]$vegeclass,SoilL[[xcomp[5]]]$vegeclass),
+						comp= rep(seq(1,length(xcomp)), each=dim(SoilL[[xcomp[1]]])[1]))
 
+#data frame of vege class and comparision ids
+
+vegeComp <- unique(data.frame(vegeClass=SoilCompDF$vegeClass,comp=SoilCompDF$comp))						
+vegeComp <- vegeComp[order(vegeComp$comp,vegeComp$vegeClass),]						
+vegeComp$vegeCompID <- seq(1,dim(vegeComp)[1])	
+
+#join back into soildf
+SoilCompDF2 <- join(SoilCompDF,vegeComp, by=c("vegeClass","comp"),type="left")
+					
+datalist <- list(Nobs=dim(SoilCompDF2)[1],
+				yvar=SoilCompDF2$yobs,
+				sig.mod=SoilCompDF2$ySD,
+				xvar=SoilCompDF2$xobs,
+				compVege=SoilCompDF2$vegeCompID,
+				NcompVege=dim(vegeComp)[1],
+				comp=vegeComp$comp,
+				Ncomp=length(xcomp))
+				
+parms <- c("rep.yvar","sig.compVege","beta0","beta1","mu.beta0","mu.beta1","sig.beta0","sig.beta1")
+
+comp.modI<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Analyses\\soil_pattern\\soil_patterns_model_code.r",
+						data=datalist,
+						n.adapt=50000,
+						n.chains=3)
+
+comp.sample <- coda.samples(comp.modI,variable.names=parms,
+                       n.iter=150000, thin=50)	
+					   
+mcmcplot(comp.sample, parms=c("sig.compVege","beta0","beta1","mu.beta0","mu.beta1","sig.beta0","sig.beta1"),
+			dir=paste0(modDI,"\\history"))	
+					   
+mod.out <- summary(comp.sample)
+
+write.table(Mod.out$statistics,paste0(modDI,"\\comp_mod_stats.csv"),
+			sep=",",row.names=TRUE)
+write.table(Mod.out$quantiles,paste0(modDI,"\\comp_mod_quant.csv"),
+			sep=",",row.names=TRUE)
+
+chain1<-as.matrix(comp.sample [[1]])
+write.table(chain1,paste0(modDI,"\\chain1_coda.csv"), sep=",")
+chain2<-as.matrix(comp.sample [[2]])
+write.table(chain2,paste0(modDI,"\\chain2_coda.csv"), sep=",")
+chain3<-as.matrix(comp.sample [[3]])
+write.table(chain3,paste0(modDI,"\\chain3_coda.csv"), sep=",")
+#######################################
+#####make plot of data            ##### 
+#######################################
+
+#make figure for soil comparisons
 
 
 #set up correlation panel
