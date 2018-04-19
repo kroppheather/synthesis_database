@@ -23,8 +23,8 @@
 source("c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Analyses\\temp_parm_extract.r")
 
 #read in vege class data: check that patterns don't vary between vege type
-datV <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_5\\vege_class.csv")
-datVI <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_5\\vegeID.csv")
+datV <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\vege_class.csv")
+datVI <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\vegeID.csv")
 #set up a plot directory
 plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\shallow_soil\\comp"
 
