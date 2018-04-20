@@ -86,7 +86,8 @@ for(i in 1:length(parmV)){
 #x values
 xcomp <- c(6,5,3,6,2)
 ycomp <- c(4,4,4,5,5)
-
+compNameX <- parmV[xcomp]
+compNameY <- parmV[ycomp]
 #######################################
 #####set up model run             ##### 
 #######################################
@@ -131,9 +132,9 @@ mcmcplot(comp.sample, parms=c("sig.compVege","beta0","beta1","mu.beta0","mu.beta
 					   
 mod.out <- summary(comp.sample)
 
-write.table(Mod.out$statistics,paste0(modDI,"\\comp_mod_stats.csv"),
+write.table(mod.out$statistics,paste0(modDI,"\\comp_mod_stats.csv"),
 			sep=",",row.names=TRUE)
-write.table(Mod.out$quantiles,paste0(modDI,"\\comp_mod_quant.csv"),
+write.table(mod.out$quantiles,paste0(modDI,"\\comp_mod_quant.csv"),
 			sep=",",row.names=TRUE)
 
 chain1<-as.matrix(comp.sample [[1]])
@@ -142,9 +143,94 @@ chain2<-as.matrix(comp.sample [[2]])
 write.table(chain2,paste0(modDI,"\\chain2_coda.csv"), sep=",")
 chain3<-as.matrix(comp.sample [[3]])
 write.table(chain3,paste0(modDI,"\\chain3_coda.csv"), sep=",")
+
+
+#read in model results 
+
+datM <- read.csv(paste0(modDI,"\\comp_mod_stats.csv"))
+datQ <- read.csv(paste0(modDI,"\\comp_mod_quant.csv"))
+
+datC <- cbind(datM,datQ)
+
+#pull out parm names
+dexps <- "\\[*[[:digit:]]*\\]"
+datC$parms <- gsub(dexps,"", rownames(datC))
+#pull out numbers
+datSP <- character(0)
+for(i in 1:dim(datC)[1]){
+	datSP[i] <- gsub("\\D","",strsplit(rownames(datC), "\\[")[[i]][2])
+}
+
+datC$parmID <- as.numeric(datSP)
+
+#look at regression coefficients
+beta0 <- datC[datC$parms=="beta0",]
+beta1 <- datC[datC$parms=="beta1",]
+
+mubeta0 <- datC[datC$parms=="mu.beta0",]
+mubeta1 <- datC[datC$parms=="mu.beta1",]
+
+#match up ids
+colnames(beta0)[11] <- "vegeCompID"
+colnames(beta1)[11] <- "vegeCompID"
+
+beta0 <- join(beta0, vegeComp, by=c("vegeCompID"), type="left")
+beta1 <- join(beta1, vegeComp, by=c("vegeCompID"), type="left")
+
+mubeta0$compNameX <- compNameX
+mubeta0$compNameY <- compNameY
+mubeta1$compNameX <- compNameX
+mubeta1$compNameY <- compNameY
+
+yl <- c(-40,-40,-40,-1,-1)
+yh <- c(1,1,1,25,25)
+xseq <- seq(1,17,by=2)
+
+#make a plot of the parms
+for(i in 1:length(compNameX)){
+	jpeg(paste0(plotDI,"\\model\\run1\\parms",compNameX[i],"_vs_",compNameY[i],".jpg"), width=2000, height=2000, units="px",quality=100)
+		par(mfrow=c(1,2))
+			plot(c(0,1),c(0,1), type="n", ylim=c(yl[i],yh[i]), xlim=c(0,20), xlab=" ", ylab=" ", xaxs="i",yaxs="i", axes=FALSE)
+				for(j in 1:9){
+					
+				arrows(xseq[j], beta0$X2.5.[beta0$comp==i&beta0$vegeClass==j],xseq[j], beta0$X97.5.[beta0$comp==i&beta0$vegeClass==j],
+						lwd=2,code=0)
+					
+					polygon(c(xseq[j]-.5,xseq[j]-.5,xseq[j]+.5,xseq[j]+.5),
+							c(beta0$X25.[beta0$comp==i&beta0$vegeClass==j],beta0$X75.[beta0$comp==i&beta0$vegeClass==j],
+							beta0$X75.[beta0$comp==i&beta0$vegeClass==j],beta0$X25.[beta0$comp==i&beta0$vegeClass==j]),
+							col="cornflowerblue")		
+				
+				arrows(xseq[j]-.5,beta0$Mean[beta0$comp==i&beta0$vegeClass==j],xseq[j]+.5,beta0$Mean[beta0$comp==i&beta0$vegeClass==j],
+						lwd=3,code=0)
+				}
+		arrows(xseq[j], beta0$X2.5.[beta0$comp==i&beta0$vegeClass==j],xseq[j], beta0$X97.5.[beta0$comp==i&beta0$vegeClass==j],
+						lwd=2,code=0)			
+		
+		arrows(19, mubeta0$X2.5.[i],19,mubeta0$X97.5.[i],
+						lwd=2,code=0)
+						
+		polygon(c(18.5,18.5,19.5,19.5), c(mubeta0$X25.[i],	mubeta0$X75.[i],mubeta0$X75.[i],mubeta0$X25.[i]),
+				col="darkorchid4")
+		arrows(18.5,mubeta0$Mean[i],19.5,	mubeta0$Mean[i], lwd=3,code=0)
+		
+	plot(c(0,1),c(0,1), type="n", ylim=c(yl[i],yh[i]), xlim=c(0,20), xlab=" ", ylab=" ", xaxs="i",yaxs="i", axes=FALSE)
+	box(which="plot")
+	dev.off()
+}
+
+
+
 #######################################
 #####make plot of data            ##### 
 #######################################
+
+
+
+
+
+
+
 
 #make figure for soil comparisons
 
