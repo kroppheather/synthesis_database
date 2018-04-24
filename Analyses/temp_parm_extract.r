@@ -50,7 +50,8 @@ WDR <- ifelse(mrunF$model.run=="m12"&mrunF$siteid <=21, "c:\\Users\\hkropp\\Goog
 			ifelse(mrunF$model.run=="m12Br3","c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u8m12B\\r3\\output_u8m12Br3",
 			ifelse(mrunF$model.run=="m12Br4","c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u8m12B\\r4\\output_u8m12Br4",
 			ifelse(mrunF$model.run=="m12Br5","c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u8m12B\\r5\\output_u8m12Br5",
-			"c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u9m12B\\r1\\output_u9m12Br1")))))))))			
+			ifelse(mrunF$model.run=="u9m12Br1","c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u9m12B\\r1\\output_u9m12Br1",
+			"c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u9m12B\\r2\\output_u9m12Br2"))))))))))			
 mrunF$WDR <- WDR
 #run id 
 
@@ -62,7 +63,8 @@ mrunF$runID <- ifelse(mrunF$model.run=="m12"&mrunF$siteid <=21,1,
 			ifelse(mrunF$model.run=="m12Br2",6,
 			ifelse(mrunF$model.run=="m12Br3",7,
 			ifelse(mrunF$model.run=="m12Br4",8,
-			ifelse(mrunF$model.run=="m12Br5",9,10)))))))))
+			ifelse(mrunF$model.run=="m12Br5",9,
+			ifelse(mrunF$model.run=="u9m12Br1",10,11))))))))))
 
 WDRI <- c ("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u7m12\\r1\\output_u7m12r1",
 			"c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u7m12\\r4\\output_u7m12r4",
@@ -73,7 +75,8 @@ WDRI <- c ("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u7m12\\r1\\output_
 			"c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u8m12B\\r3\\output_u8m12Br3",
 			"c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u8m12B\\r4\\output_u8m12Br4",
 			"c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u8m12B\\r5\\output_u8m12Br5",
-			"c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u9m12B\\r1\\output_u9m12Br1")	
+			"c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u9m12B\\r1\\output_u9m12Br1",
+			"c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u9m12B\\r2\\output_u9m12Br2")	
 
 
 Nruns <- length(WDRI)			
@@ -84,7 +87,7 @@ Nruns <- length(WDRI)
 #working directory for data
 #always refer to last model run
 #where data from additional sites will be
-dataWD <- WDRI[10]
+dataWD <- WDRI[11]
 
 #read in data
 datAI <- read.csv(paste0(dataWD,"\\AirIDS.csv"))
