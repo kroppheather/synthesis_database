@@ -46,6 +46,10 @@ library(mcmcplots)
 plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\soil_pattern\\plots"
 #model directory
 modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\soil_pattern\\model\\run2"
+Nrun <-2
+#indicate if a model run is occuring
+modRun <- 0
+
 
 #######################################
 #####organize data                ##### 
@@ -89,10 +93,7 @@ ycomp <- c(6,5,4,6,5)
 compNameX <- parmV[xcomp]
 compNameY <- parmV[ycomp]
 xcent <- SoilMs[xcomp]
-#######################################
-#####set up model run             ##### 
-#######################################
-#data frame of all observations
+
 SoilCompDF <- data.frame(xobs = c(SoilL[[xcomp[1]]]$Mean,SoilL[[xcomp[2]]]$Mean,SoilL[[xcomp[3]]]$Mean,SoilL[[xcomp[4]]]$Mean,SoilL[[xcomp[5]]]$Mean),
 						yobs= c(SoilL[[ycomp[1]]]$Mean,SoilL[[ycomp[2]]]$Mean,SoilL[[ycomp[3]]]$Mean,SoilL[[ycomp[4]]]$Mean,SoilL[[ycomp[5]]]$Mean),
 						xSD=c(SoilL[[xcomp[1]]]$SD,SoilL[[xcomp[2]]]$SD,SoilL[[xcomp[3]]]$SD,SoilL[[xcomp[4]]]$SD,SoilL[[xcomp[5]]]$SD),
@@ -109,7 +110,13 @@ vegeComp$vegeCompID <- seq(1,dim(vegeComp)[1])
 
 #join back into soildf
 SoilCompDF2 <- join(SoilCompDF,vegeComp, by=c("vegeClass","comp"),type="left")
-					
+
+
+#######################################
+#####set up model run             ##### 
+#######################################
+#data frame of all observations
+if(modRun==1){					
 datalist <- list(Nobs=dim(SoilCompDF2)[1],
 				yvar=SoilCompDF2$yobs,
 				sig.mod=SoilCompDF2$ySD,
@@ -147,6 +154,16 @@ chain2<-as.matrix(comp.sample [[2]])
 write.table(chain2,paste0(modDI,"\\chain2_coda.csv"), sep=",")
 chain3<-as.matrix(comp.sample [[3]])
 write.table(chain3,paste0(modDI,"\\chain3_coda.csv"), sep=",")
+}
+#######################################
+#####end model run                ##### 
+#######################################
+
+
+
+#######################################
+#####plot model results           ##### 
+#######################################
 
 
 #read in model results 
@@ -186,15 +203,26 @@ mubeta0$compNameY <- compNameY
 mubeta1$compNameX <- compNameX
 mubeta1$compNameY <- compNameY
 
-yl <- c(-40,-40,-40,-1,-1)
-yh <- c(1,1,1,25,25)
+yl <- c(-10,0,-40,-10,-1)
+yh <- c(5,30,1,5,25)
+
+yl2 <- c(-.1,-1,-100,-1,-100)
+yh2 <- c(.6,1,100,2,100)
+
 xseq <- seq(1,17,by=2)
+
+VIlab <- c("herb bare", "nontussock T","tussock T","short shrub T", "tall shrub T","wetland T", "evergreen B","deciduous B", "mixed B")
 
 #make a plot of the parms
 for(i in 1:length(compNameX)){
-	jpeg(paste0(plotDI,"\\model\\run1\\parms",compNameX[i],"_vs_",compNameY[i],".jpg"), width=2000, height=2000, units="px",quality=100)
-		par(mfrow=c(1,2))
+	jpeg(paste0(plotDI,"\\model\\run",Nrun,"\\parms",compNameX[i],"_vs_",compNameY[i],".jpg"), width=3000, height=1000, units="px",quality=100)
+		par(mfrow=c(1,2), mai=c(2,2,2,2))
 			plot(c(0,1),c(0,1), type="n", ylim=c(yl[i],yh[i]), xlim=c(0,20), xlab=" ", ylab=" ", xaxs="i",yaxs="i", axes=FALSE)
+			
+			abline(h=mubeta0$Mean[i], lwd=3)	
+			polygon(c(0,0,20,20), c(mubeta0$X2.5.[i],	mubeta0$X97.5.[i],mubeta0$X97.5.[i],mubeta0$X2.5.[i]),
+				col=rgb(153/255,50/255,204/255,.3),border=NA)
+
 				for(j in 1:9){
 					
 				arrows(xseq[j], beta0$X2.5.[beta0$comp==i&beta0$vegeClass==j],xseq[j], beta0$X97.5.[beta0$comp==i&beta0$vegeClass==j],
@@ -211,14 +239,37 @@ for(i in 1:length(compNameX)){
 		arrows(xseq[j], beta0$X2.5.[beta0$comp==i&beta0$vegeClass==j],xseq[j], beta0$X97.5.[beta0$comp==i&beta0$vegeClass==j],
 						lwd=2,code=0)			
 		
-		arrows(19, mubeta0$X2.5.[i],19,mubeta0$X97.5.[i],
+
+		axis(2,seq(yl[i],yh[i],by=5),las=2, cex.axis=1.5)
+		axis(1, xseq, VIlab, cex.axis=1.5)
+		mtext(paste(compNameY[i]), side=2, cex=2,line=3)
+		mtext(paste("Intercept at average", compNameX[i]), side=1, cex=2,line=3)
+	plot(c(0,1),c(0,1), type="n", ylim=c(yl2[i],yh2[i]), xlim=c(0,20), xlab=" ", ylab=" ", xaxs="i",yaxs="i", axes=FALSE)
+	
+	
+	
+		abline(h=mubeta1$Mean[i], lwd=3)	
+		polygon(c(0,0,20,20), c(mubeta1$X2.5.[i],	mubeta1$X97.5.[i],mubeta1$X97.5.[i],mubeta1$X2.5.[i]),
+		col=rgb(153/255,50/255,204/255,.3),border=NA)
+		abline(h=0, lwd=4, lty=3, col="grey35")
+		for(j in 1:9){
+					
+				arrows(xseq[j], beta1$X2.5.[beta1$comp==i&beta1$vegeClass==j],xseq[j], beta1$X97.5.[beta1$comp==i&beta1$vegeClass==j],
 						lwd=2,code=0)
-						
-		polygon(c(18.5,18.5,19.5,19.5), c(mubeta0$X25.[i],	mubeta0$X75.[i],mubeta0$X75.[i],mubeta0$X25.[i]),
-				col="darkorchid4")
-		arrows(18.5,mubeta0$Mean[i],19.5,	mubeta0$Mean[i], lwd=3,code=0)
-		
-	plot(c(0,1),c(0,1), type="n", ylim=c(yl[i],yh[i]), xlim=c(0,20), xlab=" ", ylab=" ", xaxs="i",yaxs="i", axes=FALSE)
+					
+					polygon(c(xseq[j]-.5,xseq[j]-.5,xseq[j]+.5,xseq[j]+.5),
+							c(beta1$X25.[beta1$comp==i&beta1$vegeClass==j],beta1$X75.[beta1$comp==i&beta1$vegeClass==j],
+							beta1$X75.[beta1$comp==i&beta1$vegeClass==j],beta1$X25.[beta1$comp==i&beta1$vegeClass==j]),
+							col="cornflowerblue")		
+				
+				arrows(xseq[j]-.5,beta1$Mean[beta1$comp==i&beta1$vegeClass==j],xseq[j]+.5,beta1$Mean[beta1$comp==i&beta1$vegeClass==j],
+						lwd=3,code=0)
+				}
+	
+		axis(2,round(seq(yl2[i],yh2[i],length.out=5),2),las=2, cex.axis=1.5)
+		axis(1, xseq, VIlab, cex.axis=1.5)
+		mtext(paste(compNameY[i]), side=2, cex=2,line=3)
+		mtext(paste("slope with", compNameX[i]), side=1, cex=2,line=3)
 	box(which="plot")
 	dev.off()
 }
