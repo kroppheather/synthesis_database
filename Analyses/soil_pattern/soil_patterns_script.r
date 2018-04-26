@@ -84,8 +84,8 @@ for(i in 1:length(parmV)){
 #pmin vs Tmax
 #set up comparisions
 #x values
-xcomp <- c(6,5,3,6,2)
-ycomp <- c(4,4,4,5,5)
+xcomp <- c(4,4,3,5,2)
+ycomp <- c(6,5,4,6,5)
 compNameX <- parmV[xcomp]
 compNameY <- parmV[ycomp]
 #######################################
