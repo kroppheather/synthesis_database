@@ -8,7 +8,7 @@ model{
 	for(i in 1:Nobs){
 		#likelihood
 		yvar[i] ~dnorm(mu.yvar[i], tau.yvar[i])
-		mu.yvar[i] <- beta0[compVege[i]]+ beta1[compVege[i]]*xvar[i]
+		mu.yvar[i] <- beta0[compVege[i]]+ beta1[compVege[i]]*(xvar[i]-xvarCenter[compX[i]])
 		#replicated data
 		rep.yvar[i] ~dnorm(mu.yvar[i], tau.yvar[compVege[i]])
 		#variance model includes variation from group mean and standard deviation from model runs

@@ -69,10 +69,10 @@ SoilParm <- join(SoilParm,vegeclassColors,by="vegeclass",type="left")
 					
 
 SoilL <- list()
-
+SoilMs <- numeric(0)
 for(i in 1:length(parmV)){
 	SoilL[[i]] <- SoilParm[SoilParm$parm==parmV[i],]
-
+	SoilMs[i] <- round(mean(SoilL[[i]]$Mean),3)
 }
 #pull out only revelevant comparisons that are meaningful
 
@@ -88,6 +88,7 @@ xcomp <- c(4,4,3,5,2)
 ycomp <- c(6,5,4,6,5)
 compNameX <- parmV[xcomp]
 compNameY <- parmV[ycomp]
+xcent <- SoilMs[xcomp]
 #######################################
 #####set up model run             ##### 
 #######################################
@@ -96,7 +97,8 @@ SoilCompDF <- data.frame(xobs = c(SoilL[[xcomp[1]]]$Mean,SoilL[[xcomp[2]]]$Mean,
 						yobs= c(SoilL[[ycomp[1]]]$Mean,SoilL[[ycomp[2]]]$Mean,SoilL[[ycomp[3]]]$Mean,SoilL[[ycomp[4]]]$Mean,SoilL[[ycomp[5]]]$Mean),
 						xSD=c(SoilL[[xcomp[1]]]$SD,SoilL[[xcomp[2]]]$SD,SoilL[[xcomp[3]]]$SD,SoilL[[xcomp[4]]]$SD,SoilL[[xcomp[5]]]$SD),
 						ySD=c(SoilL[[ycomp[1]]]$SD,SoilL[[ycomp[2]]]$SD,SoilL[[ycomp[3]]]$SD,SoilL[[ycomp[4]]]$SD,SoilL[[ycomp[5]]]$SD),
-						vegeClass = c(SoilL[[xcomp[1]]]$vegeclass,SoilL[[xcomp[2]]]$vegeclass,SoilL[[xcomp[3]]]$vegeclass,SoilL[[xcomp[4]]]$vegeclass,SoilL[[xcomp[5]]]$vegeclass),
+						vegeClass = c(SoilL[[xcomp[1]]]$vegeclass,SoilL[[xcomp[2]]]$vegeclass,SoilL[[xcomp[3]]]$vegeclass,
+										SoilL[[xcomp[4]]]$vegeclass,SoilL[[xcomp[5]]]$vegeclass),			
 						comp= rep(seq(1,length(xcomp)), each=dim(SoilL[[xcomp[1]]])[1]))
 
 #data frame of vege class and comparision ids
@@ -113,6 +115,8 @@ datalist <- list(Nobs=dim(SoilCompDF2)[1],
 				sig.mod=SoilCompDF2$ySD,
 				xvar=SoilCompDF2$xobs,
 				compVege=SoilCompDF2$vegeCompID,
+				compX=SoilCompDF2$comp,
+				xvarCenter=xcent,
 				NcompVege=dim(vegeComp)[1],
 				comp=vegeComp$comp,
 				Ncomp=length(xcomp))
