@@ -48,7 +48,7 @@ plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\soil_patt
 modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\soil_pattern\\model\\run3"
 Nrun <-3
 #indicate if a model run is occuring
-modRun <- 1
+modRun <- 0
 
 
 #######################################
