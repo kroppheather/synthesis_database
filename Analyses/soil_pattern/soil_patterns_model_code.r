@@ -7,13 +7,15 @@ model{
 
 	for(i in 1:Nobs){
 		#likelihood
-		yvar[i] ~dnorm(mu.yvar[i], tau.yvar[i])
-		mu.yvar[i] <- beta0[compVege[i]]+ beta1[compVege[i]]*(xvar[i]-xvarCenter[compX[i]])
+		yvar[i] ~ dnorm(mu.yvar[i], tau.yvar[i])
+		mu.yvar[i] <- beta0[compVege[i]]+ beta1[compVege[i]]*(mu.xvar[i]-xvarCenter[compX[i]])
 		#replicated data
-		rep.yvar[i] ~dnorm(mu.yvar[i], tau.yvar[compVege[i]])
+		rep.yvar[i] ~ dnorm(mu.yvar[i], tau.yvar[compVege[i]])
 		#variance model includes variation from group mean and standard deviation from model runs
 		tau.yvar[i] <- pow(sig.yvar[i],-2)
 		sig.yvar[i] <- sig.mod[i] + sig.compVege[compVege[i]]
+		mu.xvar[i] ~ dnorm(xvar[i], tau.xvar[i])
+		tau.xvar[i] <- pow(sig.xvar[i],-2)
 	}
 	#hierarchical priors for regression coefficients
 	for(i in 1:NcompVege){

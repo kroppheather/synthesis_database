@@ -45,10 +45,10 @@ library(mcmcplots)
 #set up a plot directory
 plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\soil_pattern\\plots"
 #model directory
-modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\soil_pattern\\model\\run2"
-Nrun <-2
+modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\soil_pattern\\model\\run3"
+Nrun <-3
 #indicate if a model run is occuring
-modRun <- 0
+modRun <- 1
 
 
 #######################################
@@ -121,6 +121,7 @@ datalist <- list(Nobs=dim(SoilCompDF2)[1],
 				yvar=SoilCompDF2$yobs,
 				sig.mod=SoilCompDF2$ySD,
 				xvar=SoilCompDF2$xobs,
+				sig.xvar=SoilCompDF2$xSD,
 				compVege=SoilCompDF2$vegeCompID,
 				compX=SoilCompDF2$comp,
 				xvarCenter=xcent,
