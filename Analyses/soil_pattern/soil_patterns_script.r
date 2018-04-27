@@ -282,12 +282,6 @@ for(i in 1:length(compNameX)){
 #######################################
 
 
-
-
-
-
-
-
 #make figure for soil comparisons
 
 
@@ -320,6 +314,7 @@ minS <- seq(-35,0, by=5)
 maxS <- seq(0,20,by=5)
 pminS <- seq(.25,.55,by=.1)
 pmaxS <- seq(0.65,.95,by=.1)
+
 
 jpeg(paste0(plotDI,"\\soil_comp.jpg"), width=5500, height=5000, units="px",quality=100)
 	layout(matrix(seq(1,6),byrow=TRUE,ncol=3), width=rep(lcm(wd),6), height=rep(lcm(hd),6))
@@ -386,3 +381,221 @@ jpeg(paste0(plotDI,"\\soil_comp.jpg"), width=5500, height=5000, units="px",quali
 	legend(0,10,paste(datVI$vegename),pch=19,col=as.character(vegeclassColors$coli), bty="n",cex=11)	
 	box(which="plot")
 dev.off()
+
+
+
+#######################################
+##### plot of regression result   ##### 
+#######################################
+
+beta0$sig <- ifelse(beta0$X2.5.<0&beta0$X97.5.<0,1,
+				ifelse(beta0$X2.5.>0&beta0$X97.5.>0,1,0))
+
+beta1$sig <- ifelse(beta1$X2.5.<0&beta1$X97.5.<0,1,
+				ifelse(beta1$X2.5.>0&beta1$X97.5.>0,1,0))
+				
+mubeta0$sig <- ifelse(mubeta0$X2.5.<0&mubeta0$X97.5.<0,1,
+				ifelse(mubeta0$X2.5.>0&mubeta0$X97.5.>0,1,0))
+
+mubeta1$sig <- ifelse(mubeta1$X2.5.<0&mubeta1$X97.5.<0,1,
+				ifelse(mubeta1$X2.5.>0&mubeta1$X97.5.>0,1,0))				
+				
+
+#set up correlation panel
+wd <- 50
+hd <- 50
+#set up axis limits
+aveL <- -15
+aveH <- 10
+minL <- -35
+minH <- 1
+maxL <- -1
+maxH <- 22
+pminL <- .15
+pminH <- 0.62
+pmaxL <- 0.58
+pmaxH <- 1
+xlL <- 0
+xlH <- 10
+ylL <- 0
+ylH <- 10
+#sizes
+px <- 10
+lwt <- 10
+mx <- 8
+lx <- 10
+#labels
+aveS <- seq(-15,5,by=5)
+minS <- seq(-35,0, by=5)
+maxS <- seq(0,20,by=5)
+pminS <- seq(.25,.55,by=.1)
+pmaxS <- seq(0.65,.95,by=.1)
+
+regF <- function(b0,b1,x,xcent){
+	b0+(b1*(x-xcent))
+
+}
+
+jpeg(paste0(plotDI,"\\model\\run",Nrun,"\\soil_comp_reg.jpg"), width=5500, height=5000, units="px",quality=100)
+	layout(matrix(seq(1,6),byrow=TRUE,ncol=3), width=rep(lcm(wd),6), height=rep(lcm(hd),6))
+	#ave vs min
+	par(mai=c(0,0,0,0))
+	plot(c(0,1),c(0,1),type="n", xlim=c(minL,minH), ylim=c(maxL,maxH), xlab=" ", ylab=" ",
+			xaxs="i", yaxs="i", axes=FALSE)
+	points(SoilL[[xcomp[2]]]$Mean,SoilL[[ycomp[2]]]$Mean, pch=19,col="grey25",cex=px)
+	
+	#global mean
+	if(mubeta1$sig[2]==1){
+		points(seq(minL,minH,length.out=100),regF(mubeta0$Mean[2],mubeta1$Mean[2],seq(minL,minH,length.out=100),xcent[2]), lwd=2)
+		
+		
+		
+		polygon(c(seq(minL,minH,length.out=100),rev(seq(minL,minH,length.out=100))),
+				c(regF(mubeta0$X97.5.[2],mubeta1$X97.5.[2],seq(minL,minH,length.out=100),xcent[2]),
+					rev(regF(mubeta0$X2.5.[2],mubeta1$X2.5.[2],seq(minL,minH,length.out=100),xcent[2]))), border=NA,col=rgb(.75,.75,.75,.5))
+	}else{
+		abline(h=mubeta0$Mean[2],lwd=2,lty=2)
+		polygon(c(seq(minL,minH,length.out=100),rev(seq(minL,minH,length.out=100))),
+				c(regF(mubeta0$X97.5.[2],0,seq(minL,minH,length.out=100),xcent[2]),
+				rev(regF(mubeta0$X2.5.[2],0,seq(minL,minH,length.out=100),xcent[2]))),border=NA,col=rgb(.75,.75,.75,.5))
+	}
+	
+	
+	axis(2,maxS,rep(" ",length(maxS)),lwd.ticks=lwt)
+	mtext(maxS,at=maxS,las=2,cex=mx,side=2,line=6)
+	axis(3,minS,rep(" ",length(minS)),lwd.ticks=lwt)
+	mtext(minS,at=minS,side=3,line=6,cex=mx)
+	mtext("Temp Max", side=2, line=30, cex=lx)
+	mtext("Temp Min", side=3, line=25, cex=lx)
+	box(which="plot")		
+	#min vs max		
+	par(mai=c(0,0,0,0))
+	plot(c(0,1),c(0,1),type="n", ylim=c(maxL,maxH), xlim=c(pmaxL,pmaxH), xlab=" ", ylab=" ",
+			xaxs="i", yaxs="i", axes=FALSE)	
+	points(SoilL[[xcomp[5]]]$Mean,SoilL[[ycomp[5]]]$Mean, pch=19,col="grey25",cex=px)		
+		#global mean
+	if(mubeta1$sig[5]==1){
+		points(seq(pmaxL,pmaxH,length.out=100),regF(mubeta0$Mean[5],mubeta1$Mean[5],seq(pmaxL,pmaxH,length.out=100),xcent[5]), lwd=2)
+		
+		
+		
+		polygon(c(seq(pmaxL,pmaxH,length.out=100),rev(seq(pmaxL,pmaxH,length.out=100))),
+				c(regF(mubeta0$X97.5.[5],mubeta1$X97.5.[5],seq(pmaxL,pmaxH,length.out=100),xcent[5]),
+					rev(regF(mubeta0$X2.5.[5],mubeta1$X2.5.[5],seq(pmaxL,pmaxH,length.out=100),xcent[5]))), border=NA,col=rgb(.75,.75,.75,.5))
+	}else{
+		abline(h=mubeta0$Mean[5],lwd=2,lty=2)
+		polygon(c(seq(pmaxL,pmaxH,length.out=100),rev(seq(pmaxL,pmaxH,length.out=100))),
+				c(regF(mubeta0$X97.5.[5],0,seq(pmaxL,pmaxH,length.out=100),xcent[5]),
+				rev(regF(mubeta0$X2.5.[5],0,seq(pmaxL,pmaxH,length.out=100),xcent[5]))),border=NA,col=rgb(.75,.75,.75,.5))
+	}
+	
+	
+	
+	axis(3,pmaxS,rep(" ",length(pmaxS)),lwd.ticks=lwt)
+	mtext(pmaxS,at=pmaxS,side=3,line=6,cex=mx)
+	mtext("Time Temp Max", side=3, line=25, cex=lx)	
+	box(which="plot")		
+	#min vs pmin		
+	par(mai=c(0,0,0,0))
+	plot(c(0,1),c(0,1),type="n", xlim=c(pminL,pminH), ylim=c(minL,minH), xlab=" ", ylab=" ",
+			xaxs="i", yaxs="i", axes=FALSE)	
+	points(SoilL[[xcomp[3]]]$Mean,SoilL[[ycomp[3]]]$Mean, pch=19,col="grey25",cex=px)
+	
+		#global mean
+	if(mubeta1$sig[3]==1){
+		points(seq(pminL,pminH,length.out=100),regF(mubeta0$Mean[3],mubeta1$Mean[3],seq(pminL,pminH,length.out=100),xcent[3]), lwd=2)
+		
+		
+		
+		polygon(c(seq(pminL,pminH,length.out=100),rev(seq(pminL,pminH,length.out=100))),
+				c(regF(mubeta0$X97.5.[3],mubeta1$X97.5.[3],seq(pminL,pminH,length.out=100),xcent[3]),
+					rev(regF(mubeta0$X2.5.[3],mubeta1$X2.5.[3],seq(pminL,pminH,length.out=100),xcent[3]))), border=NA,col=rgb(.75,.75,.75,.5))
+	}else{
+		abline(h=mubeta0$Mean[3],lwd=2,lty=2)
+		polygon(c(seq(pminL,pminH,length.out=100),rev(seq(pminL,pminH,length.out=100))),
+				c(regF(mubeta0$X97.5.[3],0,seq(pminL,pminH,length.out=100),xcent[3]),
+				rev(regF(mubeta0$X2.5.[3],0,seq(pminL,pminH,length.out=100),xcent[3]))),border=NA,col=rgb(.75,.75,.75,.5))
+	}
+	
+	
+	axis(3,pminS,rep(" ",length(pminS)),lwd.ticks=lwt)
+	mtext(pminS,at=pminS,side=3,line=6,cex=mx)	
+	axis(4,minS,rep(" ",length(minS)),lwd.ticks=lwt)
+	mtext(minS,at=minS,las=2,cex=mx,side=4,line=6)
+	mtext("Min time", side=3, line=25, cex=lx)
+	mtext("Temp Min", side=4, line=30, cex=lx)
+	box(which="plot")		
+	#max vs ave
+	par(mai=c(0,0,0,0))
+	plot(c(0,1),c(0,1),type="n", ylim=c(aveL,aveH), xlim=c(maxL,maxH), xlab=" ", ylab=" ",
+			xaxs="i", yaxs="i", axes=FALSE)
+	points(SoilL[[xcomp[4]]]$Mean,SoilL[[ycomp[4]]]$Mean, pch=19,col="grey25",cex=px)
+	
+	#global mean
+	if(mubeta1$sig[4]==1){
+		points(seq(maxL,maxH,length.out=100),regF(mubeta0$Mean[4],mubeta1$Mean[4],seq(maxL,maxH,length.out=100),xcent[4]), lwd=2)
+		
+		
+		
+		polygon(c(seq(maxL,maxH,length.out=100),rev(seq(maxL,maxH,length.out=100))),
+				c(regF(mubeta0$X97.5.[4],mubeta1$X97.5.[4],seq(maxL,maxH,length.out=100),xcent[4]),
+					rev(regF(mubeta0$X2.5.[4],mubeta1$X2.5.[4],seq(maxL,maxH,length.out=100),xcent[4]))), border=NA,col=rgb(.75,.75,.75,.5))
+	}else{
+		abline(h=mubeta0$Mean[4],lwd=2,lty=2)
+		polygon(c(seq(maxL,maxH,length.out=100),rev(seq(maxL,maxH,length.out=100))),
+				c(regF(mubeta0$X97.5.[4],0,seq(maxL,maxH,length.out=100),xcent[4]),
+				rev(regF(mubeta0$X2.5.[4],0,seq(maxL,maxH,length.out=100),xcent[4]))),border=NA,col=rgb(.75,.75,.75,.5))
+	}
+	
+	
+	
+	
+	axis(1,maxS,rep(" ",length(maxS)),lwd.ticks=lwt)
+	mtext(maxS,at=maxS,las=1,cex=mx,side=1,line=6)
+	axis(2,aveS,rep(" ",length(aveS)),lwd.ticks=lwt)
+	mtext("Temp Max", side=1, line=30, cex=lx)
+	mtext("Temp Ave", side=2, line=25, cex=lx)
+	mtext(aveS,at=aveS,side=2,line=10,cex=mx)
+	
+	box(which="plot")		
+	#max vs pmax
+	par(mai=c(0,0,0,0))
+	plot(c(0,1),c(0,1),type="n", xlim=c(minL,pminH), ylim=c(aveL,aveH), xlab=" ", ylab=" ",
+			xaxs="i", yaxs="i", axes=FALSE)
+	points(SoilL[[xcomp[1]]]$Mean,SoilL[[ycomp[1]]]$Mean, pch=19,col="grey25",cex=px)
+		#global mean
+	if(mubeta1$sig[1]==1){
+		points(seq(minL,minH,length.out=100),regF(mubeta0$Mean[1],mubeta1$Mean[1],seq(minL,minH,length.out=100),xcent[1]), lwd=2)
+		
+		
+		
+		polygon(c(seq(minL,minH,length.out=100),rev(seq(minL,minH,length.out=100))),
+				c(regF(mubeta0$X97.5.[1],mubeta1$X97.5.[1],seq(minL,minH,length.out=100),xcent[1]),
+					rev(regF(mubeta0$X2.5.[1],mubeta1$X2.5.[1],seq(minL,minH,length.out=100),xcent[1]))), border=NA,col=rgb(.75,.75,.75,.5))
+	}else{
+		abline(h=mubeta0$Mean[1],lwd=2,lty=2)
+		polygon(c(seq(minL,minH,length.out=100),rev(seq(minL,minH,length.out=100))),
+				c(regF(mubeta0$X97.5.[1],0,seq(minL,minH,length.out=100),xcent[1]),
+				rev(regF(mubeta0$X2.5.[1],0,seq(minL,minH,length.out=100),xcent[1]))),border=NA,col=rgb(.75,.75,.75,.5))
+	}
+	
+	
+	
+	
+	axis(1,minS,rep(" ",length(minS)),lwd.ticks=lwt)
+	mtext(minS,at=minS,cex=mx,side=1,line=10)
+	mtext("Temp Min", side=1, line=25, cex=lx)
+	box(which="plot")		
+	#legend
+	par(mai=c(0,0,0,0))
+	plot(c(0,1),c(0,1),type="n", xlim=c(xlL,xlH), ylim=c(ylL,ylH), xlab=" ", ylab=" ",
+			xaxs="i", yaxs="i", axes=FALSE)	
+			
+	legend(0,10,paste(datVI$vegename),pch=19,col=as.character(vegeclassColors$coli), bty="n",cex=11)	
+	box(which="plot")
+dev.off()
+
+
+
+
+
