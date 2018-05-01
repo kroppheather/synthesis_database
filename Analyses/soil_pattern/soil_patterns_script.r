@@ -131,7 +131,7 @@ xplot <- matrix(rep(NA,100*dim(vegeComp)[1]),ncol=dim(vegeComp)[1])
 	for(j in 1:dim(vegeComp)[1]){
 		xplot[,j] <- seq(xcompDF$xmin[vegeComp$comp[j]],xcompDF$xmax[vegeComp$comp[j]],length.out=100)
 	}
-xplotDF <- data.frame(xplot=as.vector(xplot),vegeCompID=rep(seq(1,dim(vegeComp)[1]),each=100), comp=rep(vegeComp$comp,each=100))
+xplotDF <- data.frame(xplot=as.vector(xplot),vegeCompID=rep(seq(1,dim(vegeComp)[1]),each=100), comp=rep(vegeComp$comp,each=100),vegeClass=rep(vegeComp$vegeClass,each=100))
 	
 #multiple comparision quantile
 mcQ <- round_any(0.05/(dim(vegeComp)[1]-1)	,0.001)
@@ -222,8 +222,8 @@ mubeta1 <- datC[datC$parms=="mu.beta1",]
 
 
 #match up ids
-colnames(beta0)[11] <- "vegeCompID"
-colnames(beta1)[11] <- "vegeCompID"
+colnames(beta0)[13] <- "vegeCompID"
+colnames(beta1)[13] <- "vegeCompID"
 
 beta0 <- join(beta0, vegeComp, by=c("vegeCompID"), type="left")
 beta1 <- join(beta1, vegeComp, by=c("vegeCompID"), type="left")
@@ -249,8 +249,8 @@ mubeta0$compNameY <- compNameY
 mubeta1$compNameX <- compNameX
 mubeta1$compNameY <- compNameY
 
-yl <- xcompDF$xmin
-yh <- xcompDF$xmax
+yl <- xcompDF$ymin
+yh <- xcompDF$ymax
 
 yl2 <- c(-.1,-1,-100,-1,-100)
 yh2 <- c(.6,1,100,2,100)
@@ -363,32 +363,37 @@ pmaxS <- seq(0.65,.95,by=.1)
 
 jpeg(paste0(plotDI,"\\soil_comp.jpg"), width=5500, height=5000, units="px",quality=100)
 	layout(matrix(seq(1,6),byrow=TRUE,ncol=3), width=rep(lcm(wd),6), height=rep(lcm(hd),6))
-	#ave vs min
 	par(mai=c(0,0,0,0))
-	plot(c(0,1),c(0,1),type="n", xlim=c(aveL,aveH), ylim=c(minL,minH), xlab=" ", ylab=" ",
+	plot(c(0,1),c(0,1),type="n", xlim=c(minL,minH), ylim=c(maxL,maxH), xlab=" ", ylab=" ",
 			xaxs="i", yaxs="i", axes=FALSE)
-	points(SoilL[[xcomp[1]]]$Mean,SoilL[[ycomp[1]]]$Mean, pch=19,col=as.character(SoilL[[xcomp[1]]]$coli),cex=px)
-	axis(2,minS,rep(" ",length(minS)),lwd.ticks=lwt)
-	mtext(minS,at=minS,las=2,cex=mx,side=2,line=6)
-	axis(3,aveS,rep(" ",length(aveS)),lwd.ticks=lwt)
-	mtext(aveS,at=aveS,side=3,line=6,cex=mx)
-	mtext("Temp Min", side=2, line=30, cex=lx)
-	mtext("Temp Ave", side=3, line=25, cex=lx)
+	points(SoilL[[xcomp[2]]]$Mean,SoilL[[ycomp[2]]]$Mean, pch=19,col=as.character(SoilL[[xcomp[2]]]$coli),cex=px)
+
+	
+	
+	axis(2,maxS,rep(" ",length(maxS)),lwd.ticks=lwt)
+	mtext(maxS,at=maxS,las=2,cex=mx,side=2,line=6)
+	axis(3,minS,rep(" ",length(minS)),lwd.ticks=lwt)
+	mtext(minS,at=minS,side=3,line=6,cex=mx)
+	mtext("Temp Max", side=2, line=30, cex=lx)
+	mtext("Temp Min", side=3, line=25, cex=lx)
 	box(which="plot")		
 	#min vs max		
 	par(mai=c(0,0,0,0))
-	plot(c(0,1),c(0,1),type="n", xlim=c(maxL,maxH), ylim=c(minL,minH), xlab=" ", ylab=" ",
+	plot(c(0,1),c(0,1),type="n", ylim=c(maxL,maxH), xlim=c(pmaxL,pmaxH), xlab=" ", ylab=" ",
 			xaxs="i", yaxs="i", axes=FALSE)	
-	points(SoilL[[xcomp[2]]]$Mean,SoilL[[ycomp[2]]]$Mean, pch=19,col=as.character(SoilL[[xcomp[1]]]$coli),cex=px)		
-	axis(3,maxS,rep(" ",length(maxS)),lwd.ticks=lwt)
-	mtext(maxS,at=maxS,side=3,line=6,cex=mx)
-	mtext("Temp Max", side=3, line=25, cex=lx)	
+	points(SoilL[[xcomp[5]]]$Mean,SoilL[[ycomp[5]]]$Mean, pch=19,col=as.character(SoilL[[xcomp[5]]]$coli),cex=px)		
+	
+	axis(3,pmaxS,rep(" ",length(pmaxS)),lwd.ticks=lwt)
+	mtext(pmaxS,at=pmaxS,side=3,line=6,cex=mx)
+	mtext("Time Temp Max", side=3, line=25, cex=lx)	
 	box(which="plot")		
 	#min vs pmin		
 	par(mai=c(0,0,0,0))
 	plot(c(0,1),c(0,1),type="n", xlim=c(pminL,pminH), ylim=c(minL,minH), xlab=" ", ylab=" ",
 			xaxs="i", yaxs="i", axes=FALSE)	
-	points(SoilL[[xcomp[3]]]$Mean,SoilL[[ycomp[3]]]$Mean, pch=19,col=as.character(SoilL[[xcomp[1]]]$coli),cex=px)
+	points(SoilL[[xcomp[3]]]$Mean,SoilL[[ycomp[3]]]$Mean, pch=19,col=as.character(SoilL[[xcomp[3]]]$coli),cex=px)
+	
+	
 	axis(3,pminS,rep(" ",length(pminS)),lwd.ticks=lwt)
 	mtext(pminS,at=pminS,side=3,line=6,cex=mx)	
 	axis(4,minS,rep(" ",length(minS)),lwd.ticks=lwt)
@@ -398,25 +403,29 @@ jpeg(paste0(plotDI,"\\soil_comp.jpg"), width=5500, height=5000, units="px",quali
 	box(which="plot")		
 	#max vs ave
 	par(mai=c(0,0,0,0))
-	plot(c(0,1),c(0,1),type="n", xlim=c(aveL,aveH), ylim=c(maxL,maxH), xlab=" ", ylab=" ",
+	plot(c(0,1),c(0,1),type="n", ylim=c(aveL,aveH), xlim=c(maxL,maxH), xlab=" ", ylab=" ",
 			xaxs="i", yaxs="i", axes=FALSE)
-	points(SoilL[[xcomp[4]]]$Mean,SoilL[[ycomp[4]]]$Mean, pch=19,col=as.character(SoilL[[xcomp[1]]]$coli),cex=px)
-	axis(2,maxS,rep(" ",length(maxS)),lwd.ticks=lwt)
-	mtext(maxS,at=maxS,las=2,cex=mx,side=2,line=6)
-	axis(1,aveS,rep(" ",length(aveS)),lwd.ticks=lwt)
-	mtext("Temp Max", side=2, line=30, cex=lx)
-	mtext("Temp Ave", side=1, line=25, cex=lx)
-	mtext(aveS,at=aveS,side=1,line=10,cex=mx)
+	points(SoilL[[xcomp[4]]]$Mean,SoilL[[ycomp[4]]]$Mean, pch=19,col=as.character(SoilL[[xcomp[4]]]$coli),cex=px)
+	
+	
+	axis(1,maxS,rep(" ",length(maxS)),lwd.ticks=lwt)
+	mtext(maxS,at=maxS,las=1,cex=mx,side=1,line=6)
+	axis(2,aveS,rep(" ",length(aveS)),lwd.ticks=lwt)
+	mtext("Temp Max", side=1, line=30, cex=lx)
+	mtext("Temp Ave", side=2, line=25, cex=lx)
+	mtext(aveS,at=aveS,side=2,line=10,cex=mx)
 	
 	box(which="plot")		
 	#max vs pmax
 	par(mai=c(0,0,0,0))
-	plot(c(0,1),c(0,1),type="n", xlim=c(pmaxL,pmaxH), ylim=c(maxL,maxH), xlab=" ", ylab=" ",
+	plot(c(0,1),c(0,1),type="n", xlim=c(minL,pminH), ylim=c(aveL,aveH), xlab=" ", ylab=" ",
 			xaxs="i", yaxs="i", axes=FALSE)
-	points(SoilL[[xcomp[5]]]$Mean,SoilL[[ycomp[5]]]$Mean, pch=19,col=as.character(SoilL[[xcomp[1]]]$coli),cex=px)
-	axis(1,pmaxS,rep(" ",length(pmaxS)),lwd.ticks=lwt)
-	mtext(pmaxS,at=pmaxS,cex=mx,side=1,line=10)
-	mtext("Max time", side=1, line=25, cex=lx)
+	points(SoilL[[xcomp[1]]]$Mean,SoilL[[ycomp[1]]]$Mean, pch=19,col=as.character(SoilL[[xcomp[1]]]$coli),cex=px)
+
+	
+	axis(1,minS,rep(" ",length(minS)),lwd.ticks=lwt)
+	mtext(minS,at=minS,cex=mx,side=1,line=10)
+	mtext("Temp Min", side=1, line=25, cex=lx)
 	box(which="plot")		
 	#legend
 	par(mai=c(0,0,0,0))
@@ -432,6 +441,14 @@ dev.off()
 #######################################
 ##### plot of regression result   ##### 
 #######################################
+
+
+#add regression lines from model into  xplotdf
+
+xplotDF$Mean <- datC$Mean[datC$parms=="mu.plot"]
+xplotDF$pc.l <- datC$X0.1.[datC$parms=="mu.plot"]
+xplotDF$pc.h <- datC$X99.9.[datC$parms=="mu.plot"]
+
 
 beta0$sig <- ifelse(beta0$pc.l<0&beta0$pc.h<0,1,
 				ifelse(beta0$pc.l>0&beta0$pc.h>0,1,0))
@@ -491,11 +508,11 @@ jpeg(paste0(plotDI,"\\model\\run",Nrun,"\\soil_comp_reg.jpg"), width=5500, heigh
 	
 	#global mean
 	if(mubeta1$sig[2]==1){
-		points(seq(minL,minH,length.out=100),regF(mubeta0$Mean[2],mubeta1$Mean[2],seq(minL,minH,length.out=100),xcent[2]), lwd=2)
+		points(xplotDF$xplot[xplotDF$comp==1],xplotDF$Mean, lwd=2)
 		
 		
 		
-		polygon(c(seq(minL,minH,length.out=100),rev(seq(minL,minH,length.out=100))),
+		polygon(c(xplotDF$xplot,rev(xplotDF$xplot)),
 				c(regF(mubeta0$pc.h[2],mubeta1$pc.h[2],seq(minL,minH,length.out=100),xcent[2]),
 					rev(regF(mubeta0$pc.l[2],mubeta1$pc.l[2],seq(minL,minH,length.out=100),xcent[2]))), border=NA,col=rgb(.75,.75,.75,.5))
 	}else{
