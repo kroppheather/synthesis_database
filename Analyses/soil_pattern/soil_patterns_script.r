@@ -37,6 +37,7 @@ datVI <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\vegeID.c
 library(rjags)
 library(coda)
 library(mcmcplots)
+library(plyr)
 
 #######################################
 #####set directories              ##### 
@@ -48,7 +49,7 @@ plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\soil_patt
 modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\soil_pattern\\model\\run4"
 Nrun <-4
 #indicate if a model run is occuring
-modRun <- 1
+modRun <- 0
 
 
 #######################################
@@ -219,12 +220,29 @@ beta1 <- datC[datC$parms=="beta1",]
 mubeta0 <- datC[datC$parms=="mu.beta0",]
 mubeta1 <- datC[datC$parms=="mu.beta1",]
 
+
 #match up ids
 colnames(beta0)[11] <- "vegeCompID"
 colnames(beta1)[11] <- "vegeCompID"
 
 beta0 <- join(beta0, vegeComp, by=c("vegeCompID"), type="left")
 beta1 <- join(beta1, vegeComp, by=c("vegeCompID"), type="left")
+
+#choose lower interval
+mubeta0$pc.l <- mubeta0$X0.1.
+mubeta1$pc.l <- mubeta1$X0.1.
+beta0$pc.l <- beta0$X0.1.
+beta1$pc.l <- beta1$X0.1.
+
+
+#choose upper interval
+mubeta0$pc.h <- mubeta0$X99.9.
+mubeta1$pc.h <- mubeta1$X99.9.
+beta0$pc.h <- beta0$X99.9.
+beta1$pc.h <- beta1$X99.9.
+
+
+
 
 mubeta0$compNameX <- compNameX
 mubeta0$compNameY <- compNameY
@@ -248,12 +266,12 @@ for(i in 1:length(compNameX)){
 			plot(c(0,1),c(0,1), type="n", ylim=c(yl[i],yh[i]), xlim=c(0,20), xlab=" ", ylab=" ", xaxs="i",yaxs="i", axes=FALSE)
 			
 			abline(h=mubeta0$Mean[i], lwd=3)	
-			polygon(c(0,0,20,20), c(mubeta0$X2.5.[i],	mubeta0$X97.5.[i],mubeta0$X97.5.[i],mubeta0$X2.5.[i]),
+			polygon(c(0,0,20,20), c(mubeta0$pc.l[i],	mubeta0$pc.h[i],mubeta0$pc.h[i],mubeta0$pc.l[i]),
 				col=rgb(153/255,50/255,204/255,.3),border=NA)
 
 				for(j in 1:9){
 					
-				arrows(xseq[j], beta0$X2.5.[beta0$comp==i&beta0$vegeClass==j],xseq[j], beta0$X97.5.[beta0$comp==i&beta0$vegeClass==j],
+				arrows(xseq[j], beta0$pc.l[beta0$comp==i&beta0$vegeClass==j],xseq[j], beta0$pc.h[beta0$comp==i&beta0$vegeClass==j],
 						lwd=2,code=0)
 					
 					polygon(c(xseq[j]-.5,xseq[j]-.5,xseq[j]+.5,xseq[j]+.5),
@@ -264,7 +282,7 @@ for(i in 1:length(compNameX)){
 				arrows(xseq[j]-.5,beta0$Mean[beta0$comp==i&beta0$vegeClass==j],xseq[j]+.5,beta0$Mean[beta0$comp==i&beta0$vegeClass==j],
 						lwd=3,code=0)
 				}
-		arrows(xseq[j], beta0$X2.5.[beta0$comp==i&beta0$vegeClass==j],xseq[j], beta0$X97.5.[beta0$comp==i&beta0$vegeClass==j],
+		arrows(xseq[j], beta0$pc.l[beta0$comp==i&beta0$vegeClass==j],xseq[j], beta0$pc.h[beta0$comp==i&beta0$vegeClass==j],
 						lwd=2,code=0)			
 		
 
@@ -277,12 +295,12 @@ for(i in 1:length(compNameX)){
 	
 	
 		abline(h=mubeta1$Mean[i], lwd=3)	
-		polygon(c(0,0,20,20), c(mubeta1$X2.5.[i],	mubeta1$X97.5.[i],mubeta1$X97.5.[i],mubeta1$X2.5.[i]),
+		polygon(c(0,0,20,20), c(mubeta1$pc.l[i],	mubeta1$pc.h[i],mubeta1$pc.h[i],mubeta1$pc.l[i]),
 		col=rgb(153/255,50/255,204/255,.3),border=NA)
 		abline(h=0, lwd=4, lty=3, col="grey35")
 		for(j in 1:9){
 					
-				arrows(xseq[j], beta1$X2.5.[beta1$comp==i&beta1$vegeClass==j],xseq[j], beta1$X97.5.[beta1$comp==i&beta1$vegeClass==j],
+				arrows(xseq[j], beta1$pc.l[beta1$comp==i&beta1$vegeClass==j],xseq[j], beta1$pc.h[beta1$comp==i&beta1$vegeClass==j],
 						lwd=2,code=0)
 					
 					polygon(c(xseq[j]-.5,xseq[j]-.5,xseq[j]+.5,xseq[j]+.5),
@@ -415,17 +433,17 @@ dev.off()
 ##### plot of regression result   ##### 
 #######################################
 
-beta0$sig <- ifelse(beta0$X2.5.<0&beta0$X97.5.<0,1,
-				ifelse(beta0$X2.5.>0&beta0$X97.5.>0,1,0))
+beta0$sig <- ifelse(beta0$pc.l<0&beta0$pc.h<0,1,
+				ifelse(beta0$pc.l>0&beta0$pc.h>0,1,0))
 
-beta1$sig <- ifelse(beta1$X2.5.<0&beta1$X97.5.<0,1,
-				ifelse(beta1$X2.5.>0&beta1$X97.5.>0,1,0))
+beta1$sig <- ifelse(beta1$pc.l<0&beta1$pc.h<0,1,
+				ifelse(beta1$pc.l>0&beta1$pc.h>0,1,0))
 				
-mubeta0$sig <- ifelse(mubeta0$X2.5.<0&mubeta0$X97.5.<0,1,
-				ifelse(mubeta0$X2.5.>0&mubeta0$X97.5.>0,1,0))
+mubeta0$sig <- ifelse(mubeta0$pc.l<0&mubeta0$pc.h<0,1,
+				ifelse(mubeta0$pc.l>0&mubeta0$pc.h>0,1,0))
 
-mubeta1$sig <- ifelse(mubeta1$X2.5.<0&mubeta1$X97.5.<0,1,
-				ifelse(mubeta1$X2.5.>0&mubeta1$X97.5.>0,1,0))				
+mubeta1$sig <- ifelse(mubeta1$pc.l<0&mubeta1$pc.h<0,1,
+				ifelse(mubeta1$pc.l>0&mubeta1$pc.h>0,1,0))				
 				
 
 #set up correlation panel
@@ -478,13 +496,13 @@ jpeg(paste0(plotDI,"\\model\\run",Nrun,"\\soil_comp_reg.jpg"), width=5500, heigh
 		
 		
 		polygon(c(seq(minL,minH,length.out=100),rev(seq(minL,minH,length.out=100))),
-				c(regF(mubeta0$X97.5.[2],mubeta1$X97.5.[2],seq(minL,minH,length.out=100),xcent[2]),
-					rev(regF(mubeta0$X2.5.[2],mubeta1$X2.5.[2],seq(minL,minH,length.out=100),xcent[2]))), border=NA,col=rgb(.75,.75,.75,.5))
+				c(regF(mubeta0$pc.h[2],mubeta1$pc.h[2],seq(minL,minH,length.out=100),xcent[2]),
+					rev(regF(mubeta0$pc.l[2],mubeta1$pc.l[2],seq(minL,minH,length.out=100),xcent[2]))), border=NA,col=rgb(.75,.75,.75,.5))
 	}else{
 		abline(h=mubeta0$Mean[2],lwd=2,lty=2)
 		polygon(c(seq(minL,minH,length.out=100),rev(seq(minL,minH,length.out=100))),
-				c(regF(mubeta0$X97.5.[2],0,seq(minL,minH,length.out=100),xcent[2]),
-				rev(regF(mubeta0$X2.5.[2],0,seq(minL,minH,length.out=100),xcent[2]))),border=NA,col=rgb(.75,.75,.75,.5))
+				c(regF(mubeta0$pc.h[2],0,seq(minL,minH,length.out=100),xcent[2]),
+				rev(regF(mubeta0$pc.l[2],0,seq(minL,minH,length.out=100),xcent[2]))),border=NA,col=rgb(.75,.75,.75,.5))
 	}
 	
 	
@@ -507,13 +525,13 @@ jpeg(paste0(plotDI,"\\model\\run",Nrun,"\\soil_comp_reg.jpg"), width=5500, heigh
 		
 		
 		polygon(c(seq(pmaxL,pmaxH,length.out=100),rev(seq(pmaxL,pmaxH,length.out=100))),
-				c(regF(mubeta0$X97.5.[5],mubeta1$X97.5.[5],seq(pmaxL,pmaxH,length.out=100),xcent[5]),
-					rev(regF(mubeta0$X2.5.[5],mubeta1$X2.5.[5],seq(pmaxL,pmaxH,length.out=100),xcent[5]))), border=NA,col=rgb(.75,.75,.75,.5))
+				c(regF(mubeta0$pc.h[5],mubeta1$pc.h[5],seq(pmaxL,pmaxH,length.out=100),xcent[5]),
+					rev(regF(mubeta0$pc.l[5],mubeta1$pc.l[5],seq(pmaxL,pmaxH,length.out=100),xcent[5]))), border=NA,col=rgb(.75,.75,.75,.5))
 	}else{
 		abline(h=mubeta0$Mean[5],lwd=2,lty=2)
 		polygon(c(seq(pmaxL,pmaxH,length.out=100),rev(seq(pmaxL,pmaxH,length.out=100))),
-				c(regF(mubeta0$X97.5.[5],0,seq(pmaxL,pmaxH,length.out=100),xcent[5]),
-				rev(regF(mubeta0$X2.5.[5],0,seq(pmaxL,pmaxH,length.out=100),xcent[5]))),border=NA,col=rgb(.75,.75,.75,.5))
+				c(regF(mubeta0$pc.h[5],0,seq(pmaxL,pmaxH,length.out=100),xcent[5]),
+				rev(regF(mubeta0$pc.l[5],0,seq(pmaxL,pmaxH,length.out=100),xcent[5]))),border=NA,col=rgb(.75,.75,.75,.5))
 	}
 	
 	
@@ -535,13 +553,13 @@ jpeg(paste0(plotDI,"\\model\\run",Nrun,"\\soil_comp_reg.jpg"), width=5500, heigh
 		
 		
 		polygon(c(seq(pminL,pminH,length.out=100),rev(seq(pminL,pminH,length.out=100))),
-				c(regF(mubeta0$X97.5.[3],mubeta1$X97.5.[3],seq(pminL,pminH,length.out=100),xcent[3]),
-					rev(regF(mubeta0$X2.5.[3],mubeta1$X2.5.[3],seq(pminL,pminH,length.out=100),xcent[3]))), border=NA,col=rgb(.75,.75,.75,.5))
+				c(regF(mubeta0$pc.h[3],mubeta1$pc.h[3],seq(pminL,pminH,length.out=100),xcent[3]),
+					rev(regF(mubeta0$pc.l[3],mubeta1$pc.l[3],seq(pminL,pminH,length.out=100),xcent[3]))), border=NA,col=rgb(.75,.75,.75,.5))
 	}else{
 		abline(h=mubeta0$Mean[3],lwd=2,lty=2)
 		polygon(c(seq(pminL,pminH,length.out=100),rev(seq(pminL,pminH,length.out=100))),
-				c(regF(mubeta0$X97.5.[3],0,seq(pminL,pminH,length.out=100),xcent[3]),
-				rev(regF(mubeta0$X2.5.[3],0,seq(pminL,pminH,length.out=100),xcent[3]))),border=NA,col=rgb(.75,.75,.75,.5))
+				c(regF(mubeta0$pc.h[3],0,seq(pminL,pminH,length.out=100),xcent[3]),
+				rev(regF(mubeta0$pc.l[3],0,seq(pminL,pminH,length.out=100),xcent[3]))),border=NA,col=rgb(.75,.75,.75,.5))
 	}
 	
 	
@@ -565,13 +583,13 @@ jpeg(paste0(plotDI,"\\model\\run",Nrun,"\\soil_comp_reg.jpg"), width=5500, heigh
 		
 		
 		polygon(c(seq(maxL,maxH,length.out=100),rev(seq(maxL,maxH,length.out=100))),
-				c(regF(mubeta0$X97.5.[4],mubeta1$X97.5.[4],seq(maxL,maxH,length.out=100),xcent[4]),
-					rev(regF(mubeta0$X2.5.[4],mubeta1$X2.5.[4],seq(maxL,maxH,length.out=100),xcent[4]))), border=NA,col=rgb(.75,.75,.75,.5))
+				c(regF(mubeta0$pc.h[4],mubeta1$pc.h[4],seq(maxL,maxH,length.out=100),xcent[4]),
+					rev(regF(mubeta0$pc.l[4],mubeta1$pc.l[4],seq(maxL,maxH,length.out=100),xcent[4]))), border=NA,col=rgb(.75,.75,.75,.5))
 	}else{
 		abline(h=mubeta0$Mean[4],lwd=2,lty=2)
 		polygon(c(seq(maxL,maxH,length.out=100),rev(seq(maxL,maxH,length.out=100))),
-				c(regF(mubeta0$X97.5.[4],0,seq(maxL,maxH,length.out=100),xcent[4]),
-				rev(regF(mubeta0$X2.5.[4],0,seq(maxL,maxH,length.out=100),xcent[4]))),border=NA,col=rgb(.75,.75,.75,.5))
+				c(regF(mubeta0$pc.h[4],0,seq(maxL,maxH,length.out=100),xcent[4]),
+				rev(regF(mubeta0$pc.l[4],0,seq(maxL,maxH,length.out=100),xcent[4]))),border=NA,col=rgb(.75,.75,.75,.5))
 	}
 	
 	
@@ -597,13 +615,13 @@ jpeg(paste0(plotDI,"\\model\\run",Nrun,"\\soil_comp_reg.jpg"), width=5500, heigh
 		
 		
 		polygon(c(seq(minL,minH,length.out=100),rev(seq(minL,minH,length.out=100))),
-				c(regF(mubeta0$X97.5.[1],mubeta1$X97.5.[1],seq(minL,minH,length.out=100),xcent[1]),
-					rev(regF(mubeta0$X2.5.[1],mubeta1$X2.5.[1],seq(minL,minH,length.out=100),xcent[1]))), border=NA,col=rgb(.75,.75,.75,.5))
+				c(regF(mubeta0$pc.h[1],mubeta1$pc.h[1],seq(minL,minH,length.out=100),xcent[1]),
+					rev(regF(mubeta0$pc.l[1],mubeta1$pc.l[1],seq(minL,minH,length.out=100),xcent[1]))), border=NA,col=rgb(.75,.75,.75,.5))
 	}else{
 		abline(h=mubeta0$Mean[1],lwd=2,lty=2)
 		polygon(c(seq(minL,minH,length.out=100),rev(seq(minL,minH,length.out=100))),
-				c(regF(mubeta0$X97.5.[1],0,seq(minL,minH,length.out=100),xcent[1]),
-				rev(regF(mubeta0$X2.5.[1],0,seq(minL,minH,length.out=100),xcent[1]))),border=NA,col=rgb(.75,.75,.75,.5))
+				c(regF(mubeta0$pc.h[1],0,seq(minL,minH,length.out=100),xcent[1]),
+				rev(regF(mubeta0$pc.l[1],0,seq(minL,minH,length.out=100),xcent[1]))),border=NA,col=rgb(.75,.75,.75,.5))
 	}
 	
 	
