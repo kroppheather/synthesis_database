@@ -16,7 +16,16 @@ model{
 		sig.yvar[i] <- sig.mod[i] + sig.compVege[compVege[i]]
 		mu.xvar[i] ~ dnorm(xvar[i], tau.xvar[i])
 		tau.xvar[i] <- pow(sig.xvar[i],-2)
+		
 	}
+	#monitor regression line for plotting
+	for(i in 1:Nplot){
+	
+			mu.plot[i] <- beta0[compVegeP[i]]+ beta1[compVegeP[i]]*(xplot[i]-xvarCenter[compP[i]])
+
+	}
+	
+	
 	#hierarchical priors for regression coefficients
 	for(i in 1:NcompVege){
 		beta0[i]~dnorm(mu.beta0[comp[i]], tau.beta0[comp[i]])

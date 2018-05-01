@@ -45,10 +45,10 @@ library(mcmcplots)
 #set up a plot directory
 plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\soil_pattern\\plots"
 #model directory
-modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\soil_pattern\\model\\run3"
-Nrun <-3
+modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\soil_pattern\\model\\run4"
+Nrun <-4
 #indicate if a model run is occuring
-modRun <- 0
+modRun <- 1
 
 
 #######################################
@@ -94,6 +94,17 @@ compNameX <- parmV[xcomp]
 compNameY <- parmV[ycomp]
 xcent <- SoilMs[xcomp]
 
+xcompDF <- data.frame(xcomp=xcomp,ycomp=ycomp,compNameY=compNameY,compNameX=compNameX,xcent=xcent,
+				xmin=c(round_any(min(SoilL[[xcomp[1]]]$pc2.5),5),round_any(min(SoilL[[xcomp[2]]]$pc2.5),5),
+					round_any(min(SoilL[[xcomp[3]]]$pc2.5),.1),round_any(min(SoilL[[xcomp[4]]]$pc2.5),5),round_any(min(SoilL[[xcomp[5]]]$pc2.5),.1)),
+				xmax=c(round_any(max(SoilL[[xcomp[1]]]$pc97.5),5),round_any(max(SoilL[[xcomp[2]]]$pc97.5),5),
+					round_any(max(SoilL[[xcomp[3]]]$pc97.5),.1),round_any(max(SoilL[[xcomp[4]]]$pc97.5),5),round_any(max(SoilL[[xcomp[5]]]$pc97.5),.1)),
+				ymin=c(round_any(min(SoilL[[ycomp[1]]]$pc2.5),5),round_any(min(SoilL[[ycomp[2]]]$pc2.5),5),
+					round_any(min(SoilL[[ycomp[3]]]$pc2.5),5),round_any(min(SoilL[[ycomp[4]]]$pc2.5),5),round_any(min(SoilL[[ycomp[5]]]$pc2.5),5)),
+				ymax=c(round_any(max(SoilL[[ycomp[1]]]$pc97.5),5),round_any(max(SoilL[[ycomp[2]]]$pc97.5),5),
+					round_any(max(SoilL[[ycomp[3]]]$pc97.5),5),round_any(max(SoilL[[ycomp[4]]]$pc97.5),5),round_any(max(SoilL[[ycomp[5]]]$pc97.5),5)))
+
+
 SoilCompDF <- data.frame(xobs = c(SoilL[[xcomp[1]]]$Mean,SoilL[[xcomp[2]]]$Mean,SoilL[[xcomp[3]]]$Mean,SoilL[[xcomp[4]]]$Mean,SoilL[[xcomp[5]]]$Mean),
 						yobs= c(SoilL[[ycomp[1]]]$Mean,SoilL[[ycomp[2]]]$Mean,SoilL[[ycomp[3]]]$Mean,SoilL[[ycomp[4]]]$Mean,SoilL[[ycomp[5]]]$Mean),
 						xSD=c(SoilL[[xcomp[1]]]$SD,SoilL[[xcomp[2]]]$SD,SoilL[[xcomp[3]]]$SD,SoilL[[xcomp[4]]]$SD,SoilL[[xcomp[5]]]$SD),
@@ -112,6 +123,18 @@ vegeComp$vegeCompID <- seq(1,dim(vegeComp)[1])
 SoilCompDF2 <- join(SoilCompDF,vegeComp, by=c("vegeClass","comp"),type="left")
 
 
+
+#set up a matrix for plot
+xplot <- matrix(rep(NA,100*dim(vegeComp)[1]),ncol=dim(vegeComp)[1])
+
+	for(j in 1:dim(vegeComp)[1]){
+		xplot[,j] <- seq(xcompDF$xmin[vegeComp$comp[j]],xcompDF$xmax[vegeComp$comp[j]],length.out=100)
+	}
+xplotDF <- data.frame(xplot=as.vector(xplot),vegeCompID=rep(seq(1,dim(vegeComp)[1]),each=100), comp=rep(vegeComp$comp,each=100))
+	
+#multiple comparision quantile
+mcQ <- round_any(0.05/(dim(vegeComp)[1]-1)	,0.001)
+	
 #######################################
 #####set up model run             ##### 
 #######################################
@@ -127,9 +150,13 @@ datalist <- list(Nobs=dim(SoilCompDF2)[1],
 				xvarCenter=xcent,
 				NcompVege=dim(vegeComp)[1],
 				comp=vegeComp$comp,
-				Ncomp=length(xcomp))
+				Ncomp=length(xcomp),
+				Nplot=dim(xplotDF)[1],
+				xplot=xplotDF$xplot,
+				compVegeP=xplotDF$vegeCompID,
+				compP=xplotDF$comp)
 				
-parms <- c("rep.yvar","sig.compVege","beta0","beta1","mu.beta0","mu.beta1","sig.beta0","sig.beta1")
+parms <- c("rep.yvar","sig.compVege","beta0","beta1","mu.beta0","mu.beta1","sig.beta0","sig.beta1", "mu.plot")
 
 comp.modI<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Analyses\\soil_pattern\\soil_patterns_model_code.r",
 						data=datalist,
@@ -142,7 +169,7 @@ comp.sample <- coda.samples(comp.modI,variable.names=parms,
 mcmcplot(comp.sample, parms=c("sig.compVege","beta0","beta1","mu.beta0","mu.beta1","sig.beta0","sig.beta1"),
 			dir=paste0(modDI,"\\history"))	
 					   
-mod.out <- summary(comp.sample)
+mod.out <- summary(comp.sample,  quantiles = c(mcQ,0.025, 0.25, 0.5, 0.75, 0.975,1-mcQ))
 
 write.table(mod.out$statistics,paste0(modDI,"\\comp_mod_stats.csv"),
 			sep=",",row.names=TRUE)
@@ -204,8 +231,8 @@ mubeta0$compNameY <- compNameY
 mubeta1$compNameX <- compNameX
 mubeta1$compNameY <- compNameY
 
-yl <- c(-10,0,-40,-10,-1)
-yh <- c(5,30,1,5,25)
+yl <- xcompDF$xmin
+yh <- xcompDF$xmax
 
 yl2 <- c(-.1,-1,-100,-1,-100)
 yh2 <- c(.6,1,100,2,100)
