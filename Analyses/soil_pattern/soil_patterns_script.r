@@ -548,12 +548,7 @@ jpeg(paste0(plotDI,"\\model\\run",Nrun,"\\soil_comp_reg.jpg"), width=5500, heigh
 		
 			polygon(c(xplotDF$xplot[xplotDF$comp==2&xplotDF$vegeClass==j],rev(xplotDF$xplot[xplotDF$comp==2&xplotDF$vegeClass==j])),
 				c(xplotDF$pc.l[xplotDF$comp==2&xplotDF$vegeClass==j],rev(xplotDF$pc.h[xplotDF$comp==2&xplotDF$vegeClass==j])), border=NA,col=vegeclassColors$colrgb[j])
-		}else{
-			abline(h=beta0$Mean[beta0$comp==2&beta1$vegeClass==j],lwd=3,lty=2)
-			polygon(c(seq(minL,minH,length.out=100),rev(seq(minL,minH,length.out=100))),
-				c(regF(beta0$pc.h[beta0$comp==2&beta1$vegeClass==j],0,seq(minL,minH,length.out=100),xcent[2]),
-				rev(regF(beta0$pc.l[beta0$comp==2&beta1$vegeClass==j],0,seq(minL,minH,length.out=100),xcent[2]))),border=NA,col=vegeclassColors$colrgb[j])
-		}	
+		}
 	}
 	axis(2,maxS,rep(" ",length(maxS)),lwd.ticks=lwt)
 	mtext(maxS,at=maxS,las=2,cex=mx,side=2,line=6)
@@ -580,7 +575,15 @@ jpeg(paste0(plotDI,"\\model\\run",Nrun,"\\soil_comp_reg.jpg"), width=5500, heigh
 				rev(regF(mubeta0$pc.l[5],0,seq(pmaxL,pmaxH,length.out=100),xcent[5]))),border=NA,col=rgb(.75,.75,.75,.5))
 	}
 	
-	
+		#vegetation mean
+	for(j in 1:dim(vegeclassColors)[1]){
+		if(beta1$sig[beta1$comp==5&beta1$vegeClass==j]==1){
+			points(xplotDF$xplot[xplotDF$comp==5&xplotDF$vegeClass==j],xplotDF$Mean[xplotDF$comp==5&xplotDF$vegeClass==j], type="l",lwd=3)
+		
+			polygon(c(xplotDF$xplot[xplotDF$comp==5&xplotDF$vegeClass==j],rev(xplotDF$xplot[xplotDF$comp==5&xplotDF$vegeClass==j])),
+				c(xplotDF$pc.l[xplotDF$comp==5&xplotDF$vegeClass==j],rev(xplotDF$pc.h[xplotDF$comp==5&xplotDF$vegeClass==j])), border=NA,col=vegeclassColors$colrgb[j])
+		}
+	}
 	
 	axis(3,pmaxS,rep(" ",length(pmaxS)),lwd.ticks=lwt)
 	mtext(pmaxS,at=pmaxS,side=3,line=6,cex=mx)
@@ -605,7 +608,15 @@ jpeg(paste0(plotDI,"\\model\\run",Nrun,"\\soil_comp_reg.jpg"), width=5500, heigh
 				rev(regF(mubeta0$pc.l[3],0,seq(pminL,pminH,length.out=100),xcent[3]))),border=NA,col=rgb(.75,.75,.75,.5))
 	}
 	
-	
+		#vegetation mean
+	for(j in 1:dim(vegeclassColors)[1]){
+		if(beta1$sig[beta1$comp==3&beta1$vegeClass==j]==1){
+			points(xplotDF$xplot[xplotDF$comp==3&xplotDF$vegeClass==j],xplotDF$Mean[xplotDF$comp==3&xplotDF$vegeClass==j], type="l",lwd=3)
+		
+			polygon(c(xplotDF$xplot[xplotDF$comp==3&xplotDF$vegeClass==j],rev(xplotDF$xplot[xplotDF$comp==3&xplotDF$vegeClass==j])),
+				c(xplotDF$pc.l[xplotDF$comp==3&xplotDF$vegeClass==j],rev(xplotDF$pc.h[xplotDF$comp==3&xplotDF$vegeClass==j])), border=NA,col=vegeclassColors$colrgb[j])
+		}
+	}
 	axis(3,pminS,rep(" ",length(pminS)),lwd.ticks=lwt)
 	mtext(pminS,at=pminS,side=3,line=6,cex=mx)	
 	axis(4,minS,rep(" ",length(minS)),lwd.ticks=lwt)
@@ -633,7 +644,15 @@ jpeg(paste0(plotDI,"\\model\\run",Nrun,"\\soil_comp_reg.jpg"), width=5500, heigh
 	}
 	
 	
-	
+		#vegetation mean
+	for(j in 1:dim(vegeclassColors)[1]){
+		if(beta1$sig[beta1$comp==4&beta1$vegeClass==j]==1){
+			points(xplotDF$xplot[xplotDF$comp==4&xplotDF$vegeClass==j],xplotDF$Mean[xplotDF$comp==4&xplotDF$vegeClass==j], type="l",lwd=3)
+		
+			polygon(c(xplotDF$xplot[xplotDF$comp==4&xplotDF$vegeClass==j],rev(xplotDF$xplot[xplotDF$comp==4&xplotDF$vegeClass==j])),
+				c(xplotDF$pc.l[xplotDF$comp==4&xplotDF$vegeClass==j],rev(xplotDF$pc.h[xplotDF$comp==4&xplotDF$vegeClass==j])), border=NA,col=vegeclassColors$colrgb[j])
+		}
+	}
 	
 	axis(1,maxS,rep(" ",length(maxS)),lwd.ticks=lwt)
 	mtext(maxS,at=maxS,las=1,cex=mx,side=1,line=6)
@@ -662,7 +681,15 @@ jpeg(paste0(plotDI,"\\model\\run",Nrun,"\\soil_comp_reg.jpg"), width=5500, heigh
 	}
 	
 	
-	
+		#vegetation mean
+	for(j in 1:dim(vegeclassColors)[1]){
+		if(beta1$sig[beta1$comp==1&beta1$vegeClass==j]==1){
+			points(xplotDF$xplot[xplotDF$comp==1&xplotDF$vegeClass==j],xplotDF$Mean[xplotDF$comp==1&xplotDF$vegeClass==j], type="l",lwd=3)
+		
+			polygon(c(xplotDF$xplot[xplotDF$comp==1&xplotDF$vegeClass==j],rev(xplotDF$xplot[xplotDF$comp==1&xplotDF$vegeClass==j])),
+				c(xplotDF$pc.l[xplotDF$comp==1&xplotDF$vegeClass==j],rev(xplotDF$pc.h[xplotDF$comp==1&xplotDF$vegeClass==j])), border=NA,col=vegeclassColors$colrgb[j])
+		}
+	}
 	
 	axis(1,minS,rep(" ",length(minS)),lwd.ticks=lwt)
 	mtext(minS,at=minS,cex=mx,side=1,line=10)
