@@ -24,7 +24,12 @@ model{
 			mu.plot[i] <- beta0[compVegeP[i]]+ beta1[compVegeP[i]]*(xplot[i]-xvarCenter[compP[i]])
 
 	}
+	for(i in 1:Nhhplot){
 	
+			mu.hhplot[i] <- mu.beta0[comphh[i]]+ mu.beta1[comphh[i]]*(xplothh[i]-xvarCenter[comphh[i]])
+
+	}
+		
 	
 	#hierarchical priors for regression coefficients
 	for(i in 1:NcompVege){
