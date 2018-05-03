@@ -68,16 +68,16 @@ parmA <- unique(AirParm$parm)
 
 
 vegeclassColors <- data.frame(vegeclass=seq(1,9),
-					coli=c("grey50", "deepskyblue","darkgoldenrod","darkorchid4","forestgreen","tomato3","palegreen3","goldenrod1","chocolate1"))
+					coli=c("grey50","grey25", "deepskyblue2","steelblue4","seagreen4","hotpink3","gold1","midnightblue","chocolate2"))
 
 					
-vegeclassColors$colrgb <- c(rgb(127/255	,127/255,127/255,.25), 	rgb(0/255,191/255,255/255,.5),	rgb(184/255,134/255,11/255,.25),	
-						rgb(104/255,34/255,139/255,.25),rgb(34/255,139/255,34/255,.25),rgb(205/255,79/255,57/255,.25),
-						rgb(124/255,205/255,124/255,.25),rgb(255/255,193/255,37/255,.25),rgb(255/255,127/255,36/255,.25))
+vegeclassColors$colrgb <- c(rgb(127/255	,127/255,127/255,.25), rgb(63/255,63/255,63/255,.25),	rgb(0/255,178/255,238/255,.5),
+						rgb(54/255,100/255,139/255,.25),rgb(46/255,139/255,87/255,.25),rgb(205/255,96/255,144/255,.25),
+						rgb(255/255,215/255,0/255,.25),rgb(25/255,25/255,112/255,.25),rgb(238/255,118/255,33/255,.25))
 						
-vegeclassColors$colrgb2 <- c(rgb(127/255	,127/255,127/255,.5), 	rgb(0/255,191/255,255/255,.5),	rgb(184/255,134/255,11/255,.5),	
-						rgb(104/255,34/255,139/255,.5),rgb(34/255,139/255,34/255,.5),rgb(205/255,79/255,57/255,.5),
-						rgb(124/255,205/255,124/255,.5),rgb(255/255,193/255,37/255,.5),rgb(255/255,127/255,36/255,.5))						
+vegeclassColors$colrgb2 <- c(rgb(127/255	,127/255,127/255,.5),rgb(63/255,63/255,63/255,.5), 	rgb(0/255,178/255,238/255,.5),	
+						rgb(54/255,100/255,139/255,.5),rgb(46/255,139/255,87/255,.5),rgb(205/255,96/255,144/255,.5),
+						rgb(255/255,215/255,0/255,.5),rgb(25/255,25/255,112/255,.5),rgb(238/255,118/255,33/255,.5))						
 						
 SoilParm <- join(SoilParm,vegeclassColors,by="vegeclass",type="left")
 					
@@ -272,6 +272,13 @@ mubeta0$compNameY <- compNameY
 mubeta1$compNameX <- compNameX
 mubeta1$compNameY <- compNameY
 
+
+
+#######################################
+#####compare paramters         ##### 
+#######################################
+
+
 yl <- xcompDF$ymin
 yh <- xcompDF$ymax
 
@@ -361,9 +368,9 @@ aveL <- -15
 aveH <- 10
 minL <- -35
 minH <- 1
-maxL <- -1
+maxL <- 0
 maxH <- 22
-pminL <- .15
+pminL <- .20
 pminH <- 0.62
 pmaxL <- 0.58
 pmaxH <- 1
@@ -464,6 +471,7 @@ dev.off()
 #######################################
 ##### plot of regression result   ##### 
 #####for ave and min			  #####
+#####with gray points             #####
 #######################################
 
 
@@ -500,9 +508,9 @@ aveL <- -15
 aveH <- 10
 minL <- -35
 minH <- 1
-maxL <- -1
+maxL <- 0
 maxH <- 22
-pminL <- .15
+pminL <- .20
 pminH <- 0.62
 pmaxL <- 0.58
 pmaxH <- 1
@@ -515,12 +523,18 @@ px <- 10
 lwt <- 10
 mx <- 8
 lx <- 10
+lgx <- 10
 #labels
 aveS <- seq(-15,5,by=5)
-minS <- seq(-35,0, by=5)
+minS <- seq(-30,0, by=5)
 maxS <- seq(0,20,by=5)
 pminS <- seq(.25,.55,by=.1)
 pmaxS <- seq(0.65,.95,by=.1)
+
+#line thickness
+rlw <- 12
+plw <- 5
+
 
 regF <- function(b0,b1,x,xcent){
 	b0+(b1*(x-xcent))
@@ -543,50 +557,61 @@ jpeg(paste0(plotDI,"\\model\\run",Nrun,"\\soil_comp_reg_C1.jpg"), width=5500, he
 
 	
 		#vegetation mean
-	for(j in 1:length(vegeG1)){
-		if(beta1$sig[beta1$comp==4&beta1$vegeClass==vegeG1[j]]==1){
-		points(SoilL[[xcomp[4]]]$Mean[SoilL[[xcomp[4]]]$vegeclass==vegeG1[j]],SoilL[[ycomp[4]]]$Mean[SoilL[[xcomp[4]]]$vegeclass==vegeG1[j]], pch=19,col=as.character(paste(vegeclassColors$coli[vegeG1[j]])),cex=px)
-		}else{
-		points(SoilL[[xcomp[4]]]$Mean[SoilL[[xcomp[4]]]$vegeclass==vegeG1[j]],SoilL[[ycomp[4]]]$Mean[SoilL[[xcomp[4]]]$vegeclass==vegeG1[j]], pch=19,col="grey65",cex=px)
-		}
+		for(j in 1:length(vegeG1)){
+		points(SoilL[[xcomp[4]]]$Mean[SoilL[[xcomp[4]]]$vegeclass==vegeG1[j]],SoilL[[ycomp[4]]]$Mean[SoilL[[xcomp[4]]]$vegeclass==vegeG1[j]], pch=19,col="grey75",cex=px)
 	}
+	
 	for(j in 1:length(vegeG1)){
 		if(beta1$sig[beta1$comp==4&beta1$vegeClass==vegeG1[j]]==1){
-			points(xplotDF$xplot[xplotDF$comp==4&xplotDF$vegeClass==vegeG1[j]],xplotDF$Mean[xplotDF$comp==4&xplotDF$vegeClass==vegeG1[j]], type="l",lwd=3,col=as.character(paste(vegeclassColors$coli[vegeG1[j]])))
 		
 			polygon(c(xplotDF$xplot[xplotDF$comp==4&xplotDF$vegeClass==vegeG1[j]],rev(xplotDF$xplot[xplotDF$comp==4&xplotDF$vegeClass==vegeG1[j]])),
-				c(xplotDF$pc.l[xplotDF$comp==4&xplotDF$vegeClass==vegeG1[j]],rev(xplotDF$pc.h[xplotDF$comp==4&xplotDF$vegeClass==vegeG1[j]])), border=vegeclassColors$colrgb2[vegeG1[j]],lwd=3,col=vegeclassColors$colrgb[vegeG1[j]])
+				c(xplotDF$pc.l[xplotDF$comp==4&xplotDF$vegeClass==vegeG1[j]],rev(xplotDF$pc.h[xplotDF$comp==4&xplotDF$vegeClass==vegeG1[j]])), border=vegeclassColors$colrgb2[vegeG1[j]],lwd=plw,col=vegeclassColors$colrgb[vegeG1[j]])
 		}
 	}
 	
-	legend("topleft",paste(datVI$vegename[vegeG1]),pch=19,col=as.character(vegeclassColors$coli[vegeG1]), bty="n",cex=4)
+	for(j in 1:length(vegeG1)){
+		if(beta1$sig[beta1$comp==4&beta1$vegeClass==vegeG1[j]]==1){
+			points(xplotDF$xplot[xplotDF$comp==4&xplotDF$vegeClass==vegeG1[j]],xplotDF$Mean[xplotDF$comp==4&xplotDF$vegeClass==vegeG1[j]], type="l",lwd=rlw,col=as.character(paste(vegeclassColors$coli[vegeG1[j]])))
+		
+		}
+	}
+		
 	axis(2,aveS,rep(" ",length(aveS)),lwd.ticks=lwt)
 	mtext("Temp Ave", side=2, line=25, cex=lx)
-	mtext(aveS,at=aveS,side=2,line=10,cex=mx)
+	mtext(aveS,at=aveS,side=2,line=10,cex=mx,las=2)
 	
 	box(which="plot")		
 	
 	
 	#min vs ave G1
 	par(mai=c(0,0,0,0))
-	plot(c(0,1),c(0,1),type="n", xlim=c(minL,pminH), ylim=c(aveL,aveH), xlab=" ", ylab=" ",
+	plot(c(0,1),c(0,1),type="n", xlim=c(minL,minH), ylim=c(aveL,aveH), xlab=" ", ylab=" ",
 			xaxs="i", yaxs="i", axes=FALSE)
 
 	for(j in 1:length(vegeG1)){
-		points(SoilL[[xcomp[1]]]$Mean[SoilL[[xcomp[1]]]$vegeclass==vegeG1[j]],SoilL[[ycomp[1]]]$Mean[SoilL[[xcomp[1]]]$vegeclass==vegeG1[j]], pch=19,col="grey65",cex=px)
+		points(SoilL[[xcomp[1]]]$Mean[SoilL[[xcomp[1]]]$vegeclass==vegeG1[j]],SoilL[[ycomp[1]]]$Mean[SoilL[[xcomp[1]]]$vegeclass==vegeG1[j]], pch=19,col="grey75",cex=px)
 	}
 	
 	
 		#vegetation mean
 	for(j in 1:dim(vegeclassColors)[1]){
 		if(beta1$sig[beta1$comp==1&beta1$vegeClass==vegeG1[j]]==1){
-			points(xplotDF$xplot[xplotDF$comp==1&xplotDF$vegeClass==vegeG1[j]],xplotDF$Mean[xplotDF$comp==1&xplotDF$vegeClass==vegeG1[j]], type="l",lwd=3,col=as.character(paste(vegeclassColors$coli[vegeG1[j]])))
+			
 		
 			polygon(c(xplotDF$xplot[xplotDF$comp==1&xplotDF$vegeClass==vegeG1[j]],rev(xplotDF$xplot[xplotDF$comp==1&xplotDF$vegeClass==vegeG1[j]])),
-				c(xplotDF$pc.l[xplotDF$comp==1&xplotDF$vegeClass==vegeG1[j]],rev(xplotDF$pc.h[xplotDF$comp==1&xplotDF$vegeClass==vegeG1[j]])), border=vegeclassColors$colrgb2[vegeG1[j]],lwd=3,col=vegeclassColors$colrgb[vegeG1[j]])
+				c(xplotDF$pc.l[xplotDF$comp==1&xplotDF$vegeClass==vegeG1[j]],rev(xplotDF$pc.h[xplotDF$comp==1&xplotDF$vegeClass==vegeG1[j]])), border=vegeclassColors$colrgb2[vegeG1[j]],lwd=plw,col=vegeclassColors$colrgb[vegeG1[j]])
 		}
 	}
 	
+		for(j in 1:dim(vegeclassColors)[1]){
+		if(beta1$sig[beta1$comp==1&beta1$vegeClass==vegeG1[j]]==1){
+			points(xplotDF$xplot[xplotDF$comp==1&xplotDF$vegeClass==vegeG1[j]],xplotDF$Mean[xplotDF$comp==1&xplotDF$vegeClass==vegeG1[j]], type="l",lwd=rlw,col=as.character(paste(vegeclassColors$coli[vegeG1[j]])))
+		
+		}
+	}
+	
+	
+	legend("topleft",paste(datVI$vegename[vegeG1]),pch=19,col=as.character(vegeclassColors$coli[vegeG1]), bty="n",cex=lgx )
 	box(which="plot")
 	
 	#min vs pmin	G1	
@@ -595,16 +620,22 @@ jpeg(paste0(plotDI,"\\model\\run",Nrun,"\\soil_comp_reg_C1.jpg"), width=5500, he
 			xaxs="i", yaxs="i", axes=FALSE)	
 	
 		for(j in 1:length(vegeG1)){
-		points(SoilL[[xcomp[3]]]$Mean[SoilL[[xcomp[3]]]$vegeclass==vegeG1[j]],SoilL[[ycomp[3]]]$Mean[SoilL[[xcomp[3]]]$vegeclass==vegeG1[j]], pch=19,col="grey65",cex=px)
+		points(SoilL[[xcomp[3]]]$Mean[SoilL[[xcomp[3]]]$vegeclass==vegeG1[j]],SoilL[[ycomp[3]]]$Mean[SoilL[[xcomp[3]]]$vegeclass==vegeG1[j]], pch=19,col="grey75",cex=px)
 	}
 	
 		#vegetation mean
 	for(j in 1:length(vegeG1)){
 		if(beta1$sig[beta1$comp==3&beta1$vegeClass==vegeG1[j]]==1){
-			points(xplotDF$xplot[xplotDF$comp==3&xplotDF$vegeClass==vegeG1[j]],xplotDF$Mean[xplotDF$comp==3&xplotDF$vegeClass==vegeG1[j]], type="l",lwd=3,col=as.character(paste(vegeclassColors$coli[vegeG1[j]])))
 		
 			polygon(c(xplotDF$xplot[xplotDF$comp==3&xplotDF$vegeClass==vegeG1[j]],rev(xplotDF$xplot[xplotDF$comp==3&xplotDF$vegeClass==vegeG1[j]])),
-				c(xplotDF$pc.l[xplotDF$comp==3&xplotDF$vegeClass==vegeG1[j]],rev(xplotDF$pc.h[xplotDF$comp==3&xplotDF$vegeClass==vegeG1[j]])), border=vegeclassColors$colrgb2[vegeG1[j]],lwd=3,col=vegeclassColors$colrgb[vegeG1[j]])
+				c(xplotDF$pc.l[xplotDF$comp==3&xplotDF$vegeClass==vegeG1[j]],rev(xplotDF$pc.h[xplotDF$comp==3&xplotDF$vegeClass==vegeG1[j]])), border=vegeclassColors$colrgb2[vegeG1[j]],lwd=plw,col=vegeclassColors$colrgb[vegeG1[j]])
+		}
+	}
+	for(j in 1:length(vegeG1)){
+		if(beta1$sig[beta1$comp==3&beta1$vegeClass==vegeG1[j]]==1){
+			points(xplotDF$xplot[xplotDF$comp==3&xplotDF$vegeClass==vegeG1[j]],xplotDF$Mean[xplotDF$comp==3&xplotDF$vegeClass==vegeG1[j]], type="l",lwd=rlw ,col=as.character(paste(vegeclassColors$coli[vegeG1[j]])))
+		
+			
 		}
 	}
 
@@ -622,26 +653,31 @@ jpeg(paste0(plotDI,"\\model\\run",Nrun,"\\soil_comp_reg_C1.jpg"), width=5500, he
 
 	
 	for(j in 1:length(vegeG1)){
-		points(SoilL[[xcomp[4]]]$Mean[SoilL[[xcomp[4]]]$vegeclass==vegeG2[j]],SoilL[[ycomp[4]]]$Mean[SoilL[[xcomp[4]]]$vegeclass==vegeG2[j]], pch=19,col="grey65",cex=px)
+		points(SoilL[[xcomp[4]]]$Mean[SoilL[[xcomp[4]]]$vegeclass==vegeG2[j]],SoilL[[ycomp[4]]]$Mean[SoilL[[xcomp[4]]]$vegeclass==vegeG2[j]], pch=19,col="grey75",cex=px)
 	}
 	
 		#vegetation mean
 	for(j in 1:length(vegeG2)){
 		if(beta1$sig[beta1$comp==4&beta1$vegeClass==j]==1){
-			points(xplotDF$xplot[xplotDF$comp==4&xplotDF$vegeClass==vegeG2[j]],xplotDF$Mean[xplotDF$comp==4&xplotDF$vegeClass==vegeG2[j]], type="l",lwd=3,col=as.character(paste(vegeclassColors$coli[vegeG2[j]])))
 		
 			polygon(c(xplotDF$xplot[xplotDF$comp==4&xplotDF$vegeClass==vegeG2[j]],rev(xplotDF$xplot[xplotDF$comp==4&xplotDF$vegeClass==vegeG2[j]])),
-				c(xplotDF$pc.l[xplotDF$comp==4&xplotDF$vegeClass==vegeG2[j]],rev(xplotDF$pc.h[xplotDF$comp==4&xplotDF$vegeClass==vegeG2[j]])), border=vegeclassColors$colrgb2[vegeG2[j]],lwd=3,col=vegeclassColors$colrgb[vegeG2[j]])
+				c(xplotDF$pc.l[xplotDF$comp==4&xplotDF$vegeClass==vegeG2[j]],rev(xplotDF$pc.h[xplotDF$comp==4&xplotDF$vegeClass==vegeG2[j]])), border=vegeclassColors$colrgb2[vegeG2[j]],lwd=plw,col=vegeclassColors$colrgb[vegeG2[j]])
 		}
 	}
-	
+	for(j in 1:length(vegeG2)){
+		if(beta1$sig[beta1$comp==4&beta1$vegeClass==j]==1){
+			points(xplotDF$xplot[xplotDF$comp==4&xplotDF$vegeClass==vegeG2[j]],xplotDF$Mean[xplotDF$comp==4&xplotDF$vegeClass==vegeG2[j]], type="l",lwd=rlw ,col=as.character(paste(vegeclassColors$coli[vegeG2[j]])))
+		
+		}
+	}
+		
 	axis(1,maxS,rep(" ",length(maxS)),lwd.ticks=lwt)
-	mtext(maxS,at=maxS,las=1,cex=mx,side=1,line=6)
+	mtext(maxS,at=maxS,las=1,cex=mx,side=1,line=10)
 	axis(2,aveS,rep(" ",length(aveS)),lwd.ticks=lwt)
-	mtext("Temp Max", side=1, line=30, cex=lx)
+	mtext("Temp Max", side=1, line=25, cex=lx)
 	mtext("Temp Ave", side=2, line=25, cex=lx)
-	mtext(aveS,at=aveS,side=2,line=10,cex=mx)
-	legend("topleft",paste(datVI$vegename[vegeG2]),pch=19,col=as.character(vegeclassColors$coli[vegeG2]), bty="n",cex=4)
+	mtext(aveS,at=aveS,side=2,line=10,cex=mx,las=2)
+	
 	box(which="plot")		
 
 #min vs ave G2
@@ -651,20 +687,28 @@ jpeg(paste0(plotDI,"\\model\\run",Nrun,"\\soil_comp_reg_C1.jpg"), width=5500, he
 
 	
 	for(j in 1:length(vegeG1)){
-		points(SoilL[[xcomp[1]]]$Mean[SoilL[[xcomp[1]]]$vegeclass==vegeG2[j]],SoilL[[ycomp[1]]]$Mean[SoilL[[xcomp[1]]]$vegeclass==vegeG2[j]], pch=19,col="grey65",cex=px)
+		points(SoilL[[xcomp[1]]]$Mean[SoilL[[xcomp[1]]]$vegeclass==vegeG2[j]],SoilL[[ycomp[1]]]$Mean[SoilL[[xcomp[1]]]$vegeclass==vegeG2[j]], pch=19,col="grey75",cex=px)
 	}
 	
 	
 		#vegetation mean
 	for(j in 1:length(vegeG2)){
 		if(beta1$sig[beta1$comp==1&beta1$vegeClass==vegeG2[j]]==1){
-			points(xplotDF$xplot[xplotDF$comp==1&xplotDF$vegeClass==vegeG2[j]],xplotDF$Mean[xplotDF$comp==1&xplotDF$vegeClass==vegeG2[j]], type="l",lwd=3,col=as.character(paste(vegeclassColors$coli[vegeG2[j]])))
 		
 			polygon(c(xplotDF$xplot[xplotDF$comp==1&xplotDF$vegeClass==vegeG2[j]],rev(xplotDF$xplot[xplotDF$comp==1&xplotDF$vegeClass==vegeG2[j]])),
-				c(xplotDF$pc.l[xplotDF$comp==1&xplotDF$vegeClass==vegeG2[j]],rev(xplotDF$pc.h[xplotDF$comp==1&xplotDF$vegeClass==vegeG2[j]])), border=vegeclassColors$colrgb2[vegeG2[j]],lwd=3,col=vegeclassColors$colrgb[vegeG2[j]])
+				c(xplotDF$pc.l[xplotDF$comp==1&xplotDF$vegeClass==vegeG2[j]],rev(xplotDF$pc.h[xplotDF$comp==1&xplotDF$vegeClass==vegeG2[j]])), border=vegeclassColors$colrgb2[vegeG2[j]],lwd=plw,col=vegeclassColors$colrgb[vegeG2[j]])
 		}
 	}
 	
+		for(j in 1:length(vegeG2)){
+		if(beta1$sig[beta1$comp==1&beta1$vegeClass==vegeG2[j]]==1){
+			points(xplotDF$xplot[xplotDF$comp==1&xplotDF$vegeClass==vegeG2[j]],xplotDF$Mean[xplotDF$comp==1&xplotDF$vegeClass==vegeG2[j]], type="l",lwd=rlw ,col=as.character(paste(vegeclassColors$coli[vegeG2[j]])))
+		
+		}
+	}
+	
+	
+	legend("topleft",paste(datVI$vegename[vegeG2]),pch=19,col=as.character(vegeclassColors$coli[vegeG2]), bty="n",cex=lgx )
 	axis(1,minS,rep(" ",length(minS)),lwd.ticks=lwt)
 	mtext(minS,at=minS,cex=mx,side=1,line=10)
 	mtext("Temp Min", side=1, line=25, cex=lx)
@@ -677,20 +721,30 @@ jpeg(paste0(plotDI,"\\model\\run",Nrun,"\\soil_comp_reg_C1.jpg"), width=5500, he
 
 	
 	for(j in 1:length(vegeG1)){
-		points(SoilL[[xcomp[3]]]$Mean[SoilL[[xcomp[3]]]$vegeclass==vegeG2[j]],SoilL[[ycomp[3]]]$Mean[SoilL[[xcomp[3]]]$vegeclass==vegeG2[j]], pch=19,col="grey65",cex=px)
+		points(SoilL[[xcomp[3]]]$Mean[SoilL[[xcomp[3]]]$vegeclass==vegeG2[j]],SoilL[[ycomp[3]]]$Mean[SoilL[[xcomp[3]]]$vegeclass==vegeG2[j]], pch=19,col="grey75",cex=px)
 	}
 	
 		#vegetation mean
 	for(j in 1:length(vegeG2)){
 		if(beta1$sig[beta1$comp==3&beta1$vegeClass==vegeG2[j]]==1){
-			points(xplotDF$xplot[xplotDF$comp==3&xplotDF$vegeClass==vegeG2[j]],xplotDF$Mean[xplotDF$comp==3&xplotDF$vegeClass==vegeG2[j]], type="l",lwd=3,col=as.character(paste(vegeclassColors$coli[vegeG2[j]])))
+			
 		
 			polygon(c(xplotDF$xplot[xplotDF$comp==3&xplotDF$vegeClass==vegeG2[j]],rev(xplotDF$xplot[xplotDF$comp==3&xplotDF$vegeClass==vegeG2[j]])),
-				c(xplotDF$pc.l[xplotDF$comp==3&xplotDF$vegeClass==vegeG2[j]],rev(xplotDF$pc.h[xplotDF$comp==3&xplotDF$vegeClass==vegeG2[j]])), border=vegeclassColors$colrgb2[vegeG2[j]],lwd=3,col=vegeclassColors$colrgb[vegeG2[j]])
+				c(xplotDF$pc.l[xplotDF$comp==3&xplotDF$vegeClass==vegeG2[j]],rev(xplotDF$pc.h[xplotDF$comp==3&xplotDF$vegeClass==vegeG2[j]])), border=vegeclassColors$colrgb2[vegeG2[j]],lwd=plw,col=vegeclassColors$colrgb[vegeG2[j]])
 		}
 	}
+	
+		for(j in 1:length(vegeG2)){
+		if(beta1$sig[beta1$comp==3&beta1$vegeClass==vegeG2[j]]==1){
+			points(xplotDF$xplot[xplotDF$comp==3&xplotDF$vegeClass==vegeG2[j]],xplotDF$Mean[xplotDF$comp==3&xplotDF$vegeClass==vegeG2[j]], type="l",lwd=rlw ,col=as.character(paste(vegeclassColors$coli[vegeG2[j]])))
+		
+			
+		}
+	}
+	
+	
 	axis(1,pminS,rep(" ",length(pminS)),lwd.ticks=lwt)
-	mtext(pminS,at=pminS,side=1,line=6,cex=mx)	
+	mtext(pminS,at=pminS,side=1,line=10,cex=mx)	
 	axis(4,minS,rep(" ",length(minS)),lwd.ticks=lwt)
 	mtext(minS,at=minS,las=2,cex=mx,side=4,line=6)
 	mtext("Min time", side=1, line=25, cex=lx)
@@ -698,6 +752,233 @@ jpeg(paste0(plotDI,"\\model\\run",Nrun,"\\soil_comp_reg_C1.jpg"), width=5500, he
 	box(which="plot")	
 
 dev.off()
+
+
+
+
+#######################################
+##### plot of regression result   ##### 
+#####for ave and min			  #####
+#####with color points             #####
+#######################################
+
+
+
+
+jpeg(paste0(plotDI,"\\model\\run",Nrun,"\\soil_comp_reg_C1_col.jpg"), width=5500, height=5000, units="px",quality=100)
+	layout(matrix(seq(1,6),byrow=TRUE,ncol=3), width=rep(lcm(wd),6), height=rep(lcm(hd),6))
+	#max vs ave Vege G1 
+	par(mai=c(0,0,0,0))
+	plot(c(0,1),c(0,1),type="n", ylim=c(aveL,aveH), xlim=c(maxL,maxH), xlab=" ", ylab=" ",
+			xaxs="i", yaxs="i", axes=FALSE)
+	
+
+	
+		#vegetation mean
+	for(j in 1:length(vegeG1)){
+		points(SoilL[[xcomp[4]]]$Mean[SoilL[[xcomp[4]]]$vegeclass==vegeG1[j]],SoilL[[ycomp[4]]]$Mean[SoilL[[xcomp[4]]]$vegeclass==vegeG1[j]], pch=19,col=as.character(paste(vegeclassColors$coli[vegeG1[j]])),cex=px)
+	
+	}
+	for(j in 1:length(vegeG1)){
+		if(beta1$sig[beta1$comp==4&beta1$vegeClass==vegeG1[j]]==1){
+		
+			polygon(c(xplotDF$xplot[xplotDF$comp==4&xplotDF$vegeClass==vegeG1[j]],rev(xplotDF$xplot[xplotDF$comp==4&xplotDF$vegeClass==vegeG1[j]])),
+				c(xplotDF$pc.l[xplotDF$comp==4&xplotDF$vegeClass==vegeG1[j]],rev(xplotDF$pc.h[xplotDF$comp==4&xplotDF$vegeClass==vegeG1[j]])), border=vegeclassColors$colrgb2[vegeG1[j]],lwd=plw,col=vegeclassColors$colrgb[vegeG1[j]])
+		}
+	}
+	
+	for(j in 1:length(vegeG1)){
+		if(beta1$sig[beta1$comp==4&beta1$vegeClass==vegeG1[j]]==1){
+			points(xplotDF$xplot[xplotDF$comp==4&xplotDF$vegeClass==vegeG1[j]],xplotDF$Mean[xplotDF$comp==4&xplotDF$vegeClass==vegeG1[j]], type="l",lwd=rlw,col=as.character(paste(vegeclassColors$coli[vegeG1[j]])))
+		
+		}
+	}
+		
+	axis(2,aveS,rep(" ",length(aveS)),lwd.ticks=lwt)
+	mtext("Temp Ave", side=2, line=25, cex=lx)
+	mtext(aveS,at=aveS,side=2,line=10,cex=mx,las=2)
+	
+	box(which="plot")		
+	
+	
+	#min vs ave G1
+	par(mai=c(0,0,0,0))
+	plot(c(0,1),c(0,1),type="n", xlim=c(minL,minH), ylim=c(aveL,aveH), xlab=" ", ylab=" ",
+			xaxs="i", yaxs="i", axes=FALSE)
+
+	for(j in 1:length(vegeG1)){
+		points(SoilL[[xcomp[1]]]$Mean[SoilL[[xcomp[1]]]$vegeclass==vegeG1[j]],SoilL[[ycomp[1]]]$Mean[SoilL[[xcomp[1]]]$vegeclass==vegeG1[j]], pch=19,col=as.character(paste(vegeclassColors$coli[vegeG1[j]])),cex=px)
+	}
+	
+	
+		#vegetation mean
+	for(j in 1:dim(vegeclassColors)[1]){
+		if(beta1$sig[beta1$comp==1&beta1$vegeClass==vegeG1[j]]==1){
+			
+		
+			polygon(c(xplotDF$xplot[xplotDF$comp==1&xplotDF$vegeClass==vegeG1[j]],rev(xplotDF$xplot[xplotDF$comp==1&xplotDF$vegeClass==vegeG1[j]])),
+				c(xplotDF$pc.l[xplotDF$comp==1&xplotDF$vegeClass==vegeG1[j]],rev(xplotDF$pc.h[xplotDF$comp==1&xplotDF$vegeClass==vegeG1[j]])), border=vegeclassColors$colrgb2[vegeG1[j]],lwd=plw,col=vegeclassColors$colrgb[vegeG1[j]])
+		}
+	}
+	
+		for(j in 1:dim(vegeclassColors)[1]){
+		if(beta1$sig[beta1$comp==1&beta1$vegeClass==vegeG1[j]]==1){
+			points(xplotDF$xplot[xplotDF$comp==1&xplotDF$vegeClass==vegeG1[j]],xplotDF$Mean[xplotDF$comp==1&xplotDF$vegeClass==vegeG1[j]], type="l",lwd=rlw,col=as.character(paste(vegeclassColors$coli[vegeG1[j]])))
+		
+		}
+	}
+	
+	
+	legend("topleft",paste(datVI$vegename[vegeG1]),pch=19,col=as.character(vegeclassColors$coli[vegeG1]), bty="n",cex=lgx )
+	box(which="plot")
+	
+	#min vs pmin	G1	
+	par(mai=c(0,0,0,0))
+	plot(c(0,1),c(0,1),type="n", xlim=c(pminL,pminH), ylim=c(minL,minH), xlab=" ", ylab=" ",
+			xaxs="i", yaxs="i", axes=FALSE)	
+	
+		for(j in 1:length(vegeG1)){
+		points(SoilL[[xcomp[3]]]$Mean[SoilL[[xcomp[3]]]$vegeclass==vegeG1[j]],SoilL[[ycomp[3]]]$Mean[SoilL[[xcomp[3]]]$vegeclass==vegeG1[j]], pch=19,col=as.character(paste(vegeclassColors$coli[vegeG1[j]])),cex=px)
+	}
+	
+		#vegetation mean
+	for(j in 1:length(vegeG1)){
+		if(beta1$sig[beta1$comp==3&beta1$vegeClass==vegeG1[j]]==1){
+		
+			polygon(c(xplotDF$xplot[xplotDF$comp==3&xplotDF$vegeClass==vegeG1[j]],rev(xplotDF$xplot[xplotDF$comp==3&xplotDF$vegeClass==vegeG1[j]])),
+				c(xplotDF$pc.l[xplotDF$comp==3&xplotDF$vegeClass==vegeG1[j]],rev(xplotDF$pc.h[xplotDF$comp==3&xplotDF$vegeClass==vegeG1[j]])), border=vegeclassColors$colrgb2[vegeG1[j]],lwd=plw,col=vegeclassColors$colrgb[vegeG1[j]])
+		}
+	}
+	for(j in 1:length(vegeG1)){
+		if(beta1$sig[beta1$comp==3&beta1$vegeClass==vegeG1[j]]==1){
+			points(xplotDF$xplot[xplotDF$comp==3&xplotDF$vegeClass==vegeG1[j]],xplotDF$Mean[xplotDF$comp==3&xplotDF$vegeClass==vegeG1[j]], type="l",lwd=rlw ,col=as.character(paste(vegeclassColors$coli[vegeG1[j]])))
+		
+			
+		}
+	}
+
+	axis(4,minS,rep(" ",length(minS)),lwd.ticks=lwt)
+	mtext(minS,at=minS,las=2,cex=mx,side=4,line=6)
+	mtext("Temp Min", side=4, line=30, cex=lx)
+	box(which="plot")	
+
+
+
+	#max vs ave Vege G2 
+	par(mai=c(0,0,0,0))
+	plot(c(0,1),c(0,1),type="n", ylim=c(aveL,aveH), xlim=c(maxL,maxH), xlab=" ", ylab=" ",
+			xaxs="i", yaxs="i", axes=FALSE)
+
+	
+	for(j in 1:length(vegeG1)){
+		points(SoilL[[xcomp[4]]]$Mean[SoilL[[xcomp[4]]]$vegeclass==vegeG2[j]],SoilL[[ycomp[4]]]$Mean[SoilL[[xcomp[4]]]$vegeclass==vegeG2[j]], pch=19,col=as.character(paste(vegeclassColors$coli[vegeG2[j]])),cex=px)
+	}
+	
+		#vegetation mean
+	for(j in 1:length(vegeG2)){
+		if(beta1$sig[beta1$comp==4&beta1$vegeClass==j]==1){
+		
+			polygon(c(xplotDF$xplot[xplotDF$comp==4&xplotDF$vegeClass==vegeG2[j]],rev(xplotDF$xplot[xplotDF$comp==4&xplotDF$vegeClass==vegeG2[j]])),
+				c(xplotDF$pc.l[xplotDF$comp==4&xplotDF$vegeClass==vegeG2[j]],rev(xplotDF$pc.h[xplotDF$comp==4&xplotDF$vegeClass==vegeG2[j]])), border=vegeclassColors$colrgb2[vegeG2[j]],lwd=plw,col=vegeclassColors$colrgb[vegeG2[j]])
+		}
+	}
+	for(j in 1:length(vegeG2)){
+		if(beta1$sig[beta1$comp==4&beta1$vegeClass==j]==1){
+			points(xplotDF$xplot[xplotDF$comp==4&xplotDF$vegeClass==vegeG2[j]],xplotDF$Mean[xplotDF$comp==4&xplotDF$vegeClass==vegeG2[j]], type="l",lwd=rlw ,col=as.character(paste(vegeclassColors$coli[vegeG2[j]])))
+		
+		}
+	}
+		
+	axis(1,maxS,rep(" ",length(maxS)),lwd.ticks=lwt)
+	mtext(maxS,at=maxS,las=1,cex=mx,side=1,line=10)
+	axis(2,aveS,rep(" ",length(aveS)),lwd.ticks=lwt)
+	mtext("Temp Max", side=1, line=25, cex=lx)
+	mtext("Temp Ave", side=2, line=25, cex=lx)
+	mtext(aveS,at=aveS,side=2,line=10,cex=mx,las=2)
+	
+	box(which="plot")		
+
+#min vs ave G2
+	par(mai=c(0,0,0,0))
+	plot(c(0,1),c(0,1),type="n", xlim=c(minL,pminH), ylim=c(aveL,aveH), xlab=" ", ylab=" ",
+			xaxs="i", yaxs="i", axes=FALSE)
+
+	
+	for(j in 1:length(vegeG1)){
+		points(SoilL[[xcomp[1]]]$Mean[SoilL[[xcomp[1]]]$vegeclass==vegeG2[j]],SoilL[[ycomp[1]]]$Mean[SoilL[[xcomp[1]]]$vegeclass==vegeG2[j]], pch=19,col=as.character(paste(vegeclassColors$coli[vegeG2[j]])),cex=px)
+	}
+	
+	
+		#vegetation mean
+	for(j in 1:length(vegeG2)){
+		if(beta1$sig[beta1$comp==1&beta1$vegeClass==vegeG2[j]]==1){
+		
+			polygon(c(xplotDF$xplot[xplotDF$comp==1&xplotDF$vegeClass==vegeG2[j]],rev(xplotDF$xplot[xplotDF$comp==1&xplotDF$vegeClass==vegeG2[j]])),
+				c(xplotDF$pc.l[xplotDF$comp==1&xplotDF$vegeClass==vegeG2[j]],rev(xplotDF$pc.h[xplotDF$comp==1&xplotDF$vegeClass==vegeG2[j]])), border=vegeclassColors$colrgb2[vegeG2[j]],lwd=plw,col=vegeclassColors$colrgb[vegeG2[j]])
+		}
+	}
+	
+		for(j in 1:length(vegeG2)){
+		if(beta1$sig[beta1$comp==1&beta1$vegeClass==vegeG2[j]]==1){
+			points(xplotDF$xplot[xplotDF$comp==1&xplotDF$vegeClass==vegeG2[j]],xplotDF$Mean[xplotDF$comp==1&xplotDF$vegeClass==vegeG2[j]], type="l",lwd=rlw ,col=as.character(paste(vegeclassColors$coli[vegeG2[j]])))
+		
+		}
+	}
+	
+	
+	legend("topleft",paste(datVI$vegename[vegeG2]),pch=19,col=as.character(vegeclassColors$coli[vegeG2]), bty="n",cex=lgx )
+	axis(1,minS,rep(" ",length(minS)),lwd.ticks=lwt)
+	mtext(minS,at=minS,cex=mx,side=1,line=10)
+	mtext("Temp Min", side=1, line=25, cex=lx)
+	box(which="plot")
+	
+	#min vs pmin G2		
+	par(mai=c(0,0,0,0))
+	plot(c(0,1),c(0,1),type="n", xlim=c(pminL,pminH), ylim=c(minL,minH), xlab=" ", ylab=" ",
+			xaxs="i", yaxs="i", axes=FALSE)	
+
+	
+	for(j in 1:length(vegeG1)){
+		points(SoilL[[xcomp[3]]]$Mean[SoilL[[xcomp[3]]]$vegeclass==vegeG2[j]],SoilL[[ycomp[3]]]$Mean[SoilL[[xcomp[3]]]$vegeclass==vegeG2[j]], pch=19,col=as.character(paste(vegeclassColors$coli[vegeG2[j]])),cex=px)
+	}
+	
+		#vegetation mean
+	for(j in 1:length(vegeG2)){
+		if(beta1$sig[beta1$comp==3&beta1$vegeClass==vegeG2[j]]==1){
+			
+		
+			polygon(c(xplotDF$xplot[xplotDF$comp==3&xplotDF$vegeClass==vegeG2[j]],rev(xplotDF$xplot[xplotDF$comp==3&xplotDF$vegeClass==vegeG2[j]])),
+				c(xplotDF$pc.l[xplotDF$comp==3&xplotDF$vegeClass==vegeG2[j]],rev(xplotDF$pc.h[xplotDF$comp==3&xplotDF$vegeClass==vegeG2[j]])), border=vegeclassColors$colrgb2[vegeG2[j]],lwd=plw,col=vegeclassColors$colrgb[vegeG2[j]])
+		}
+	}
+	
+		for(j in 1:length(vegeG2)){
+		if(beta1$sig[beta1$comp==3&beta1$vegeClass==vegeG2[j]]==1){
+			points(xplotDF$xplot[xplotDF$comp==3&xplotDF$vegeClass==vegeG2[j]],xplotDF$Mean[xplotDF$comp==3&xplotDF$vegeClass==vegeG2[j]], type="l",lwd=rlw ,col=as.character(paste(vegeclassColors$coli[vegeG2[j]])))
+		
+			
+		}
+	}
+	
+	
+	axis(1,pminS,rep(" ",length(pminS)),lwd.ticks=lwt)
+	mtext(pminS,at=pminS,side=1,line=10,cex=mx)	
+	axis(4,minS,rep(" ",length(minS)),lwd.ticks=lwt)
+	mtext(minS,at=minS,las=2,cex=mx,side=4,line=6)
+	mtext("Min time", side=1, line=25, cex=lx)
+	mtext("Temp Min", side=4, line=30, cex=lx)
+	box(which="plot")	
+
+dev.off()
+
+
+
+
+
+
+
+
+
 
 
 
