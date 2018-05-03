@@ -47,4 +47,12 @@ model{
 		tau.beta1[i] <- pow(sig.beta1[i],-2)
 		sig.beta1[i] ~dunif(0,1000)	
 	}
+	#compare vegetation slopes
+	for(k in 1:Ncomp){
+		for(i in 1:NVege){
+			for(m in 1:NVege){
+				slopeDiff[k,i,m] <- beta1[i+compAdd[k]]-beta1[m+compAdd[k]]
+			}
+		}	
+	}
 }
