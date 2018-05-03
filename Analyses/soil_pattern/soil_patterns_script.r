@@ -46,8 +46,8 @@ library(plyr)
 #set up a plot directory
 plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\soil_pattern\\plots"
 #model directory
-modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\soil_pattern\\model\\run6"
-Nrun <-6
+modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\soil_pattern\\model\\run7"
+Nrun <-7
 #indicate if a model run is occuring
 modRun <- 0
 
@@ -178,9 +178,10 @@ datalist <- list(Nobs=dim(SoilCompDF2)[1],
 				compP=xplotDF$comp,
 				comphh=hhxplotDF$comp,
 				xplothh=hhxplotDF$hhxplot,
-				Nhhplot=dim(hhxplotDF)[1])
+				Nhhplot=dim(hhxplotDF)[1],
+				compAdd=c(0,9,18,27,36),NVege=9)
 				
-parms <- c("rep.yvar","sig.compVege","beta0","beta1","mu.beta0","mu.beta1","sig.beta0","sig.beta1", "mu.plot","mu.hhplot")
+parms <- c("rep.yvar","sig.compVege","beta0","beta1","mu.beta0","mu.beta1","sig.beta0","sig.beta1", "mu.plot","mu.hhplot", "slopeDiff")
 
 comp.modI<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Analyses\\soil_pattern\\soil_patterns_model_code.r",
 						data=datalist,
