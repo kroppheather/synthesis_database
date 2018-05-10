@@ -130,7 +130,7 @@ Msoil2 <- join(Msoil,SYPid, by=c("siteid","wyear","parmID","vegeclass"), type="l
 
 #look at vegeParm in SYP
 vegeParmDF <- unique(data.frame(vegeclass=SYPid$vegeclass,parmID=SYPid$parmID))
-vegeParmDF$vegeParmid <- seq(1, dim(vegeParm)[1])
+vegeParmDF$vegeParmid <- seq(1, dim(vegeParmDF)[1])
 
 #join back into SYPid
 SYPid <- join(SYPid,vegeParmDF, by=c("vegeclass","parmID"), type="left")
@@ -225,7 +225,7 @@ vegMI <- join(vegMI, datVI, by="vegeclass",type="left")
 #now make 3 plots of the slopes
 
 hd <- 30
-wd <- 25
+wd <- 30
 
 yl <- c(-.4,-.8,-.007)
 yh <- c(2,.2,.011)
@@ -234,7 +234,7 @@ yhs <- c(2,.2,.01)
 yis <- c(.5,.2,.005)
 
 for(i in 1:length(parmVs)){
-	jpeg(paste0(plotDI,"\\model\\run",Nrun,"\\slopes_comp",parmVs[i],".jpeg"), width=7000, height=2000, units="px",quality=100)
+	jpeg(paste0(plotDI,"\\model\\run",Nrun,"\\slopes_comp",parmVs[i],".jpeg"), width=8000, height=2000, units="px",quality=100)
 		layout(matrix(seq(1,dim(vegMI)[1]), ncol=dim(vegMI)[1]), width=rep(lcm(wd),dim(vegMI)[1]), height=rep(lcm(hd),dim(vegMI)[1]))
 		
 	for(j in 1:dim(vegMI)[1]){
