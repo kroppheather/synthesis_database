@@ -52,10 +52,10 @@ library(plyr)
 #set up a plot directory
 plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\plots"
 #model directory
-modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model\\run1"
-Nrun <-1
+modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model\\run2"
+Nrun <-2
 #indicate if a model run is occuring
-modRun <- 1
+modRun <- 0
 
 
 #######################################
@@ -128,6 +128,13 @@ SYPid$SYP <- seq(1,dim(SYPid)[1])
 Msoil2 <- join(Msoil,SYPid, by=c("siteid","wyear","parmID","vegeclass"), type="left")
 
 
+#look at vegeParm in SYP
+vegeParmDF <- unique(data.frame(vegeclass=SYPid$vegeclass,parmID=SYPid$parmID))
+vegeParmDF$vegeParmid <- seq(1, dim(vegeParm)[1])
+
+#join back into SYPid
+SYPid <- join(SYPid,vegeParmDF, by=c("vegeclass","parmID"), type="left")
+
 #######################################
 #####prepare model run            ##### 
 #######################################
@@ -139,23 +146,26 @@ datalist <- list(Nobs=dim(Msoil2)[1],
 				depth=Msoil2$depth,
 				sig.mod=Msoil2$SD,
 				NSYP=dim(SYPid)[1],
+				vegeParm=SYPid$vegeParmid,
+				NvegeParm=dim(vegeParmDF)[1],
+				Parm=vegeParmDF$parmID,
 				Nparm=length(parmVs))
 				
 #paramters of interest
-parms <- c("beta0","beta1","sigP")			
+parms <- c("beta0","beta1","sigP", "mu.beta0","sig.beta0","mu.beta0C","sig.beta0C","mu.beta1","sig.beta1","mu.beta1C","sig.beta1C")			
 
 if(modRun==1){
 #start model 
 vege.modI<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Analyses\\vege_type\\depth_slopes_model_code.r",
 						data=datalist,
-						n.adapt=10000,
+						n.adapt=50000,
 						n.chains=3)
 
 vege.sample <- coda.samples(vege.modI,variable.names=parms,
-                       n.iter=30000, thin=10)	
+                       n.iter=120000, thin=40)	
 					
 #model history
-mcmcplot(vege.sample, parms=c("beta0","beta1","sigP"),
+mcmcplot(vege.sample, parms=c("beta0","beta1","sigP", "mu.beta0","sig.beta0","mu.beta0C","sig.beta0C","mu.beta1","sig.beta1","mu.beta1C","sig.beta1C"),
 			dir=paste0(modDI,"\\history"))
 
 
@@ -199,9 +209,61 @@ datC$parms <- gsub(dexps,"", rownames(datC))
 
 
 #look at slopes
-slope <- datC[datC$parms=="beta1",]
-slope <- cbind(slope,SYPid)
+slope <- datC[datC$parms=="mu.beta1",]
+slope <- cbind(slope,vegeParmDF)
 
 
-plot(slope$SYP,slope$Mean, pch=19)
-arrows(slope$SYP,slope$X2.5.,slope$SYP,slope$X97.5.,code=0)
+
+#slope site
+slopeS <- datC[datC$parms=="beta1",]
+slopeS <- cbind(slopeS,SYPid)
+
+
+#join unique vegeinfo
+vegMI <- data.frame(vegeclass=unique(slopeS$vegeclass))
+vegMI <- join(vegMI, datVI, by="vegeclass",type="left")
+#now make 3 plots of the slopes
+
+hd <- 30
+wd <- 25
+
+yl <- c(-.4,-.8,-.007)
+yh <- c(2,.2,.011)
+yls <- c(-.5,-.8,-.01)
+yhs <- c(2,.2,.01)
+yis <- c(.5,.2,.005)
+
+for(i in 1:length(parmVs)){
+	jpeg(paste0(plotDI,"\\model\\run",Nrun,"\\slopes_comp",parmVs[i],".jpeg"), width=7000, height=2000, units="px",quality=100)
+		layout(matrix(seq(1,dim(vegMI)[1]), ncol=dim(vegMI)[1]), width=rep(lcm(wd),dim(vegMI)[1]), height=rep(lcm(hd),dim(vegMI)[1]))
+		
+	for(j in 1:dim(vegMI)[1]){
+	par(mai=c(0,0,0,0))
+	plot(c(0,1),
+			c(0,1), type="n",
+			xlab=" ", ylab=" ", ylim=c(yl[i],yh[i]),xlim=c(0,length(slopeS$Mean[slopeS$parmID==i&slopeS$vegeclass==vegMI$vegeclass[j]])+1),
+			axes=FALSE, xaxs="i",yaxs="i")
+	abline(h=0, lwd=10, lty=3, col="royalblue3")
+	abline(h=slope$Mean[slope$parmID==i&slope$vegeclass==vegMI$vegeclass[j]], lwd=8, col="tomato3")
+	polygon(c(seq(0,length(slopeS$Mean[slopeS$parmID==i&slopeS$vegeclass==vegMI$vegeclass[j]])+1, length.out=100),
+				rev(seq(0,length(slopeS$Mean[slopeS$parmID==i&slopeS$vegeclass==vegMI$vegeclass[j]])+1, length.out=100))),
+			c(rep(slope$X2.5.[slope$parmID==i&slope$vegeclass==vegMI$vegeclass[j]],100),
+				rep(slope$X97.5.[slope$parmID==i&slope$vegeclass==vegMI$vegeclass[j]],100)),
+				col=rgb(205/255,79/255,57/255,.5), border=NA)
+	
+	points(seq(1,length(slopeS$Mean[slopeS$parmID==i&slopeS$vegeclass==vegMI$vegeclass[j]])),
+			slopeS$Mean[slopeS$parmID==i&slopeS$vegeclass==vegMI$vegeclass[j]], pch=19, cex=5)
+	
+	arrows(	seq(1,length(slopeS$Mean[slopeS$parmID==i&slopeS$vegeclass==vegMI$vegeclass[j]])),
+		slopeS$X2.5.[slopeS$parmID==i&slopeS$vegeclass==vegMI$vegeclass[j]],
+		seq(1,length(slopeS$Mean[slopeS$parmID==i&slopeS$vegeclass==vegMI$vegeclass[j]])),
+		slopeS$X97.5.[slopeS$parmID==i&slopeS$vegeclass==vegMI$vegeclass[j]], code=0, lwd=4)
+	box(which="plot")
+	mtext(paste(vegMI$vegename[vegMI$vegeclass==vegMI$vegeclass[j]]), side=1, line=10, cex=5)
+	if(j==1){
+		axis(2, seq(yls[i],yhs[i], by=yis[i]), rep(" ", length(seq(yls[i],yhs[i], by=yis[i]))),lwd.ticks=5)
+		mtext(seq(yls[i],yhs[i], by=yis[i]),at=seq(yls[i],yhs[i], by=yis[i]), las=2, cex=5, line=5, side=2)
+		}
+	}
+	dev.off()
+}
