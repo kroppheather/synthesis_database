@@ -147,4 +147,4 @@ for(i in 4:12){
 
 ClusterLoc$siteTot <- rowSums(ClusterLoc[,4:12])
 
-write.table(ClusterLoc,"c:\\Users\\hkropp\\Google Drive\\map_synth\\SitesClustered.txt",sep=",",row.names=FALSE)
+write.table(ClusterLoc,"c:\\Users\\hkropp\\Google Drive\\map_synth\\SitesClustered.csv",sep=",",row.names=FALSE)
