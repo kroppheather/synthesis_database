@@ -188,7 +188,6 @@ write.table(chain2,paste0(modDI,"\\chain2_coda.csv"), sep=",")
 chain3<-as.matrix(vege.sample [[3]])
 write.table(chain3,paste0(modDI,"\\chain3_coda.csv"), sep=",")		
 
-
 }	
 
 
