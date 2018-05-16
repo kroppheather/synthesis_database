@@ -3,7 +3,7 @@
 ########Heather Kropp started May 2018         ###########
 ##########################################################
 ##########################################################
-#simple non-hierarchical model for sites with 3 or more obs
+#simple hierarchical model for sites with 3 or more obs
 model{
 	#likelihood
 	for(i in 1:Nobs){
