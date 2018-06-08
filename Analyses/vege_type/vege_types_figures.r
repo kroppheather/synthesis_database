@@ -53,8 +53,7 @@ plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type
 #model directory
 modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run2"
 Nrun <-2
-#indicate if a model run is occuring
-modRun <- 1
+
 
 
 #######################################
@@ -135,71 +134,10 @@ ParmAll <- join(ParmAll,regvegeID, by=c("vegeclass","regID"),type="left")
 #precip mean
 precMs <- c(mean(ParmAll$precW),mean(ParmAll$precS),mean(ParmAll$precW))
 
-#######################################
-#####prepare model run            ##### 
-#######################################
-#data
-datalist <- list(Nobs=dim(ParmAll)[1],
-				regVege=ParmAll$regvegeID,
-				depth=ParmAll$depth,
-				SoilP=ParmAll$Mean,
-				reg=ParmAll$regID,
-				AirPbar=AirMs,
-				precip=ParmAll$precR,
-				precipbar=precMs,
-				sigMod=ParmAll$SD,
-				AirP=ParmAll$AMean,
-				sig.Air=ParmAll$ASD,
-				NregVege=dim(regvegeID)[1],
-				regV=regvegeID$regID,
-				Nreg=3
-				)
-				
-#paramters of interest
-parms <- c("beta0","beta1","beta2","beta3","sigSoilV","repSoilP",
-		"mu.beta0","mu.beta1","mu.beta2","mu.beta3",
-		"sig.beta0","sig.beta1","sig.beta2","sig.beta3")			
-Xcomp <- round(0.05/((9*3)-1),3)
-if(modRun==1){
-#start model 
-vege.modI<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Analyses\\vege_type\\vege_types_model_code.r",
-						data=datalist,
-						n.adapt=50000,
-						n.chains=3)
-
-vege.sample <- coda.samples(vege.modI,variable.names=parms,
-                       n.iter=300000, thin=100)	
-					
-#model history
-mcmcplot(vege.sample, parms=c("beta0","beta1","beta2","beta3","sigSoilV",
-								"mu.beta0","mu.beta1","mu.beta3","mu.beta3",
-								"sig.beta0","sig.beta1","sig.beta2","sig.beta3"),
-			dir=paste0(modDI,"\\history"))
-
-
-			
-#model output							   
-mod.out <- summary(vege.sample,  quantiles = c(Xcomp,0.025, 0.25, 0.5, 0.75, 0.975,1-Xcomp))
-
-write.table(mod.out$statistics,paste0(modDI,"\\vege_mod_stats.csv"),
-			sep=",",row.names=TRUE)
-write.table(mod.out$quantiles,paste0(modDI,"\\vege_mod_quant.csv"),
-			sep=",",row.names=TRUE)
-
-#coda output
-chain1<-as.matrix(vege.sample [[1]])
-write.table(chain1,paste0(modDI,"\\chain1_coda.csv"), sep=",")
-chain2<-as.matrix(vege.sample [[2]])
-write.table(chain2,paste0(modDI,"\\chain2_coda.csv"), sep=",")
-chain3<-as.matrix(vege.sample [[3]])
-write.table(chain3,paste0(modDI,"\\chain3_coda.csv"), sep=",")		
-
-}	
-
 
 
 #######################################
-#####look at data                 ##### 
+#####look at model                ##### 
 #######################################
 
 
