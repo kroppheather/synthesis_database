@@ -152,3 +152,24 @@ datC <- cbind(datM,datQ)
 dexps <- "\\[*[[:digit:]]*\\]"
 datC$parms <- gsub(dexps,"", rownames(datC))
 
+#isolate betas
+
+beta0 <- datC[datC$parms=="beta0",]
+beta1 <- datC[datC$parms=="beta1",]
+beta2 <- datC[datC$parms=="beta2",]
+beta3 <- datC[datC$parms=="beta3",]
+#add in sig test
+beta1$sigID <- ifelse(beta1$X0.2.<0&beta1$X99.8.<0,1,
+				ifelse(beta1$X0.2.>0&beta1$X99.8.>0,1,0))
+				
+beta2$sigID <- ifelse(beta2$X0.2.<0&beta2$X99.8.<0,1,
+				ifelse(beta2$X0.2.>0&beta2$X99.8.>0,1,0))				
+				
+beta3$sigID <- ifelse(beta3$X0.2.<0&beta3$X99.8.<0,1,
+				ifelse(beta3$X0.2.>0&beta3$X99.8.>0,1,0))
+
+#add identifier info
+beta0 <- data.frame(beta0,regvegeID )
+beta1 <- data.frame(beta1,regvegeID )
+beta2 <-data.frame(beta2,regvegeID )
+beta3 <-data.frame(beta3,regvegeID )
