@@ -173,3 +173,136 @@ beta0 <- data.frame(beta0,regvegeID )
 beta1 <- data.frame(beta1,regvegeID )
 beta2 <-data.frame(beta2,regvegeID )
 beta3 <-data.frame(beta3,regvegeID )
+
+
+
+#######################################
+#####plot parameter comparison   ##### 
+#######################################
+
+
+
+wd <- 45
+hd <- 40
+
+
+#make a panel of parameters for each regression
+
+
+xseq <-c(1,4,7,10,13,16,19,22,25)
+
+yli <- c(-35,0,0.2)
+yhi <- c(10,25,.6)
+yls1 <- c(-1,-1,-1)
+yhs1 <- c(1,1,1)
+yls2 <- c(-1,-1,-1)
+yhs2 <- c(1.5,1,1)
+yls3 <- c(-.5,-1,-1)
+yhs3 <- c(.5,1,1)
+
+xl <- -1
+xh <- 27
+alw <- 2
+zlw <- 10
+mlw <- 5
+#
+for(i in 1:3){
+	jpeg(paste0(plotDI,"\\run",Nrun,"\\regression_parm",i,".jpg"), width=5500,height=2000,
+			quality=100,units="px")
+	layout(matrix(seq(1,4),ncol=4), width=rep(lcm(wd),4),height=rep(lcm(hd),4))
+		#plot intercept
+		par(mai=c(2,2,2,2))
+			plot(c(0,1),c(0,1), ylim=c(yli[i],yhi[i]), xlim=c(xl,xh),
+				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+			
+			for(j in 1:9){
+				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
+						c(beta0$X25.[beta0$regID==i&beta0$vegeclass==j],beta0$X75.[beta0$regID==i&beta0$vegeclass==j],
+							beta0$X75.[beta0$regID==i&beta0$vegeclass==j],beta0$X25.[beta0$regID==i&beta0$vegeclass==j]),
+						col="tomato3",border=NA)
+				arrows(xseq[j]-1,beta0$Mean[beta0$regID==i&beta0$vegeclass==j],
+						xseq[j]+1,beta0$Mean[beta0$regID==i&beta0$vegeclass==j],code=0,lwd=mlw)
+				arrows(	xseq[j],beta0$X0.2.[beta0$regID==i&beta0$vegeclass==j],
+						xseq[j],beta0$X99.8.[beta0$regID==i&beta0$vegeclass==j],
+						code=0, lwd=alw)
+			}
+		box(which="plot")
+		#plot slope 1
+		par(mai=c(2,2,2,2))
+			plot(c(0,1),c(0,1), ylim=c(yls1[i],yhs1[i]), xlim=c(xl,xh),
+				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+		abline(h=0,	lwd	=2, col="grey75",lty=3)			
+			for(j in 1:9){
+			if(beta1$sigID[beta1$regID==i&beta1$vegeclass==j]==1){
+				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
+						c(beta1$X25.[beta1$regID==i&beta1$vegeclass==j],beta1$X75.[beta1$regID==i&beta1$vegeclass==j],
+							beta1$X75.[beta1$regID==i&beta1$vegeclass==j],beta1$X25.[beta1$regID==i&beta1$vegeclass==j]),
+						col="tomato3",border=NA)
+			}else{
+				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
+						c(beta1$X25.[beta1$regID==i&beta1$vegeclass==j],beta1$X75.[beta1$regID==i&beta1$vegeclass==j],
+							beta1$X75.[beta1$regID==i&beta1$vegeclass==j],beta1$X25.[beta1$regID==i&beta1$vegeclass==j]),
+						col="grey75",border=NA)
+				}
+				arrows(xseq[j]-1,beta1$Mean[beta1$regID==i&beta1$vegeclass==j],
+						xseq[j]+1,beta1$Mean[beta1$regID==i&beta1$vegeclass==j],code=0,lwd=mlw)
+				arrows(	xseq[j],beta1$X0.2.[beta1$regID==i&beta1$vegeclass==j],
+						xseq[j],beta1$X99.8.[beta1$regID==i&beta1$vegeclass==j],
+						code=0, lwd=alw)
+			}			
+		box(which="plot")	
+
+		#plot slope 2
+		par(mai=c(2,2,2,2))
+			plot(c(0,1),c(0,1), ylim=c(yls2[i],yhs2[i]), xlim=c(xl,xh),
+				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)	
+			abline(h=0,	lwd	=2, col="grey75",lty=3)	
+			for(j in 1:9){
+			if(beta2$sigID[beta2$regID==i&beta2$vegeclass==j]==1){
+				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
+						c(beta2$X25.[beta2$regID==i&beta2$vegeclass==j],beta2$X75.[beta2$regID==i&beta2$vegeclass==j],
+							beta2$X75.[beta2$regID==i&beta2$vegeclass==j],beta2$X25.[beta2$regID==i&beta2$vegeclass==j]),
+						col="tomato3",border=NA)
+			}else{
+				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
+						c(beta2$X25.[beta2$regID==i&beta2$vegeclass==j],beta2$X75.[beta2$regID==i&beta2$vegeclass==j],
+							beta2$X75.[beta2$regID==i&beta2$vegeclass==j],beta2$X25.[beta2$regID==i&beta2$vegeclass==j]),
+						col="grey75",border=NA)
+				}
+				arrows(xseq[j]-1,beta2$Mean[beta2$regID==i&beta2$vegeclass==j],
+						xseq[j]+1,beta2$Mean[beta2$regID==i&beta2$vegeclass==j],code=0,lwd=mlw)
+				arrows(	xseq[j],beta2$X0.2.[beta2$regID==i&beta2$vegeclass==j],
+						xseq[j],beta2$X99.8.[beta2$regID==i&beta2$vegeclass==j],
+						code=0, lwd=alw)
+		}
+		box(which="plot")	
+
+		#plot slope 3
+		par(mai=c(2,2,2,2))
+			plot(c(0,1),c(0,1), ylim=c(yls3[i],yhs3[i]), xlim=c(xl,xh),
+				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)	
+			abline(h=0,	lwd	=2, col="grey75",lty=3)	
+			for(j in 1:9){
+			if(beta3$sigID[beta3$regID==i&beta3$vegeclass==j]==1){
+				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
+						c(beta3$X25.[beta3$regID==i&beta2$vegeclass==j],beta3$X75.[beta3$regID==i&beta3$vegeclass==j],
+							beta3$X75.[beta3$regID==i&beta3$vegeclass==j],beta3$X25.[beta3$regID==i&beta3$vegeclass==j]),
+						col="tomato3",border=NA)
+			}else{
+				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
+						c(beta3$X25.[beta3$regID==i&beta2$vegeclass==j],beta3$X75.[beta3$regID==i&beta3$vegeclass==j],
+							beta3$X75.[beta3$regID==i&beta3$vegeclass==j],beta3$X25.[beta3$regID==i&beta3$vegeclass==j]),
+						col="grey75",border=NA)
+				}
+						
+				arrows(xseq[j]-1,beta3$Mean[beta0$regID==i&beta3$vegeclass==j],
+						xseq[j]+1,beta3$Mean[beta0$regID==i&beta3$vegeclass==j],code=0,lwd=mlw)
+				arrows(	xseq[j],beta3$X0.2.[beta3$regID==i&beta3$vegeclass==j],
+						xseq[j],beta3$X99.8.[beta3$regID==i&beta3$vegeclass==j],
+						code=0, lwd=alw)
+		}
+		box(which="plot")	
+		
+	dev.off()		
+	
+}	
