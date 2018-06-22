@@ -106,6 +106,7 @@ for(i in 1:length(parmAs)){
 	AirL[[i]]$regID <- rep(i,dim(AirL[[i]])[1])
 }
 
+
 #turn back into a data frame
 
 SoilR <- ldply(SoilL,data.frame)
