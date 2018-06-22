@@ -192,22 +192,34 @@ hd <- 40
 xseq <-c(1,4,7,10,13,16,19,22,25)
 
 yli <- c(-35,0,0.2)
-yhi <- c(10,25,.6)
-yls1 <- c(-1,-1,-1)
-yhs1 <- c(1,1,1)
-yls2 <- c(-1,-1,-1)
-yhs2 <- c(1.5,1,1)
-yls3 <- c(-.5,-1,-1)
-yhs3 <- c(.5,1,1)
+yhi <- c(10,25,.65)
+yls1 <- c(-1,-1,-.01)
+yhs1 <- c(1,.5,.01)
+yls2 <- c(-1,-1,-2.5)
+yhs2 <- c(1.5,2,2)
+yls3 <- c(-.5,-.15,-.005)
+yhs3 <- c(.5,.15,.005)
 
 xl <- -1
 xh <- 27
 alw <- 2
 zlw <- 10
 mlw <- 5
-#
+#axis labels
+tlw <- 4
+alx <- 4
+mlx <- 7
+
+yii <- c(5,5,.1)
+yi1 <- c(.1,.1,.005)
+yi2 <- c(.5,.5,.5)
+yi3 <- c(.1,.1,.001)
+#three regressions
+regName <- c("Soil min vs air min","Soil max vs air max", "Time of soil min vs time of air min")
+
+
 for(i in 1:3){
-	jpeg(paste0(plotDI,"\\run",Nrun,"\\regression_parm",i,".jpg"), width=5500,height=2000,
+	jpeg(paste0(plotDI,"\\run",Nrun,"\\regression_parm",i,".jpg"), width=5500,height=2500,
 			quality=100,units="px")
 	layout(matrix(seq(1,4),ncol=4), width=rep(lcm(wd),4),height=rep(lcm(hd),4))
 		#plot intercept
@@ -226,12 +238,18 @@ for(i in 1:3){
 						xseq[j],beta0$X99.8.[beta0$regID==i&beta0$vegeclass==j],
 						code=0, lwd=alw)
 			}
+		axis(1, xseq,rep("",length(xseq)), lwd.ticks=tlw)
+		mtext(datVI$vegename,at=xseq,cex=alx,line=3,las=2,side=1)
+		axis(2,seq(yli[i],yhi[i], by=yii[i]),rep("",length(seq(yli[i],yhi[i], by=yii[i]))), lwd.ticks=tlw)
+		mtext(seq(yli[i],yhi[i], by=yii[i]),at=seq(yli[i],yhi[i], by=yii[i]),cex=alx,line=3,las=2,side=2)
+		mtext("Intercept", side=3, line=5, cex=mlx)
+		mtext(paste(regName[i]), side=3, outer=TRUE,line=-40,cex=12)
 		box(which="plot")
 		#plot slope 1
 		par(mai=c(2,2,2,2))
 			plot(c(0,1),c(0,1), ylim=c(yls1[i],yhs1[i]), xlim=c(xl,xh),
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
-		abline(h=0,	lwd	=2, col="grey75",lty=3)			
+		abline(h=0,	lwd	=zlw, col="grey75",lty=3)			
 			for(j in 1:9){
 			if(beta1$sigID[beta1$regID==i&beta1$vegeclass==j]==1){
 				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
@@ -250,13 +268,18 @@ for(i in 1:3){
 						xseq[j],beta1$X99.8.[beta1$regID==i&beta1$vegeclass==j],
 						code=0, lwd=alw)
 			}			
+		axis(1, xseq,rep("",length(xseq)), lwd.ticks=tlw)
+		mtext(datVI$vegename,at=xseq,cex=alx,line=3,las=2,side=1)
+		axis(2,seq(yls1[i],yhs1[i], by=yi1[i]),rep("",length(seq(yls1[i],yhs1[i], by=yi1[i]))), lwd.ticks=tlw)
+		mtext(seq(yls1[i],yhs1[i], by=yi1[i]),at=seq(yls1[i],yhs1[i], by=yi1[i]),cex=alx,line=3,las=2,side=2)	
+		mtext("Slope depth", side=3, line=5, cex=mlx)
 		box(which="plot")	
 
 		#plot slope 2
 		par(mai=c(2,2,2,2))
 			plot(c(0,1),c(0,1), ylim=c(yls2[i],yhs2[i]), xlim=c(xl,xh),
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)	
-			abline(h=0,	lwd	=2, col="grey75",lty=3)	
+			abline(h=0,	lwd	=zlw, col="grey75",lty=3)	
 			for(j in 1:9){
 			if(beta2$sigID[beta2$regID==i&beta2$vegeclass==j]==1){
 				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
@@ -275,13 +298,18 @@ for(i in 1:3){
 						xseq[j],beta2$X99.8.[beta2$regID==i&beta2$vegeclass==j],
 						code=0, lwd=alw)
 		}
+		axis(1, xseq,rep("",length(xseq)), lwd.ticks=tlw)
+		mtext(datVI$vegename,at=xseq,cex=alx,line=3,las=2,side=1)
+		axis(2,seq(yls2[i],yhs2[i], by=yi2[i]),rep("",length(seq(yls2[i],yhs2[i], by=yi2[i]))), lwd.ticks=tlw)
+		mtext(seq(yls2[i],yhs2[i], by=yi2[i]),at=seq(yls2[i],yhs2[i], by=yi2[i]),cex=alx,line=3,las=2,side=2)
+		mtext("Slope air", side=3, line=5, cex=mlx)
 		box(which="plot")	
 
 		#plot slope 3
 		par(mai=c(2,2,2,2))
 			plot(c(0,1),c(0,1), ylim=c(yls3[i],yhs3[i]), xlim=c(xl,xh),
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)	
-			abline(h=0,	lwd	=2, col="grey75",lty=3)	
+			abline(h=0,	lwd	=zlw, col="grey75",lty=3)	
 			for(j in 1:9){
 			if(beta3$sigID[beta3$regID==i&beta3$vegeclass==j]==1){
 				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
@@ -301,6 +329,12 @@ for(i in 1:3){
 						xseq[j],beta3$X99.8.[beta3$regID==i&beta3$vegeclass==j],
 						code=0, lwd=alw)
 		}
+		axis(1, xseq,rep("",length(xseq)), lwd.ticks=tlw)
+		mtext(datVI$vegename,at=xseq,cex=alx,line=3,las=2,side=1)
+		
+		axis(2,seq(yls3[i],yhs3[i], by=yi3[i]),rep("",length(seq(yls3[i],yhs3[i], by=yi3[i]))), lwd.ticks=tlw)
+		mtext(seq(yls3[i],yhs3[i], by=yi3[i]),at=seq(yls3[i],yhs3[i], by=yi3[i]),cex=alx,line=3,las=2,side=2)
+		mtext("Slope precipitation", side=3, line=5, cex=mlx)
 		box(which="plot")	
 		
 	dev.off()		
