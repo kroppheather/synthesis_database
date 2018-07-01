@@ -51,8 +51,8 @@ library(plyr)
 #set up a plot directory
 plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\plots\\model_all"
 #model directory
-modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run2"
-Nrun <-2
+modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run3"
+Nrun <-3
 #indicate if a model run is occuring
 modRun <- 1
 
@@ -136,6 +136,34 @@ ParmAll <- join(ParmAll,regvegeID, by=c("vegeclass","regID"),type="left")
 #precip mean
 precMs <- c(mean(ParmAll$precW),mean(ParmAll$precS),mean(ParmAll$precW))
 
+
+#get range of precip and air temps in each vegetation group for each regression
+#get minimumAir
+minAir <- aggregate(ParmAll$AMean,by=list(ParmAll$regvegeID),FUN="min")
+maxAir <- aggregate(ParmAll$AMean,by=list(ParmAll$regvegeID),FUN="max")
+
+
+minPrec <- aggregate(ParmAll$precR,by=list(ParmAll$regvegeID),FUN="min")
+maxPrec <- aggregate(ParmAll$precR,by=list(ParmAll$regvegeID),FUN="max")
+
+regvegeID$precMeanA <- rep(precMs, each=9)
+regvegeID$airMeanA <- rep(AirMs, each=9)
+
+
+regvegeID$minAir <- minAir$x
+regvegeID$maxAir <- maxAir$x
+
+regvegeID$minPrec <- minPrec$x
+regvegeID$maxPrec <- maxPrec$x
+
+#now check if mean across all vege types falls into range
+regvegeID$airCheck <- ifelse(regvegeID$airMeanA >= regvegeID$minAir & regvegeID$airMeanA<=regvegeID$maxAir,1,0)
+regvegeID$precCheck <- ifelse(regvegeID$precMeanA >= regvegeID$minPrec & regvegeID$precMeanA<=regvegeID$maxPrec,1,0)
+
+#50mm has overlap or close overlap for all winter sites
+regvegeID$precCent <- rep(c(100,200,100), each=9)
+regvegeID$precCheck2 <- ifelse(regvegeID$precCent>= regvegeID$minPrec & regvegeID$precCent<=regvegeID$maxPrec,1,0)
+
 #######################################
 #####prepare model run            ##### 
 #######################################
@@ -146,7 +174,7 @@ datalist <- list(Nobs=dim(ParmAll)[1],
 				SoilP=ParmAll$Mean,
 				reg=ParmAll$regID,
 				AirPbar=AirMs,
-				precip=ParmAll$precR,
+				precip=c(100,200,100),
 				precipbar=precMs,
 				sigMod=ParmAll$SD,
 				AirP=ParmAll$AMean,
