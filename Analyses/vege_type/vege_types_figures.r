@@ -51,8 +51,8 @@ library(plyr)
 #set up a plot directory
 plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\plots\\model_all"
 #model directory
-modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run2"
-Nrun <-2
+modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run3"
+Nrun <-3
 
 
 
@@ -132,7 +132,7 @@ regvegeID$regvegeID <- seq(1,dim(regvegeID)[1])
 ParmAll <- join(ParmAll,regvegeID, by=c("vegeclass","regID"),type="left")
 
 #precip mean
-precMs <- c(mean(ParmAll$precW),mean(ParmAll$precS),mean(ParmAll$precW))
+precMs <- c(100,200,100)
 
 
 
