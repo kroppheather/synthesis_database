@@ -340,3 +340,16 @@ for(i in 1:3){
 	dev.off()		
 	
 }	
+
+
+#######################################
+#####check fit                    ##### 
+#######################################
+reps <- datC$Mean[datC$parms=="repSoilP"]
+
+plot(ParmAll$Mean[ParmAll$regID==1], reps[ParmAll$regID==1])
+fit <- lm(reps[ParmAll$regID==1]~ParmAll$Mean[ParmAll$regID==1])
+summary(fit)
+
+
+
