@@ -367,5 +367,6 @@ for(i in 1:3){
 				"+",round(summary(fit)$coefficients[2,1],2),"x"), col="red",cex=2)
 	
 	text(tx2[i],ty2[i], paste("R2=", round(summary(fit)$r.squared,2)), col="red",cex=2)
+	dev.off()
 }
 
