@@ -347,9 +347,25 @@ for(i in 1:3){
 #######################################
 reps <- datC$Mean[datC$parms=="repSoilP"]
 
-plot(ParmAll$Mean[ParmAll$regID==1], reps[ParmAll$regID==1])
-fit <- lm(reps[ParmAll$regID==1]~ParmAll$Mean[ParmAll$regID==1])
-summary(fit)
+ll <- c(-35,0,0)
+hh <- c(0,30,.65)
+lname <- c("Temperature minimum (C)", "Temperature maximum (C)","Minimum time")
+tx1 <- c(-15,15,.35)
+ty1 <- c(-3,25,.6)
+tx2 <- c(-15,15,.35)
+ty2 <- c(-7,20,.5)
+for(i in 1:3){
 
-
+	jpeg(paste0(plotDI,"\\run",Nrun,"\\regression_fit",i,".jpg"), width=700,height=700,
+			quality=100,units="px")
+	plot(ParmAll$Mean[ParmAll$regID==i], reps[ParmAll$regID==i], xlim=c(ll[i],hh[i]), ylim=c(ll[i],hh[i]),
+			xlab=lname[i],ylab=lname[i],pch=19)
+	fit <- lm(reps[ParmAll$regID==i]~ParmAll$Mean[ParmAll$regID==i])
+	abline(fit, lwd=2,lty=3)
+	abline(0,1,lwd=2,col="red")
+	text(tx1[i],ty1[i], paste("y=",round(summary(fit)$coefficients[1,1],2),
+				"+",round(summary(fit)$coefficients[2,1],2),"x"), col="red",cex=2)
+	
+	text(tx2[i],ty2[i], paste("R2=", round(summary(fit)$r.squared,2)), col="red",cex=2)
+}
 
