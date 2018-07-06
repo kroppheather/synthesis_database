@@ -46,6 +46,9 @@ datL <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\LAI.csv")
 
 datM <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\moss.csv")
 colnames(datM)[6] <- "siteid"
+
+siteinfo <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\siteinfo.csv")
+colnames(siteinfo)[1] <- "siteid"
 #join to vegetation info so that only sites with vegetation info are included
 
 vegeSP <- join(datV,datSP, by=c("siteid"), type="right")
@@ -64,6 +67,23 @@ vegeM <- vegeM[vegeM$vegeclass <=5,]
 length(unique(vegeSP$siteid))
 length(unique(vegeL$siteid))
 length(unique(vegeM$siteid))
+
+
+#join siteinfo in
+vegeSP <- join(vegeSP, siteinfo, by="siteid",type="left")
+vegeL<- join(vegeL, siteinfo, by="siteid",type="left")
+vegeM <- join(vegeM, siteinfo, by="siteid",type="left")
+unique(vegeSP$loc)
+unique(vegeSP$site_name)
+
+
+
+unique(vegeL$loc)
+unique(vegeL$site_name)
+
+
+unique(vegeM$loc)
+unique(vegeM$site_name)
 
 
 
