@@ -87,3 +87,51 @@ unique(vegeM$site_name)
 
 
 
+#######################################
+#####aggregate vegetation         ##### 
+#######################################
+
+#need to add up all vegetation covers and normalize ones that add up to over
+#100%. THose are likely based on canopy ground cover rather than mix
+#of species abundance
+percT <- aggregate(vegeSP$perc_cov, by=list(vegeSP$siteid), FUN="sum")
+colnames(percT) <- c("siteid","percTot")
+
+vegeSP <- join(vegeSP, percT, by="siteid", type="left")
+
+#normalize sites over 100 percent
+vegeSP$perc_covN <- ifelse(vegeSP$percTot >= 100, (vegeSP$perc_cov/vegeSP$percTot)*100,vegeSP$perc_cov)
+
+#total up species cover for each site
+
+totC <- aggregate(vegeSP$perc_covN, by=list(vegeSP$func_type,vegeSP$siteid), FUN="sum")
+colnames(totC) <- c("func_type","siteid", "percCN")
+#grab any shrub
+
+
+#get all shrub observations
+shrub <- totC[grepl("shrub",totC$func_type)==TRUE,]
+#summ up all shrub observations
+shrubA <- aggregate(shrub$percCN, by=list(shrub$siteid), FUN="sum")
+colnames(shrubA) <- c("siteid","shrubC")
+
+nonvascular <- totC[grepl("moss",totC$func_type)==TRUE|grepl("lichen",totC$func_type)==TRUE|grepl("liverwort",totC$func_type)==TRUE,]
+
+nonvascularA <-  aggregate(nonvascular$percCN, by=list(nonvascular$siteid), FUN="sum")
+colnames(nonvascularA) <- c("siteid","nonvascularC")
+
+grass <- totC[grepl("gramminoid",totC$func_type)==TRUE|grepl("sedges",totC$func_type)==TRUE|grepl("grasses",totC$func_type)==TRUE|grepl("rush",totC$func_type)==TRUE|grepl("Tall sedges",totC$func_type)==TRUE,]
+
+
+grassA <-  aggregate(grass$percCN, by=list(grass$siteid), FUN="sum")
+colnames(grassA) <- c("siteid","grassC")
+
+#join all together
+
+coverAll <- join(shrubA, grassA, by="siteid", type="full")
+coverAll <- join(coverAll, nonvascularA, by="siteid", type="full")
+
+#grass is missing a lot of observations. It is difficult to say whether or not 
+#it was there or it just wasn't measured so exclude it from analysis
+
+coverAll2 <- join(shrubA, nonvascularA, by="siteid", type="full")
