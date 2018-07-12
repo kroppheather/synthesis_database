@@ -30,7 +30,11 @@
 source("c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Analyses\\temp_parm_extract.r")
 
 #load libraries
-
+library(rjags)
+library(coda)
+library(mcmcplots)
+#set up directories
+modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\continuous\\model\\run1"
 #read in vege class data: check that patterns don't vary between vege type
 datV <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\vege_class.csv")
 datVI <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\vegeID.csv")
@@ -272,6 +276,67 @@ dim(MLTcount[MLTcount$regID==1&MLTcount$count>1,])
 PCcount <- join(PCcount,siteinfo, by="siteid",type="left")
 NDcount <- join(NDcount,siteinfo, by="siteid",type="left")
 MLTcount <- join(MLTcount,siteinfo, by="siteid",type="left")
+
+
+#subset the %cover to have sites with more than 1 depth and year observation
+PCcount <- PCcount[PCcount$count>2,]
+#create regID 
+PCcount$regsiteID <- seq(1,dim(PCcount)[1])
+#join cover data for regressions
+PCdata <- join(PCcount, coverAll2, by="siteid", type="left")
+
+
+#join the regression site id back into ParmPC
+#first make a smaller dataframe to not join tomuch
+PCIDj <- data.frame(regsiteID=PCcount$regsiteID,regID=PCcount$regID, siteid=PCcount$siteid)
+
+ParmPC <- join(ParmPC, PCIDj, by=c("siteid","regID"), type="inner")
+
+
+AirMean <- aggregate(ParmPC$AMean, by=list(ParmPC$regID), FUN="mean")
+colnames(AirMean) <- c("regID", "Abar")
 #######################################
 #####organize model run           ##### 
-#######################################					
+#######################################	
+datalist <- list( Nobs=dim(ParmPC)[1],SoilP=ParmPC$Mean,regsiteID=ParmPC$regsiteID,
+				depth=ParmPC$depth, AirP=ParmPC$AMean,AirPbar=AirMean$Abar,
+				regID=ParmPC$regID, sigMod=ParmPC$SD, sig.Air=ParmPC$ASD,
+				Nregsite=dim(PCdata)[1], regS=PCdata$regID,shrubC=PCdata$shrubC,
+				mossC=PCdata$nonvascularC)
+
+parms <- c("sig	SoilV","beta0","beta1","beta2","a0","a1","a2","b0","b1","b2",	
+			"c0","c1","c2","repSoilP")
+
+
+#organize data for the model
+#start model 
+vege.modI<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Analyses\\continuous_vege\\continuous_vege_model_codePC.r",
+						data=datalist,
+						n.adapt=10000,
+						n.chains=3)
+
+vege.sample <- coda.samples(vege.modI,variable.names=parms,
+                       n.iter=60000, thin=30)	
+					
+#model history
+mcmcplot(vege.sample, parms=c("sig	SoilV","beta0","beta1","beta2","a0","a1","a2","b0","b1","b2",	
+			"c0","c1","c2"),
+			dir=paste0(modDI,"\\history"))
+
+
+Xcomp <- round(0.05/((3*3	*3)-1)	,3)	
+#model output							   
+mod.out <- summary(vege.sample,  quantiles = c(Xcomp,0.025, 0.25, 0.5, 0.75, 0.975,1-Xcomp))
+
+write.table(mod.out$statistics,paste0(modDI,"\\vege_mod_stats.csv"),
+			sep=",",row.names=TRUE)
+write.table(mod.out$quantiles,paste0(modDI,"\\vege_mod_quant.csv"),
+			sep=",",row.names=TRUE)
+
+#coda output
+chain1<-as.matrix(vege.sample [[1]])
+write.table(chain1,paste0(modDI,"\\chain1_coda.csv"), sep=",")
+chain2<-as.matrix(vege.sample [[2]])
+write.table(chain2,paste0(modDI,"\\chain2_coda.csv"), sep=",")
+chain3<-as.matrix(vege.sample [[3]])
+write.table(chain3,paste0(modDI,"\\chain3_coda.csv"), sep=",")				
