@@ -35,8 +35,12 @@ source("c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Analyses\\temp
 library(rjags)
 library(coda)
 library(mcmcplots)
+library(RColorBrewer)
+
 #set up directories
 modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\continuous\\model\\run1"
+plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\continuous\\plots"
+Nrun <- 1
 #read in vege class data: check that patterns don't vary between vege type
 datV <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\vege_class.csv")
 datVI <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\vegeID.csv")
@@ -301,3 +305,167 @@ colnames(AirMean) <- c("regID", "Abar")
 #######################################
 #####read in model results        ##### 
 #######################################	
+
+
+
+#read in model results 
+
+datM <- read.csv(paste0(modDI,"\\vege_mod_stats.csv"))
+datQ <- read.csv(paste0(modDI,"\\vege_mod_quant.csv"))
+
+datC <- cbind(datM,datQ)
+
+#pull out parm names
+dexps <- "\\[*[[:digit:]]*\\]"
+datC$parms <- gsub(dexps,"", rownames(datC))
+
+datC$parms2 <- gsub("\\d","",datC$parms )
+
+datA <- datC[datC$parms2=="a",]
+datA$regID <- rep(seq(1,3),times=3)
+datA$parmID <- rep(seq(1,3),eac=3)
+
+datB <- datC[datC$parms2=="b",]
+datB$regID <- rep(seq(1,3),times=3)
+datB$parmID <- rep(seq(1,3),eac=3)
+
+datD <- datC[datC$parms2=="c",]
+datD$regID <- rep(seq(1,3),times=3)
+datD$parmID <- rep(seq(1,3),eac=3)
+parmR <- list(datA,datB,datD)
+
+#######################################
+#####look at the regression parms ##### 
+#######################################
+wd <- 30
+hd <- 35
+
+parmL <- c("a","b","c")
+
+xl <- 0
+xh <- 3
+xs <- 1.5
+
+yrA <- c(.5,.5,.005,.005,.005,.005,.005,.005,.005)
+yrB <- c(.1,.1,.005,.005,.005,.005,.005,.005,.005)
+yrD <- c(.5,.5,.5,.005,.005,.005,.005,.005,.005)
+
+
+ylA <- data.frame(yl=round_any(datA$X0.2.,yrA,floor),parmID=datA$parmID,regID=datA$regID,yi=yrA)
+ylB <- data.frame(yl=round_any(datB$X0.2.,yrB,floor),parmID=datB$parmID,regID=datB$regID,yi=yrB)
+ylD <- data.frame(yl=round_any(datD$X0.2.,yrD,floor),parmID=datD$parmID,regID=datD$regID,yi=yrD)
+
+yhA <- data.frame(yh=round_any(datA$X99.8.,yrA,ceiling),parmID=datA$parmID,regID=datA$regID)
+yhB <- data.frame(yh=round_any(datB$X99.8.,yrB,ceiling),parmID=datB$parmID,regID=datB$regID)
+yhD <- data.frame(yh=round_any(datD$X99.8.,yrD,ceiling),parmID=datD$parmID,regID=datD$regID)
+
+yl <- list(ylA,ylB,ylD)
+yh <- list(yhA,yhB,yhD)
+
+parmName <- c("intercept","slope Shrub","slope moss")
+regName <- c("Soil min vs air min","Soil max vs air max", "Time of soil min vs time of air min")
+typeName <- c("intercept", "depth slope","air slope")
+alw <- 3
+mlw <- 3
+#regression
+for(i in 1:3){
+	#parameter type
+	for(m in 1:3){
+	jpeg(paste0(plotDI,"\\run",Nrun,"\\regression",i,"_parm_",parmL[m],".jpg"), width=3000,height=2000,
+			quality=100,units="px")
+	layout(matrix(seq(1,3),ncol=3), width=rep(lcm(wd),3),height=rep(lcm(hd),3))
+		
+	#parameter number	
+	for(j in 1:3){	
+		par(mai=c(1,1,1,1))
+			plot(c(0,1),c(0,1), ylim=c(yl[[m]]$yl[yl[[m]]$parmID==j&yl[[m]]$regID==i],
+				yh[[m]]$yh[yh[[m]]$parmID==j&yh[[m]]$regID==i]), xlim=c(xl,xh),
+				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+			abline(h=0, lwd=5,col="grey75",lty=3)	
+			arrows(	xs,parmR[[m]]$X0.2.[parmR[[m]]$parmID==j&parmR[[m]]$regID==i],
+					xs,parmR[[m]]$X99.8.[parmR[[m]]$parmID==j&parmR[[m]]$regID==i],code=0,lwd=alw)
+			polygon(c(xs-1,xs-1,xs+1,xs+1),
+				c(parmR[[m]]$X25.[parmR[[m]]$parmID==j&parmR[[m]]$regID==i],
+				parmR[[m]]$X75.[parmR[[m]]$parmID==j&parmR[[m]]$regID==i],
+				parmR[[m]]$X75.[parmR[[m]]$parmID==j&parmR[[m]]$regID==i],
+				parmR[[m]]$X25.[parmR[[m]]$parmID==j&parmR[[m]]$regID==i]),border=NA,col="tomato3")
+			arrows(	xs-1,parmR[[m]]$Mean[parmR[[m]]$parmID==j&parmR[[m]]$regID==i],
+					xs+1,parmR[[m]]$Mean[parmR[[m]]$parmID==j&parmR[[m]]$regID==i],code=0,lwd=mlw)	
+		
+		axis(2,seq(	yl[[m]]$yl[yl[[m]]$parmID==j&yl[[m]]$regID==i],
+				yh[[m]]$yh[yh[[m]]$parmID==j&yh[[m]]$regID==i], by=yl[[m]]$yi[yl[[m]]$parmID==j&yl[[m]]$regID==i]),
+				cex.axis=5,las=2)
+		axis(1, c(-1,xs,5), c("","",""), cex.axis=5)		
+		mtext(paste(parmName[j]),side=1,line=5,cex=4)
+		if(j==1){
+		mtext(paste("regression: ",regName[i],"regression parameter: ",typeName[m]),side=3,line=-20,outer=TRUE,cex=7)
+		}
+				
+	}		
+			
+					
+	dev.off()			
+		
+	}
+}		
+				
+				
+				
+#######################################
+#####plot at the regression       ##### 
+#######################################		
+
+#get the range of the % cover
+range(PCdata$shrubC)
+range(PCdata$nonvascularC)	
+#highest value is 91 in shrub and 77 in moss
+#cap at 100 and 80
+ycs <- seq(1,8)
+
+colS <- brewer.pal(9,"Blues"))
+colM <- rev(brewer.pal(9,"Reds"))
+
+
+
+redM <- numeric(0)
+greenM <- numeric(0)
+blueM <- numeric(0)
+redS <- numeric(0)
+greenS <- numeric(0)
+blueS <- numeric(0)
+for(i in 1:8){
+	redM[i] <- col2rgb(colM[i])[1,1]
+	greenM[i] <- col2rgb(colM[i])[2,1]
+	blueM[i] <- col2rgb(colM[i])[3,1]
+	redS[i] <- col2rgb(colS[i])[1,1]
+	greenS[i] <- col2rgb(colS[i])[2,1]
+	blueS[i] <- col2rgb(colS[i])[3,1]
+}
+par(mfrow=c(1,4))
+	plot(c(0,1),c(0,1), type="n",xlim=c(0,1),ylim=c(-1,10),xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+	for(i in 1:8){
+		polygon(c(0,0,1,1), c(ycs[i]-.5,ycs[i]+.5,ycs[i]+.5,ycs[i]-.5), col=colS[i], border=NA)
+	}
+	plot(c(0,1),c(0,1), type="n",xlim=c(0,1),ylim=c(-1,10),xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+	for(i in 1:8){
+		polygon(c(0,0,1,1), c(ycs[i]-.5,ycs[i]+.5,ycs[i]+.5,ycs[i]-.5), col=colM[i], border=NA)
+	}	
+	#increasing shrub
+	plot(c(0,1),c(0,1), type="n",xlim=c(0,1),ylim=c(-1,10),xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+	for(i in 1:8){
+		polygon(c(0,0,1,1), c(ycs[i]-.5,ycs[i]+.5,ycs[i]+.5,ycs[i]-.5), 
+			col=rgb(redM[i]/255,blueM[i]/255,greenM[i]/255,.5), border=NA)
+		polygon(c(0,0,1,1), c(ycs[i]-.5,ycs[i]+.5,ycs[i]+.5,ycs[i]-.5), 
+			col=rgb(redS[i]/255,blueS[i]/255,greenS[i]/255,.5), border=NA)	
+			
+	}	
+
+
+	plot(c(0,1),c(0,1), type="n",xlim=c(0,1),ylim=c(-1,10),xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+	for(i in 1:8){
+		polygon(c(0,0,1,1), c(ycs[i]-.5,ycs[i]+.5,ycs[i]+.5,ycs[i]-.5), 
+			col=rgb(rev(redM[i]/255,rev(blueM[i]/255,rev(greenM[i]/255,.5), border=NA)
+		polygon(c(0,0,1,1), c(ycs[i]-.5,ycs[i]+.5,ycs[i]+.5,ycs[i]-.5), 
+			col=rgb(redS[i]/255,blueS[i]/255,greenS[i]/255,.5), border=NA)	
+			
+	}			
