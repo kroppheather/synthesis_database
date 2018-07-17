@@ -334,6 +334,14 @@ datD$regID <- rep(seq(1,3),times=3)
 datD$parmID <- rep(seq(1,3),eac=3)
 parmR <- list(datA,datB,datD)
 
+beta0 <- datC[datC$parms=="beta0",]
+beta1 <- datC[datC$parms=="beta1",]
+beta2 <- datC[datC$parms=="beta2",]
+#add identifying information onto betas
+beta0 <- cbind(beta0,PCdata)
+beta1 <- cbind(beta1,PCdata)
+beta2 <- cbind(beta2,PCdata)
+
 #######################################
 #####look at the regression parms ##### 
 #######################################
@@ -420,12 +428,13 @@ range(PCdata$shrubC)
 range(PCdata$nonvascularC)	
 #highest value is 91 in shrub and 77 in moss
 #cap at 100 and 80
-ycs <- seq(1,8)
+ycs <- seq(1,9)
 
-colS <- brewer.pal(9,"Blues"))
-colM <- rev(brewer.pal(9,"Reds"))
+colS <- brewer.pal(9,"Blues")
+colM <- brewer.pal(9,"Reds")
 
-
+colS <- colS[-1]
+colM <- colM[-1]
 
 redM <- numeric(0)
 greenM <- numeric(0)
@@ -441,31 +450,146 @@ for(i in 1:8){
 	greenS[i] <- col2rgb(colS[i])[2,1]
 	blueS[i] <- col2rgb(colS[i])[3,1]
 }
-par(mfrow=c(1,4))
-	plot(c(0,1),c(0,1), type="n",xlim=c(0,1),ylim=c(-1,10),xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
-	for(i in 1:8){
-		polygon(c(0,0,1,1), c(ycs[i]-.5,ycs[i]+.5,ycs[i]+.5,ycs[i]-.5), col=colS[i], border=NA)
-	}
-	plot(c(0,1),c(0,1), type="n",xlim=c(0,1),ylim=c(-1,10),xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
-	for(i in 1:8){
-		polygon(c(0,0,1,1), c(ycs[i]-.5,ycs[i]+.5,ycs[i]+.5,ycs[i]-.5), col=colM[i], border=NA)
-	}	
-	#increasing shrub
-	plot(c(0,1),c(0,1), type="n",xlim=c(0,1),ylim=c(-1,10),xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
-	for(i in 1:8){
-		polygon(c(0,0,1,1), c(ycs[i]-.5,ycs[i]+.5,ycs[i]+.5,ycs[i]-.5), 
-			col=rgb(redM[i]/255,blueM[i]/255,greenM[i]/255,.5), border=NA)
-		polygon(c(0,0,1,1), c(ycs[i]-.5,ycs[i]+.5,ycs[i]+.5,ycs[i]-.5), 
-			col=rgb(redS[i]/255,blueS[i]/255,greenS[i]/255,.5), border=NA)	
-			
-	}	
+
+#assign colors based on percentage
+beta0$colShrub <- ifelse(beta0$shrubC<=12.5,colS[1],
+					ifelse(beta0$shrubC>12.5&beta0$shrubC<=25,colS[2],
+					ifelse(beta0$shrubC>25&beta0$shrubC<=37.5,colS[3],
+					ifelse(beta0$shrubC>37.5&beta0$shrubC<=50,colS[4],
+					ifelse(beta0$shrubC>50&beta0$shrubC<=67.5,colS[5],
+					ifelse(beta0$shrubC>67.5&beta0$shrubC<=75,colS[6],
+					ifelse(beta0$shrubC>75&beta0$shrubC<=87.5,colS[7],
+					ifelse(beta0$shrubC>87.5&beta0$shrubC<100,colS[8],rgb(0,0,0)))))))))
+					
+beta0$colMoss <- ifelse(beta0$nonvascularC<=10,colM[1],
+					ifelse(beta0$nonvascularC>10&beta0$nonvascularC<=20,colM[2],
+					ifelse(beta0$nonvascularC>20&beta0$nonvascularC<=30,colM[3],
+					ifelse(beta0$nonvascularC>30&beta0$nonvascularC<=40,colM[4],
+					ifelse(beta0$nonvascularC>40&beta0$nonvascularC<=50,colM[5],
+					ifelse(beta0$nonvascularC>50&beta0$nonvascularC<=60,colM[6],
+					ifelse(beta0$nonvascularC>60&beta0$nonvascularC<=70,colM[7],
+					ifelse(beta0$nonvascularC>70&beta0$nonvascularC<80,colM[8],rgb(0,0,0)))))))))					
+					
+beta1$colShrub <- ifelse(beta1$shrubC<=12.5,colS[1],
+					ifelse(beta1$shrubC>12.5&beta1$shrubC<=25,colS[2],
+					ifelse(beta1$shrubC>25&beta1$shrubC<=37.5,colS[3],
+					ifelse(beta1$shrubC>37.5&beta1$shrubC<=50,colS[4],
+					ifelse(beta1$shrubC>50&beta1$shrubC<=67.5,colS[5],
+					ifelse(beta1$shrubC>67.5&beta1$shrubC<=75,colS[6],
+					ifelse(beta1$shrubC>75&beta1$shrubC<=87.5,colS[7],
+					ifelse(beta1$shrubC>87.5&beta1$shrubC<100,colS[8],rgb(0,0,0)))))))))
+					
+beta1$colMoss <- ifelse(beta1$nonvascularC<=10,colM[1],
+					ifelse(beta1$nonvascularC>10&beta1$nonvascularC<=20,colM[2],
+					ifelse(beta1$nonvascularC>20&beta1$nonvascularC<=30,colM[3],
+					ifelse(beta1$nonvascularC>30&beta1$nonvascularC<=40,colM[4],
+					ifelse(beta1$nonvascularC>40&beta1$nonvascularC<=50,colM[5],
+					ifelse(beta1$nonvascularC>50&beta1$nonvascularC<=60,colM[6],
+					ifelse(beta1$nonvascularC>60&beta1$nonvascularC<=70,colM[7],
+					ifelse(beta1$nonvascularC>70&beta1$nonvascularC<80,colM[8],rgb(0,0,0)))))))))	
+					
+					
+beta2$colShrub <- ifelse(beta2$shrubC<=12.5,colS[1],
+					ifelse(beta2$shrubC>12.5&beta2$shrubC<=25,colS[2],
+					ifelse(beta2$shrubC>25&beta2$shrubC<=37.5,colS[3],
+					ifelse(beta2$shrubC>37.5&beta2$shrubC<=50,colS[4],
+					ifelse(beta2$shrubC>50&beta2$shrubC<=67.5,colS[5],
+					ifelse(beta2$shrubC>67.5&beta2$shrubC<=75,colS[6],
+					ifelse(beta2$shrubC>75&beta2$shrubC<=87.5,colS[7],
+					ifelse(beta2$shrubC>87.5&beta2$shrubC<100,colS[8],rgb(0,0,0)))))))))
+					
+beta2$colMoss <- ifelse(beta2$nonvascularC<=10,colM[1],
+					ifelse(beta2$nonvascularC>10&beta2$nonvascularC<=20,colM[2],
+					ifelse(beta2$nonvascularC>20&beta2$nonvascularC<=30,colM[3],
+					ifelse(beta2$nonvascularC>30&beta2$nonvascularC<=40,colM[4],
+					ifelse(beta2$nonvascularC>40&beta2$nonvascularC<=50,colM[5],
+					ifelse(beta2$nonvascularC>50&beta2$nonvascularC<=60,colM[6],
+					ifelse(beta2$nonvascularC>60&beta2$nonvascularC<=70,colM[7],
+					ifelse(beta2$nonvascularC>70&beta2$nonvascularC<80,colM[8],rgb(0,0,0)))))))))						
+					
+#add color for points
+SiteCol <- unique(data.frame(siteid=beta1$siteid, colMoss=beta1$colMoss,colShrub=beta1$colShrub))
+ParmPC <- join(ParmPC, SiteCol, by="siteid",type="left")					
+#now join to soil data					
+	
 
 
-	plot(c(0,1),c(0,1), type="n",xlim=c(0,1),ylim=c(-1,10),xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
-	for(i in 1:8){
-		polygon(c(0,0,1,1), c(ycs[i]-.5,ycs[i]+.5,ycs[i]+.5,ycs[i]-.5), 
-			col=rgb(rev(redM[i]/255,rev(blueM[i]/255,rev(greenM[i]/255,.5), border=NA)
-		polygon(c(0,0,1,1), c(ycs[i]-.5,ycs[i]+.5,ycs[i]+.5,ycs[i]-.5), 
-			col=rgb(redS[i]/255,blueS[i]/255,greenS[i]/255,.5), border=NA)	
+	
+wd <- 20
+hd <- 20
+
+yli <- c(-40,-5,0)
+yhi <- c(5,30,.65)
+xlA <- c(-45,0,-45)
+xhA <- c(0,35,0)
+xlD <- -1
+xhD <- 21
+pcx <- 3
+slw <- 4
+regCent <- function(x,y0,y1,xbar){
+	y0+(y1*(x-xbar))
+}
+startR <- c(0,22,44)
+#regression
+for(i in 1:3){
+	jpeg(paste0(plotDI,"\\run",Nrun,"\\regression_all_",i,".jpg"), width=2000,height=2000,
+			quality=100,units="px")
+	layout(matrix(seq(1,4),ncol=2,byrow=TRUE), width=rep(lcm(wd),4),height=rep(lcm(hd),4))
+		par(mai=c(0,0,0,0))
+		
+			plot(c(0,1),c(0,1), ylim=c(yli[i],yhi[i]), xlim=c(xlD,xhD),
+				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+				
+			points(ParmPC$depth,ParmPC$Mean,pch=19,col=paste(ParmPC$colShrub),cex=pcx)
+			for(j in 1:22){
+				points(seq(0,20),regCent(seq(0,20),beta0$Mean[beta0$regID==i&beta0$regsiteID==j+startR[i]],
+							beta1$Mean[beta1$regID==i&beta1$regsiteID==j+startR[i]],0),
+							col=paste(beta1$colShrub[beta0$regID==i&beta0$regsiteID==j+startR[i]]),
+							lwd=slw, type="l")
+			}
+			box(which="plot")
 			
-	}			
+		par(mai=c(0,0,0,0))
+		
+			plot(c(0,1),c(0,1), ylim=c(yli[i],yhi[i]), xlim=c(xlA[i],xhA[i]),
+				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+				
+			points(ParmPC$AMean,ParmPC$Mean,pch=19,col=paste(ParmPC$colShrub),cex=pcx)
+			
+			for(j in 1:22){
+				points(seq(yli[i],yhi[i]),regCent(seq(yli[i],yhi[i]),beta0$Mean[beta0$regID==i&beta0$regsiteID==j+startR[i]],
+							beta2$Mean[beta2$regID==i&beta2$regsiteID==j+startR[i]],AirMean$Abar[i]),
+							col=paste(beta1$colShrub[beta0$regID==i&beta0$regsiteID==j+startR[i]]),
+							lwd=slw, type="l")
+			}
+			box(which="plot")			
+		par(mai=c(0,0,0,0))
+		
+			plot(c(0,1),c(0,1), ylim=c(yli[i],yhi[i]), xlim=c(xlD,xhD),
+				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+				
+			points(ParmPC$depth,ParmPC$Mean,pch=19,col=paste(ParmPC$colMoss),cex=pcx)
+			
+			for(j in 1:22){
+				points(seq(0,20),regCent(seq(0,20),beta0$Mean[beta0$regID==i&beta0$regsiteID==j+startR[i]],
+							beta1$Mean[beta1$regID==i&beta1$regsiteID==j+startR[i]],0),
+							col=paste(beta1$colMoss[beta0$regID==i&beta0$regsiteID==j+startR[i]]),
+							lwd=slw, type="l")
+			}
+			box(which="plot")
+			
+		par(mai=c(0,0,0,0))
+		
+			plot(c(0,1),c(0,1), ylim=c(yli[i],yhi[i]), xlim=c(xlA[i],xhA[i]),
+				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+				
+			points(ParmPC$AMean,ParmPC$Mean,pch=19,col=paste(ParmPC$colMoss),cex=pcx)
+						for(j in 1:22){
+				points(seq(yli[i],yhi[i]),regCent(seq(yli[i],yhi[i]),beta0$Mean[beta0$regID==i&beta0$regsiteID==j+startR[i]],
+							beta2$Mean[beta2$regID==i&beta2$regsiteID==j+startR[i]],AirMean$Abar[i]),
+							col=paste(beta1$colMoss[beta0$regID==i&beta0$regsiteID==j+startR[i]]),
+							lwd=slw, type="l")
+			}
+			box(which="plot")					
+	dev.off()
+}	
