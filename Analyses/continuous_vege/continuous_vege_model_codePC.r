@@ -28,7 +28,14 @@ model{
 	beta2[i] <- c0[regS[i]] + c1[regS[i]]*shrubC[i] + c2[regS[i]]*mossC[i]
 	
 	}
-	
+	for(i in 1:Nmonitor){
+		for(j in 1:Nregsite){
+			mu.site.air[i,j] <- beta0[j] + beta2[j]*(monitorAir[i]-AirPbar[EregID[i]])
+			mu.site.depth[i,j] <- beta0[j]+ beta1[j]*monitordepth[i] 
+			
+		}	
+	}
+
 	#priors
 	for(i in 1:3){
 		a0[i] ~ dnorm(0,0.0001)

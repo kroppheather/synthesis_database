@@ -38,7 +38,7 @@ library(mcmcplots)
 library(RColorBrewer)
 
 #set up directories
-modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\continuous\\model\\run1"
+modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\continuous\\model\\run2"
 plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\continuous\\plots"
 Nrun <- 1
 #read in vege class data: check that patterns don't vary between vege type

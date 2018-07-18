@@ -34,7 +34,7 @@ library(rjags)
 library(coda)
 library(mcmcplots)
 #set up directories
-modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\continuous\\model\\run1"
+modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\continuous\\model\\run2"
 #read in vege class data: check that patterns don't vary between vege type
 datV <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\vege_class.csv")
 datVI <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\vegeID.csv")
@@ -295,6 +295,14 @@ ParmPC <- join(ParmPC, PCIDj, by=c("siteid","regID"), type="inner")
 
 AirMean <- aggregate(ParmPC$AMean, by=list(ParmPC$regID), FUN="mean")
 colnames(AirMean) <- c("regID", "Abar")
+
+#generate dataset for monitoring regression means
+
+mu.monitor <- data.frame(regID = rep(seq(1,3),each=100), 
+				monitorAir = c(seq(-45,0, length.out=100),seq(0,35,length.out=100),seq(0,.65,length.out=100)),
+				monitorDepth=rep(seq(0,20,length.out=100),times=3))
+
+
 #######################################
 #####organize model run           ##### 
 #######################################	
@@ -302,10 +310,11 @@ datalist <- list( Nobs=dim(ParmPC)[1],SoilP=ParmPC$Mean,regsiteID=ParmPC$regsite
 				depth=ParmPC$depth, AirP=ParmPC$AMean,AirPbar=AirMean$Abar,
 				regID=ParmPC$regID, sigMod=ParmPC$SD, sig.Air=ParmPC$ASD,
 				Nregsite=dim(PCdata)[1], regS=PCdata$regID,shrubC=PCdata$shrubC,
-				mossC=PCdata$nonvascularC)
+				mossC=PCdata$nonvascularC,Nmonitor=dim(mu.monitor)[1],monitorAir=mu.monitor$monitorAir,
+				monitordepth=mu.monitor$monitorDepth,EregID=mu.monitor$regID)
 
 parms <- c("sig	SoilV","beta0","beta1","beta2","a0","a1","a2","b0","b1","b2",	
-			"c0","c1","c2","repSoilP")
+			"c0","c1","c2","repSoilP","mu.site.air","mu.site.depth")
 
 
 #organize data for the model
