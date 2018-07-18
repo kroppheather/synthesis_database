@@ -520,12 +520,13 @@ hd <- 20
 
 yli <- c(-40,-5,0)
 yhi <- c(5,30,.65)
-xlA <- c(-45,0,-45)
-xhA <- c(0,35,0)
+xlA <- c(-45,0,0)
+xhA <- c(0,35,.65)
 xlD <- -1
 xhD <- 21
 pcx <- 3
 slw <- 4
+si <- c(1,1,.01)
 regCent <- function(x,y0,y1,xbar){
 	y0+(y1*(x-xbar))
 }
@@ -540,7 +541,7 @@ for(i in 1:3){
 			plot(c(0,1),c(0,1), ylim=c(yli[i],yhi[i]), xlim=c(xlD,xhD),
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
 				
-			points(ParmPC$depth,ParmPC$Mean,pch=19,col=paste(ParmPC$colShrub),cex=pcx)
+			points(ParmPC$depth[ParmPC$regID==i],ParmPC$Mean[ParmPC$regID==i],pch=19,col=paste(ParmPC$colShrub),cex=pcx)
 			for(j in 1:22){
 				points(seq(0,20),regCent(seq(0,20),beta0$Mean[beta0$regID==i&beta0$regsiteID==j+startR[i]],
 							beta1$Mean[beta1$regID==i&beta1$regsiteID==j+startR[i]],0),
@@ -554,10 +555,10 @@ for(i in 1:3){
 			plot(c(0,1),c(0,1), ylim=c(yli[i],yhi[i]), xlim=c(xlA[i],xhA[i]),
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
 				
-			points(ParmPC$AMean,ParmPC$Mean,pch=19,col=paste(ParmPC$colShrub),cex=pcx)
+			points(ParmPC$AMean[ParmPC$regID==i],ParmPC$Mean[ParmPC$regID==i],pch=19,col=paste(ParmPC$colShrub),cex=pcx)
 			
 			for(j in 1:22){
-				points(seq(yli[i],yhi[i]),regCent(seq(yli[i],yhi[i]),beta0$Mean[beta0$regID==i&beta0$regsiteID==j+startR[i]],
+				points(seq(yli[i],yhi[i],by=si[i]),regCent(seq(yli[i],yhi[i],by=si[i]),beta0$Mean[beta0$regID==i&beta0$regsiteID==j+startR[i]],
 							beta2$Mean[beta2$regID==i&beta2$regsiteID==j+startR[i]],AirMean$Abar[i]),
 							col=paste(beta1$colShrub[beta0$regID==i&beta0$regsiteID==j+startR[i]]),
 							lwd=slw, type="l")
@@ -568,7 +569,7 @@ for(i in 1:3){
 			plot(c(0,1),c(0,1), ylim=c(yli[i],yhi[i]), xlim=c(xlD,xhD),
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
 				
-			points(ParmPC$depth,ParmPC$Mean,pch=19,col=paste(ParmPC$colMoss),cex=pcx)
+			points(ParmPC$depth[ParmPC$regID==i],ParmPC$Mean[ParmPC$regID==i],pch=19,col=paste(ParmPC$colMoss),cex=pcx)
 			
 			for(j in 1:22){
 				points(seq(0,20),regCent(seq(0,20),beta0$Mean[beta0$regID==i&beta0$regsiteID==j+startR[i]],
@@ -583,9 +584,9 @@ for(i in 1:3){
 			plot(c(0,1),c(0,1), ylim=c(yli[i],yhi[i]), xlim=c(xlA[i],xhA[i]),
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
 				
-			points(ParmPC$AMean,ParmPC$Mean,pch=19,col=paste(ParmPC$colMoss),cex=pcx)
+			points(ParmPC$AMean[ParmPC$regID==i],ParmPC$Mean[ParmPC$regID==i],pch=19,col=paste(ParmPC$colMoss),cex=pcx)
 						for(j in 1:22){
-				points(seq(yli[i],yhi[i]),regCent(seq(yli[i],yhi[i]),beta0$Mean[beta0$regID==i&beta0$regsiteID==j+startR[i]],
+				points(seq(yli[i],yhi[i],by=si[i]),regCent(seq(yli[i],yhi[i],by=si[i]),beta0$Mean[beta0$regID==i&beta0$regsiteID==j+startR[i]],
 							beta2$Mean[beta2$regID==i&beta2$regsiteID==j+startR[i]],AirMean$Abar[i]),
 							col=paste(beta1$colMoss[beta0$regID==i&beta0$regsiteID==j+startR[i]]),
 							lwd=slw, type="l")
