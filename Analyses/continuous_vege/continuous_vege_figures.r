@@ -349,9 +349,18 @@ beta1 <- cbind(beta1,PCdata)
 beta2 <- cbind(beta2,PCdata)
 
 
+
+#add significance to beta1 and beta 2
+beta1$sigP <- ifelse(beta1$X0.2.<0&beta1$X99.8.<0,1,
+				ifelse(beta1$X0.2.>0&beta1$X99.8.>0,1,0))
+
+beta2$sigP <- ifelse(beta2$X0.2.<0&beta2$X99.8.<0,1,
+				ifelse(beta2$X0.2.>0&beta2$X99.8.>0,1,0))
+
 #pull out regression means
 mu.site.air <- datC[datC$parms2=="mu.site.air[,",]
 mu.site.depth <- datC[datC$parms2=="mu.site.depth[,",]
+
 
 
 #accidentally monitored betas for all regressions not just the ones that they are in. Pull out the matching betas that belong
@@ -644,18 +653,36 @@ for(i in 1:3){
 			points(ParmPC$depth[ParmPC$regID==i],ParmPC$Mean[ParmPC$regID==i],pch=19,col=paste(ParmPC$colShrub),cex=pcx)
 			
 			for(j in 1:22){
-				polygon(c(mu.monitor$monitorDepth[mu.monitor$regID==i],rev(mu.monitor$monitorDepth[mu.monitor$regID==i])),
-					c(mu.site.depth$X0.2.[mu.site.depth$regID==i&mu.site.depth$regsiteID==j+startR[i]],
+			
+			
+				if(beta1$sigP[beta1$regID==i&beta1$regsiteID==j+startR[i]]==1){
+					polygon(c(mu.monitor$monitorDepth[mu.monitor$regID==i],rev(mu.monitor$monitorDepth[mu.monitor$regID==i])),
+						c(mu.site.depth$X0.2.[mu.site.depth$regID==i&mu.site.depth$regsiteID==j+startR[i]],
 						rev(mu.site.depth$X99.8.[mu.site.depth$regID==i&mu.site.depth$regsiteID==j+startR[i]])),
 						col=rgb(mu.site.depth$redShrub[mu.site.depth$regID==i&mu.site.depth$regsiteID==j+startR[i]]/255,
 						mu.site.depth$greenShrub[mu.site.depth$regID==i&mu.site.depth$regsiteID==j+startR[i]]/255,
 						mu.site.depth$blueShrub[mu.site.depth$regID==i&mu.site.depth$regsiteID==j+startR[i]]/255,.35),border=NA)
+				}else{
+					polygon(c(mu.monitor$monitorDepth[mu.monitor$regID==i],rev(mu.monitor$monitorDepth[mu.monitor$regID==i])),
+						c(rep(beta0$X0.2.[beta0$regID==i&beta0$regsiteID==j+startR[i]],100),
+						rev(rep(beta0$X99.8.[beta0$regID==i&beta0$regsiteID==j+startR[i]],100))),
+						col=rgb(mu.site.depth$redShrub[mu.site.depth$regID==i&mu.site.depth$regsiteID==j+startR[i]]/255,
+						mu.site.depth$greenShrub[mu.site.depth$regID==i&mu.site.depth$regsiteID==j+startR[i]]/255,
+						mu.site.depth$blueShrub[mu.site.depth$regID==i&mu.site.depth$regsiteID==j+startR[i]]/255,.35),border=NA)
+			}
 			}
 			for(j in 1:22){
-				points(mu.monitor$monitorDepth[mu.monitor$regID==i],
-					mu.site.depth$Mean[mu.site.depth$regID==i&mu.site.depth$regsiteID==j+startR[i]],
+				if(beta1$sigP[beta1$regID==i&beta1$regsiteID==j+startR[i]]==1){
+
+					points(mu.monitor$monitorDepth[mu.monitor$regID==i],
+						mu.site.depth$Mean[mu.site.depth$regID==i&mu.site.depth$regsiteID==j+startR[i]],
 							col=paste(mu.site.depth$colShrub[mu.site.depth$regID==i&mu.site.depth$regsiteID==j+startR[i]]),
 							lwd=slw, type="l")
+				}else{
+					abline(h=beta0$Mean[beta0$regID==i&beta0$regsiteID==j+startR[i]],lwd=slw,
+							col=paste(beta0$colShrub[beta0$regID==i&beta0$regsiteID==j+startR[i]]), lty=2)
+			
+				}
 			}
 			box(which="plot")
 			
@@ -666,18 +693,36 @@ for(i in 1:3){
 				
 			points(ParmPC$AMean[ParmPC$regID==i],ParmPC$Mean[ParmPC$regID==i],pch=19,col=paste(ParmPC$colShrub),cex=pcx)
 			for(j in 1:22){
-				polygon(c(mu.monitor$monitorAir[mu.monitor$regID==i],rev(mu.monitor$monitorAir[mu.monitor$regID==i])),
-					c(mu.site.air$X0.2.[mu.site.air$regID==i&mu.site.air$regsiteID==j+startR[i]],
+				if(beta2$sigP[beta2$regID==i&beta2$regsiteID==j+startR[i]]==1){
+				
+					polygon(c(mu.monitor$monitorAir[mu.monitor$regID==i],rev(mu.monitor$monitorAir[mu.monitor$regID==i])),
+						c(mu.site.air$X0.2.[mu.site.air$regID==i&mu.site.air$regsiteID==j+startR[i]],
 						rev(mu.site.air$X99.8.[mu.site.air$regID==i&mu.site.air$regsiteID==j+startR[i]])),
 						col=rgb(mu.site.air$redShrub[mu.site.air$regID==i&mu.site.air$regsiteID==j+startR[i]]/255,
 						mu.site.air$greenShrub[mu.site.air$regID==i&mu.site.air$regsiteID==j+startR[i]]/255,
 						mu.site.air$blueShrub[mu.site.air$regID==i&mu.site.air$regsiteID==j+startR[i]]/255,.35),border=NA)
+				}else{
+					polygon(c(mu.monitor$monitorAir[mu.monitor$regID==i],rev(mu.monitor$monitorAir[mu.monitor$regID==i])),
+						c(rep(beta0$X0.2.[beta0$regID==i&beta0$regsiteID==j+startR[i]],100),
+						rev(rep(beta0$X99.8.[beta0$regID==i&beta0$regsiteID==j+startR[i]],100))),
+						col=rgb(mu.site.air$redShrub[mu.site.air$regID==i&mu.site.air$regsiteID==j+startR[i]]/255,
+						mu.site.air$greenShrub[mu.site.air$regID==i&mu.site.air$regsiteID==j+startR[i]]/255,
+						mu.site.air$blueShrub[mu.site.air$regID==i&mu.site.air$regsiteID==j+startR[i]]/255,.35),border=NA)
+				
+				}
 			}
 			for(j in 1:22){
-				points(mu.monitor$monitorAir[mu.monitor$regID==i],
-					mu.site.air$Mean[mu.site.air$regID==i&mu.site.air$regsiteID==j+startR[i]],
+				if(beta2$sigP[beta2$regID==i&beta2$regsiteID==j+startR[i]]==1){
+					points(mu.monitor$monitorAir[mu.monitor$regID==i],
+						mu.site.air$Mean[mu.site.air$regID==i&mu.site.air$regsiteID==j+startR[i]],
 							col=paste(mu.site.air$colShrub[mu.site.air$regID==i&mu.site.air$regsiteID==j+startR[i]]),
 							lwd=slw, type="l")
+				}else{
+					abline(h=beta0$Mean[beta0$regID==i&beta0$regsiteID==j+startR[i]],lwd=slw,
+							col=paste(beta0$colShrub[beta0$regID==i&beta0$regsiteID==j+startR[i]]), lty=2)
+
+					}
+							
 			}
 			box(which="plot")			
 		par(mai=c(0,0,0,0))
@@ -687,18 +732,36 @@ for(i in 1:3){
 				
 			points(ParmPC$depth[ParmPC$regID==i],ParmPC$Mean[ParmPC$regID==i],pch=19,col=paste(ParmPC$colMoss),cex=pcx)
 			for(j in 1:22){
-				polygon(c(mu.monitor$monitorDepth[mu.monitor$regID==i],rev(mu.monitor$monitorDepth[mu.monitor$regID==i])),
-					c(mu.site.depth$X0.2.[mu.site.depth$regID==i&mu.site.depth$regsiteID==j+startR[i]],
+			
+			
+				if(beta1$sigP[beta1$regID==i&beta1$regsiteID==j+startR[i]]==1){
+					polygon(c(mu.monitor$monitorDepth[mu.monitor$regID==i],rev(mu.monitor$monitorDepth[mu.monitor$regID==i])),
+						c(mu.site.depth$X0.2.[mu.site.depth$regID==i&mu.site.depth$regsiteID==j+startR[i]],
 						rev(mu.site.depth$X99.8.[mu.site.depth$regID==i&mu.site.depth$regsiteID==j+startR[i]])),
 						col=rgb(mu.site.depth$redMoss[mu.site.depth$regID==i&mu.site.depth$regsiteID==j+startR[i]]/255,
 						mu.site.depth$greenMoss[mu.site.depth$regID==i&mu.site.depth$regsiteID==j+startR[i]]/255,
 						mu.site.depth$blueMoss[mu.site.depth$regID==i&mu.site.depth$regsiteID==j+startR[i]]/255,.35),border=NA)
+				}else{
+					polygon(c(mu.monitor$monitorDepth[mu.monitor$regID==i],rev(mu.monitor$monitorDepth[mu.monitor$regID==i])),
+						c(rep(beta0$X0.2.[beta0$regID==i&beta0$regsiteID==j+startR[i]],100),
+						rev(rep(beta0$X99.8.[beta0$regID==i&beta0$regsiteID==j+startR[i]],100))),
+						col=rgb(mu.site.depth$redMoss[mu.site.depth$regID==i&mu.site.depth$regsiteID==j+startR[i]]/255,
+						mu.site.depth$greenMoss[mu.site.depth$regID==i&mu.site.depth$regsiteID==j+startR[i]]/255,
+						mu.site.depth$blueMoss[mu.site.depth$regID==i&mu.site.depth$regsiteID==j+startR[i]]/255,.35),border=NA)
+			}
 			}
 			for(j in 1:22){
-				points(mu.monitor$monitorDepth[mu.monitor$regID==i],
-					mu.site.depth$Mean[mu.site.depth$regID==i&mu.site.depth$regsiteID==j+startR[i]],
+				if(beta1$sigP[beta1$regID==i&beta1$regsiteID==j+startR[i]]==1){
+
+					points(mu.monitor$monitorDepth[mu.monitor$regID==i],
+						mu.site.depth$Mean[mu.site.depth$regID==i&mu.site.depth$regsiteID==j+startR[i]],
 							col=paste(mu.site.depth$colMoss[mu.site.depth$regID==i&mu.site.depth$regsiteID==j+startR[i]]),
 							lwd=slw, type="l")
+				}else{
+					abline(h=beta0$Mean[beta0$regID==i&beta0$regsiteID==j+startR[i]],lwd=slw,
+							col=paste(beta0$colMoss[beta0$regID==i&beta0$regsiteID==j+startR[i]]), lty=2)
+			
+				}
 			}
 			box(which="plot")
 			
@@ -710,19 +773,36 @@ for(i in 1:3){
 			points(ParmPC$AMean[ParmPC$regID==i],ParmPC$Mean[ParmPC$regID==i],pch=19,col=paste(ParmPC$colMoss),cex=pcx)
 			
 			for(j in 1:22){
-				polygon(c(mu.monitor$monitorAir[mu.monitor$regID==i],rev(mu.monitor$monitorAir[mu.monitor$regID==i])),
-					c(mu.site.air$X0.2.[mu.site.air$regID==i&mu.site.air$regsiteID==j+startR[i]],
+				if(beta2$sigP[beta2$regID==i&beta2$regsiteID==j+startR[i]]==1){
+				
+					polygon(c(mu.monitor$monitorAir[mu.monitor$regID==i],rev(mu.monitor$monitorAir[mu.monitor$regID==i])),
+						c(mu.site.air$X0.2.[mu.site.air$regID==i&mu.site.air$regsiteID==j+startR[i]],
 						rev(mu.site.air$X99.8.[mu.site.air$regID==i&mu.site.air$regsiteID==j+startR[i]])),
 						col=rgb(mu.site.air$redMoss[mu.site.air$regID==i&mu.site.air$regsiteID==j+startR[i]]/255,
 						mu.site.air$greenMoss[mu.site.air$regID==i&mu.site.air$regsiteID==j+startR[i]]/255,
 						mu.site.air$blueMoss[mu.site.air$regID==i&mu.site.air$regsiteID==j+startR[i]]/255,.35),border=NA)
+				}else{
+					polygon(c(mu.monitor$monitorAir[mu.monitor$regID==i],rev(mu.monitor$monitorAir[mu.monitor$regID==i])),
+						c(rep(beta0$X0.2.[beta0$regID==i&beta0$regsiteID==j+startR[i]],100),
+						rev(rep(beta0$X99.8.[beta0$regID==i&beta0$regsiteID==j+startR[i]],100))),
+						col=rgb(mu.site.air$redShrub[mu.site.air$regID==i&mu.site.air$regsiteID==j+startR[i]]/255,
+						mu.site.air$greenMoss[mu.site.air$regID==i&mu.site.air$regsiteID==j+startR[i]]/255,
+						mu.site.air$blueMoss[mu.site.air$regID==i&mu.site.air$regsiteID==j+startR[i]]/255,.35),border=NA)
+				
+				}
 			}
-			
 			for(j in 1:22){
-				points(mu.monitor$monitorAir[mu.monitor$regID==i],
-					mu.site.air$Mean[mu.site.air$regID==i&mu.site.air$regsiteID==j+startR[i]],
+				if(beta2$sigP[beta2$regID==i&beta2$regsiteID==j+startR[i]]==1){
+					points(mu.monitor$monitorAir[mu.monitor$regID==i],
+						mu.site.air$Mean[mu.site.air$regID==i&mu.site.air$regsiteID==j+startR[i]],
 							col=paste(mu.site.air$colMoss[mu.site.air$regID==i&mu.site.air$regsiteID==j+startR[i]]),
 							lwd=slw, type="l")
+				}else{
+					abline(h=beta0$Mean[beta0$regID==i&beta0$regsiteID==j+startR[i]],lwd=slw,
+							col=paste(beta0$colMoss[beta0$regID==i&beta0$regsiteID==j+startR[i]]), lty=2)
+
+					}
+							
 			}
 			box(which="plot")					
 	dev.off()
