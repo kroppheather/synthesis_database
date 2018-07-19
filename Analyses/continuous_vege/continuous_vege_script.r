@@ -34,7 +34,7 @@ library(rjags)
 library(coda)
 library(mcmcplots)
 #set up directories
-modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\continuous\\model\\run2"
+modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\continuous\\model\\run3"
 #read in vege class data: check that patterns don't vary between vege type
 datV <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\vege_class.csv")
 datVI <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\vegeID.csv")
@@ -314,7 +314,11 @@ datalist <- list( Nobs=dim(ParmPC)[1],SoilP=ParmPC$Mean,regsiteID=ParmPC$regsite
 				monitordepth=mu.monitor$monitorDepth,EregID=mu.monitor$regID)
 
 parms <- c("sig	SoilV","beta0","beta1","beta2","a0","a1","a2","b0","b1","b2",	
-			"c0","c1","c2","repSoilP","mu.site.air","mu.site.depth")
+			"c0","c1","c2","repSoilP","mu.site.air","mu.site.depth",
+			"Xbeta0N","Xbeta0S","Xbeta0M","Xbeta1N","Xbeta1S","Xbeta1M",
+			"Xbeta2N","Xbeta2S","Xbeta2M","mu.0.air","mu.0.depth", 
+			"mu.shrub100.air","mu.shrub100.depth","mu.moss80.air","mu.moss80.depth"
+			)
 
 
 #organize data for the model
