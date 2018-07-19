@@ -316,8 +316,8 @@ datalist <- list( Nobs=dim(ParmPC)[1],SoilP=ParmPC$Mean,regsiteID=ParmPC$regsite
 parms <- c("sig	SoilV","beta0","beta1","beta2","a0","a1","a2","b0","b1","b2",	
 			"c0","c1","c2","repSoilP","mu.site.air","mu.site.depth",
 			"Xbeta0N","Xbeta0S","Xbeta0M","Xbeta1N","Xbeta1S","Xbeta1M",
-			"Xbeta2N","Xbeta2S","Xbeta2M","mu.0.air","mu.0.depth", 
-			"mu.shrub100.air","mu.shrub100.depth","mu.moss80.air","mu.moss80.depth"
+			"Xbeta2N","Xbeta2S","Xbeta2M","mu.X0.air","mu.X0.depth", 
+			"mu.Xshrub100.air","mu.Xshrub100.depth","mu.Xmoss80.air","mu.Xmoss80.depth"
 			)
 
 

@@ -65,13 +65,13 @@ model{
 	}	
 	#monitor mean slopes
 	for(i in 1:Nmonitor){
-		for(j in 1:Nreg){
+		for(j in 1:3){
 			mu.X0.depth[i,j] <- Xbeta0N[j] + Xbeta1N[j]*monitordepth[i]
 			mu.X0.air[i,j] <- Xbeta0N[j] + Xbeta2N[j]*(monitorAir[i]-AirPbar[EregID[i]])
 			mu.Xshrub100.depth[i,j] <- Xbeta0S[j] + Xbeta1S[j]*monitordepth[i]
 			mu.Xshrub100.air[i,j] <- Xbeta0S[j] + Xbeta2S[j]*(monitorAir[i]-AirPbar[EregID[i]])
-			mu.Xshrub80.depth[i,j] <- Xbeta0M[j] + Xbeta1M[j]*monitordepth[i]
-			mu.Xshrub80.air[i,j] <- Xbeta0M[j] + Xbeta2M[j]*(monitorAir[i]-AirPbar[EregID[i]])
+			mu.Xmoss80.depth[i,j] <- Xbeta0M[j] + Xbeta1M[j]*monitordepth[i]
+			mu.Xmoss80.air[i,j] <- Xbeta0M[j] + Xbeta2M[j]*(monitorAir[i]-AirPbar[EregID[i]])
 		}
 	}
 	

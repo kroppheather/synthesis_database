@@ -38,9 +38,9 @@ library(mcmcplots)
 library(RColorBrewer)
 
 #set up directories
-modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\continuous\\model\\run2"
+modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\continuous\\model\\run3"
 plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\continuous\\plots"
-Nrun <- 2
+Nrun <- 3
 #read in vege class data: check that patterns don't vary between vege type
 datV <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\vege_class.csv")
 datVI <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\vegeID.csv")
@@ -338,6 +338,22 @@ datB$parmID <- rep(seq(1,3),eac=3)
 datD <- datC[datC$parms2=="c",]
 datD$regID <- rep(seq(1,3),times=3)
 datD$parmID <- rep(seq(1,3),eac=3)
+
+#create significance column
+datA$sigP <- ifelse(datA$X0.2.<0&datA$X99.8.<0,"*",
+			ifelse(datA$X0.2.>0&datA$X99.8.>0,"*","NS"))
+datB$sigP <- ifelse(datB$X0.2.<0&datB$X99.8.<0,"*",
+			ifelse(datB$X0.2.>0&datB$X99.8.>0,"*","NS"))
+datD$sigP <- ifelse(datD$X0.2.<0&datD$X99.8.<0,"*",
+			ifelse(datD$X0.2.>0&datD$X99.8.>0,"*","NS"))
+
+datA$signP <- ifelse(datA$X0.2.<0&datA$X99.8.<0,"-",
+			ifelse(datA$X0.2.>0&datA$X99.8.>0,"+"," "))			
+datB$signP <- ifelse(datB$X0.2.<0&datB$X99.8.<0,"-",
+			ifelse(datB$X0.2.>0&datB$X99.8.>0,"+"," "))
+datD$signP <- ifelse(datD$X0.2.<0&datD$X99.8.<0,"-",
+			ifelse(datD$X0.2.>0&datD$X99.8.>0,"+"," "))			
+			
 parmR <- list(datA,datB,datD)
 
 beta0 <- datC[datC$parms=="beta0",]
@@ -348,7 +364,16 @@ beta0 <- cbind(beta0,PCdata)
 beta1 <- cbind(beta1,PCdata)
 beta2 <- cbind(beta2,PCdata)
 
-
+#subset out extreme examples
+Xbeta0M <- datC[datC$parms=="Xbeta0M",]
+Xbeta0N <- datC[datC$parms=="Xbeta0N",]
+Xbeta0S <-  datC[datC$parms=="Xbeta0S",]
+Xbeta1M <- datC[datC$parms=="Xbeta1M",]
+Xbeta1N <- datC[datC$parms=="Xbeta1N",]
+Xbeta1S <-  datC[datC$parms=="Xbeta1S",]
+Xbeta2M <- datC[datC$parms=="Xbeta2M",]
+Xbeta2N <- datC[datC$parms=="Xbeta2N",]
+Xbeta2S <-  datC[datC$parms=="Xbeta2S",]
 
 #add significance to beta1 and beta 2
 beta1$sigP <- ifelse(beta1$X0.2.<0&beta1$X99.8.<0,1,
@@ -356,7 +381,21 @@ beta1$sigP <- ifelse(beta1$X0.2.<0&beta1$X99.8.<0,1,
 
 beta2$sigP <- ifelse(beta2$X0.2.<0&beta2$X99.8.<0,1,
 				ifelse(beta2$X0.2.>0&beta2$X99.8.>0,1,0))
-
+#add significance to example betas of extremes				
+Xbeta1M$sigP <- ifelse(Xbeta1M$X0.2.<0&Xbeta1M$X99.8.<0,1,
+				ifelse(Xbeta1M$X0.2.>0&Xbeta1M$X99.8.>0,1,0))				
+Xbeta1S$sigP <- ifelse(Xbeta1S$X0.2.<0&Xbeta1S$X99.8.<0,1,
+				ifelse(Xbeta1S$X0.2.>0&Xbeta1S$X99.8.>0,1,0))					
+Xbeta1N$sigP <- ifelse(Xbeta1N$X0.2.<0&Xbeta1N$X99.8.<0,1,
+				ifelse(Xbeta1N$X0.2.>0&Xbeta1N$X99.8.>0,1,0))
+				
+Xbeta2M$sigP <- ifelse(Xbeta2M$X0.2.<0&Xbeta2M$X99.8.<0,1,
+				ifelse(Xbeta2M$X0.2.>0&Xbeta2M$X99.8.>0,1,0))				
+Xbeta2S$sigP <- ifelse(Xbeta2S$X0.2.<0&Xbeta2S$X99.8.<0,1,
+				ifelse(Xbeta2S$X0.2.>0&Xbeta2S$X99.8.>0,1,0))					
+Xbeta2N$sigP <- ifelse(Xbeta2N$X0.2.<0&Xbeta2N$X99.8.<0,1,
+				ifelse(Xbeta2N$X0.2.>0&Xbeta2N$X99.8.>0,1,0))				
+				
 #pull out regression means
 mu.site.air <- datC[datC$parms2=="mu.site.air[,",]
 mu.site.depth <- datC[datC$parms2=="mu.site.depth[,",]
@@ -389,6 +428,43 @@ mu.site.depth <- rbind(mu.site.depthp1,mu.site.depthp2,mu.site.depthp3)
 #join other info
 mu.site.air <- join(mu.site.air, PCdata, by="regsiteID",type="left")
 mu.site.depth <- join(mu.site.depth, PCdata, by="regsiteID",type="left")
+
+
+
+
+
+
+#pull out regression means for example of extremes
+mu.XN.air <- datC[datC$parms2=="mu.X.air[,",]
+mu.XN.depth <- datC[datC$parms2=="mu.X.depth[,",]
+
+mu.XM.air <- datC[datC$parms2=="mu.Xmoss.air[,",]
+mu.XM.depth <- datC[datC$parms2=="mu.Xmoss.depth[,",]
+
+mu.XS.air <- datC[datC$parms2=="mu.Xshrub.air[,",]
+mu.XS.depth <- datC[datC$parms2=="mu.Xshrub.depth[,",]
+
+
+#pull out the appropriate regression
+mu.XN.air <- rbind(mu.XN.air[1:100,],mu.XN.air[401:500,],mu.XN.air[801:900,])
+mu.XN.air$regID <- rep(seq(1,3),each=100)
+
+mu.XN.depth <- rbind(mu.XN.depth[1:100,],mu.XN.depth[401:500,],mu.XN.depth[801:900,])
+mu.XN.depth$regID <- rep(seq(1,3),each=100)
+
+mu.XM.air <- rbind(mu.XM.air[1:100,],mu.XM.air[401:500,],mu.XM.air[801:900,])
+mu.XM.air$regID <- rep(seq(1,3),each=100)
+
+mu.XM.depth <- rbind(mu.XM.depth[1:100,],mu.XM.depth[401:500,],mu.XM.depth[801:900,])
+mu.XM.depth$regID <- rep(seq(1,3),each=100)
+
+
+mu.XS.air <- rbind(mu.XS.air[1:100,],mu.XS.air[401:500,],mu.XS.air[801:900,])
+mu.XS.air$regID <- rep(seq(1,3),each=100)
+
+mu.XS.depth <- rbind(mu.XS.depth[1:100,],mu.XS.depth[401:500,],mu.XS.depth[801:900,])
+mu.XS.depth$regID <- rep(seq(1,3),each=100)
+
 
 #######################################
 #####look at the regression parms ##### 
@@ -594,7 +670,7 @@ mu.site.depth$colMoss <- ifelse(mu.site.depth$nonvascularC<=10,colM[1],
 					ifelse(mu.site.depth$nonvascularC>70&mu.site.depth$nonvascularC<80,colM[8],rgb(0,0,0)))))))))						
 
 
-
+#colors for means
 
 #set up colors for transparency
 for(i in 1:dim(mu.site.depth)[1]){
@@ -636,15 +712,83 @@ xhD <- 21
 pcx <- 3
 slw <- 4
 si <- c(1,1,.01)
+
+xTA <- c(-5,25,.55)
+xTD <- 15
+yT <- c(-30,5,.25)
+cxT <- 10
+
 regCent <- function(x,y0,y1,xbar){
 	y0+(y1*(x-xbar))
 }
 startR <- c(0,22,44)
 #regression
 for(i in 1:3){
-	jpeg(paste0(plotDI,"\\run",Nrun,"\\regression_all_",i,".jpg"), width=2000,height=2000,
+	jpeg(paste0(plotDI,"\\run",Nrun,"\\regression_all_",i,".jpg"), width=3000,height=2000,
 			quality=100,units="px")
-	layout(matrix(seq(1,4),ncol=2,byrow=TRUE), width=rep(lcm(wd),4),height=rep(lcm(hd),4))
+	layout(matrix(seq(1,8),ncol=4,byrow=TRUE), width=rep(lcm(wd),8),height=rep(lcm(hd),8))
+		#plot example of extreme
+		par(mai=c(0,0,0,0))
+			plot(c(0,1),c(0,1), ylim=c(yli[i],yhi[i]), xlim=c(xlD,xhD),
+				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+					
+			if(Xbeta1N$sigP[i]==1){
+					polygon(c(mu.monitor$monitorDepth[mu.monitor$regID==i],rev(mu.monitor$monitorDepth[mu.monitor$regID==i])),
+						c(mu.XN.depth$X0.2.[mu.XN.depth$regID==i],
+						rev(mu.XN.depth$X99.8.[mu.XN.depth$regID==i])),
+						col=rgb(redS[1]/255,
+						greenS[1]/255,
+						blueS[1]/255,.35),border=NA)
+				}else{
+					polygon(c(mu.monitor$monitorDepth[mu.monitor$regID==i],rev(mu.monitor$monitorDepth[mu.monitor$regID==i])),
+						c(rep(Xbeta0N$X0.2.[i],100),
+						rev(rep(Xbeta0N$X99.8.[i],100))),
+						col=rgb(redS[1]/255,
+						greenS[1]/255,
+						blueS[1]/255,.35),border=NA)
+			}
+			if(Xbeta1S$sigP[i]==1){
+					polygon(c(mu.monitor$monitorDepth[mu.monitor$regID==i],rev(mu.monitor$monitorDepth[mu.monitor$regID==i])),
+						c(mu.XS.depth$X0.2.[mu.XS.depth$regID==i],
+						rev(mu.XS.depth$X99.8.[mu.XS.depth$regID==i])),
+						col=rgb(redS[8]/255,
+						greenS[8]/255,
+						blueS[8]/255,.35),border=NA)
+				}else{
+					polygon(c(mu.monitor$monitorDepth[mu.monitor$regID==i],rev(mu.monitor$monitorDepth[mu.monitor$regID==i])),
+						c(rep(Xbeta0S$X0.2.[i],100),
+						rev(rep(Xbeta0S$X99.8.[i],100))),
+						col=rgb(redS[8]/255,
+						greenS[8]/255,
+						blueS[8]/255,.35),border=NA)
+			}	
+
+			if(Xbeta1N$sigP[i]==1){
+
+					points(mu.monitor$monitorDepth[mu.monitor$regID==i],
+						mu.XN.depth$Mean[mu.XN.depth$regID==i],
+							col=paste(colS[1]),
+							lwd=slw, type="l")
+				}else{
+					abline(h=Xbeta0N$Mean[i],lwd=slw,
+							col=paste(colS[1]), lty=2)
+			
+				}
+
+			if(Xbeta1S$sigP[i]==1){
+
+					points(mu.monitor$monitorDepth[mu.monitor$regID==i],
+						mu.XS.depth$Mean[mu.XS.depth$regID==i],
+							col=paste(colS[8]),
+							lwd=slw, type="l")
+				}else{
+					abline(h=Xbeta0S$Mean[i],lwd=slw,
+							col=paste(colS[8]), lty=2)
+			
+				}
+		text(xTD,yT[i], paste(datB$sigP[datB$parmID==2&datB$regID==i],datB$signP[datB$parmID==2&datB$regID==i]),cex=cxT)
+		box(which="plot")		
+		#plot data
 		par(mai=c(0,0,0,0))
 		
 			plot(c(0,1),c(0,1), ylim=c(yli[i],yhi[i]), xlim=c(xlD,xhD),
@@ -684,8 +828,11 @@ for(i in 1:3){
 			
 				}
 			}
-			box(which="plot")
 			
+			box(which="plot")
+
+		#data
+		
 		par(mai=c(0,0,0,0))
 		
 			plot(c(0,1),c(0,1), ylim=c(yli[i],yhi[i]), xlim=c(xlA[i],xhA[i]),
@@ -724,7 +871,135 @@ for(i in 1:3){
 					}
 							
 			}
-			box(which="plot")			
+			
+			box(which="plot")	
+
+		#plot extreme example
+		par(mai=c(0,0,0,0))
+		
+			plot(c(0,1),c(0,1), ylim=c(yli[i],yhi[i]), xlim=c(xlA[i],xhA[i]),
+				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+		if(Xbeta2N$sigP[i]==1){
+					polygon(c(mu.monitor$monitorAir[mu.monitor$regID==i],rev(mu.monitor$monitorAir[mu.monitor$regID==i])),
+						c(mu.XN.air$X0.2.[mu.XN.air$regID==i],
+						rev(mu.XN.air$X99.8.[mu.XN.air$regID==i])),
+						col=rgb(redS[1]/255,
+						greenS[1]/255,
+						blueS[1]/255,.35),border=NA)
+				}else{
+					polygon(c(mu.monitor$monitorAir[mu.monitor$regID==i],rev(mu.monitor$monitorAir[mu.monitor$regID==i])),
+						c(rep(Xbeta0N$X0.2.[i],100),
+						rev(rep(Xbeta0N$X99.8.[i],100))),
+						col=rgb(redS[1]/255,
+						greenS[1]/255,
+						blueS[1]/255,.35),border=NA)
+			}
+			if(Xbeta2S$sigP[i]==1){
+					polygon(c(mu.monitor$monitorAir[mu.monitor$regID==i],rev(mu.monitor$monitorAir[mu.monitor$regID==i])),
+						c(mu.XS.air$X0.2.[mu.XS.air$regID==i],
+						rev(mu.XS.air$X99.8.[mu.XS.air$regID==i])),
+						col=rgb(redS[8]/255,
+						greenS[8]/255,
+						blueS[8]/255,.35),border=NA)
+				}else{
+					polygon(c(mu.monitor$monitorAir[mu.monitor$regID==i],rev(mu.monitor$monitorAir[mu.monitor$regID==i])),
+						c(rep(Xbeta0S$X0.2.[i],100),
+						rev(rep(Xbeta0S$X99.8.[i],100))),
+						col=rgb(redS[8]/255,
+						greenS[8]/255,
+						blueS[8]/255,.35),border=NA)
+			}	
+
+			if(Xbeta2N$sigP[i]==1){
+
+					points(mu.monitor$monitorAir[mu.monitor$regID==i],
+						mu.XN.air$Mean[mu.XN.air$regID==i],
+							col=paste(colS[1]),
+							lwd=slw, type="l")
+				}else{
+					abline(h=Xbeta0N$Mean[i],lwd=slw,
+							col=paste(colS[1]), lty=2)
+			
+				}
+
+			if(Xbeta2S$sigP[i]==1){
+
+					points(mu.monitor$monitorAir[mu.monitor$regID==i],
+						mu.XS.air$Mean[mu.XS.air$regID==i],
+							col=paste(colS[8]),
+							lwd=slw, type="l")
+				}else{
+					abline(h=Xbeta0S$Mean[i],lwd=slw,
+							col=paste(colS[8]), lty=2)
+			
+				}
+			text(xTA[i],yT[i], paste(datD$sigP[datD$parmID==2&datD$regID==i],datD$signP[datD$parmID==2&datD$regID==i]),cex=cxT)	
+		box(which="plot")
+		
+		#plot extreme example
+		par(mai=c(0,0,0,0))
+		
+			plot(c(0,1),c(0,1), ylim=c(yli[i],yhi[i]), xlim=c(xlD,xhD),
+				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)		
+		if(Xbeta1N$sigP[i]==1){
+					polygon(c(mu.monitor$monitorDepth[mu.monitor$regID==i],rev(mu.monitor$monitorDepth[mu.monitor$regID==i])),
+						c(mu.XN.depth$X0.2.[mu.XN.depth$regID==i],
+						rev(mu.XN.depth$X99.8.[mu.XN.depth$regID==i])),
+						col=rgb(redM[1]/255,
+						greenM[1]/255,
+						blueM[1]/255,.35),border=NA)
+				}else{
+					polygon(c(mu.monitor$monitorDepth[mu.monitor$regID==i],rev(mu.monitor$monitorDepth[mu.monitor$regID==i])),
+						c(rep(Xbeta0N$X0.2.[i],100),
+						rev(rep(Xbeta0N$X99.8.[i],100))),
+						col=rgb(redM[1]/255,
+						greenM[1]/255,
+						blueM[1]/255,.35),border=NA)
+			}
+			if(Xbeta1M$sigP[i]==1){
+					polygon(c(mu.monitor$monitorDepth[mu.monitor$regID==i],rev(mu.monitor$monitorDepth[mu.monitor$regID==i])),
+						c(mu.XM.depth$X0.2.[mu.XM.depth$regID==i],
+						rev(mu.XM.depth$X99.8.[mu.XM.depth$regID==i])),
+						col=rgb(redM[8]/255,
+						greenM[8]/255,
+						blueM[8]/255,.35),border=NA)
+				}else{
+					polygon(c(mu.monitor$monitorDepth[mu.monitor$regID==i],rev(mu.monitor$monitorDepth[mu.monitor$regID==i])),
+						c(rep(Xbeta0M$X0.2.[i],100),
+						rev(rep(Xbeta0M$X99.8.[i],100))),
+						col=rgb(redM[8]/255,
+						greenM[8]/255,
+						blueM[8]/255,.35),border=NA)
+			}	
+
+			if(Xbeta1N$sigP[i]==1){
+
+					points(mu.monitor$monitorDepth[mu.monitor$regID==i],
+						mu.XN.depth$Mean[mu.XN.depth$regID==i],
+							col=paste(colM[1]),
+							lwd=slw, type="l")
+				}else{
+					abline(h=Xbeta0N$Mean[i],lwd=slw,
+							col=paste(colM[1]), lty=2)
+			
+				}
+
+			if(Xbeta1M$sigP[i]==1){
+
+					points(mu.monitor$monitorDepth[mu.monitor$regID==i],
+						mu.XM.depth$Mean[mu.XM.depth$regID==i],
+							col=paste(colM[8]),
+							lwd=slw, type="l")
+				}else{
+					abline(h=Xbeta0M$Mean[i],lwd=slw,
+							col=paste(colM[8]), lty=2)
+			
+				}
+
+		text(xTD,yT[i], paste(datB$sigP[datB$parmID==3&datB$regID==i],datB$signP[datB$parmID==3&datB$regID==i]),cex=cxT)		
+		box(which="plot")
+		
+		#plot data	
 		par(mai=c(0,0,0,0))
 		
 			plot(c(0,1),c(0,1), ylim=c(yli[i],yhi[i]), xlim=c(xlD,xhD),
@@ -804,6 +1079,68 @@ for(i in 1:3){
 					}
 							
 			}
-			box(which="plot")					
+			box(which="plot")	
+
+	#plot extreme example
+	par(mai=c(0,0,0,0))
+		
+		plot(c(0,1),c(0,1), ylim=c(yli[i],yhi[i]), xlim=c(xlA[i],xhA[i]),
+			xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+	if(Xbeta2N$sigP[i]==1){
+					polygon(c(mu.monitor$monitorAir[mu.monitor$regID==i],rev(mu.monitor$monitorAir[mu.monitor$regID==i])),
+						c(mu.XN.air$X0.2.[mu.XN.air$regID==i],
+						rev(mu.XN.air$X99.8.[mu.XN.air$regID==i])),
+						col=rgb(redM[1]/255,
+						greenM[1]/255,
+						blueM[1]/255,.35),border=NA)
+				}else{
+					polygon(c(mu.monitor$monitorAir[mu.monitor$regID==i],rev(mu.monitor$monitorAir[mu.monitor$regID==i])),
+						c(rep(Xbeta0N$X0.2.[i],100),
+						rev(rep(Xbeta0N$X99.8.[i],100))),
+						col=rgb(redM[1]/255,
+						greenM[1]/255,
+						blueM[1]/255,.35),border=NA)
+			}
+			if(Xbeta2M$sigP[i]==1){
+					polygon(c(mu.monitor$monitorAir[mu.monitor$regID==i],rev(mu.monitor$monitorAir[mu.monitor$regID==i])),
+						c(mu.XM.air$X0.2.[mu.XM.air$regID==i],
+						rev(mu.XM.air$X99.8.[mu.XM.air$regID==i])),
+						col=rgb(redM[8]/255,
+						greenM[8]/255,
+						blueM[8]/255,.35),border=NA)
+				}else{
+					polygon(c(mu.monitor$monitorAir[mu.monitor$regID==i],rev(mu.monitor$monitorAir[mu.monitor$regID==i])),
+						c(rep(Xbeta0M$X0.2.[i],100),
+						rev(rep(Xbeta0M$X99.8.[i],100))),
+						col=rgb(redM[8]/255,
+						greenM[8]/255,
+						blueM[8]/255,.35),border=NA)
+			}	
+
+			if(Xbeta2N$sigP[i]==1){
+
+					points(mu.monitor$monitorAir[mu.monitor$regID==i],
+						mu.XN.air$Mean[mu.XN.air$regID==i],
+							col=paste(colM[1]),
+							lwd=slw, type="l")
+				}else{
+					abline(h=Xbeta0N$Mean[i],lwd=slw,
+							col=paste(colM[1]), lty=2)
+			
+				}
+
+			if(Xbeta2M$sigP[i]==1){
+
+					points(mu.monitor$monitorAir[mu.monitor$regID==i],
+						mu.XM.air$Mean[mu.XM.air$regID==i],
+							col=paste(colM[8]),
+							lwd=slw, type="l")
+				}else{
+					abline(h=Xbeta0M$Mean[i],lwd=slw,
+							col=paste(colM[8]), lty=2)
+			
+				}	
+	text(xTA[i],yT[i], paste(datD$sigP[datD$parmID==3&datD$regID==i],datD$signP[datD$parmID==3&datD$regID==i]),cex=cxT)				
+	box(which="plot")		
 	dev.off()
 }	
