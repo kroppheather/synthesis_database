@@ -40,7 +40,7 @@ library(RColorBrewer)
 #set up directories
 modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\continuous\\model\\run2"
 plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\continuous\\plots"
-Nrun <- 1
+Nrun <- 2
 #read in vege class data: check that patterns don't vary between vege type
 datV <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\vege_class.csv")
 datVI <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\vegeID.csv")
@@ -302,6 +302,12 @@ ParmPC <- join(ParmPC, PCIDj, by=c("siteid","regID"), type="inner")
 AirMean <- aggregate(ParmPC$AMean, by=list(ParmPC$regID), FUN="mean")
 colnames(AirMean) <- c("regID", "Abar")
 
+
+#generate dataset for monitoring regression means
+
+mu.monitor <- data.frame(regID = rep(seq(1,3),each=100), 
+				monitorAir = c(seq(-45,0, length.out=100),seq(0,35,length.out=100),seq(0,.65,length.out=100)),
+				monitorDepth=rep(seq(0,20,length.out=100),times=3))
 #######################################
 #####read in model results        ##### 
 #######################################	
@@ -341,6 +347,39 @@ beta2 <- datC[datC$parms=="beta2",]
 beta0 <- cbind(beta0,PCdata)
 beta1 <- cbind(beta1,PCdata)
 beta2 <- cbind(beta2,PCdata)
+
+
+#pull out regression means
+mu.site.air <- datC[datC$parms2=="mu.site.air[,",]
+mu.site.depth <- datC[datC$parms2=="mu.site.depth[,",]
+
+
+#accidentally monitored betas for all regressions not just the ones that they are in. Pull out the matching betas that belong
+#first indicate what each stands for
+mu.site.air$regsiteID <- rep(seq(1,dim(PCdata)[1]), each=300)
+mu.site.air$regID <- rep(rep(seq(1,3), each=100),times=66)
+
+mu.site.depth$regsiteID <- rep(seq(1,dim(PCdata)[1]), each=300)
+mu.site.depth$regID <- rep(rep(seq(1,3), each=100),times=66)
+
+#each regression has 22 ids in it so subset to pull out the right one
+mu.site.airp1 <- mu.site.air[mu.site.air$regID==1&mu.site.air$regsiteID<=22,]
+mu.site.airp2 <- mu.site.air[mu.site.air$regID==2&mu.site.air$regsiteID>22&mu.site.air$regsiteID<=44,]
+mu.site.airp3 <- mu.site.air[mu.site.air$regID==3&mu.site.air$regsiteID>44&mu.site.air$regsiteID<=66,]
+
+mu.site.airp <- rbind(mu.site.airp1,mu.site.airp2,mu.site.airp3)
+
+mu.site.depthp1 <- mu.site.depth[mu.site.depth$regID==1&mu.site.depth$regsiteID<=22,]
+mu.site.depthp2 <- mu.site.depth[mu.site.depth$regID==2&mu.site.depth$regsiteID>22&mu.site.depth$regsiteID<=44,]
+mu.site.depthp3 <- mu.site.depth[mu.site.depth$regID==3&mu.site.depth$regsiteID>44&mu.site.depth$regsiteID<=66,]
+
+mu.site.depth <- rbind(mu.site.depthp1,mu.site.depthp2,mu.site.depthp3)
+
+
+
+#join other info
+mu.site.air <- join(mu.site.air, PCdata, by="regsiteID",type="left")
+mu.site.depth <- join(mu.site.depth, PCdata, by="regsiteID",type="left")
 
 #######################################
 #####look at the regression parms ##### 
@@ -505,7 +544,68 @@ beta2$colMoss <- ifelse(beta2$nonvascularC<=10,colM[1],
 					ifelse(beta2$nonvascularC>40&beta2$nonvascularC<=50,colM[5],
 					ifelse(beta2$nonvascularC>50&beta2$nonvascularC<=60,colM[6],
 					ifelse(beta2$nonvascularC>60&beta2$nonvascularC<=70,colM[7],
-					ifelse(beta2$nonvascularC>70&beta2$nonvascularC<80,colM[8],rgb(0,0,0)))))))))						
+					ifelse(beta2$nonvascularC>70&beta2$nonvascularC<80,colM[8],rgb(0,0,0)))))))))		
+
+
+					
+mu.site.air$colMoss <- ifelse(mu.site.air$nonvascularC<=10,colM[1],
+					ifelse(mu.site.air$nonvascularC>10&mu.site.air$nonvascularC<=20,colM[2],
+					ifelse(mu.site.air$nonvascularC>20&mu.site.air$nonvascularC<=30,colM[3],
+					ifelse(mu.site.air$nonvascularC>30&mu.site.air$nonvascularC<=40,colM[4],
+					ifelse(mu.site.air$nonvascularC>40&mu.site.air$nonvascularC<=50,colM[5],
+					ifelse(mu.site.air$nonvascularC>50&mu.site.air$nonvascularC<=60,colM[6],
+					ifelse(mu.site.air$nonvascularC>60&mu.site.air$nonvascularC<=70,colM[7],
+					ifelse(mu.site.air$nonvascularC>70&mu.site.air$nonvascularC<80,colM[8],rgb(0,0,0)))))))))	
+
+mu.site.air$colShrub <- ifelse(mu.site.air$shrubC<=12.5,colS[1],
+					ifelse(mu.site.air$shrubC>12.5&mu.site.air$shrubC<=25,colS[2],
+					ifelse(mu.site.air$shrubC>25&mu.site.air$shrubC<=37.5,colS[3],
+					ifelse(mu.site.air$shrubC>37.5&mu.site.air$shrubC<=50,colS[4],
+					ifelse(mu.site.air$shrubC>50&mu.site.air$shrubC<=67.5,colS[5],
+					ifelse(mu.site.air$shrubC>67.5&mu.site.air$shrubC<=75,colS[6],
+					ifelse(mu.site.air$shrubC>75&mu.site.air$shrubC<=87.5,colS[7],
+					ifelse(mu.site.air$shrubC>87.5&mu.site.air$shrubC<100,colS[8],rgb(0,0,0)))))))))
+
+mu.site.depth$colShrub <- ifelse(mu.site.depth$shrubC<=12.5,colS[1],
+					ifelse(mu.site.depth$shrubC>12.5&mu.site.depth$shrubC<=25,colS[2],
+					ifelse(mu.site.depth$shrubC>25&mu.site.depth$shrubC<=37.5,colS[3],
+					ifelse(mu.site.depth$shrubC>37.5&mu.site.depth$shrubC<=50,colS[4],
+					ifelse(mu.site.depth$shrubC>50&mu.site.depth$shrubC<=67.5,colS[5],
+					ifelse(mu.site.depth$shrubC>67.5&mu.site.depth$shrubC<=75,colS[6],
+					ifelse(mu.site.depth$shrubC>75&mu.site.depth$shrubC<=87.5,colS[7],
+					ifelse(mu.site.depth$shrubC>87.5&mu.site.depth$shrubC<100,colS[8],rgb(0,0,0)))))))))
+					
+mu.site.depth$colMoss <- ifelse(mu.site.depth$nonvascularC<=10,colM[1],
+					ifelse(mu.site.depth$nonvascularC>10&mu.site.depth$nonvascularC<=20,colM[2],
+					ifelse(mu.site.depth$nonvascularC>20&mu.site.depth$nonvascularC<=30,colM[3],
+					ifelse(mu.site.depth$nonvascularC>30&mu.site.depth$nonvascularC<=40,colM[4],
+					ifelse(mu.site.depth$nonvascularC>40&mu.site.depth$nonvascularC<=50,colM[5],
+					ifelse(mu.site.depth$nonvascularC>50&mu.site.depth$nonvascularC<=60,colM[6],
+					ifelse(mu.site.depth$nonvascularC>60&mu.site.depth$nonvascularC<=70,colM[7],
+					ifelse(mu.site.depth$nonvascularC>70&mu.site.depth$nonvascularC<80,colM[8],rgb(0,0,0)))))))))						
+
+
+
+
+#set up colors for transparency
+for(i in 1:dim(mu.site.depth)[1]){
+	mu.site.depth$redShrub[i] <- col2rgb(paste(mu.site.depth$colShrub[i]))[1,1]
+	mu.site.depth$greenShrub[i] <- col2rgb(paste(mu.site.depth$colShrub[i]))[2,1]
+	mu.site.depth$blueShrub[i] <- col2rgb(paste(mu.site.depth$colShrub[i]))[3,1]
+	mu.site.depth$redMoss[i] <- col2rgb(paste(mu.site.depth$colMoss[i]))[1,1]
+	mu.site.depth$greenMoss[i] <- col2rgb(paste(mu.site.depth$colMoss[i]))[2,1]
+	mu.site.depth$blueMoss[i] <- col2rgb(paste(mu.site.depth$colMoss[i]))[3,1]
+	
+	
+	mu.site.air$redShrub[i] <- col2rgb(paste(mu.site.air$colShrub[i]))[1,1]
+	mu.site.air$greenShrub[i] <- col2rgb(paste(mu.site.air$colShrub[i]))[2,1]
+	mu.site.air$blueShrub[i] <- col2rgb(paste(mu.site.air$colShrub[i]))[3,1]
+	mu.site.air$redMoss[i] <- col2rgb(paste(mu.site.air$colMoss[i]))[1,1]
+	mu.site.air$greenMoss[i] <- col2rgb(paste(mu.site.air$colMoss[i]))[2,1]
+	mu.site.air$blueMoss[i] <- col2rgb(paste(mu.site.air$colMoss[i]))[3,1]
+}
+
+
 					
 #add color for points
 SiteCol <- unique(data.frame(siteid=beta1$siteid, colMoss=beta1$colMoss,colShrub=beta1$colShrub))
@@ -542,10 +642,19 @@ for(i in 1:3){
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
 				
 			points(ParmPC$depth[ParmPC$regID==i],ParmPC$Mean[ParmPC$regID==i],pch=19,col=paste(ParmPC$colShrub),cex=pcx)
+			
 			for(j in 1:22){
-				points(seq(0,20),regCent(seq(0,20),beta0$Mean[beta0$regID==i&beta0$regsiteID==j+startR[i]],
-							beta1$Mean[beta1$regID==i&beta1$regsiteID==j+startR[i]],0),
-							col=paste(beta1$colShrub[beta0$regID==i&beta0$regsiteID==j+startR[i]]),
+				polygon(c(mu.monitor$monitorDepth[mu.monitor$regID==i],rev(mu.monitor$monitorDepth[mu.monitor$regID==i])),
+					c(mu.site.depth$X0.2.[mu.site.depth$regID==i&mu.site.depth$regsiteID==j+startR[i]],
+						rev(mu.site.depth$X99.8.[mu.site.depth$regID==i&mu.site.depth$regsiteID==j+startR[i]])),
+						col=rgb(mu.site.depth$redShrub[mu.site.depth$regID==i&mu.site.depth$regsiteID==j+startR[i]]/255,
+						mu.site.depth$greenShrub[mu.site.depth$regID==i&mu.site.depth$regsiteID==j+startR[i]]/255,
+						mu.site.depth$blueShrub[mu.site.depth$regID==i&mu.site.depth$regsiteID==j+startR[i]]/255,.35),border=NA)
+			}
+			for(j in 1:22){
+				points(mu.monitor$monitorDepth[mu.monitor$regID==i],
+					mu.site.depth$Mean[mu.site.depth$regID==i&mu.site.depth$regsiteID==j+startR[i]],
+							col=paste(mu.site.depth$colShrub[mu.site.depth$regID==i&mu.site.depth$regsiteID==j+startR[i]]),
 							lwd=slw, type="l")
 			}
 			box(which="plot")
@@ -556,11 +665,18 @@ for(i in 1:3){
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
 				
 			points(ParmPC$AMean[ParmPC$regID==i],ParmPC$Mean[ParmPC$regID==i],pch=19,col=paste(ParmPC$colShrub),cex=pcx)
-			
 			for(j in 1:22){
-				points(seq(yli[i],yhi[i],by=si[i]),regCent(seq(yli[i],yhi[i],by=si[i]),beta0$Mean[beta0$regID==i&beta0$regsiteID==j+startR[i]],
-							beta2$Mean[beta2$regID==i&beta2$regsiteID==j+startR[i]],AirMean$Abar[i]),
-							col=paste(beta1$colShrub[beta0$regID==i&beta0$regsiteID==j+startR[i]]),
+				polygon(c(mu.monitor$monitorAir[mu.monitor$regID==i],rev(mu.monitor$monitorAir[mu.monitor$regID==i])),
+					c(mu.site.air$X0.2.[mu.site.air$regID==i&mu.site.air$regsiteID==j+startR[i]],
+						rev(mu.site.air$X99.8.[mu.site.air$regID==i&mu.site.air$regsiteID==j+startR[i]])),
+						col=rgb(mu.site.air$redShrub[mu.site.air$regID==i&mu.site.air$regsiteID==j+startR[i]]/255,
+						mu.site.air$greenShrub[mu.site.air$regID==i&mu.site.air$regsiteID==j+startR[i]]/255,
+						mu.site.air$blueShrub[mu.site.air$regID==i&mu.site.air$regsiteID==j+startR[i]]/255,.35),border=NA)
+			}
+			for(j in 1:22){
+				points(mu.monitor$monitorAir[mu.monitor$regID==i],
+					mu.site.air$Mean[mu.site.air$regID==i&mu.site.air$regsiteID==j+startR[i]],
+							col=paste(mu.site.air$colShrub[mu.site.air$regID==i&mu.site.air$regsiteID==j+startR[i]]),
 							lwd=slw, type="l")
 			}
 			box(which="plot")			
@@ -570,11 +686,18 @@ for(i in 1:3){
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
 				
 			points(ParmPC$depth[ParmPC$regID==i],ParmPC$Mean[ParmPC$regID==i],pch=19,col=paste(ParmPC$colMoss),cex=pcx)
-			
 			for(j in 1:22){
-				points(seq(0,20),regCent(seq(0,20),beta0$Mean[beta0$regID==i&beta0$regsiteID==j+startR[i]],
-							beta1$Mean[beta1$regID==i&beta1$regsiteID==j+startR[i]],0),
-							col=paste(beta1$colMoss[beta0$regID==i&beta0$regsiteID==j+startR[i]]),
+				polygon(c(mu.monitor$monitorDepth[mu.monitor$regID==i],rev(mu.monitor$monitorDepth[mu.monitor$regID==i])),
+					c(mu.site.depth$X0.2.[mu.site.depth$regID==i&mu.site.depth$regsiteID==j+startR[i]],
+						rev(mu.site.depth$X99.8.[mu.site.depth$regID==i&mu.site.depth$regsiteID==j+startR[i]])),
+						col=rgb(mu.site.depth$redMoss[mu.site.depth$regID==i&mu.site.depth$regsiteID==j+startR[i]]/255,
+						mu.site.depth$greenMoss[mu.site.depth$regID==i&mu.site.depth$regsiteID==j+startR[i]]/255,
+						mu.site.depth$blueMoss[mu.site.depth$regID==i&mu.site.depth$regsiteID==j+startR[i]]/255,.35),border=NA)
+			}
+			for(j in 1:22){
+				points(mu.monitor$monitorDepth[mu.monitor$regID==i],
+					mu.site.depth$Mean[mu.site.depth$regID==i&mu.site.depth$regsiteID==j+startR[i]],
+							col=paste(mu.site.depth$colMoss[mu.site.depth$regID==i&mu.site.depth$regsiteID==j+startR[i]]),
 							lwd=slw, type="l")
 			}
 			box(which="plot")
@@ -585,10 +708,20 @@ for(i in 1:3){
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
 				
 			points(ParmPC$AMean[ParmPC$regID==i],ParmPC$Mean[ParmPC$regID==i],pch=19,col=paste(ParmPC$colMoss),cex=pcx)
-						for(j in 1:22){
-				points(seq(yli[i],yhi[i],by=si[i]),regCent(seq(yli[i],yhi[i],by=si[i]),beta0$Mean[beta0$regID==i&beta0$regsiteID==j+startR[i]],
-							beta2$Mean[beta2$regID==i&beta2$regsiteID==j+startR[i]],AirMean$Abar[i]),
-							col=paste(beta1$colMoss[beta0$regID==i&beta0$regsiteID==j+startR[i]]),
+			
+			for(j in 1:22){
+				polygon(c(mu.monitor$monitorAir[mu.monitor$regID==i],rev(mu.monitor$monitorAir[mu.monitor$regID==i])),
+					c(mu.site.air$X0.2.[mu.site.air$regID==i&mu.site.air$regsiteID==j+startR[i]],
+						rev(mu.site.air$X99.8.[mu.site.air$regID==i&mu.site.air$regsiteID==j+startR[i]])),
+						col=rgb(mu.site.air$redMoss[mu.site.air$regID==i&mu.site.air$regsiteID==j+startR[i]]/255,
+						mu.site.air$greenMoss[mu.site.air$regID==i&mu.site.air$regsiteID==j+startR[i]]/255,
+						mu.site.air$blueMoss[mu.site.air$regID==i&mu.site.air$regsiteID==j+startR[i]]/255,.35),border=NA)
+			}
+			
+			for(j in 1:22){
+				points(mu.monitor$monitorAir[mu.monitor$regID==i],
+					mu.site.air$Mean[mu.site.air$regID==i&mu.site.air$regsiteID==j+startR[i]],
+							col=paste(mu.site.air$colMoss[mu.site.air$regID==i&mu.site.air$regsiteID==j+startR[i]]),
 							lwd=slw, type="l")
 			}
 			box(which="plot")					
