@@ -712,11 +712,16 @@ xhD <- 21
 pcx <- 3
 slw <- 4
 si <- c(1,1,.01)
+yii <- c(5,5,.5)
 
 xTA <- c(-5,25,.55)
 xTD <- 15
 yT <- c(-30,5,.25)
 cxT <- 10
+mx <- 4
+mly <- 6
+mlx <- 4
+tx <- 6
 
 regCent <- function(x,y0,y1,xbar){
 	y0+(y1*(x-xbar))
@@ -786,6 +791,9 @@ for(i in 1:3){
 							col=paste(colS[8]), lty=2)
 			
 				}
+				
+				
+		axis(		
 		text(xTD,yT[i], paste(datB$sigP[datB$parmID==2&datB$regID==i],datB$signP[datB$parmID==2&datB$regID==i]),cex=cxT)
 		box(which="plot")		
 		#plot data
