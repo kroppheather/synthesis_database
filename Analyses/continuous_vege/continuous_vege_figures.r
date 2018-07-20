@@ -793,7 +793,9 @@ for(i in 1:3){
 				}
 				
 				
-		axis(		
+		axis(2, seq(yli[i]+yii[i],yhi[i]-yli[i],by=yii[i]), rep("",length(seq(yli[i]+yii[i],yhi[i]-yli[i],by=yii[i]))),lwd.ticks=tx)
+		mtext(seq(yli[i]+yii[i],yhi[i]-yli[i],by=yii[i]),at=seq(yli[i]+yii[i]-yli[i],yhi[i],by=yii[i]),
+				side=2,line=mly,cex=mx,las=2)
 		text(xTD,yT[i], paste(datB$sigP[datB$parmID==2&datB$regID==i],datB$signP[datB$parmID==2&datB$regID==i]),cex=cxT)
 		box(which="plot")		
 		#plot data
@@ -941,7 +943,11 @@ for(i in 1:3){
 							col=paste(colS[8]), lty=2)
 			
 				}
-			text(xTA[i],yT[i], paste(datD$sigP[datD$parmID==2&datD$regID==i],datD$signP[datD$parmID==2&datD$regID==i]),cex=cxT)	
+			text(xTA[i],yT[i], paste(datD$sigP[datD$parmID==2&datD$regID==i],datD$signP[datD$parmID==2&datD$regID==i]),cex=cxT)
+
+		axis(4, seq(yli[i]+yii[i],yhi[i]-yli[i],by=yii[i]), rep("",length(seq(yli[i]+yii[i],yhi[i]-yli[i],by=yii[i]))),lwd.ticks=tx)
+		mtext(seq(yli[i]+yii[i],yhi[i]-yli[i],by=yii[i]),at=seq(yli[i]+yii[i]-yli[i],yhi[i],by=yii[i]),
+				side=4,line=mly,cex=mx,las=2)			
 		box(which="plot")
 		
 		#plot extreme example
@@ -1004,7 +1010,11 @@ for(i in 1:3){
 			
 				}
 
-		text(xTD,yT[i], paste(datB$sigP[datB$parmID==3&datB$regID==i],datB$signP[datB$parmID==3&datB$regID==i]),cex=cxT)		
+		text(xTD,yT[i], paste(datB$sigP[datB$parmID==3&datB$regID==i],datB$signP[datB$parmID==3&datB$regID==i]),cex=cxT)
+
+		axis(2, seq(yli[i]+yii[i],yhi[i]-yli[i],by=yii[i]), rep("",length(seq(yli[i]+yii[i],yhi[i]-yli[i],by=yii[i]))),lwd.ticks=tx)
+		mtext(seq(yli[i]+yii[i],yhi[i]-yli[i],by=yii[i]),at=seq(yli[i]+yii[i],yhi[i]-yli[i],by=yii[i]),
+				side=2,line=mly,cex=mx,las=2)		
 		box(which="plot")
 		
 		#plot data	
@@ -1148,7 +1158,11 @@ for(i in 1:3){
 							col=paste(colM[8]), lty=2)
 			
 				}	
-	text(xTA[i],yT[i], paste(datD$sigP[datD$parmID==3&datD$regID==i],datD$signP[datD$parmID==3&datD$regID==i]),cex=cxT)				
+	text(xTA[i],yT[i], paste(datD$sigP[datD$parmID==3&datD$regID==i],datD$signP[datD$parmID==3&datD$regID==i]),cex=cxT)
+		axis(4, seq(yli[i]+yii[i],yhi[i]-yli[i],by=yii[i]), rep("",length(seq(yli[i]+yii[i],yhi[i]-yli[i],by=yii[i]))),lwd.ticks=tx)
+		mtext(seq(yli[i]+yii[i],yhi[i]-yli[i],by=yii[i]),at=seq(yli[i]+yii[i],yhi[i]-yli[i],by=yii[i]),
+				side=4,line=mly,cex=mx,las=2)
+	
 	box(which="plot")		
 	dev.off()
 }	
