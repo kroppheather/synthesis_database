@@ -703,8 +703,8 @@ ParmPC <- join(ParmPC, SiteCol, by="siteid",type="left")
 wd <- 20
 hd <- 20
 
-yli <- c(-40,-5,0)
-yhi <- c(5,30,.65)
+yli <- c(-40,0,0)
+yhi <- c(0,30,.65)
 xlA <- c(-45,0,0)
 xhA <- c(0,35,.65)
 xlD <- -1
@@ -712,16 +712,18 @@ xhD <- 21
 pcx <- 3
 slw <- 4
 si <- c(1,1,.01)
-yii <- c(5,5,.5)
+yii <- c(5,5,.1)
 
 xTA <- c(-5,25,.55)
 xTD <- 15
 yT <- c(-30,5,.25)
 cxT <- 10
-mx <- 4
+mx <- 3
 mly <- 6
 mlx <- 4
 tx <- 6
+yname <- c("Minimum soil temperature","Maximum soil temperature","Time of soil minimum")
+xname <- c("Air minimum", "Air maximum","Air time of minimum")
 
 regCent <- function(x,y0,y1,xbar){
 	y0+(y1*(x-xbar))
@@ -793,11 +795,13 @@ for(i in 1:3){
 				}
 				
 				
-		axis(2, seq(yli[i]+yii[i],yhi[i]-yli[i],by=yii[i]), rep("",length(seq(yli[i]+yii[i],yhi[i]-yli[i],by=yii[i]))),lwd.ticks=tx)
-		mtext(seq(yli[i]+yii[i],yhi[i]-yli[i],by=yii[i]),at=seq(yli[i]+yii[i]-yli[i],yhi[i],by=yii[i]),
+		axis(2, seq(yli[i]+yii[i],yhi[i]-yii[i],by=yii[i]), rep("",length(seq(yli[i]+yii[i],yhi[i]-yii[i],by=yii[i]))),lwd.ticks=tx)
+		mtext(seq(yli[i]+yii[i],yhi[i]-yii[i],by=yii[i]),at=seq(yli[i]+yii[i],yhi[i]-yii[i],by=yii[i]),
 				side=2,line=mly,cex=mx,las=2)
 		text(xTD,yT[i], paste(datB$sigP[datB$parmID==2&datB$regID==i],datB$signP[datB$parmID==2&datB$regID==i]),cex=cxT)
-		box(which="plot")		
+		box(which="plot")
+		legend("topleft",c("0 % shrub", "100% shrub"), pch=19, col=c(colS[1],colS[8]), cex=5, bty="n")
+		mtext(paste0(yname[i]), outer=TRUE, side=2, line=-20, cex=5)
 		#plot data
 		par(mai=c(0,0,0,0))
 		
@@ -945,11 +949,11 @@ for(i in 1:3){
 				}
 			text(xTA[i],yT[i], paste(datD$sigP[datD$parmID==2&datD$regID==i],datD$signP[datD$parmID==2&datD$regID==i]),cex=cxT)
 
-		axis(4, seq(yli[i]+yii[i],yhi[i]-yli[i],by=yii[i]), rep("",length(seq(yli[i]+yii[i],yhi[i]-yli[i],by=yii[i]))),lwd.ticks=tx)
-		mtext(seq(yli[i]+yii[i],yhi[i]-yli[i],by=yii[i]),at=seq(yli[i]+yii[i]-yli[i],yhi[i],by=yii[i]),
+		axis(4, seq(yli[i]+yii[i],yhi[i]-yii[i],by=yii[i]), rep("",length(seq(yli[i]+yii[i],yhi[i]-yii[i],by=yii[i]))),lwd.ticks=tx)
+		mtext(seq(yli[i]+yii[i],yhi[i]-yii[i],by=yii[i]),at=seq(yli[i]+yii[i],yhi[i]-yii[i],by=yii[i]),
 				side=4,line=mly,cex=mx,las=2)			
 		box(which="plot")
-		
+		mtext(paste0(yname[i]), outer=TRUE, side=4, line=-20, cex=5)
 		#plot extreme example
 		par(mai=c(0,0,0,0))
 		
@@ -1012,10 +1016,17 @@ for(i in 1:3){
 
 		text(xTD,yT[i], paste(datB$sigP[datB$parmID==3&datB$regID==i],datB$signP[datB$parmID==3&datB$regID==i]),cex=cxT)
 
-		axis(2, seq(yli[i]+yii[i],yhi[i]-yli[i],by=yii[i]), rep("",length(seq(yli[i]+yii[i],yhi[i]-yli[i],by=yii[i]))),lwd.ticks=tx)
-		mtext(seq(yli[i]+yii[i],yhi[i]-yli[i],by=yii[i]),at=seq(yli[i]+yii[i],yhi[i]-yli[i],by=yii[i]),
+		axis(2, seq(yli[i]+yii[i],yhi[i]-yii[i],by=yii[i]), rep("",length(seq(yli[i]+yii[i],yhi[i]-yii[i],by=yii[i]))),lwd.ticks=tx)
+		mtext(seq(yli[i]+yii[i],yhi[i]-yii[i],by=yii[i]),at=seq(yli[i]+yii[i],yhi[i]-yii[i],by=yii[i]),
 				side=2,line=mly,cex=mx,las=2)		
+				
+		axis(1, seq(0,15,by=5), rep("",length(seq(0,15,by=5))),lwd.ticks=tx)
+		mtext(seq(0,15,by=5),at=seq(0,15,by=5),
+				side=1,line=mly,cex=mx)				
+				
 		box(which="plot")
+		mtext("Depth (cm)",  side=1, line=15, cex=5)
+		legend("topleft",c("0 % moss", "100% moss"), pch=19, col=c(colM[1],colM[8]), cex=5, bty="n")
 		
 		#plot data	
 		par(mai=c(0,0,0,0))
@@ -1057,7 +1068,11 @@ for(i in 1:3){
 				}
 			}
 			box(which="plot")
-			
+			axis(1, seq(0,15,by=5), rep("",length(seq(0,15,by=5))),lwd.ticks=tx)
+			mtext(seq(0,15,by=5),at=seq(0,15,by=5),
+				side=1,line=mly,cex=mx)			
+			mtext("Depth (cm)",  side=1, line=15, cex=5)
+		
 		par(mai=c(0,0,0,0))
 		
 			plot(c(0,1),c(0,1), ylim=c(yli[i],yhi[i]), xlim=c(xlA[i],xhA[i]),
@@ -1098,7 +1113,10 @@ for(i in 1:3){
 							
 			}
 			box(which="plot")	
-
+		axis(1, seq(yli[i]+yii[i],yhi[i]-yii[i],by=yii[i]), rep("",length(seq(yli[i]+yii[i],yhi[i]-yii[i],by=yii[i]))),lwd.ticks=tx)
+		mtext(seq(yli[i]+yii[i],yhi[i]-yii[i],by=yii[i]),at=seq(yli[i]+yii[i],yhi[i]-yii[i],by=yii[i]),
+				side=1,line=mly,cex=mx)
+		mtext(paste(xname[i]),  side=1, line=15, cex=5)		
 	#plot extreme example
 	par(mai=c(0,0,0,0))
 		
@@ -1159,10 +1177,14 @@ for(i in 1:3){
 			
 				}	
 	text(xTA[i],yT[i], paste(datD$sigP[datD$parmID==3&datD$regID==i],datD$signP[datD$parmID==3&datD$regID==i]),cex=cxT)
-		axis(4, seq(yli[i]+yii[i],yhi[i]-yli[i],by=yii[i]), rep("",length(seq(yli[i]+yii[i],yhi[i]-yli[i],by=yii[i]))),lwd.ticks=tx)
-		mtext(seq(yli[i]+yii[i],yhi[i]-yli[i],by=yii[i]),at=seq(yli[i]+yii[i],yhi[i]-yli[i],by=yii[i]),
+		axis(4, seq(yli[i]+yii[i],yhi[i]-yii[i],by=yii[i]), rep("",length(seq(yli[i]+yii[i],yhi[i]-yii[i],by=yii[i]))),lwd.ticks=tx)
+		mtext(seq(yli[i]+yii[i],yhi[i]-yii[i],by=yii[i]),at=seq(yli[i]+yii[i],yhi[i]-yii[i],by=yii[i]),
 				side=4,line=mly,cex=mx,las=2)
+	axis(1, seq(yli[i]+yii[i],yhi[i]-yii[i],by=yii[i]), rep("",length(seq(yli[i]+yii[i],yhi[i]-yii[i],by=yii[i]))),lwd.ticks=tx)
+		mtext(seq(yli[i]+yii[i],yhi[i]-yii[i],by=yii[i]),at=seq(yli[i]+yii[i],yhi[i]-yii[i],by=yii[i]),
+				side=1,line=mly,cex=mx)	
+	box(which="plot")
+	mtext(paste(xname[i]),  side=1, line=15, cex=5)	
 	
-	box(which="plot")		
 	dev.off()
 }	
