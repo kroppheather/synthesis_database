@@ -34,7 +34,7 @@ library(rjags)
 library(coda)
 library(mcmcplots)
 #set up directories
-modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\continuous\\model\\run3"
+modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\continuous\\model\\run4"
 #read in vege class data: check that patterns don't vary between vege type
 datV <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\vege_class.csv")
 datVI <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\vegeID.csv")
@@ -246,51 +246,16 @@ ParmPC <- join(ParmAll, coverAll2, by="siteid", type="inner")
 ParmNDVI <- join(ParmAll, NDVI, by="siteid", type="inner")
 ParmMLT <- join(ParmAll, datM, by="siteid", type="inner")
 
+#need to join vegeclass data
+ParmPC <- join(ParmPC, datV, by=c("siteid"), type="left")
 
-#now see how many years and sites are actually in each regression
-PCcount <- aggregate(ParmPC$Mean, by=list(ParmPC$siteid,ParmPC$regID),FUN="length")
-NDcount <- aggregate(ParmNDVI$Mean, by=list(ParmNDVI$siteid,ParmNDVI$regID),FUN="length")
-MLTcount <- aggregate(ParmMLT$Mean, by=list(ParmMLT$siteid,ParmMLT$regID),FUN="length")
+#check how many observations in each vegeclass and regression
+vegeCount <- aggregate(ParmPC$Mean, by=list(ParmPC$vegeclass,ParmPC$regID),FUN="length")
+colnames(vegeCount) <- c("vegeclass","regID","count")
+vegeCount$regvegeID <- seq(1,dim(vegeCount)[1])
+#join back into parmpc
+ParmPC <- join(ParmPC, vegeCount, by=c("vegeclass","regID"),type="left")
 
-colnames(PCcount) <- c("siteid","regID","count")
-colnames(NDcount) <- c("siteid","regID","count")
-colnames(MLTcount) <- c("siteid","regID","count")
-
-PCcount <- join(PCcount,datV, by="siteid",type="left")
-NDcount <- join(NDcount,datV, by="siteid",type="left")
-MLTcount <- join(MLTcount,datV, by="siteid",type="left")
-#subset MLT so only looking in tundra
-MLTcount <- MLTcount[MLTcount$vegeclass<6,]
-
-PCcount[PCcount$regID==1,]
-
-PCcount[PCcount$regID==1&PCcount$count>1,]
-dim(PCcount[PCcount$regID==1&PCcount$count>1,])
-NDcount[NDcount$regID==1&NDcount$count>1,]
-MLTcount[MLTcount$regID==1&MLTcount$count>1,]
-dim(NDcount[NDcount$regID==1&NDcount$count>1,])
-dim(MLTcount[MLTcount$regID==1&MLTcount$count>1,])
-
-#these will be dramatically smaller coverages in the tundra but worth investigating
-
-PCcount <- join(PCcount,siteinfo, by="siteid",type="left")
-NDcount <- join(NDcount,siteinfo, by="siteid",type="left")
-MLTcount <- join(MLTcount,siteinfo, by="siteid",type="left")
-
-
-#subset the %cover to have sites with more than 1 depth and year observation
-PCcount <- PCcount[PCcount$count>2,]
-#create regID 
-PCcount$regsiteID <- seq(1,dim(PCcount)[1])
-#join cover data for regressions
-PCdata <- join(PCcount, coverAll2, by="siteid", type="left")
-
-
-#join the regression site id back into ParmPC
-#first make a smaller dataframe to not join tomuch
-PCIDj <- data.frame(regsiteID=PCcount$regsiteID,regID=PCcount$regID, siteid=PCcount$siteid)
-
-ParmPC <- join(ParmPC, PCIDj, by=c("siteid","regID"), type="inner")
 
 
 AirMean <- aggregate(ParmPC$AMean, by=list(ParmPC$regID), FUN="mean")
@@ -300,25 +265,24 @@ colnames(AirMean) <- c("regID", "Abar")
 
 mu.monitor <- data.frame(regID = rep(seq(1,3),each=100), 
 				monitorAir = c(seq(-45,0, length.out=100),seq(0,35,length.out=100),seq(0,.65,length.out=100)),
-				monitorDepth=rep(seq(0,20,length.out=100),times=3))
+				monitorDepth=rep(seq(0,20,length.out=100),times=3),
+				monitorShrub=rep(seq(0,100,length.out=100),times=3),
+				monitorMoss=rep(seq(0,80,length.out=100),times=3))
 
 
 #######################################
 #####organize model run           ##### 
 #######################################	
-datalist <- list( Nobs=dim(ParmPC)[1],SoilP=ParmPC$Mean,regsiteID=ParmPC$regsiteID,
+datalist <- list( Nobs=dim(ParmPC)[1],SoilP=ParmPC$Mean,regvegeID=ParmPC$regvegeID,
 				depth=ParmPC$depth, AirP=ParmPC$AMean,AirPbar=AirMean$Abar,
 				regID=ParmPC$regID, sigMod=ParmPC$SD, sig.Air=ParmPC$ASD,
-				Nregsite=dim(PCdata)[1], regS=PCdata$regID,shrubC=PCdata$shrubC,
-				mossC=PCdata$nonvascularC,Nmonitor=dim(mu.monitor)[1],monitorAir=mu.monitor$monitorAir,
-				monitordepth=mu.monitor$monitorDepth,EregID=mu.monitor$regID)
+				Nregvege=dim(vegeCount)[1],shrubC=ParmPC$shrubC,
+				mossC=ParmPC$nonvascularC,Nmonitor=dim(mu.monitor)[1],monitorAir=mu.monitor$monitorAir,
+				monitordepth=mu.monitor$monitorDepth,EregID=mu.monitor$regID,
+				monitorShrub=mu.monitor$monitorShrub,monitorMoss=mu.monitor$monitorMoss)
 
-parms <- c("sig	SoilV","beta0","beta1","beta2","a0","a1","a2","b0","b1","b2",	
-			"c0","c1","c2","repSoilP","mu.site.air","mu.site.depth",
-			"Xbeta0N","Xbeta0S","Xbeta0M","Xbeta1N","Xbeta1S","Xbeta1M",
-			"Xbeta2N","Xbeta2S","Xbeta2M","mu.X0.air","mu.X0.depth", 
-			"mu.Xshrub100.air","mu.Xshrub100.depth","mu.Xmoss80.air","mu.Xmoss80.depth"
-			)
+parms <- c("sig	SoilV","beta0","beta1","beta2","beta3","beta4","repSoilP",
+			"mu.site.air","mu.site.depth","mu.site.shrub","mu.site.moss")
 
 
 #organize data for the model

@@ -38,9 +38,9 @@ library(mcmcplots)
 library(RColorBrewer)
 
 #set up directories
-modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\continuous\\model\\run3"
+modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\continuous\\model\\run4"
 plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\continuous\\plots"
-Nrun <- 3
+Nrun <- 4
 #read in vege class data: check that patterns don't vary between vege type
 datV <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\vege_class.csv")
 datVI <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\vegeID.csv")
@@ -94,6 +94,7 @@ unique(vegeL$site_name)
 
 unique(vegeM$loc)
 unique(vegeM$site_name)
+
 
 
 
@@ -252,62 +253,29 @@ ParmPC <- join(ParmAll, coverAll2, by="siteid", type="inner")
 ParmNDVI <- join(ParmAll, NDVI, by="siteid", type="inner")
 ParmMLT <- join(ParmAll, datM, by="siteid", type="inner")
 
+#need to join vegeclass data
+ParmPC <- join(ParmPC, datV, by=c("siteid"), type="left")
 
-#now see how many years and sites are actually in each regression
-PCcount <- aggregate(ParmPC$Mean, by=list(ParmPC$siteid,ParmPC$regID),FUN="length")
-NDcount <- aggregate(ParmNDVI$Mean, by=list(ParmNDVI$siteid,ParmNDVI$regID),FUN="length")
-MLTcount <- aggregate(ParmMLT$Mean, by=list(ParmMLT$siteid,ParmMLT$regID),FUN="length")
+#check how many observations in each vegeclass and regression
+vegeCount <- aggregate(ParmPC$Mean, by=list(ParmPC$vegeclass,ParmPC$regID),FUN="length")
+colnames(vegeCount) <- c("vegeclass","regID","count")
+vegeCount$regvegeID <- seq(1,dim(vegeCount)[1])
+#join back into parmpc
+ParmPC <- join(ParmPC, vegeCount, by=c("vegeclass","regID"),type="left")
 
-colnames(PCcount) <- c("siteid","regID","count")
-colnames(NDcount) <- c("siteid","regID","count")
-colnames(MLTcount) <- c("siteid","regID","count")
-
-PCcount <- join(PCcount,datV, by="siteid",type="left")
-NDcount <- join(NDcount,datV, by="siteid",type="left")
-MLTcount <- join(MLTcount,datV, by="siteid",type="left")
-#subset MLT so only looking in tundra
-MLTcount <- MLTcount[MLTcount$vegeclass<6,]
-
-PCcount[PCcount$regID==1,]
-
-PCcount[PCcount$regID==1&PCcount$count>1,]
-dim(PCcount[PCcount$regID==1&PCcount$count>1,])
-NDcount[NDcount$regID==1&NDcount$count>1,]
-MLTcount[MLTcount$regID==1&MLTcount$count>1,]
-dim(NDcount[NDcount$regID==1&NDcount$count>1,])
-dim(MLTcount[MLTcount$regID==1&MLTcount$count>1,])
-
-#these will be dramatically smaller coverages in the tundra but worth investigating
-
-PCcount <- join(PCcount,siteinfo, by="siteid",type="left")
-NDcount <- join(NDcount,siteinfo, by="siteid",type="left")
-MLTcount <- join(MLTcount,siteinfo, by="siteid",type="left")
-
-
-#subset the %cover to have sites with more than 1 depth and year observation
-PCcount <- PCcount[PCcount$count>2,]
-#create regID 
-PCcount$regsiteID <- seq(1,dim(PCcount)[1])
-#join cover data for regressions
-PCdata <- join(PCcount, coverAll2, by="siteid", type="left")
-
-
-#join the regression site id back into ParmPC
-#first make a smaller dataframe to not join tomuch
-PCIDj <- data.frame(regsiteID=PCcount$regsiteID,regID=PCcount$regID, siteid=PCcount$siteid)
-
-ParmPC <- join(ParmPC, PCIDj, by=c("siteid","regID"), type="inner")
 
 
 AirMean <- aggregate(ParmPC$AMean, by=list(ParmPC$regID), FUN="mean")
 colnames(AirMean) <- c("regID", "Abar")
 
-
 #generate dataset for monitoring regression means
 
 mu.monitor <- data.frame(regID = rep(seq(1,3),each=100), 
 				monitorAir = c(seq(-45,0, length.out=100),seq(0,35,length.out=100),seq(0,.65,length.out=100)),
-				monitorDepth=rep(seq(0,20,length.out=100),times=3))
+				monitorDepth=rep(seq(0,20,length.out=100),times=3),
+				monitorShrub=rep(seq(0,100,length.out=100),times=3),
+				monitorMoss=rep(seq(0,80,length.out=100),times=3))
+				
 #######################################
 #####read in model results        ##### 
 #######################################	
