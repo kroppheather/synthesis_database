@@ -65,6 +65,12 @@ vegeSP <- vegeSP[vegeSP$vegeclass <=5,]
 vegeL <- vegeL[vegeL$vegeclass <=5,]
 vegeM <- vegeM[vegeM$vegeclass <=5,]
 
+vegeSP <- vegeSP[vegeSP$vegeclass !=1,]
+vegeL <- vegeSP[vegeL$vegeclass !=1,]
+vegeM <- vegeSP[vegeM$vegeclass !=1,]
+vegeSP <- vegeSP[vegeSP$vegeclass !=3,]
+vegeL <- vegeSP[vegeL$vegeclass !=3,]
+vegeM <- vegeSP[vegeM$vegeclass !=3,]
 
 
 #get count of number of sites
@@ -148,7 +154,7 @@ coverAll2$shrubC <- ifelse(is.na(coverAll2$shrubC),0,coverAll2$shrubC)
 #site 101 does not have moss
 #site 190 no moss
 
-coverAll2$nonvascularC[coverAll2$siteid==101] <- 0
+
 coverAll2$nonvascularC[coverAll2$siteid==190] <- 0
 
 
@@ -290,7 +296,7 @@ parms <- c("sig	SoilV","beta0","beta1","beta2","beta3","beta4","repSoilP",
 #start model 
 vege.modI<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Analyses\\continuous_vege\\continuous_vege_model_codePC.r",
 						data=datalist,
-						n.adapt=10000,
+						n.adapt=15000,
 						n.chains=3)
 
 vege.sample <- coda.samples(vege.modI,variable.names=parms,
@@ -300,8 +306,8 @@ vege.sample <- coda.samples(vege.modI,variable.names=parms,
 mcmcplot(vege.sample, parms=c("sig	SoilV","beta0","beta1","beta2","beta3","beta4"),
 			dir=paste0(modDI,"\\history"))
 
-#4 parms 3 regressions 5 vegetypes
-Xcomp <- round(0.05/((4*3*5)-1)	,3)	
+#4 parms 3 regressions 3 vegetypes
+Xcomp <- round(0.05/((4*3*3)-1)	,3)	
 #model output							   
 mod.out <- summary(vege.sample,  quantiles = c(Xcomp,0.025, 0.25, 0.5, 0.75, 0.975,1-Xcomp))
 
