@@ -279,7 +279,8 @@ datalist <- list( Nobs=dim(ParmPC)[1],SoilP=ParmPC$Mean,regvegeID=ParmPC$regvege
 				Nregvege=dim(vegeCount)[1],shrubC=ParmPC$shrubC,
 				mossC=ParmPC$nonvascularC,Nmonitor=dim(mu.monitor)[1],monitorAir=mu.monitor$monitorAir,
 				monitordepth=mu.monitor$monitorDepth,EregID=mu.monitor$regID,
-				monitorShrub=mu.monitor$monitorShrub,monitorMoss=mu.monitor$monitorMoss)
+				monitorShrub=mu.monitor$monitorShrub,monitorMoss=mu.monitor$monitorMoss,
+				Nreg=3)
 
 parms <- c("sig	SoilV","beta0","beta1","beta2","beta3","beta4","repSoilP",
 			"mu.site.air","mu.site.depth","mu.site.shrub","mu.site.moss")
@@ -296,12 +297,11 @@ vege.sample <- coda.samples(vege.modI,variable.names=parms,
                        n.iter=60000, thin=30)	
 					
 #model history
-mcmcplot(vege.sample, parms=c("sig	SoilV","beta0","beta1","beta2","a0","a1","a2","b0","b1","b2",	
-			"c0","c1","c2"),
+mcmcplot(vege.sample, parms=c("sig	SoilV","beta0","beta1","beta2","beta3","beta4"),
 			dir=paste0(modDI,"\\history"))
 
-
-Xcomp <- round(0.05/((3*3	*3)-1)	,3)	
+#4 parms 3 regressions 5 vegetypes
+Xcomp <- round(0.05/((4*3*5)-1)	,3)	
 #model output							   
 mod.out <- summary(vege.sample,  quantiles = c(Xcomp,0.025, 0.25, 0.5, 0.75, 0.975,1-Xcomp))
 

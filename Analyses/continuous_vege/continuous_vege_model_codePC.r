@@ -40,6 +40,8 @@ model{
 		beta2[i] ~ dnorm(0,0.0001)
 		beta3[i] ~ dnorm(0,0.0001)
 		beta4[i] ~ dnorm(0,0.0001)
+		}
+	for(i in 1:Nreg){	
 		sigSoilV[i] ~dunif(0,1000)
 	}
 	
