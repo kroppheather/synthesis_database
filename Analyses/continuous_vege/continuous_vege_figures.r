@@ -70,7 +70,12 @@ vegeM <- join(datV, datM, by=c("siteid"), type="right")
 vegeSP <- vegeSP[vegeSP$vegeclass <=5,]
 vegeL <- vegeL[vegeL$vegeclass <=5,]
 vegeM <- vegeM[vegeM$vegeclass <=5,]
-
+vegeSP <- vegeSP[vegeSP$vegeclass !=1,]
+vegeL <- vegeSP[vegeL$vegeclass !=1,]
+vegeM <- vegeSP[vegeM$vegeclass !=1,]
+vegeSP <- vegeSP[vegeSP$vegeclass !=3,]
+vegeL <- vegeSP[vegeL$vegeclass !=3,]
+vegeM <- vegeSP[vegeM$vegeclass !=3,]
 
 
 #get count of number of sites
