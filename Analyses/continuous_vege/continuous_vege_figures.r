@@ -311,3 +311,278 @@ datB$parmID <- rep(seq(1,5),each=9)
 
 datB$sigP <- ifelse(datB$X0.1.<0&datB$X99.9.<0,1,
 			ifelse(datB$X0.1.>0&datB$X99.9.>0,1,0))
+			
+			
+					
+#######################################
+##### make a figure               ##### 
+##### comparing parameters        ##### 
+#######################################
+#unique vege type for plotting
+vegePL <- data.frame(vegeclass=unique(datB$vegeID))
+vegePL <- join(vegePL, datVI, by="vegeclass", type="left")
+
+wd <- 40
+hd <- 40
+
+#make a panel of parameters for each regression
+
+
+#x sequence
+xseq <-c(1,4,7)
+#axis limits
+xl <- -1
+xh <- 9
+yl1 <- c(-25,0,.4)
+yh1 <- c(0,25,.7)
+yl2 <- c(-0.5,-1,-0.01)
+yh2 <- c(1,0.5,0.02)
+yl3 <- c(-0.2,-0.1,-0.1)
+yh3 <- c(1.2,1.2,1)
+yl4 <- c(-0.5,-0.5,-0.004)
+yh4 <- c(0.5,0.5,0.004)
+yl5 <- c(-0.2,-0.2,-0.003)
+yh5 <- c(0.1,0.1,0.001)
+
+#axis sequence
+yi1 <- c(5,5,.1)
+yi2 <- c(.1,.1,.002)
+yi3 <- c(.2,.2,.1)
+yi4 <- c(.1,.1,.001)
+yi5 <- c(.05,.05,.001)
+
+#arrow width
+alw <- 5
+#mean bar width
+mlw <- 7
+#zero line width
+zlw <- 7
+
+#y margin label
+ymx <- 5
+
+#axis label size
+ax <- 5
+#axis tick width
+tx <- 5
+#y axis line
+yll <- 5 
+#x axis line
+xll <- 5
+
+scol <- "tomato3"
+nscol <- "grey75"
+zcol <- "grey50"
+
+#three regressions
+regName <- c("Soil min vs air min","Soil max vs air max", "Time of soil min vs time of air min")
+
+
+for(i in 1:3){
+	jpeg(paste0(plotDI,"\\run",Nrun,"\\regression_parm",i,".jpg"), width=6000,height=3000,
+			quality=100,units="px")
+			
+		layout(matrix(seq(1,5),ncol=5), width=rep(lcm(wd),5),height=rep(lcm(hd),5))
+			#intercept
+			par(mai=c(2,2,2,2))
+			
+				plot(c(0,1),c(0,1), xlim=c(xl,xh), ylim=c(yl1[i],yh1[i]), axes=FALSE, xlab=" ", ylab=" ",
+					type="n", xaxs="i",yaxs="i")
+				
+				
+				
+				arrows(xseq,datB$X0.1.[datB$regID==i&datB$parmID==1],xseq,datB$X99.9.[datB$regID==i&datB$parmID==1],
+						code=0,lwd=alw)
+				for(j in 1:dim(vegePL)[1]){
+					if(datB$sigP[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==1]==1){
+						polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
+							c(datB$X25.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==1],
+								datB$X75.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==1],
+								datB$X75.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==1],
+								datB$X25.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==1]),
+							col=scol, border=NA)
+
+				}else{
+					polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
+							c(datB$X25.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==1],
+								datB$X75.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==1],
+								datB$X75.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==1],
+								datB$X25.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==1]),
+							col=nscol, border=NA)
+				
+				
+					}
+				}
+				arrows(xseq-1,datB$Mean[datB$regID==i&datB$parmID==1],xseq+1,datB$Mean[datB$regID==i&datB$parmID==1],
+					code=0, lwd=mlw)
+					
+			axis(2,seq(yl1[i],yh1[i], by=yi1[i]), rep(" ",length(seq(yl1[i],yh1[i], by=yi1[i]))), lwd.ticks=tx)
+			mtext(seq(yl1[i],yh1[i], by=yi1[i]), at=seq(yl1[i],yh1[i], by=yi1[i]),cex=ax,line=yll,side=2,las=2)
+			
+			axis(1, xseq,rep(" ",length(xseq)), lwd.ticks=tx)
+			mtext(vegePL$vegename,at=xseq,cex=ax,line=xll,side=1,las=2)
+			
+
+			mtext("Intercept", side=3, line=xll,cex=ymx)
+			mtext("Vegetation type", side=1, outer=TRUE,line=-15,cex=10)
+			mtext(regName[i], side=3, outer=TRUE,line=-40,cex=10)
+			
+			box(which="plot")
+			#depth
+			par(mai=c(2,2,2,2))
+			
+				plot(c(0,1),c(0,1), xlim=c(xl,xh), ylim=c(yl2[i],yh2[i]), axes=FALSE, xlab=" ", ylab=" ",
+					type="n", xaxs="i",yaxs="i")
+					
+				abline(h=0,lwd=zlw,lty=3,col=zcol)
+				arrows(xseq,datB$X0.1.[datB$regID==i&datB$parmID==2],xseq,datB$X99.9.[datB$regID==i&datB$parmID==2],
+						code=0,lwd=alw)
+				for(j in 1:dim(vegePL)[1]){
+					if(datB$sigP[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==2]==1){
+						polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
+							c(datB$X25.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==2],
+								datB$X75.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==2],
+								datB$X75.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==2],
+								datB$X25.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==2]),
+							col=scol, border=NA)
+
+				}else{
+					polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
+							c(datB$X25.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==2],
+								datB$X75.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==2],
+								datB$X75.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==2],
+								datB$X25.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==2]),
+							col=nscol, border=NA)
+				
+				
+					}
+				}
+				arrows(xseq-1,datB$Mean[datB$regID==i&datB$parmID==2],xseq+1,datB$Mean[datB$regID==i&datB$parmID==2],
+					code=0, lwd=mlw)
+			
+			
+			axis(2,seq(yl2[i],yh2[i], by=yi2[i]), rep(" ",length(seq(yl2[i],yh2[i], by=yi2[i]))), lwd.ticks=tx)
+			mtext(seq(yl2[i],yh2[i], by=yi2[i]), at=seq(yl2[i],yh2[i], by=yi2[i]),cex=ax,line=yll,side=2,las=2)
+			axis(1, xseq,rep(" ",length(xseq)), lwd.ticks=tx)
+			mtext(vegePL$vegename,at=xseq,cex=ax,line=xll,side=1,las=2)
+			mtext("Depth", side=3, line=xll,cex=ymx)
+			box(which="plot")	
+			#air temperature
+			par(mai=c(2,2,2,2))
+			
+				plot(c(0,1),c(0,1), xlim=c(xl,xh), ylim=c(yl3[i],yh3[i]), axes=FALSE, xlab=" ", ylab=" ",
+					type="n", xaxs="i",yaxs="i")
+				abline(h=0,lwd=zlw,lty=3,col=zcol)
+				arrows(xseq,datB$X0.1.[datB$regID==i&datB$parmID==3],xseq,datB$X99.9.[datB$regID==i&datB$parmID==3],
+						code=0,lwd=alw)
+				for(j in 1:dim(vegePL)[1]){
+					if(datB$sigP[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==3]==1){
+						polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
+							c(datB$X25.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==3],
+								datB$X75.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==3],
+								datB$X75.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==3],
+								datB$X25.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==3]),
+							col=scol, border=NA)
+
+				}else{
+					polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
+							c(datB$X25.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==3],
+								datB$X75.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==3],
+								datB$X75.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==3],
+								datB$X25.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==3]),
+							col=nscol, border=NA)
+				
+				
+					}
+				}
+				arrows(xseq-1,datB$Mean[datB$regID==i&datB$parmID==3],xseq+1,datB$Mean[datB$regID==i&datB$parmID==3],
+					code=0, lwd=mlw)
+			
+			
+			axis(2,seq(yl3[i],yh3[i], by=yi3[i]), rep(" ",length(seq(yl3[i],yh3[i], by=yi3[i]))), lwd.ticks=tx)
+			mtext(seq(yl3[i],yh3[i], by=yi3[i]), at=seq(yl3[i],yh3[i], by=yi3[i]),cex=ax,line=yll,side=2,las=2)
+			axis(1, xseq,rep(" ",length(xseq)), lwd.ticks=tx)
+			mtext(vegePL$vegename,at=xseq,cex=ax,line=xll,side=1,las=2)
+			mtext("Air", side=3, line=xll,cex=ymx)
+			box(which="plot")	
+			#shrub
+			par(mai=c(2,2,2,2))
+			
+				plot(c(0,1),c(0,1), xlim=c(xl,xh), ylim=c(yl4[i],yh4[i]), axes=FALSE, xlab=" ", ylab=" ",
+					type="n", xaxs="i",yaxs="i")
+				abline(h=0,lwd=zlw,lty=3,col=zcol)	
+				arrows(xseq,datB$X0.1.[datB$regID==i&datB$parmID==4],xseq,datB$X99.9.[datB$regID==i&datB$parmID==4],
+						code=0,lwd=alw)
+				for(j in 1:dim(vegePL)[1]){
+					if(datB$sigP[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==4]==1){
+						polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
+							c(datB$X25.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==4],
+								datB$X75.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==4],
+								datB$X75.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==4],
+								datB$X25.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==4]),
+							col=scol, border=NA)
+
+				}else{
+					polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
+							c(datB$X25.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==4],
+								datB$X75.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==4],
+								datB$X75.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==4],
+								datB$X25.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==4]),
+							col=nscol, border=NA)
+				
+				
+					}
+				}
+				arrows(xseq-1,datB$Mean[datB$regID==i&datB$parmID==4],xseq+1,datB$Mean[datB$regID==i&datB$parmID==4],
+					code=0, lwd=mlw)	
+					
+					
+			axis(2,seq(yl4[i],yh4[i], by=yi4[i]), rep(" ",length(seq(yl4[i],yh4[i], by=yi4[i]))), lwd.ticks=tx)
+			mtext(seq(yl4[i],yh4[i], by=yi4[i]), at=seq(yl4[i],yh4[i], by=yi4[i]),cex=ax,line=yll,side=2,las=2)
+			axis(1, xseq,rep(" ",length(xseq)), lwd.ticks=tx)
+			mtext(vegePL$vegename,at=xseq,cex=ax,line=xll,side=1,las=2)
+			mtext("% shrub cover", side=3, line=xll,cex=ymx)
+			box(which="plot")
+			#moss
+			par(mai=c(2,2,2,2))
+			
+				plot(c(0,1),c(0,1), xlim=c(xl,xh), ylim=c(yl5[i],yh5[i]), axes=FALSE, xlab=" ", ylab=" ",
+					type="n", xaxs="i",yaxs="i")
+				abline(h=0,lwd=zlw,lty=3,col=zcol)
+				arrows(xseq,datB$X0.1.[datB$regID==i&datB$parmID==5],xseq,datB$X99.9.[datB$regID==i&datB$parmID==5],
+						code=0,lwd=alw)
+				for(j in 1:dim(vegePL)[1]){
+					if(datB$sigP[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==5]==1){
+						polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
+							c(datB$X25.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==5],
+								datB$X75.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==5],
+								datB$X75.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==5],
+								datB$X25.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==5]),
+							col=scol, border=NA)
+
+				}else{
+					polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
+							c(datB$X25.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==5],
+								datB$X75.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==5],
+								datB$X75.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==5],
+								datB$X25.[datB$vegeID==vegePL$vegeclass[j]&datB$regID==i&datB$parmID==5]),
+							col=nscol, border=NA)
+				
+				
+					}
+				}
+				arrows(xseq-1,datB$Mean[datB$regID==i&datB$parmID==5],xseq+1,datB$Mean[datB$regID==i&datB$parmID==5],
+					code=0, lwd=mlw)	
+			
+			axis(2,seq(yl5[i],yh5[i], by=yi5[i]), rep(" ",length(seq(yl5[i],yh5[i], by=yi5[i]))), lwd.ticks=tx)
+			mtext(seq(yl5[i],yh5[i], by=yi5[i]), at=seq(yl5[i],yh5[i], by=yi5[i]),cex=ax,line=yll,side=2,las=2)			
+			axis(1, xseq,rep(" ",length(xseq)), lwd.ticks=tx)
+			mtext(vegePL$vegename,at=xseq,cex=ax,line=xll,side=1,las=2)
+			mtext("% moss cover", side=3, line=xll,cex=ymx)
+			box(which="plot")
+		
+	dev.off()		
+}			
+
+
+
