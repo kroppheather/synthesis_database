@@ -195,3 +195,61 @@ ParmAlls3 <- join(ParmAlls2, TsoilAve2, by=c("siteid","depth","wyear"), type="le
 ParmAlls4 <- join(ParmAlls3, TsoilAve3, by=c("siteid","depth","wyear"), type="left")
 ParmAlls5 <- join(ParmAlls4, TsoilAve4, by=c("siteid","depth","wyear"), type="left")
 
+#omit any data with NA because that means there aren't enough preceding years
+ParmAlls5 <- na.omit(ParmAlls5)
+
+#make regVege table
+regVegeDF <- unique(data.frame(regID=ParmAlls5$regID,vegeclass=ParmAlls5$vegeclass)) 
+regVegeDF$regvegeID <- seq(1,dim(regVegeDF)[1])
+
+#join into dataframe
+ParmAlls6 <- join(ParmAlls5,regVegeDF, by=c("regID","vegeclass"), type="left")
+
+#calculate average air temp in each regression
+airTempCurrentm <- aggregate(ParmAlls6$AMean,by=list(ParmAlls6$regID),FUN="mean")
+airTempPastm <- aggregate(ParmAlls6$AMeanc,by=list(ParmAlls6$regID),FUN="mean")
+
+colnames(airTempCurrentm) <- c("regID","meanA")
+colnames(airTempPastm) <- c("regID","meanA")
+
+#######################################
+#####set up model run             ##### 
+#######################################
+datalist <- list(Nobs=dim(ParmAlls6)[1],
+					SoilP=ParmAlls6$Mean,
+					regVege=ParmAlls6$regvegeID,
+					depth=ParmAlls6$depth,
+					AirPbar=airTempCurrentm$meanA,
+					pastairbar=airTempPastm$meanA,
+					reg=ParmAlls6$regID,
+					sigMod=ParmAlls6$SD,
+					AirP=ParmAlls6$AMean,
+					sig.Air=ParmAlls6$ASD,
+					pastAir=ParmAlls6$AMeanc,
+					sig.pastAir=ParmAlls6$ASDc,
+					NregVege=dim(regVegeDF)[1],
+					Nlag=4,
+					a.T=matrix(c(ParmAlls6$MeanM1,
+								ParmAlls6$MeanM2,
+								ParmAlls6$MeanM3,
+								ParmAlls6$MeanM4),ncol=4,byrow=FALSE))
+								
+parms <- c("beta0","beta1","beta3","beta4","sigSoilV","wT","antSoil","repSoilP")								
+
+
+if(modRun==1){
+#start model 
+inter.modI<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Analyses\\inter_annual\\inter_annual_code.r",
+						data=datalist,
+						n.adapt=5000,
+						n.chains=3)
+
+inter.sample <- coda.samples(inter.modI,variable.names=parms,
+                       n.iter=3000, thin=1)	
+					
+#model history
+mcmcplot(inter.sample, parms=c("beta0","beta1","beta2","beta3","sigSoilV",
+								"wT"),
+			dir=paste0(modDI,"\\history"))								
+					
+
