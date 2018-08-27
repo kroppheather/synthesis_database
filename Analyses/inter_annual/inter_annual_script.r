@@ -241,15 +241,31 @@ if(modRun==1){
 #start model 
 inter.modI<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Analyses\\inter_annual\\inter_annual_code.r",
 						data=datalist,
-						n.adapt=5000,
+						n.adapt=200000,
 						n.chains=3)
 
 inter.sample <- coda.samples(inter.modI,variable.names=parms,
-                       n.iter=3000, thin=1)	
+                       n.iter=1200000, thin=600)	
 					
 #model history
-mcmcplot(inter.sample, parms=c("beta0","beta1","beta2","beta3","sigSoilV",
+mcmcplot(inter.sample, parms=c("beta0","beta1","beta2","beta3","beta4","sigSoilV",
 								"wT"),
 			dir=paste0(modDI,"\\history"))								
 					
+Xcomp <- round(0.05/((dim(regVegeDF)[1]-1)),3)		
+#model output							   
+mod.out <- summary(inter.sample,  quantiles = c(Xcomp,0.025, 0.25, 0.5, 0.75, 0.975,1-Xcomp))
 
+write.table(mod.out$statistics,paste0(modDI,"\\inter_mod_stats.csv"),
+			sep=",",row.names=TRUE)
+write.table(mod.out$quantiles,paste0(modDI,"\\inter_mod_quant.csv"),
+			sep=",",row.names=TRUE)
+
+#coda output
+chain1<-as.matrix(inter.sample [[1]])
+write.table(chain1,paste0(modDI,"\\chain1_coda.csv"), sep=",")
+chain2<-as.matrix(inter.sample [[2]])
+write.table(chain2,paste0(modDI,"\\chain2_coda.csv"), sep=",")
+chain3<-as.matrix(inter.sample [[3]])
+write.table(chain3,paste0(modDI,"\\chain3_coda.csv"), sep=",")		
+}
