@@ -271,21 +271,37 @@ parallel.bugs <- function(chain, x.data, params){
 				ifelse(chain==2,"c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\interannual\\model\\run2\\chain2",
 					"c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\interannual\\model\\run2\\chain3"))
  	
-	
+	 if(chain==1){
+	 inits <- list(list(beta0=c(-10,-10,10,10,.5,.5), beta1=c(.1,.1,-.1,-.1,.1,.1), beta2=c(.2,.2,.2,.2,.2,.2),
+					beta3=c(.2,.2,.2,.2,.2,.2),beta4=c(.2,.2,.2,.2,.2,.2)))
+	 
+	 }
+	 if(chain==2){
+	 inits <- list(list(beta0=c(-15,-15,15,15,.55,.55), beta1=c(.15,.15,-.15,-.15,.15,.15), beta2=c(.1,.1,.1,.1,.1,.1),
+					beta3=c(.25,.25,.25,.25,.25,.25),beta4=c(.25,.25,.25,.25,.25,.25)))
+	 
+	 }
+	 	 if(chain==3){
+	 inits <- list(list(beta0=c(-20,-20,20,20,.45,.45), beta1=c(.01,.01,-.01,-.01,.01,.01), beta2=c(.02,.02,.02,.02,.02,.02),
+					beta3=c(.02,.02,.02,.02,.02,.02),beta4=c(.02,.02,.02,.02,.02,.02)))
+	 
+	 }
+	 
 	# 5b. call openbugs
-	bugs(data=x.data, inits=NULL,parameters.to.save=params,
+	bugs(data=x.data, inits=inits,parameters.to.save=params,
              n.iter=10000, n.chains=1, n.burnin=5000, n.thin=1,
              model.file="model_code.txt", codaPkg=TRUE,
              OpenBUGS.pgm="C:/Program Files (x86)/OpenBUGS/OpenBUGS323/OpenBUGS.exe",debug=TRUE,
              working.directory=folder)	
-}			 
+}	
+		 
 # parallel.bugs on each of the 3 CPUs
 sfLapply(1:3, fun=parallel.bugs,x.data=datalist, params=parms)
 
 
-folder1 <- paste0(modDI, "\\chain1\\")
-folder2 <- paste0(modDI, "\\chain2\\")
-folder3 <- paste0(modDI, "\\chain3\\")
+folder1 <- paste0(modDI, "\\chain1")
+folder2 <- paste0(modDI, "\\chain2")
+folder3 <- paste0(modDI, "\\chain3")
 
 
 
@@ -295,10 +311,11 @@ codaobj1 <- read.bugs(c(paste0(folder1, "\\CODAchain1.txt"),
 						paste0(folder2, "\\CODAchain1.txt")
 						,paste0(folder3, "\\CODAchain1.txt")
 						))
-					
+
+plot(codaobj1[,"beta0[2]"])				
 #model history
-mcmcplot(codaobj1, parms=c("beta0","beta1","beta2","beta3","beta4","sigSoilV",
-								"wT"),
+mcmcplot(mcmc.list(codaobj1),parms=c("beta0","beta1","beta2","beta3","beta4","sigSoilV",
+								"wT"),	
 			dir=paste0(modDI,"\\history"))								
 					
 Xcomp <- round(0.05/((dim(regVegeDF)[1]-1)),3)		
