@@ -44,6 +44,7 @@ library(mcmcplots)
 library(plyr)
 library(snow)
 library(snowfall)
+library(R2OpenBUGS)
 
 #######################################
 #####set directories              ##### 
@@ -52,8 +53,8 @@ library(snowfall)
 #set up a plot directory
 plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\interannual\\plots\\model"
 #model directory
-modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\interannual\\model\\run2"
-Nrun <- 2
+modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\interannual\\model\\run3"
+Nrun <- 3
 #indicate if a model run is occuring
 modRun <- 1
 
@@ -289,19 +290,21 @@ parallel.bugs <- function(chain, x.data, params){
 	 
 	# 5b. call openbugs
 	bugs(data=x.data, inits=inits,parameters.to.save=params,
-             n.iter=10000, n.chains=1, n.burnin=5000, n.thin=1,
+             n.iter=10, n.chains=1, n.burnin=1, n.thin=1,
              model.file="model_code.txt", codaPkg=TRUE,
              OpenBUGS.pgm="C:/Program Files (x86)/OpenBUGS/OpenBUGS323/OpenBUGS.exe",debug=TRUE,
              working.directory=folder)	
 }	
-		 
+	#finish running with slice updater by hand.	 
+	#updated 10 to get model going. Then did 3000 thinning by 50
+	#realized I forgot to set samples on two chains so I reran for another 3000 thinning by 100
 # parallel.bugs on each of the 3 CPUs
 sfLapply(1:3, fun=parallel.bugs,x.data=datalist, params=parms)
 
 
-folder1 <- paste0(modDI, "\\chain1")
-folder2 <- paste0(modDI, "\\chain2")
-folder3 <- paste0(modDI, "\\chain3")
+folder1 <- paste0(modDI, "\\CODA\\chain1")
+folder2 <- paste0(modDI, "\\CODA\\chain2")
+folder3 <- paste0(modDI, "\\CODA\\chain3")
 
 
 
@@ -312,7 +315,7 @@ codaobj1 <- read.bugs(c(paste0(folder1, "\\CODAchain1.txt"),
 						,paste0(folder3, "\\CODAchain1.txt")
 						))
 
-plot(codaobj1[,"beta0[2]"])				
+		
 #model history
 mcmcplot(mcmc.list(codaobj1),parms=c("beta0","beta1","beta2","beta3","beta4","sigSoilV",
 								"wT"),	
