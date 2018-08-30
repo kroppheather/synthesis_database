@@ -38,13 +38,11 @@ datVI <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\vegeID.c
 #######################################
 #####libraries                    ##### 
 #######################################
-
+library(rjags)
 library(coda)
 library(mcmcplots)
 library(plyr)
-library(snow)
-library(snowfall)
-library(R2OpenBUGS)
+
 
 #######################################
 #####set directories              ##### 
@@ -53,8 +51,8 @@ library(R2OpenBUGS)
 #set up a plot directory
 plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\interannual\\plots\\model"
 #model directory
-modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\interannual\\model\\run3"
-Nrun <- 3
+modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\interannual\\model\\run5"
+Nrun <- 5
 #indicate if a model run is occuring
 modRun <- 1
 
@@ -215,6 +213,14 @@ airTempPastm <- aggregate(ParmAlls6$AMeanc,by=list(ParmAlls6$regID),FUN="mean")
 colnames(airTempCurrentm) <- c("regID","meanA")
 colnames(airTempPastm) <- c("regID","meanA")
 
+#calculate average past temp across sites
+aveAll <- data.frame(TempA=c(ParmAlls6$MeanM1,
+								ParmAlls6$MeanM2,
+								ParmAlls6$MeanM3,
+								ParmAlls6$MeanM4),
+					regvegeID=rep(ParmAlls6$regvegeID,times=4))			
+aveAnt <- aggregate(aveAll$TempA, by=list(aveAll$regvegeID), FUN="mean")
+colnames(aveAnt) <- c("regvegeID","tempAve")
 #######################################
 #####set up model run             ##### 
 #######################################
@@ -235,95 +241,31 @@ datalist <- list(Nobs=dim(ParmAlls6)[1],
 					a.T=matrix(c(ParmAlls6$MeanM1,
 								ParmAlls6$MeanM2,
 								ParmAlls6$MeanM3,
-								ParmAlls6$MeanM4),ncol=4,byrow=FALSE))
+								ParmAlls6$MeanM4),ncol=4,byrow=FALSE),
+					meanSoilT=aveAnt$tempAve,
+					regVegeA=aveAnt$regvegeID)
 								
-parms <- c("beta0","beta1","beta3","beta4","sigSoilV","wT","antSoil","repSoilP")								
+parms <- c("beta0","beta1","beta3","beta4star","sigSoilV","wT","antSoil","repSoilP")								
 
 
 if(modRun==1){
+#start model 
+inter.modI<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Analyses\\inter_annual\\inter_annual_code.r",
+						data=datalist,
+						n.adapt=100000,
+						n.chains=3)
 
-# set the number of CPUs to be 3
-
-
-sfInit(parallel=TRUE, cpus=3)
-
-# assign the R2OpenBUGS library to each CPU
-sfLibrary(R2OpenBUGS)	
-
-#creating separate directory for each CPU process
-
-modCode <- "c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Analyses\\inter_annual\\inter_annual_code.r"
-
-folder1 <- paste0(modDI, "\\chain1")
-folder2 <- paste0(modDI, "\\chain2")
-folder3 <- paste0(modDI, "\\chain3")
-dir.create(folder1); dir.create(folder2); dir.create(folder3)	
-folderALL <- c(folder1, folder2, folder3)
-#copy model code
-for (i in 1:length(folderALL)){
-
-	file.copy(modCode, paste0(folderALL[i], "\\model_code.txt"), overwrite=TRUE) 
-
-}	
-
-#get model started but run manually
-parallel.bugs <- function(chain, x.data, params){
-	folder <- ifelse(chain==1,"c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\interannual\\model\\run2\\chain1",
-				ifelse(chain==2,"c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\interannual\\model\\run2\\chain2",
-					"c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\interannual\\model\\run2\\chain3"))
- 	
-	 if(chain==1){
-	 inits <- list(list(beta0=c(-10,-10,10,10,.5,.5), beta1=c(.1,.1,-.1,-.1,.1,.1), beta2=c(.2,.2,.2,.2,.2,.2),
-					beta3=c(.2,.2,.2,.2,.2,.2),beta4=c(.2,.2,.2,.2,.2,.2)))
-	 
-	 }
-	 if(chain==2){
-	 inits <- list(list(beta0=c(-15,-15,15,15,.55,.55), beta1=c(.15,.15,-.15,-.15,.15,.15), beta2=c(.1,.1,.1,.1,.1,.1),
-					beta3=c(.25,.25,.25,.25,.25,.25),beta4=c(.25,.25,.25,.25,.25,.25)))
-	 
-	 }
-	 	 if(chain==3){
-	 inits <- list(list(beta0=c(-20,-20,20,20,.45,.45), beta1=c(.01,.01,-.01,-.01,.01,.01), beta2=c(.02,.02,.02,.02,.02,.02),
-					beta3=c(.02,.02,.02,.02,.02,.02),beta4=c(.02,.02,.02,.02,.02,.02)))
-	 
-	 }
-	 
-	# 5b. call openbugs
-	bugs(data=x.data, inits=inits,parameters.to.save=params,
-             n.iter=10, n.chains=1, n.burnin=1, n.thin=1,
-             model.file="model_code.txt", codaPkg=TRUE,
-             OpenBUGS.pgm="C:/Program Files (x86)/OpenBUGS/OpenBUGS323/OpenBUGS.exe",debug=TRUE,
-             working.directory=folder)	
-}	
-	#finish running with slice updater by hand.	 
-	#updated 10 to get model going. Then did 3000 thinning by 50
-	#realized I forgot to set samples on two chains so I reran for another 3000 thinning by 100
-# parallel.bugs on each of the 3 CPUs
-sfLapply(1:3, fun=parallel.bugs,x.data=datalist, params=parms)
-
-
-folder1 <- paste0(modDI, "\\CODA\\chain1")
-folder2 <- paste0(modDI, "\\CODA\\chain2")
-folder3 <- paste0(modDI, "\\CODA\\chain3")
-
-
-
-
-# 9. pull coda back out
-codaobj1 <- read.bugs(c(paste0(folder1, "\\CODAchain1.txt"),
-						paste0(folder2, "\\CODAchain1.txt")
-						,paste0(folder3, "\\CODAchain1.txt")
-						))
-
-		
+inter.sample <- coda.samples(inter.modI,variable.names=parms,
+                       n.iter=100000, thin=50)	
+					
 #model history
-mcmcplot(mcmc.list(codaobj1),parms=c("beta0","beta1","beta2","beta3","beta4","sigSoilV",
-								"wT"),	
+mcmcplot(inter.sample, parms=c("beta0","beta1","beta2","beta3","beta4","sigSoilV",
+								"wT"),
 			dir=paste0(modDI,"\\history"))								
 					
 Xcomp <- round(0.05/((dim(regVegeDF)[1]-1)),3)		
 #model output							   
-mod.out <- summary(codaobj1,  quantiles = c(Xcomp,0.025, 0.25, 0.5, 0.75, 0.975,1-Xcomp))
+mod.out <- summary(inter.sample,  quantiles = c(Xcomp,0.025, 0.25, 0.5, 0.75, 0.975,1-Xcomp))
 
 write.table(mod.out$statistics,paste0(modDI,"\\inter_mod_stats.csv"),
 			sep=",",row.names=TRUE)
@@ -331,10 +273,10 @@ write.table(mod.out$quantiles,paste0(modDI,"\\inter_mod_quant.csv"),
 			sep=",",row.names=TRUE)
 
 #coda output
-chain1<-as.matrix(codaobj1[[1]])
+chain1<-as.matrix(inter.sample [[1]])
 write.table(chain1,paste0(modDI,"\\chain1_coda.csv"), sep=",")
-chain2<-as.matrix(codaobj1[[2]])
+chain2<-as.matrix(inter.sample [[2]])
 write.table(chain2,paste0(modDI,"\\chain2_coda.csv"), sep=",")
-chain3<-as.matrix(codaobj1[[3]])
+chain3<-as.matrix(inter.sample [[3]])
 write.table(chain3,paste0(modDI,"\\chain3_coda.csv"), sep=",")		
 }
