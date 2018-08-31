@@ -81,7 +81,7 @@ model{
 	###priors                ###
 	############################
 	for(j in 1:NregVege){
-	beta0[j] ~ dnorm(0,.0001)
+	beta0[j] ~ dunif(lower[regV[j]],upper[regV[j]])
 	beta1[j] ~ dnorm(0,.0001)
 	beta2[j] ~ dnorm(0,.0001)
 	beta3[j] ~ dnorm(0,.0001)
