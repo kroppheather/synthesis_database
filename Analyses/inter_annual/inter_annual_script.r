@@ -243,23 +243,22 @@ datalist <- list(Nobs=dim(ParmAlls6)[1],
 								ParmAlls6$MeanM3,
 								ParmAlls6$MeanM4),ncol=4,byrow=FALSE),
 					meanSoilT=aveAnt$tempAve,
-					regVegeA=aveAnt$regvegeID,
 					lower=c(-40,0,0),
 					upper=c(0,35,.65),
 					regV=regVegeDF$regID)
 								
-parms <- c("beta0","beta1","beta3","beta4star","sigSoilV","wT","antSoil","repSoilP")								
+parms <- c("beta0","beta1","beta3","beta4","sigSoilV","wT","antSoil","repSoilP")								
 
 
 if(modRun==1){
 #start model 
 inter.modI<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Analyses\\inter_annual\\inter_annual_code.r",
 						data=datalist,
-						n.adapt=1000000,
+						n.adapt=500000,
 						n.chains=3)
 
 inter.sample <- coda.samples(inter.modI,variable.names=parms,
-                       n.iter=2000000, thin=1000)	
+                       n.iter=100000, thin=50)	
 					
 #model history
 mcmcplot(inter.sample, parms=c("beta0","beta1","beta2","beta3","beta4star","sigSoilV",

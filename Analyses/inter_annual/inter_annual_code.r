@@ -12,7 +12,7 @@ model{
 		SoilP[i] ~ dnorm(mu.Soil[i],tau.Soil[i])
 		#mean model
 		mu.Soil[i] <- beta0[regVege[i]]+ beta1[regVege[i]]*depth[i] + beta2[regVege[i]]*(mu.AirP[i]-AirPbar[reg[i]]) 
-						+ beta3[regVege[i]]*(mu.past.air[i]-pastairbar[reg[i]])+beta4[regVege[i]]+(antSoil[i]-antSoilbar[regVege[i]])
+						+ beta3[regVege[i]]*(mu.past.air[i]-pastairbar[reg[i]])+beta4[regVege[i]]+(antSoil[i]-meanSoilT[regVege[i]])
 		#standard deviation that accounts for parameter standard deviation
 		tau.Soil[i] <- pow(sig.Soil[i],-2)
 		sig.Soil[i] <- sigMod[i] + sigSoilV[regVege[i]]
@@ -48,19 +48,14 @@ model{
 
 	}	
 	
-	#calculate mean on unnormalized scale
-	for(j in 1:NregVege){
-	
-		antSoilbar[j] <- meanSoilT[regVegeA[j]]*sumT[j]
-	
-	}
+
 	
 	
 	#calculate weighted temperature for each year in the past in the past
 	for(i in 1:Nobs){
 		for(m in 1:Nlag){
 
-			T.temp[i,m]<-deltaT[m,regVege[i]]*a.T[i,m]
+			T.temp[i,m]<-wT[m,regVege[i]]*a.T[i,m]
 		}
 
 	}	
@@ -73,9 +68,7 @@ model{
 
 	}
 	#calculate identifiable regression estimator
-	for(j in 1:NregVege){
-		beta4star[j] <- beta4[j]*sumT[j]
-	}
+
 	
 	############################
 	###priors                ###
