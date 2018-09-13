@@ -247,7 +247,7 @@ datalist <- list(Nobs=dim(ParmAlls6)[1],
 					upper=c(0,35,.65),
 					regV=regVegeDF$regID)
 								
-parms <- c("beta0","beta1","beta3","beta4","sigSoilV","wT","antSoil","repSoilP")								
+parms <- c("beta0","beta1","beta2","beta3","beta4","sigSoilV","wT","antSoil","repSoilP")								
 
 
 if(modRun==1){
@@ -282,3 +282,20 @@ write.table(chain2,paste0(modDI,"\\chain2_coda.csv"), sep=",")
 chain3<-as.matrix(inter.sample [[3]])
 write.table(chain3,paste0(modDI,"\\chain3_coda.csv"), sep=",")		
 }
+
+#see if correlation between effects is causing mixing problems
+
+cnames <- colnames(chain1)
+dexps <- "\\[*[[:digit:]]*\\]"
+cparms <- gsub(dexps,"", cnames)
+
+beta0 <- chain1[,cparms=="beta0"]
+beta1 <- chain1[,cparms=="beta1"]
+beta2 <- chain1[,cparms=="beta2"]
+beta3 <- chain1[,cparms=="beta3"]
+beta4 <- chain1[,cparms=="beta4"]
+
+
+plot(~beta0[,1]+beta1[,1]+beta3[,1]+beta4[,1])
+plot(~beta0[,2]+beta1[,2]+beta3[,2]+beta4[,2])
+plot(~beta0[,4]+beta1[,4]+beta3[,4]+beta4[,4])
