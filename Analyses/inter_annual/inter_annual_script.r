@@ -51,8 +51,8 @@ library(plyr)
 #set up a plot directory
 plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\interannual\\plots\\model"
 #model directory
-modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\interannual\\model\\run7"
-Nrun <- 7
+modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\interannual\\model\\run8"
+Nrun <- 8
 #indicate if a model run is occuring
 modRun <- 1
 
@@ -149,7 +149,7 @@ ParmAlls <- join(ParmAll, YearSub2, by=c("depth","siteid"), type="inner")
 
 #organize previous air components
 #organize past air maximum focusing on past 4 years
-Tmax <- AirParm[SoilParm$Aparm=="TmaxA",]
+Tmax <- SoilParm[SoilParm$parm=="TmaxS",]
 
 
 #matching for 1 year into the past
@@ -171,10 +171,10 @@ colnames(Tmax4)[1:4] <- paste0(colnames(Tmax4)[1:4],"Max4")
 
 #join to ParmAlls
 
-ParmAlls1 <- join(ParmAlls,Tmax1, by=c("siteid","wyear"),type="left")
-ParmAlls2 <- join(ParmAlls1, Tmax2, by=c("siteid","wyear"), type="left")
-ParmAlls3 <- join(ParmAlls2, Tmax3, by=c("siteid","wyear"), type="left")
-ParmAlls4 <- join(ParmAlls3, Tmax4, by=c("siteid","wyear"), type="left")
+ParmAlls1 <- join(ParmAlls,Tmax1, by=c("siteid","wyear","depth"),type="left")
+ParmAlls2 <- join(ParmAlls1, Tmax2, by=c("siteid","wyear","depth"), type="left")
+ParmAlls3 <- join(ParmAlls2, Tmax3, by=c("siteid","wyear","depth"), type="left")
+ParmAlls4 <- join(ParmAlls3, Tmax4, by=c("siteid","wyear","depth"), type="left")
 
 #omit any data with NA because that means there aren't enough preceding years
 ParmAlls5 <- na.omit(ParmAlls4)
@@ -193,7 +193,7 @@ colnames(airTempCurrentm) <- c("regID","meanA")
 
 #calculate average past temp across sites
 		
-aveAnt <- aggregate(c(ParmAlls6$AMeanMax1,ParmAlls6$AMeanMax2,ParmAlls6$AMeanMax3,ParmAlls6$AMeanMax4), 
+aveAnt <- aggregate(c(ParmAlls6$MeanMax1,ParmAlls6$MeanMax2,ParmAlls6$MeanMax3,ParmAlls6$MeanMax4), 
 						by=list(c(ParmAlls6$regID,ParmAlls6$regID,ParmAlls6$regID,ParmAlls6$regID)),
 						FUN="mean")
 colnames(aveAnt) <- c("regID","tempAve")
@@ -211,7 +211,7 @@ datalist <- list(Nobs=dim(ParmAlls6)[1],
 					sig.Air=ParmAlls6$ASD,
 					meanpastMax=aveAnt$tempAve,
 					NregVege=dim(regVegeDF)[1],
-					a.Tmax= matrix(c(ParmAlls6$AMeanMax1,ParmAlls6$AMeanMax2,ParmAlls6$AMeanMax3,ParmAlls6$AMeanMax4),
+					a.Tmax= matrix(c(ParmAlls6$MeanMax1,ParmAlls6$MeanMax2,ParmAlls6$MeanMax3,ParmAlls6$MeanMax4),
 									byrow=FALSE,ncol=4),
 					Nlag=4,				
 					lower=c(-40,0,0),
