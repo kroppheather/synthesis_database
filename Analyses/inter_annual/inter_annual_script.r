@@ -301,20 +301,11 @@ write.table(chain2,paste0(modDI,"\\chain2_coda.csv"), sep=",")
 chain3<-as.matrix(inter.sample [[3]])
 write.table(chain3,paste0(modDI,"\\chain3_coda.csv"), sep=",")		
 }
-
-#see if correlation between effects is causing mixing problems
-
-cnames <- colnames(chain1)
-dexps <- "\\[*[[:digit:]]*\\]"
-cparms <- gsub(dexps,"", cnames)
-
-beta0 <- chain1[,cparms=="beta0"]
-beta1 <- chain1[,cparms=="beta1"]
-beta2 <- chain1[,cparms=="beta2"]
-beta3 <- chain1[,cparms=="beta3"]
-beta4 <- chain1[,cparms=="beta4"]
-
-
-plot(~beta0[,1]+beta1[,1]+beta3[,1]+beta4[,1])
-plot(~beta0[,2]+beta1[,2]+beta3[,2]+beta4[,2])
-plot(~beta0[,4]+beta1[,4]+beta3[,4]+beta4[,4])
+#checked max wieghts 4 years is sufficient
+#min weights check 4 years is enough
+plot(mod.out$statistics[409:412,1])
+plot(mod.out$statistics[413:416,1])
+plot(mod.out$statistics[417:420,1])
+plot(mod.out$statistics[421:424,1])
+plot(mod.out$statistics[425:428,1])
+plot(mod.out$statistics[429:432,1])
