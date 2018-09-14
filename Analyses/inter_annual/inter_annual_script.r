@@ -51,8 +51,8 @@ library(plyr)
 #set up a plot directory
 plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\interannual\\plots\\model"
 #model directory
-modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\interannual\\model\\run9"
-Nrun <- 9
+modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\interannual\\model\\run10"
+Nrun <- 10
 #indicate if a model run is occuring
 modRun <- 1
 
@@ -121,8 +121,8 @@ YearAll <- unique(data.frame(siteid=ParmAll$siteid,depth=ParmAll$depth,wyear=Par
 #count the number of years for each site and depth
 YearCount <- aggregate(YearAll$wyear, by=list(YearAll$depth,YearAll$siteid), FUN="length")
 colnames(YearCount) <- c("depth","siteid","nYear")
-#subset sites with at least 5 years
-YearSub <- YearCount[YearCount$nYear >=5,]
+#subset sites with at least 6 years
+YearSub <- YearCount[YearCount$nYear >=6,]
 
 #join vegeclass to see how many
 YearSub <- join(YearSub,datV, by="siteid",type="left")
@@ -199,6 +199,12 @@ colnames(Tmin3)[1:4] <- paste0(colnames(Tmin3)[1:4],"MinT3")
 Tmin4 <- Tmin
 Tmin4$wyear <- Tmin4$wyear+4
 colnames(Tmin4)[1:4] <- paste0(colnames(Tmin4)[1:4],"MinT4")
+#matching previous 2 year 
+Tmin5 <- Tmin
+Tmin5$wyear <- Tmin5$wyear+4
+colnames(Tmin5)[1:4] <- paste0(colnames(Tmin5)[1:4],"MinT5")
+
+
 
 #join to Parms
 
@@ -208,7 +214,7 @@ ParmAlls6 <- join(ParmAlls5, Tmin1, by=c("siteid","wyear","depth"), type="left")
 ParmAlls7 <- join(ParmAlls6, Tmin2, by=c("siteid","wyear","depth"), type="left")
 ParmAlls8 <- join(ParmAlls7, Tmin3, by=c("siteid","wyear","depth"), type="left")
 ParmAlls9 <- join(ParmAlls8, Tmin4, by=c("siteid","wyear","depth"), type="left")
-
+ParmAlls9 <- join(ParmAlls9, Tmin5, by=c("siteid","wyear","depth"), type="left")
 
 
 
@@ -216,7 +222,7 @@ ParmAlls9$MeanMin1 <- ifelse(ParmAlls9$regID==2,ParmAlls9$MeanMinT0,ParmAlls9$Me
 ParmAlls9$MeanMin2 <- ifelse(ParmAlls9$regID==2,ParmAlls9$MeanMinT1,ParmAlls9$MeanMinT2)
 ParmAlls9$MeanMin3 <- ifelse(ParmAlls9$regID==2,ParmAlls9$MeanMinT2,ParmAlls9$MeanMinT3)
 ParmAlls9$MeanMin4 <- ifelse(ParmAlls9$regID==2,ParmAlls9$MeanMinT3,ParmAlls9$MeanMinT4)
-
+ParmAlls9$MeanMin5 <- ifelse(ParmAlls9$regID==2,ParmAlls9$MeanMinT4,ParmAlls9$MeanMinT5)
 #omit any data with NA because that means there aren't enough preceding years
 ParmAlls9 <- na.omit(ParmAlls9)
 
@@ -239,8 +245,8 @@ maxAnt <- aggregate(c(ParmAlls10$MeanMax1,ParmAlls10$MeanMax2,ParmAlls10$MeanMax
 						FUN="mean")
 colnames(maxAnt) <- c("regID","tempAve")
 
-minAnt <- aggregate(c(ParmAlls10$MeanMin1,ParmAlls10$MeanMin2,ParmAlls10$MeanMin3,ParmAlls10$MeanMin4), 
-						by=list(c(ParmAlls10$regID,ParmAlls10$regID,ParmAlls10$regID,ParmAlls10$regID)),
+minAnt <- aggregate(c(ParmAlls10$MeanMin1,ParmAlls10$MeanMin2,ParmAlls10$MeanMin3,ParmAlls10$MeanMin4,ParmAlls10$MeanMin5), 
+						by=list(c(ParmAlls10$regID,ParmAlls10$regID,ParmAlls10$regID,ParmAlls10$regID,ParmAlls10$regID)),
 						FUN="mean")
 colnames(minAnt) <- c("regID","tempAve")
 
@@ -260,9 +266,10 @@ datalist <- list(Nobs=dim(ParmAlls10)[1],
 					NregVege=dim(regVegeDF)[1],
 					a.Tmax= matrix(c(ParmAlls10$MeanMax1,ParmAlls10$MeanMax2,ParmAlls10$MeanMax3,ParmAlls10$MeanMax4),
 									byrow=FALSE,ncol=4),
-					a.Tmin= matrix(c(ParmAlls10$MeanMin1,ParmAlls10$MeanMin2,ParmAlls10$MeanMin3,ParmAlls10$MeanMin4),
-									byrow=FALSE,ncol=4),															
-					Nlag=4,				
+					a.Tmin= matrix(c(ParmAlls10$MeanMin1,ParmAlls10$MeanMin2,ParmAlls10$MeanMin3,ParmAlls10$MeanMin4,ParmAlls10$MeanMin5),
+									byrow=FALSE,ncol=5),															
+					Nlag=4,	
+					NlagMin=5,
 					lower=c(-40,0,0),
 					upper=c(0,35,.65),
 					regV=regVegeDF$regID)
@@ -274,11 +281,11 @@ if(modRun==1){
 #start model 
 inter.modI<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Analyses\\inter_annual\\inter_annual_code.r",
 						data=datalist,
-						n.adapt=10000,
+						n.adapt=50000,
 						n.chains=3)
 
 inter.sample <- coda.samples(inter.modI,variable.names=parms,
-                       n.iter=40000, thin=20)	
+                       n.iter=160000, thin=80)	
 					
 #model history
 mcmcplot(inter.sample, parms=c("beta0","beta1","beta2","beta3","beta4","wTmax","wTmin","sigSoilV"),

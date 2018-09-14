@@ -62,7 +62,7 @@ model{
 	##minimum
 	#antecedent model for past soil temperature
 	for(j in 1:NregVege){
-		for(m in 1:Nlag){
+		for(m in 1:NlagMin){
 			deltaTmin[m,j]~dgamma(1,1)
 			wTmin[m,j]<-deltaTmin[m,j]/sumTmin[j]
 
@@ -79,7 +79,7 @@ model{
 	}	
 	#calculate weighted temperature for each year in the past in the past
 	for(i in 1:Nobs){
-		for(m in 1:Nlag){
+		for(m in 1:NlagMin){
 
 			T.tempmin[i,m]<-wTmin[m,regVege[i]]*a.Tmin[i,m]
 		}
