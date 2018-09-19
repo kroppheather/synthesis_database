@@ -281,11 +281,11 @@ if(modRun==1){
 #start model 
 inter.modI<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Analyses\\inter_annual\\inter_annual_code.r",
 						data=datalist,
-						n.adapt=50000,
+						n.adapt=70000,
 						n.chains=3)
 
 inter.sample <- coda.samples(inter.modI,variable.names=parms,
-                       n.iter=160000, thin=80)	
+                       n.iter=1200000, thin=600)	
 					
 #model history
 mcmcplot(inter.sample, parms=c("beta0","beta1","beta2","beta3","beta4","wTmax","wTmin","sigSoilV"),
