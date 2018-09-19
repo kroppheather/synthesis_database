@@ -51,8 +51,8 @@ library(plyr)
 #set up a plot directory
 plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\interannual\\plots\\model"
 #model directory
-modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\interannual\\model\\run10"
-Nrun <- 10
+modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\interannual\\model\\run11"
+Nrun <- 11
 #indicate if a model run is occuring
 modRun <- 1
 
@@ -122,7 +122,7 @@ YearAll <- unique(data.frame(siteid=ParmAll$siteid,depth=ParmAll$depth,wyear=Par
 YearCount <- aggregate(YearAll$wyear, by=list(YearAll$depth,YearAll$siteid), FUN="length")
 colnames(YearCount) <- c("depth","siteid","nYear")
 #subset sites with at least 6 years
-YearSub <- YearCount[YearCount$nYear >=6,]
+YearSub <- YearCount[YearCount$nYear >=3,]
 
 #join vegeclass to see how many
 YearSub <- join(YearSub,datV, by="siteid",type="left")
@@ -135,7 +135,7 @@ SubdepthN <- SubdepthN[order(SubdepthN$vegeclass),]
 #find out how many sites in each vegeclass
 siteNl <- aggregate(SubsiteN$siteid, by=list(SubsiteN$vegeclass), FUN="length")
 colnames(siteNl) <- c("vegeclass","count")
-#most vegeclasses only have 1-3 sites with at least 2 years of data
+#most vegeclasses only have 1-3 sites with at least 3 years of data
 #need to subset vege classes to focus on ones with more sites
 #subset so that there are at least 5 different sites in a vegeclass
 siteNl <- siteNl[siteNl$count>=5,]
@@ -156,25 +156,12 @@ Tmax <- SoilParm[SoilParm$parm=="TmaxS",]
 Tmax1 <- Tmax
 Tmax1$wyear <- Tmax1$wyear+1
 colnames(Tmax1)[1:4] <- paste0(colnames(Tmax1)[1:4],"Max1")
-#matching for 2 year into the past
-Tmax2 <- Tmax
-Tmax2$wyear <- Tmax2$wyear+2
-colnames(Tmax2)[1:4] <- paste0(colnames(Tmax2)[1:4],"Max2")
-#matching for 3 year into the past
-Tmax3 <- Tmax
-Tmax3$wyear <- Tmax3$wyear+3
-colnames(Tmax3)[1:4] <- paste0(colnames(Tmax3)[1:4],"Max3")
-#matching for 4 year into the past
-Tmax4 <- Tmax
-Tmax4$wyear <- Tmax4$wyear+4
-colnames(Tmax4)[1:4] <- paste0(colnames(Tmax4)[1:4],"Max4")
+
 
 #join to ParmAlls
 
 ParmAlls1 <- join(ParmAlls,Tmax1, by=c("siteid","wyear","depth"),type="left")
-ParmAlls2 <- join(ParmAlls1, Tmax2, by=c("siteid","wyear","depth"), type="left")
-ParmAlls3 <- join(ParmAlls2, Tmax3, by=c("siteid","wyear","depth"), type="left")
-ParmAlls4 <- join(ParmAlls3, Tmax4, by=c("siteid","wyear","depth"), type="left")
+
 
 
 #organize past soil maximum focusing on past 4 years
@@ -187,108 +174,80 @@ colnames(Tmin0)[1:4] <- paste0(colnames(Tmin0)[1:4],"MinT0")
 Tmin1 <- Tmin
 Tmin1$wyear <- Tmin1$wyear+1
 colnames(Tmin1)[1:4] <- paste0(colnames(Tmin1)[1:4],"MinT1")
-#matching previous 2 year 
-Tmin2 <- Tmin
-Tmin2$wyear <- Tmin2$wyear+2
-colnames(Tmin2)[1:4] <- paste0(colnames(Tmin2)[1:4],"MinT2")
-#matching previous 3 year 
-Tmin3 <- Tmin
-Tmin3$wyear <- Tmin3$wyear+3
-colnames(Tmin3)[1:4] <- paste0(colnames(Tmin3)[1:4],"MinT3")
-#matching previous 2 year 
-Tmin4 <- Tmin
-Tmin4$wyear <- Tmin4$wyear+4
-colnames(Tmin4)[1:4] <- paste0(colnames(Tmin4)[1:4],"MinT4")
-#matching previous 2 year 
-Tmin5 <- Tmin
-Tmin5$wyear <- Tmin5$wyear+4
-colnames(Tmin5)[1:4] <- paste0(colnames(Tmin5)[1:4],"MinT5")
-
 
 
 #join to Parms
 
 #first get the temp years joined
-ParmAlls5 <- join(ParmAlls4, Tmin0, by=c("siteid","wyear","depth"), type="left")
-ParmAlls6 <- join(ParmAlls5, Tmin1, by=c("siteid","wyear","depth"), type="left")
-ParmAlls7 <- join(ParmAlls6, Tmin2, by=c("siteid","wyear","depth"), type="left")
-ParmAlls8 <- join(ParmAlls7, Tmin3, by=c("siteid","wyear","depth"), type="left")
-ParmAlls9 <- join(ParmAlls8, Tmin4, by=c("siteid","wyear","depth"), type="left")
-ParmAlls9 <- join(ParmAlls9, Tmin5, by=c("siteid","wyear","depth"), type="left")
+ParmAlls2 <- join(ParmAlls1, Tmin0, by=c("siteid","wyear","depth"), type="left")
+ParmAlls3 <- join(ParmAlls2, Tmin1, by=c("siteid","wyear","depth"), type="left")
 
 
 
-ParmAlls9$MeanMin1 <- ifelse(ParmAlls9$regID==2,ParmAlls9$MeanMinT0,ParmAlls9$MeanMinT1)
-ParmAlls9$MeanMin2 <- ifelse(ParmAlls9$regID==2,ParmAlls9$MeanMinT1,ParmAlls9$MeanMinT2)
-ParmAlls9$MeanMin3 <- ifelse(ParmAlls9$regID==2,ParmAlls9$MeanMinT2,ParmAlls9$MeanMinT3)
-ParmAlls9$MeanMin4 <- ifelse(ParmAlls9$regID==2,ParmAlls9$MeanMinT3,ParmAlls9$MeanMinT4)
-ParmAlls9$MeanMin5 <- ifelse(ParmAlls9$regID==2,ParmAlls9$MeanMinT4,ParmAlls9$MeanMinT5)
+
+ParmAlls3$MeanMin1 <- ifelse(ParmAlls3$regID==2,ParmAlls3$MeanMinT0,ParmAlls3$MeanMinT1)
+ParmAlls3$SDMin1 <- ifelse(ParmAlls3$regID==2,ParmAlls3$SDMinT0,ParmAlls3$SDMinT1)
 #omit any data with NA because that means there aren't enough preceding years
-ParmAlls9 <- na.omit(ParmAlls9)
+ParmAlls3 <- na.omit(ParmAlls3)
 
 #make regVege table
-regVegeDF <- unique(data.frame(regID=ParmAlls5$regID,vegeclass=ParmAlls5$vegeclass)) 
+regVegeDF <- unique(data.frame(regID=ParmAlls3$regID,vegeclass=ParmAlls3$vegeclass)) 
 regVegeDF$regvegeID <- seq(1,dim(regVegeDF)[1])
 
 #join into dataframe
-ParmAlls10 <- join(ParmAlls9,regVegeDF, by=c("regID","vegeclass"), type="left")
+ParmAlls4 <- join(ParmAlls3,regVegeDF, by=c("regID","vegeclass"), type="left")
 
 #calculate average air temp in each regression
-airTempCurrentm <- aggregate(ParmAlls10$AMean,by=list(ParmAlls10$regID),FUN="mean")
+airTempCurrentm <- aggregate(ParmAlls4$AMean,by=list(ParmAlls4$regID),FUN="mean")
 
 colnames(airTempCurrentm) <- c("regID","meanA")
 
-#calculate average past temp across sites
-		
-maxAnt <- aggregate(c(ParmAlls10$MeanMax1,ParmAlls10$MeanMax2,ParmAlls10$MeanMax3,ParmAlls10$MeanMax4), 
-						by=list(c(ParmAlls10$regID,ParmAlls10$regID,ParmAlls10$regID,ParmAlls10$regID)),
-						FUN="mean")
-colnames(maxAnt) <- c("regID","tempAve")
+pastMaxave <- aggregate(ParmAlls4$MeanMax1,by=list(ParmAlls4$regID),FUN="mean")
+colnames(pastMaxave) <- c("regID","meanMax")
 
-minAnt <- aggregate(c(ParmAlls10$MeanMin1,ParmAlls10$MeanMin2,ParmAlls10$MeanMin3,ParmAlls10$MeanMin4,ParmAlls10$MeanMin5), 
-						by=list(c(ParmAlls10$regID,ParmAlls10$regID,ParmAlls10$regID,ParmAlls10$regID,ParmAlls10$regID)),
-						FUN="mean")
-colnames(minAnt) <- c("regID","tempAve")
+pastMinave <- aggregate(ParmAlls4$MeanMin1,by=list(ParmAlls4$regID),FUN="mean")
+colnames(pastMinave) <- c("regID","meanMin")
 
 #######################################
 #####set up model run             ##### 
 #######################################
-datalist <- list(Nobs=dim(ParmAlls10)[1],
-					SoilP=ParmAlls10$Mean,
-					regVege=ParmAlls10$regvegeID,
-					depth=ParmAlls10$depth,
+datalist <- list(Nobs=dim(ParmAlls4)[1],
+					SoilP=ParmAlls4$Mean,
+					regVege=ParmAlls4$regvegeID,
+					depth=ParmAlls4$depth,
 					AirPbar=airTempCurrentm$meanA,
-					reg=ParmAlls10$regID,
-					sigMod=ParmAlls10$SD,
-					AirP=ParmAlls10$AMean,
-					meanpastMax=maxAnt$tempAve,
-					meanpastMin=minAnt$tempAve,
+					reg=ParmAlls4$regID,
+					sigMod=ParmAlls4$SD,
+					AirP=ParmAlls4$AMean,
+					sig.AirP=ParmAlls4$ASD,
+					pastMax=ParmAlls4$MeanMax1,
+					sig.pastMax=ParmAlls4$SDMax1,
+					meanpastMax=pastMaxave$meanMax,
+					pastMin=ParmAlls4$MeanMin1,
+					sig.pastMin=ParmAlls4$SDMin1,					
+					meanpastMin=pastMinave$meanMin,
 					NregVege=dim(regVegeDF)[1],
-					a.Tmax= matrix(c(ParmAlls10$MeanMax1,ParmAlls10$MeanMax2,ParmAlls10$MeanMax3,ParmAlls10$MeanMax4),
-									byrow=FALSE,ncol=4),
-					a.Tmin= matrix(c(ParmAlls10$MeanMin1,ParmAlls10$MeanMin2,ParmAlls10$MeanMin3,ParmAlls10$MeanMin4,ParmAlls10$MeanMin5),
-									byrow=FALSE,ncol=5),															
-					Nlag=4,	
-					NlagMin=5,
-					lower=c(-40,0,0),
-					upper=c(0,35,.65),
 					regV=regVegeDF$regID)
 								
-parms <- c("beta0","beta1","beta2","beta3","beta4","wTmax","sigSoilV","repSoilP","wTmin")								
+parms <- c("beta0","beta1","beta2","beta3","beta4","sigSoilV","repSoilP",
+				"mu.beta0","mu.beta1","mu.beta2","mu.beta3","mu.beta4",
+				"sig.beta0","sig.beta1","sig.beta2","sig.beta3","sig.beta4")								
 
 
 if(modRun==1){
 #start model 
 inter.modI<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Analyses\\inter_annual\\inter_annual_code.r",
 						data=datalist,
-						n.adapt=70000,
+						n.adapt=50000,
 						n.chains=3)
 
 inter.sample <- coda.samples(inter.modI,variable.names=parms,
-                       n.iter=1200000, thin=600)	
+                       n.iter=100000, thin=50)	
 					
 #model history
-mcmcplot(inter.sample, parms=c("beta0","beta1","beta2","beta3","beta4","wTmax","wTmin","sigSoilV"),
+mcmcplot(inter.sample, parms=c("beta0","beta1","beta2","beta3","beta4","sigSoilV",
+				"mu.beta0","mu.beta1","mu.beta2","mu.beta3","mu.beta4",
+				"sig.beta0","sig.beta1","sig.beta2","sig.beta3","sig.beta4"),
 			dir=paste0(modDI,"\\history"))								
 					
 Xcomp <- round(0.05/((dim(regVegeDF)[1]-1)),3)		
