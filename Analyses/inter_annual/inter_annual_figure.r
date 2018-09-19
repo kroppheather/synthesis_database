@@ -520,3 +520,31 @@ for(i in 1:3){
 	dev.off()
 	
 }	
+
+
+#######################################
+#####plot weights for significant ##### 
+#####regression parms             #####
+#######################################
+
+
+
+
+
+
+#######################################
+#####plot goodness of fit         ##### 
+#######################################
+
+reps <- datC[datC$parms2=="repSoilP",]
+reps$regID <- ParmAlls10$regID
+plot(ParmAlls10$Mean[ParmAlls10$regID==1],reps$Mean[reps$regID==1])
+plot(ParmAlls10$Mean[ParmAlls10$regID==2],reps$Mean[reps$regID==2])
+plot(ParmAlls10$Mean[ParmAlls10$regID==3],reps$Mean[reps$regID==3])
+
+fit1 <- lm(reps$Mean[reps$regID==1]~ParmAlls10$Mean[ParmAlls10$regID==1])
+summary(fit1)
+fit2 <- lm(reps$Mean[reps$regID==2]~ParmAlls10$Mean[ParmAlls10$regID==2])
+summary(fit2)
+fit3 <- lm(reps$Mean[reps$regID==3]~ParmAlls10$Mean[ParmAlls10$regID==3])
+summary(fit3)
