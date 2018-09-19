@@ -269,9 +269,3 @@ write.table(chain3,paste0(modDI,"\\chain3_coda.csv"), sep=",")
 }
 #checked max wieghts 4 years is sufficient
 #min weights check 4 years is enough
-plot(mod.out$statistics[409:412,1])
-plot(mod.out$statistics[413:416,1])
-plot(mod.out$statistics[417:420,1])
-plot(mod.out$statistics[421:424,1])
-plot(mod.out$statistics[425:428,1])
-plot(mod.out$statistics[429:432,1])
