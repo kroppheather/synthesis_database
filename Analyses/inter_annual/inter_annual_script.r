@@ -51,8 +51,8 @@ library(plyr)
 #set up a plot directory
 plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\interannual\\plots\\model"
 #model directory
-modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\interannual\\model\\run13"
-Nrun <- 13
+modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\interannual\\model\\run14"
+Nrun <- 14
 #indicate if a model run is occuring
 modRun <- 1
 
@@ -122,7 +122,7 @@ YearAll <- unique(data.frame(siteid=ParmAll$siteid,depth=ParmAll$depth,wyear=Par
 YearCount <- aggregate(YearAll$wyear, by=list(YearAll$depth,YearAll$siteid), FUN="length")
 colnames(YearCount) <- c("depth","siteid","nYear")
 #subset sites with at least 6 years
-YearSub <- YearCount[YearCount$nYear >=2,]
+YearSub <- YearCount[YearCount$nYear >=5,]
 
 #join vegeclass to see how many
 YearSub <- join(YearSub,datV, by="siteid",type="left")
@@ -202,11 +202,38 @@ airTempCurrentm <- aggregate(ParmAlls4$AMean,by=list(ParmAlls4$regID),FUN="mean"
 
 colnames(airTempCurrentm) <- c("regID","meanA")
 
-pastMaxave <- aggregate(ParmAlls4$MeanMax1,by=list(ParmAlls4$regID),FUN="mean")
-colnames(pastMaxave) <- c("regID","meanMax")
+#calculate long term average for anamalies
 
-pastMinave <- aggregate(ParmAlls4$MeanMin1,by=list(ParmAlls4$regID),FUN="mean")
-colnames(pastMinave) <- c("regID","meanMin")
+pastMaxave <- aggregate(Tmax$Mean,by=list(Tmax$siteid,Tmax$depth),FUN="mean")
+colnames(pastMaxave) <- c("siteid","depth","meanMax")
+#subset to only include site and depth in model
+siteforM <- unique(data.frame(depth=ParmAlls3$depth,siteid=ParmAlls3$siteid))
+pastMaxave <- join(pastMaxave,siteforM, by=c("siteid","depth"),type="inner")
+pastMaxave$siteDepthID <- seq(1,dim(pastMaxave)[1])
+
+pastMinave <- aggregate(Tmin$Mean,by=list(Tmin$siteid,Tmin$depth),FUN="mean")
+colnames(pastMinave) <- c("siteid","depth","meanMin")
+
+#join back into data frame
+ParmAlls4 <- join(ParmAlls4,pastMaxave,by=c("siteid","depth"),type="left")
+ParmAlls4 <- join(ParmAlls4,pastMinave,by=c("siteid","depth"),type="left")
+
+ParmAlls4$minAnom <- ParmAlls4$MeanMin1-ParmAlls4$meanMin
+ParmAlls4$maxAnom <- ParmAlls4$MeanMax1-ParmAlls4$meanMax
+
+#organize by site and depth
+ParmAlls4 <- ParmAlls4[order(ParmAlls4$siteDepthID),]
+
+#get start and end of data for each site and depth
+rowC <- list()
+startAve <- numeric(0)
+endAve <- numeric(0)
+for(i in 1:dim(pastMaxave)[1]){
+	rowC[[i]] <- which(ParmAlls4$siteDepthID==i)
+	startAve[i] <- rowC[[i]][1]
+	endAve[i] <- rowC[[i]][length(rowC[[i]])]
+
+}
 
 #set up data for plotting
 seqDepth <- seq(0,20,length.out=100)
@@ -217,19 +244,19 @@ seqAir <- matrix(c(seq(round_any(range(ParmAlls4$AMean[ParmAlls4$regID==1])[1],5
 				seq(round_any(range(ParmAlls4$AMean[ParmAlls4$regID==3])[1],.05,floor),
 				round_any(range(ParmAlls4$AMean[ParmAlls4$regID==3])[2],.05,ceiling),length.out=100)),ncol=3,
 				byrow=FALSE)
-seqMax <- matrix(c(seq(round_any(range(ParmAlls4$MeanMax1[ParmAlls4$regID==1])[1],5,floor),
-				round_any(range(ParmAlls4$MeanMax1[ParmAlls4$regID==1])[2],5,ceiling),length.out=100),
-				seq(round_any(range(ParmAlls4$MeanMax1[ParmAlls4$regID==2])[1],5,floor),
-				round_any(range(ParmAlls4$MeanMax1[ParmAlls4$regID==2])[2],5,ceiling),length.out=100),
-				seq(round_any(range(ParmAlls4$MeanMax1[ParmAlls4$regID==3])[1],5,floor),
-				round_any(range(ParmAlls4$MeanMax1[ParmAlls4$regID==3])[2],5,ceiling),length.out=100)),ncol=3,
+seqMax <- matrix(c(seq(round_any(range(ParmAlls4$maxAnom[ParmAlls4$regID==1])[1],5,floor),
+				round_any(range(ParmAlls4$maxAnom[ParmAlls4$regID==1])[2],5,ceiling),length.out=100),
+				seq(round_any(range(ParmAlls4$maxAnom[ParmAlls4$regID==2])[1],5,floor),
+				round_any(range(ParmAlls4$maxAnom[ParmAlls4$regID==2])[2],5,ceiling),length.out=100),
+				seq(round_any(range(ParmAlls4$maxAnom[ParmAlls4$regID==3])[1],5,floor),
+				round_any(range(ParmAlls4$maxAnom[ParmAlls4$regID==3])[2],5,ceiling),length.out=100)),ncol=3,
 				byrow=FALSE)				
-seqMin <- matrix(c(seq(round_any(range(ParmAlls4$MeanMin1[ParmAlls4$regID==1])[1],5,floor),
-				round_any(range(ParmAlls4$MeanMin1[ParmAlls4$regID==1])[2],5,ceiling),length.out=100),
-				seq(round_any(range(ParmAlls4$MeanMin1[ParmAlls4$regID==2])[1],5,floor),
-				round_any(range(ParmAlls4$MeanMin1[ParmAlls4$regID==2])[2],5,ceiling),length.out=100),
-				seq(round_any(range(ParmAlls4$MeanMin1[ParmAlls4$regID==3])[1],5,floor),
-				round_any(range(ParmAlls4$MeanMin1[ParmAlls4$regID==3])[2],5,ceiling),length.out=100)),ncol=3,
+seqMin <- matrix(c(seq(round_any(range(ParmAlls4$minAnom[ParmAlls4$regID==1])[1],5,floor),
+				round_any(range(ParmAlls4$minAnom[ParmAlls4$regID==1])[2],5,ceiling),length.out=100),
+				seq(round_any(range(ParmAlls4$minAnom[ParmAlls4$regID==2])[1],5,floor),
+				round_any(range(ParmAlls4$minAnom[ParmAlls4$regID==2])[2],5,ceiling),length.out=100),
+				seq(round_any(range(ParmAlls4$minAnom[ParmAlls4$regID==3])[1],5,floor),
+				round_any(range(ParmAlls4$minAnom[ParmAlls4$regID==3])[2],5,ceiling),length.out=100)),ncol=3,
 				byrow=FALSE)
 #######################################
 #####set up model run             ##### 
