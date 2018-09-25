@@ -51,8 +51,8 @@ library(plyr)
 #set up a plot directory
 plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\interannual\\plots\\model"
 #model directory
-modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\interannual\\model\\run12"
-Nrun <- 12
+modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\interannual\\model\\run13"
+Nrun <- 13
 #indicate if a model run is occuring
 modRun <- 1
 
@@ -208,6 +208,29 @@ colnames(pastMaxave) <- c("regID","meanMax")
 pastMinave <- aggregate(ParmAlls4$MeanMin1,by=list(ParmAlls4$regID),FUN="mean")
 colnames(pastMinave) <- c("regID","meanMin")
 
+#set up data for plotting
+seqDepth <- seq(0,20,length.out=100)
+seqAir <- matrix(c(seq(round_any(range(ParmAlls4$AMean[ParmAlls4$regID==1])[1],5,floor),
+				round_any(range(ParmAlls4$AMean[ParmAlls4$regID==1])[2],5,ceiling),length.out=100),
+				seq(round_any(range(ParmAlls4$AMean[ParmAlls4$regID==2])[1],5,floor),
+				round_any(range(ParmAlls4$AMean[ParmAlls4$regID==2])[2],5,ceiling),length.out=100),
+				seq(round_any(range(ParmAlls4$AMean[ParmAlls4$regID==3])[1],.05,floor),
+				round_any(range(ParmAlls4$AMean[ParmAlls4$regID==3])[2],.05,ceiling),length.out=100)),ncol=3,
+				byrow=FALSE)
+seqMax <- matrix(c(seq(round_any(range(ParmAlls4$MeanMax1[ParmAlls4$regID==1])[1],5,floor),
+				round_any(range(ParmAlls4$MeanMax1[ParmAlls4$regID==1])[2],5,ceiling),length.out=100),
+				seq(round_any(range(ParmAlls4$MeanMax1[ParmAlls4$regID==2])[1],5,floor),
+				round_any(range(ParmAlls4$MeanMax1[ParmAlls4$regID==2])[2],5,ceiling),length.out=100),
+				seq(round_any(range(ParmAlls4$MeanMax1[ParmAlls4$regID==3])[1],5,floor),
+				round_any(range(ParmAlls4$MeanMax1[ParmAlls4$regID==3])[2],5,ceiling),length.out=100)),ncol=3,
+				byrow=FALSE)				
+seqMin <- matrix(c(seq(round_any(range(ParmAlls4$MeanMin1[ParmAlls4$regID==1])[1],5,floor),
+				round_any(range(ParmAlls4$MeanMin1[ParmAlls4$regID==1])[2],5,ceiling),length.out=100),
+				seq(round_any(range(ParmAlls4$MeanMin1[ParmAlls4$regID==2])[1],5,floor),
+				round_any(range(ParmAlls4$MeanMin1[ParmAlls4$regID==2])[2],5,ceiling),length.out=100),
+				seq(round_any(range(ParmAlls4$MeanMin1[ParmAlls4$regID==3])[1],5,floor),
+				round_any(range(ParmAlls4$MeanMin1[ParmAlls4$regID==3])[2],5,ceiling),length.out=100)),ncol=3,
+				byrow=FALSE)
 #######################################
 #####set up model run             ##### 
 #######################################
@@ -227,11 +250,16 @@ datalist <- list(Nobs=dim(ParmAlls4)[1],
 					sig.pastMin=ParmAlls4$SDMin1,					
 					meanpastMin=pastMinave$meanMin,
 					NregVege=dim(regVegeDF)[1],
-					regV=regVegeDF$regID)
+					regV=regVegeDF$regID,
+					seqDepth=seqDepth,
+					seqAir=seqAir,
+					seqMin=seqMin,
+					seqMax=seqMax, NmuPlot=100)
 								
 parms <- c("beta0","beta1","beta2","beta3","beta4","sigSoilV","repSoilP",
 				"mu.beta0","mu.beta1","mu.beta2","mu.beta3","mu.beta4",
-				"sig.beta0","sig.beta1","sig.beta2","sig.beta3","sig.beta4")								
+				"sig.beta0","sig.beta1","sig.beta2","sig.beta3","sig.beta4",
+				"plotDepth","plotAir","plotMax","plotMin")								
 
 
 if(modRun==1){

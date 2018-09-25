@@ -29,7 +29,18 @@ model{
 		
 	
 	}
+	############################
+	###monitor means for plot###
+	############################
+	for(i in 1:NmuPlot){
+		for(j in 1:NregVege){
+			plotDepth[i,j] <- beta0[j] + beta1[j] * seqDepth[i]
+			plotAir[i,j] <- beta0[j] + beta2[j] * (seqAir[i,regV[j]]-AirPbar[regV[j]])
+			plotMax[i,j] <- beta0[j] + beta3[j] * (seqMax[i,regV[j]]-meanpastMax[regV[j]])
+			plotMin[i,j] <- beta0[j] + beta4[j] * (seqMin[i,regV[j]]-meanpastMin[regV[j]])
+		}
 	
+	}
 	
 	############################
 	###priors                ###
