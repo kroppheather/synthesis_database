@@ -51,8 +51,8 @@ library(plyr)
 #set up a plot directory
 plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\interannual\\plots\\model"
 #model directory
-modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\interannual\\model\\run11"
-Nrun <- 11
+modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\interannual\\model\\run12"
+Nrun <- 12
 #indicate if a model run is occuring
 modRun <- 1
 
@@ -122,7 +122,7 @@ YearAll <- unique(data.frame(siteid=ParmAll$siteid,depth=ParmAll$depth,wyear=Par
 YearCount <- aggregate(YearAll$wyear, by=list(YearAll$depth,YearAll$siteid), FUN="length")
 colnames(YearCount) <- c("depth","siteid","nYear")
 #subset sites with at least 6 years
-YearSub <- YearCount[YearCount$nYear >=3,]
+YearSub <- YearCount[YearCount$nYear >=2,]
 
 #join vegeclass to see how many
 YearSub <- join(YearSub,datV, by="siteid",type="left")
@@ -267,5 +267,4 @@ write.table(chain2,paste0(modDI,"\\chain2_coda.csv"), sep=",")
 chain3<-as.matrix(inter.sample [[3]])
 write.table(chain3,paste0(modDI,"\\chain3_coda.csv"), sep=",")		
 }
-#checked max wieghts 4 years is sufficient
-#min weights check 4 years is enough
+

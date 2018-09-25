@@ -50,8 +50,8 @@ library(plyr)
 #set up a plot directory
 plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\interannual\\plots\\model"
 #model directory
-modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\interannual\\model\\run11"
-Nrun <- 11
+modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\interannual\\model\\run12"
+Nrun <- 12
 #indicate if a model run is occuring
 modRun <- 1
 
@@ -121,7 +121,7 @@ YearAll <- unique(data.frame(siteid=ParmAll$siteid,depth=ParmAll$depth,wyear=Par
 YearCount <- aggregate(YearAll$wyear, by=list(YearAll$depth,YearAll$siteid), FUN="length")
 colnames(YearCount) <- c("depth","siteid","nYear")
 #subset sites with at least 6 years
-YearSub <- YearCount[YearCount$nYear >=3,]
+YearSub <- YearCount[YearCount$nYear >=2,]
 
 #join vegeclass to see how many
 YearSub <- join(YearSub,datV, by="siteid",type="left")
@@ -251,8 +251,8 @@ betaOut <- list(beta0,beta1,beta2,beta3,beta4)
 
 #create significance ID on each dataframe
 for(i in 1:5){
-	betaOut[[i]]$sigP <- ifelse(betaOut[[i]]$X0.5.<0&betaOut[[i]]$X99.5.<0,1,
-			ifelse(betaOut[[i]]$X0.5.>0&betaOut[[i]]$X99.5.>0,1,0))
+	betaOut[[i]]$sigP <- ifelse(betaOut[[i]]$X0.3.<0&betaOut[[i]]$X99.7.<0,1,
+			ifelse(betaOut[[i]]$X0.3.>0&betaOut[[i]]$X99.7.>0,1,0))
 }
 
 
@@ -271,6 +271,8 @@ for(i in 1:5){
 vegeSub <- data.frame(vegeclass=unique(regVegeDF$vegeclass))
 vegeSub <- join(vegeSub,datVI, by="vegeclass", type="left")
 vegeSub <- vegeSub[order(vegeSub$vegeclass),]
+
+
 wd <- 45
 hd <- 40
 
@@ -278,21 +280,21 @@ hd <- 40
 #make a panel of parameters for each regression
 
 
-xseq <-c(1,4,7,10)
+xseq <-c(1,4,7,10,13,16)
 
-yli <- c(-35,0,0.2)
-yhi <- c(10,25,.65)
+yli <- c(-20,0,0.3)
+yhi <- c(0,15,.65)
 yls1 <- c(-1.5,-.5,-.02)
-yhs1 <- c(2,.5,.02)
-yls2 <- c(-.2,-1,-1)
-yhs2 <- c(1.2,1,1)
-yls3 <- c(-.4,-1,-.015)
-yhs3 <- c(1.2,1,.015)
-yls4 <- c(-.2,-1,-.01)
-yhs4 <- c(1,1,.01)
+yhs1 <- c(2,.1,.02)
+yls2 <- c(-.2,-.2,-.2)
+yhs2 <- c(.8,1.4,1.4)
+yls3 <- c(-.4,-.2,-.015)
+yhs3 <- c(1,1.2,.015)
+yls4 <- c(-.2,-.2,-.01)
+yhs4 <- c(1.2,.4,.01)
 
 xl <- -1
-xh <- 12
+xh <- 18
 alw <- 2
 zlw <- 10
 mlw <- 5
@@ -302,10 +304,10 @@ alx <- 4
 mlx <- 7
 
 yii <- c(5,5,.1)
-yi1 <- c(.5,.5,.005)
-yi2 <- c(.2,.5,.5)
-yi3 <- c(.2,.1,.005)
-yi4 <- c(.2,.1,.002)
+yi1 <- c(.5,.1,.005)
+yi2 <- c(.2,.2,.2)
+yi3 <- c(.2,.2,.005)
+yi4 <- c(.2,.2,.002)
 #three regressions
 regName <- c("Soil min vs air min","Soil max vs air max", "Time of soil min vs time of air min")
 
@@ -327,8 +329,8 @@ for(i in 1:3){
 						col="tomato3",border=NA)
 				arrows(xseq[j]-1,betaOut[[1]]$Mean[betaOut[[1]]$regID==i&betaOut[[1]]$vegeclass==vegeSub$vegeclass[j]],
 						xseq[j]+1,betaOut[[1]]$Mean[betaOut[[1]]$regID==i&betaOut[[1]]$vegeclass==vegeSub$vegeclass[j]],code=0,lwd=mlw)
-				arrows(	xseq[j],betaOut[[1]]$X0.5.[betaOut[[1]]$regID==i&betaOut[[1]]$vegeclass==vegeSub$vegeclass[j]],
-						xseq[j],betaOut[[1]]$X99.5.[betaOut[[1]]$regID==i&betaOut[[1]]$vegeclass==vegeSub$vegeclass[j]],
+				arrows(	xseq[j],betaOut[[1]]$X0.3.[betaOut[[1]]$regID==i&betaOut[[1]]$vegeclass==vegeSub$vegeclass[j]],
+						xseq[j],betaOut[[1]]$X99.7.[betaOut[[1]]$regID==i&betaOut[[1]]$vegeclass==vegeSub$vegeclass[j]],
 						code=0, lwd=alw)
 			}
 		axis(1, xseq,rep("",length(xseq)), lwd.ticks=tlw)
@@ -361,8 +363,8 @@ for(i in 1:3){
 				}
 				arrows(xseq[j]-1,betaOut[[2]]$Mean[betaOut[[2]]$regID==i&betaOut[[2]]$vegeclass==vegeSub$vegeclass[j]],
 						xseq[j]+1,betaOut[[2]]$Mean[betaOut[[2]]$regID==i&betaOut[[2]]$vegeclass==vegeSub$vegeclass[j]],code=0,lwd=mlw)
-				arrows(	xseq[j],betaOut[[2]]$X0.5.[betaOut[[2]]$regID==i&betaOut[[2]]$vegeclass==vegeSub$vegeclass[j]],
-						xseq[j],betaOut[[2]]$X99.5.[betaOut[[2]]$regID==i&betaOut[[2]]$vegeclass==vegeSub$vegeclass[j]],
+				arrows(	xseq[j],betaOut[[2]]$X0.3.[betaOut[[2]]$regID==i&betaOut[[2]]$vegeclass==vegeSub$vegeclass[j]],
+						xseq[j],betaOut[[2]]$X99.7.[betaOut[[2]]$regID==i&betaOut[[2]]$vegeclass==vegeSub$vegeclass[j]],
 						code=0, lwd=alw)
 			}			
 		axis(1, xseq,rep("",length(xseq)), lwd.ticks=tlw)
@@ -394,8 +396,8 @@ for(i in 1:3){
 				}
 				arrows(xseq[j]-1,betaOut[[3]]$Mean[betaOut[[3]]$regID==i&betaOut[[3]]$vegeclass==vegeSub$vegeclass[j]],
 						xseq[j]+1,betaOut[[3]]$Mean[betaOut[[3]]$regID==i&betaOut[[3]]$vegeclass==vegeSub$vegeclass[j]],code=0,lwd=mlw)
-				arrows(	xseq[j],betaOut[[3]]$X0.5.[betaOut[[3]]$regID==i&betaOut[[3]]$vegeclass==vegeSub$vegeclass[j]],
-						xseq[j],betaOut[[3]]$X99.5.[betaOut[[3]]$regID==i&betaOut[[3]]$vegeclass==vegeSub$vegeclass[j]],
+				arrows(	xseq[j],betaOut[[3]]$X0.3.[betaOut[[3]]$regID==i&betaOut[[3]]$vegeclass==vegeSub$vegeclass[j]],
+						xseq[j],betaOut[[3]]$X99.7.[betaOut[[3]]$regID==i&betaOut[[3]]$vegeclass==vegeSub$vegeclass[j]],
 						code=0, lwd=alw)
 			}			
 		axis(1, xseq,rep("",length(xseq)), lwd.ticks=tlw)
@@ -427,8 +429,8 @@ for(i in 1:3){
 				}
 				arrows(xseq[j]-1,betaOut[[4]]$Mean[betaOut[[4]]$regID==i&betaOut[[4]]$vegeclass==vegeSub$vegeclass[j]],
 						xseq[j]+1,betaOut[[4]]$Mean[betaOut[[4]]$regID==i&betaOut[[4]]$vegeclass==vegeSub$vegeclass[j]],code=0,lwd=mlw)
-				arrows(	xseq[j],betaOut[[4]]$X0.5.[betaOut[[4]]$regID==i&betaOut[[4]]$vegeclass==vegeSub$vegeclass[j]],
-						xseq[j],betaOut[[4]]$X99.5.[betaOut[[4]]$regID==i&betaOut[[4]]$vegeclass==vegeSub$vegeclass[j]],
+				arrows(	xseq[j],betaOut[[4]]$X0.3.[betaOut[[4]]$regID==i&betaOut[[4]]$vegeclass==vegeSub$vegeclass[j]],
+						xseq[j],betaOut[[4]]$X99.7.[betaOut[[4]]$regID==i&betaOut[[4]]$vegeclass==vegeSub$vegeclass[j]],
 						code=0, lwd=alw)
 			}			
 		axis(1, xseq,rep("",length(xseq)), lwd.ticks=tlw)
@@ -461,8 +463,8 @@ for(i in 1:3){
 				}
 				arrows(xseq[j]-1,betaOut[[5]]$Mean[betaOut[[5]]$regID==i&betaOut[[5]]$vegeclass==vegeSub$vegeclass[j]],
 						xseq[j]+1,betaOut[[5]]$Mean[betaOut[[5]]$regID==i&betaOut[[5]]$vegeclass==vegeSub$vegeclass[j]],code=0,lwd=mlw)
-				arrows(	xseq[j],betaOut[[5]]$X0.5.[betaOut[[5]]$regID==i&betaOut[[5]]$vegeclass==vegeSub$vegeclass[j]],
-						xseq[j],betaOut[[5]]$X99.5.[betaOut[[5]]$regID==i&betaOut[[5]]$vegeclass==vegeSub$vegeclass[j]],
+				arrows(	xseq[j],betaOut[[5]]$X0.3.[betaOut[[5]]$regID==i&betaOut[[5]]$vegeclass==vegeSub$vegeclass[j]],
+						xseq[j],betaOut[[5]]$X99.7.[betaOut[[5]]$regID==i&betaOut[[5]]$vegeclass==vegeSub$vegeclass[j]],
 						code=0, lwd=alw)
 			}			
 		axis(1, xseq,rep("",length(xseq)), lwd.ticks=tlw)
