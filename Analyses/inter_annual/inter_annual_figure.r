@@ -50,8 +50,8 @@ library(plyr)
 #set up a plot directory
 plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\interannual\\plots\\model"
 #model directory
-modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\interannual\\model\\run13"
-Nrun <- 13
+modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\interannual\\model\\run14"
+Nrun <- 14
 #indicate if a model run is occuring
 modRun <- 1
 
@@ -121,7 +121,7 @@ YearAll <- unique(data.frame(siteid=ParmAll$siteid,depth=ParmAll$depth,wyear=Par
 YearCount <- aggregate(YearAll$wyear, by=list(YearAll$depth,YearAll$siteid), FUN="length")
 colnames(YearCount) <- c("depth","siteid","nYear")
 #subset sites with at least 6 years
-YearSub <- YearCount[YearCount$nYear >=2,]
+YearSub <- YearCount[YearCount$nYear >=5,]
 
 #join vegeclass to see how many
 YearSub <- join(YearSub,datV, by="siteid",type="left")
@@ -201,11 +201,27 @@ airTempCurrentm <- aggregate(ParmAlls4$AMean,by=list(ParmAlls4$regID),FUN="mean"
 
 colnames(airTempCurrentm) <- c("regID","meanA")
 
-pastMaxave <- aggregate(ParmAlls4$MeanMax1,by=list(ParmAlls4$regID),FUN="mean")
-colnames(pastMaxave) <- c("regID","meanMax")
+#calculate long term average for anamalies
 
-pastMinave <- aggregate(ParmAlls4$MeanMin1,by=list(ParmAlls4$regID),FUN="mean")
-colnames(pastMinave) <- c("regID","meanMin")
+pastMaxave <- aggregate(Tmax$Mean,by=list(Tmax$siteid,Tmax$depth),FUN="mean")
+colnames(pastMaxave) <- c("siteid","depth","meanMax")
+#subset to only include site and depth in model
+siteforM <- unique(data.frame(depth=ParmAlls3$depth,siteid=ParmAlls3$siteid))
+pastMaxave <- join(pastMaxave,siteforM, by=c("siteid","depth"),type="inner")
+pastMaxave$siteDepthID <- seq(1,dim(pastMaxave)[1])
+
+pastMinave <- aggregate(Tmin$Mean,by=list(Tmin$siteid,Tmin$depth),FUN="mean")
+colnames(pastMinave) <- c("siteid","depth","meanMin")
+
+#join back into data frame
+ParmAlls4 <- join(ParmAlls4,pastMaxave,by=c("siteid","depth"),type="left")
+ParmAlls4 <- join(ParmAlls4,pastMinave,by=c("siteid","depth"),type="left")
+
+ParmAlls4$minAnom <- ParmAlls4$MeanMin1-ParmAlls4$meanMin
+ParmAlls4$maxAnom <- ParmAlls4$MeanMax1-ParmAlls4$meanMax
+
+
+
 
 #set up data for plotting
 seqDepth <- seq(0,20,length.out=100)
@@ -216,19 +232,19 @@ seqAir <- matrix(c(seq(round_any(range(ParmAlls4$AMean[ParmAlls4$regID==1])[1],5
 				seq(round_any(range(ParmAlls4$AMean[ParmAlls4$regID==3])[1],.05,floor),
 				round_any(range(ParmAlls4$AMean[ParmAlls4$regID==3])[2],.05,ceiling),length.out=100)),ncol=3,
 				byrow=FALSE)
-seqMax <- matrix(c(seq(round_any(range(ParmAlls4$MeanMax1[ParmAlls4$regID==1])[1],5,floor),
-				round_any(range(ParmAlls4$MeanMax1[ParmAlls4$regID==1])[2],5,ceiling),length.out=100),
-				seq(round_any(range(ParmAlls4$MeanMax1[ParmAlls4$regID==2])[1],5,floor),
-				round_any(range(ParmAlls4$MeanMax1[ParmAlls4$regID==2])[2],5,ceiling),length.out=100),
-				seq(round_any(range(ParmAlls4$MeanMax1[ParmAlls4$regID==3])[1],5,floor),
-				round_any(range(ParmAlls4$MeanMax1[ParmAlls4$regID==3])[2],5,ceiling),length.out=100)),ncol=3,
+seqMax <- matrix(c(seq(round_any(range(ParmAlls4$maxAnom[ParmAlls4$regID==1])[1],5,floor),
+				round_any(range(ParmAlls4$maxAnom[ParmAlls4$regID==1])[2],5,ceiling),length.out=100),
+				seq(round_any(range(ParmAlls4$maxAnom[ParmAlls4$regID==2])[1],5,floor),
+				round_any(range(ParmAlls4$maxAnom[ParmAlls4$regID==2])[2],5,ceiling),length.out=100),
+				seq(round_any(range(ParmAlls4$maxAnom[ParmAlls4$regID==3])[1],5,floor),
+				round_any(range(ParmAlls4$maxAnom[ParmAlls4$regID==3])[2],5,ceiling),length.out=100)),ncol=3,
 				byrow=FALSE)				
-seqMin <- matrix(c(seq(round_any(range(ParmAlls4$MeanMin1[ParmAlls4$regID==1])[1],5,floor),
-				round_any(range(ParmAlls4$MeanMin1[ParmAlls4$regID==1])[2],5,ceiling),length.out=100),
-				seq(round_any(range(ParmAlls4$MeanMin1[ParmAlls4$regID==2])[1],5,floor),
-				round_any(range(ParmAlls4$MeanMin1[ParmAlls4$regID==2])[2],5,ceiling),length.out=100),
-				seq(round_any(range(ParmAlls4$MeanMin1[ParmAlls4$regID==3])[1],5,floor),
-				round_any(range(ParmAlls4$MeanMin1[ParmAlls4$regID==3])[2],5,ceiling),length.out=100)),ncol=3,
+seqMin <- matrix(c(seq(round_any(range(ParmAlls4$minAnom[ParmAlls4$regID==1])[1],5,floor),
+				round_any(range(ParmAlls4$minAnom[ParmAlls4$regID==1])[2],5,ceiling),length.out=100),
+				seq(round_any(range(ParmAlls4$minAnom[ParmAlls4$regID==2])[1],5,floor),
+				round_any(range(ParmAlls4$minAnom[ParmAlls4$regID==2])[2],5,ceiling),length.out=100),
+				seq(round_any(range(ParmAlls4$minAnom[ParmAlls4$regID==3])[1],5,floor),
+				round_any(range(ParmAlls4$minAnom[ParmAlls4$regID==3])[2],5,ceiling),length.out=100)),ncol=3,
 				byrow=FALSE)
 
 #######################################
@@ -273,8 +289,8 @@ betaOut <- list(beta0,beta1,beta2,beta3,beta4)
 
 #create significance ID on each dataframe
 for(i in 1:5){
-	betaOut[[i]]$sigP <- ifelse(betaOut[[i]]$X0.3.<0&betaOut[[i]]$X99.7.<0,1,
-			ifelse(betaOut[[i]]$X0.3.>0&betaOut[[i]]$X99.7.>0,1,0))
+	betaOut[[i]]$sigP <- ifelse(betaOut[[i]]$X1.<0&betaOut[[i]]$X99.<0,1,
+			ifelse(betaOut[[i]]$X1.>0&betaOut[[i]]$X99.>0,1,0))
 }
 
 #extract means
@@ -312,7 +328,7 @@ hd <- 40
 #make a panel of parameters for each regression
 
 
-xseq <-c(1,4,7,10,13,16)
+xseq <-c(1,4)
 
 yli <- c(-20,0,0.3)
 yhi <- c(0,15,.65)
@@ -326,7 +342,7 @@ yls4 <- c(-.2,-.2,-.01)
 yhs4 <- c(1.2,.4,.01)
 
 xl <- -1
-xh <- 18
+xh <- 6
 alw <- 2
 zlw <- 10
 mlw <- 5
@@ -361,8 +377,8 @@ for(i in 1:3){
 						col="tomato3",border=NA)
 				arrows(xseq[j]-1,betaOut[[1]]$Mean[betaOut[[1]]$regID==i&betaOut[[1]]$vegeclass==vegeSub$vegeclass[j]],
 						xseq[j]+1,betaOut[[1]]$Mean[betaOut[[1]]$regID==i&betaOut[[1]]$vegeclass==vegeSub$vegeclass[j]],code=0,lwd=mlw)
-				arrows(	xseq[j],betaOut[[1]]$X0.3.[betaOut[[1]]$regID==i&betaOut[[1]]$vegeclass==vegeSub$vegeclass[j]],
-						xseq[j],betaOut[[1]]$X99.7.[betaOut[[1]]$regID==i&betaOut[[1]]$vegeclass==vegeSub$vegeclass[j]],
+				arrows(	xseq[j],betaOut[[1]]$X1.[betaOut[[1]]$regID==i&betaOut[[1]]$vegeclass==vegeSub$vegeclass[j]],
+						xseq[j],betaOut[[1]]$X99.[betaOut[[1]]$regID==i&betaOut[[1]]$vegeclass==vegeSub$vegeclass[j]],
 						code=0, lwd=alw)
 			}
 		axis(1, xseq,rep("",length(xseq)), lwd.ticks=tlw)
@@ -395,8 +411,8 @@ for(i in 1:3){
 				}
 				arrows(xseq[j]-1,betaOut[[2]]$Mean[betaOut[[2]]$regID==i&betaOut[[2]]$vegeclass==vegeSub$vegeclass[j]],
 						xseq[j]+1,betaOut[[2]]$Mean[betaOut[[2]]$regID==i&betaOut[[2]]$vegeclass==vegeSub$vegeclass[j]],code=0,lwd=mlw)
-				arrows(	xseq[j],betaOut[[2]]$X0.3.[betaOut[[2]]$regID==i&betaOut[[2]]$vegeclass==vegeSub$vegeclass[j]],
-						xseq[j],betaOut[[2]]$X99.7.[betaOut[[2]]$regID==i&betaOut[[2]]$vegeclass==vegeSub$vegeclass[j]],
+				arrows(	xseq[j],betaOut[[2]]$X1.[betaOut[[2]]$regID==i&betaOut[[2]]$vegeclass==vegeSub$vegeclass[j]],
+						xseq[j],betaOut[[2]]$X99.[betaOut[[2]]$regID==i&betaOut[[2]]$vegeclass==vegeSub$vegeclass[j]],
 						code=0, lwd=alw)
 			}			
 		axis(1, xseq,rep("",length(xseq)), lwd.ticks=tlw)
@@ -428,8 +444,8 @@ for(i in 1:3){
 				}
 				arrows(xseq[j]-1,betaOut[[3]]$Mean[betaOut[[3]]$regID==i&betaOut[[3]]$vegeclass==vegeSub$vegeclass[j]],
 						xseq[j]+1,betaOut[[3]]$Mean[betaOut[[3]]$regID==i&betaOut[[3]]$vegeclass==vegeSub$vegeclass[j]],code=0,lwd=mlw)
-				arrows(	xseq[j],betaOut[[3]]$X0.3.[betaOut[[3]]$regID==i&betaOut[[3]]$vegeclass==vegeSub$vegeclass[j]],
-						xseq[j],betaOut[[3]]$X99.7.[betaOut[[3]]$regID==i&betaOut[[3]]$vegeclass==vegeSub$vegeclass[j]],
+				arrows(	xseq[j],betaOut[[3]]$X1.[betaOut[[3]]$regID==i&betaOut[[3]]$vegeclass==vegeSub$vegeclass[j]],
+						xseq[j],betaOut[[3]]$X99.[betaOut[[3]]$regID==i&betaOut[[3]]$vegeclass==vegeSub$vegeclass[j]],
 						code=0, lwd=alw)
 			}			
 		axis(1, xseq,rep("",length(xseq)), lwd.ticks=tlw)
@@ -461,8 +477,8 @@ for(i in 1:3){
 				}
 				arrows(xseq[j]-1,betaOut[[4]]$Mean[betaOut[[4]]$regID==i&betaOut[[4]]$vegeclass==vegeSub$vegeclass[j]],
 						xseq[j]+1,betaOut[[4]]$Mean[betaOut[[4]]$regID==i&betaOut[[4]]$vegeclass==vegeSub$vegeclass[j]],code=0,lwd=mlw)
-				arrows(	xseq[j],betaOut[[4]]$X0.3.[betaOut[[4]]$regID==i&betaOut[[4]]$vegeclass==vegeSub$vegeclass[j]],
-						xseq[j],betaOut[[4]]$X99.7.[betaOut[[4]]$regID==i&betaOut[[4]]$vegeclass==vegeSub$vegeclass[j]],
+				arrows(	xseq[j],betaOut[[4]]$X1.[betaOut[[4]]$regID==i&betaOut[[4]]$vegeclass==vegeSub$vegeclass[j]],
+						xseq[j],betaOut[[4]]$X99.[betaOut[[4]]$regID==i&betaOut[[4]]$vegeclass==vegeSub$vegeclass[j]],
 						code=0, lwd=alw)
 			}			
 		axis(1, xseq,rep("",length(xseq)), lwd.ticks=tlw)
@@ -495,8 +511,8 @@ for(i in 1:3){
 				}
 				arrows(xseq[j]-1,betaOut[[5]]$Mean[betaOut[[5]]$regID==i&betaOut[[5]]$vegeclass==vegeSub$vegeclass[j]],
 						xseq[j]+1,betaOut[[5]]$Mean[betaOut[[5]]$regID==i&betaOut[[5]]$vegeclass==vegeSub$vegeclass[j]],code=0,lwd=mlw)
-				arrows(	xseq[j],betaOut[[5]]$X0.3.[betaOut[[5]]$regID==i&betaOut[[5]]$vegeclass==vegeSub$vegeclass[j]],
-						xseq[j],betaOut[[5]]$X99.7.[betaOut[[5]]$regID==i&betaOut[[5]]$vegeclass==vegeSub$vegeclass[j]],
+				arrows(	xseq[j],betaOut[[5]]$X1.[betaOut[[5]]$regID==i&betaOut[[5]]$vegeclass==vegeSub$vegeclass[j]],
+						xseq[j],betaOut[[5]]$X99.[betaOut[[5]]$regID==i&betaOut[[5]]$vegeclass==vegeSub$vegeclass[j]],
 						code=0, lwd=alw)
 			}			
 		axis(1, xseq,rep("",length(xseq)), lwd.ticks=tlw)
@@ -601,21 +617,21 @@ xh1 <- c(round_any(range(ParmAlls4$AMean[ParmAlls4$regID==1])[2],5,ceiling),
 			round_any(range(ParmAlls4$AMean[ParmAlls4$regID==2])[2],5,ceiling),
 			round_any(range(ParmAlls4$AMean[ParmAlls4$regID==3])[2],.05,ceiling))
 
-xl2 <- c(round_any(range(ParmAlls4$MeanMax1[ParmAlls4$regID==1])[1],5,floor),
-			round_any(range(ParmAlls4$MeanMax1[ParmAlls4$regID==2])[1],5,floor),
-			round_any(range(ParmAlls4$MeanMax1[ParmAlls4$regID==3])[1],5,floor))
+xl2 <- c(round_any(range(ParmAlls4$maxAnom[ParmAlls4$regID==1])[1],5,floor),
+			round_any(range(ParmAlls4$maxAnom[ParmAlls4$regID==2])[1],5,floor),
+			round_any(range(ParmAlls4$maxAnom[ParmAlls4$regID==3])[1],5,floor))
 			
-xh2 <- c(round_any(range(ParmAlls4$MeanMax1[ParmAlls4$regID==1])[2],5,ceiling),
-			round_any(range(ParmAlls4$MeanMax1[ParmAlls4$regID==2])[2],5,ceiling),
-			round_any(range(ParmAlls4$MeanMax1[ParmAlls4$regID==3])[2],5,ceiling))
+xh2 <- c(round_any(range(ParmAlls4$maxAnom[ParmAlls4$regID==1])[2],5,ceiling),
+			round_any(range(ParmAlls4$maxAnom[ParmAlls4$regID==2])[2],5,ceiling),
+			round_any(range(ParmAlls4$maxAnom[ParmAlls4$regID==3])[2],5,ceiling))
 
-xl3 <- c(round_any(range(ParmAlls4$MeanMin1[ParmAlls4$regID==1])[1],5,floor),
-			round_any(range(ParmAlls4$MeanMin1[ParmAlls4$regID==2])[1],5,floor),
-			round_any(range(ParmAlls4$MeanMin1[ParmAlls4$regID==3])[1],5,floor))
+xl3 <- c(round_any(range(ParmAlls4$minAnom[ParmAlls4$regID==1])[1],5,floor),
+			round_any(range(ParmAlls4$minAnom[ParmAlls4$regID==2])[1],5,floor),
+			round_any(range(ParmAlls4$minAnom[ParmAlls4$regID==3])[1],5,floor))
 
-xh3 <- c(round_any(range(ParmAlls4$MeanMin1[ParmAlls4$regID==1])[2],5,ceiling),
-			round_any(range(ParmAlls4$MeanMin1[ParmAlls4$regID==2])[2],5,ceiling),
-			round_any(range(ParmAlls4$MeanMin1[ParmAlls4$regID==3])[2],5,ceiling))
+xh3 <- c(round_any(range(ParmAlls4$minAnom[ParmAlls4$regID==1])[2],5,ceiling),
+			round_any(range(ParmAlls4$minAnom[ParmAlls4$regID==2])[2],5,ceiling),
+			round_any(range(ParmAlls4$minAnom[ParmAlls4$regID==3])[2],5,ceiling))
 
 yl <- c(-35,0,0)
 yh <- c(0,25,.65)			
@@ -639,8 +655,8 @@ jpeg(paste0(plotDI,"\\run",Nrun,"\\regression.jpg"), width=5000,height=5000,
 				
 				if(betaOut[[3]]$sigP[betaOut[[3]]$regID==i&betaOut[[3]]$vegeclass==vegeSub$vegeclass[j]]==1){
 					polygon(c(seqAir[,i],rev(seqAir[,i])),
-							c(muAir$X0.3.[muAir$regID==i&muAir$vegeclass==vegeSub$vegeclass[j]],
-							rev(muAir$X99.7.[muAir$regID==i&muAir$vegeclass==vegeSub$vegeclass[j]])),
+							c(muAir$X1.[muAir$regID==i&muAir$vegeclass==vegeSub$vegeclass[j]],
+							rev(muAir$X99.[muAir$regID==i&muAir$vegeclass==vegeSub$vegeclass[j]])),
 							border=NA,col=vegeSub$colrgb[j])
 					points(seqAir[,i],
 						muAir$Mean[muAir$regID==i&muAir$vegeclass==vegeSub$vegeclass[j]],
@@ -649,8 +665,8 @@ jpeg(paste0(plotDI,"\\run",Nrun,"\\regression.jpg"), width=5000,height=5000,
 					abline(h=betaOut[[1]]$Mean[betaOut[[1]]$regID==i&betaOut[[1]]$vegeclass==vegeSub$vegeclass[j]],
 						lwd=mlw,lty=2,,col=as.character(vegeSub$coli[j]))
 					polygon(c(seqAir[,i],rev(seqAir[,i])),
-							c(rep(betaOut[[1]]$X0.3.[betaOut[[1]]$regID==i&betaOut[[1]]$vegeclass==vegeSub$vegeclass[j]],100),
-							rep(betaOut[[1]]$X99.7.[betaOut[[1]]$regID==i&betaOut[[1]]$vegeclass==vegeSub$vegeclass[j]],100)),
+							c(rep(betaOut[[1]]$X1.[betaOut[[1]]$regID==i&betaOut[[1]]$vegeclass==vegeSub$vegeclass[j]],100),
+							rep(betaOut[[1]]$X9[betaOut[[1]]$regID==i&betaOut[[1]]$vegeclass==vegeSub$vegeclass[j]],100)),
 							border=NA,col=vegeSub$colrgb[j])
 				}
 			}
@@ -660,14 +676,14 @@ jpeg(paste0(plotDI,"\\run",Nrun,"\\regression.jpg"), width=5000,height=5000,
 			plot(c(0,1),c(0,1), ylim=c(yl[i],yh[i]), xlim=c(xl2[i],xh2[i]),
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
 			for(j in 1:dim(vegeSub)[1]){
-				points(ParmAlls4$MeanMax1[ParmAlls4$regID==i&ParmAlls4$vegeclass==vegeSub$vegeclass[j]],
+				points(ParmAlls4$maxAnom[ParmAlls4$regID==i&ParmAlls4$vegeclass==vegeSub$vegeclass[j]],
 						ParmAlls4$Mean[ParmAlls4$regID==i&ParmAlls4$vegeclass==vegeSub$vegeclass[j]],
 						col=as.character(vegeSub$coli[j]),pch=19,cex=px)
 			
 				if(betaOut[[4]]$sigP[betaOut[[4]]$regID==i&betaOut[[4]]$vegeclass==vegeSub$vegeclass[j]]==1){
 					polygon(c(seqMax[,i],rev(seqMax[,i])),
-							c(muMax$X0.3.[muMax$regID==i&muMax$vegeclass==vegeSub$vegeclass[j]],
-							rev(muMax$X99.7.[muMax$regID==i&muMax$vegeclass==vegeSub$vegeclass[j]])),
+							c(muMax$X1.[muMax$regID==i&muMax$vegeclass==vegeSub$vegeclass[j]],
+							rev(muMax$X99.[muMax$regID==i&muMax$vegeclass==vegeSub$vegeclass[j]])),
 							border=NA,col=vegeSub$colrgb[j])
 					points(seqMax[,i],
 						muMax$Mean[muMax$regID==i&muMax$vegeclass==vegeSub$vegeclass[j]],
@@ -676,8 +692,8 @@ jpeg(paste0(plotDI,"\\run",Nrun,"\\regression.jpg"), width=5000,height=5000,
 					abline(h=betaOut[[1]]$Mean[betaOut[[1]]$regID==i&betaOut[[1]]$vegeclass==vegeSub$vegeclass[j]],
 						lwd=mlw,lty=2,,col=as.character(vegeSub$coli[j]))
 					polygon(c(seqMax[,i],rev(seqMax[,i])),
-							c(rep(betaOut[[1]]$X0.3.[betaOut[[1]]$regID==i&betaOut[[1]]$vegeclass==vegeSub$vegeclass[j]],100),
-							rep(betaOut[[1]]$X99.7.[betaOut[[1]]$regID==i&betaOut[[1]]$vegeclass==vegeSub$vegeclass[j]],100)),
+							c(rep(betaOut[[1]]$X1.[betaOut[[1]]$regID==i&betaOut[[1]]$vegeclass==vegeSub$vegeclass[j]],100),
+							rep(betaOut[[1]]$X99.[betaOut[[1]]$regID==i&betaOut[[1]]$vegeclass==vegeSub$vegeclass[j]],100)),
 							border=NA,col=vegeSub$colrgb[j])
 					}
 			}	
@@ -686,7 +702,7 @@ jpeg(paste0(plotDI,"\\run",Nrun,"\\regression.jpg"), width=5000,height=5000,
 			plot(c(0,1),c(0,1), ylim=c(yl[i],yh[i]), xlim=c(xl3[i],xh3[i]),
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
 			for(j in 1:dim(vegeSub)[1]){
-				points(ParmAlls4$MeanMin1[ParmAlls4$regID==i&ParmAlls4$vegeclass==vegeSub$vegeclass[j]],
+				points(ParmAlls4$minAnom[ParmAlls4$regID==i&ParmAlls4$vegeclass==vegeSub$vegeclass[j]],
 						ParmAlls4$Mean[ParmAlls4$regID==i&ParmAlls4$vegeclass==vegeSub$vegeclass[j]],
 						col=as.character(vegeSub$coli[j]),pch=19,cex=px)
 											
@@ -694,8 +710,8 @@ jpeg(paste0(plotDI,"\\run",Nrun,"\\regression.jpg"), width=5000,height=5000,
 			
 				if(betaOut[[5]]$sigP[betaOut[[5]]$regID==i&betaOut[[5]]$vegeclass==vegeSub$vegeclass[j]]==1){
 					polygon(c(seqMin[,i],rev(seqMin[,i])),
-							c(muMin$X0.3.[muMin$regID==i&muMin$vegeclass==vegeSub$vegeclass[j]],
-							rev(muMin$X99.7.[muMin$regID==i&muMin$vegeclass==vegeSub$vegeclass[j]])),
+							c(muMin$X1.[muMin$regID==i&muMin$vegeclass==vegeSub$vegeclass[j]],
+							rev(muMin$X99.[muMin$regID==i&muMin$vegeclass==vegeSub$vegeclass[j]])),
 							border=NA,col=vegeSub$colrgb[j])
 					points(seqMin[,i],
 						muMin$Mean[muMin$regID==i&muMin$vegeclass==vegeSub$vegeclass[j]],
@@ -704,8 +720,8 @@ jpeg(paste0(plotDI,"\\run",Nrun,"\\regression.jpg"), width=5000,height=5000,
 					abline(h=betaOut[[1]]$Mean[betaOut[[1]]$regID==i&betaOut[[1]]$vegeclass==vegeSub$vegeclass[j]],
 						lwd=mlw,lty=2,,col=as.character(vegeSub$coli[j]))
 					polygon(c(seqMin[,i],rev(seqMin[,i])),
-							c(rep(betaOut[[1]]$X0.3.[betaOut[[1]]$regID==i&betaOut[[1]]$vegeclass==vegeSub$vegeclass[j]],100),
-							rep(betaOut[[1]]$X99.7.[betaOut[[1]]$regID==i&betaOut[[1]]$vegeclass==vegeSub$vegeclass[j]],100)),
+							c(rep(betaOut[[1]]$X1.[betaOut[[1]]$regID==i&betaOut[[1]]$vegeclass==vegeSub$vegeclass[j]],100),
+							rep(betaOut[[1]]$X99.[betaOut[[1]]$regID==i&betaOut[[1]]$vegeclass==vegeSub$vegeclass[j]],100)),
 							border=NA,col=vegeSub$colrgb[j])
 					}
 			}		

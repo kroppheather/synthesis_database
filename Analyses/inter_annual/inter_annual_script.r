@@ -221,19 +221,8 @@ ParmAlls4 <- join(ParmAlls4,pastMinave,by=c("siteid","depth"),type="left")
 ParmAlls4$minAnom <- ParmAlls4$MeanMin1-ParmAlls4$meanMin
 ParmAlls4$maxAnom <- ParmAlls4$MeanMax1-ParmAlls4$meanMax
 
-#organize by site and depth
-ParmAlls4 <- ParmAlls4[order(ParmAlls4$siteDepthID),]
 
-#get start and end of data for each site and depth
-rowC <- list()
-startAve <- numeric(0)
-endAve <- numeric(0)
-for(i in 1:dim(pastMaxave)[1]){
-	rowC[[i]] <- which(ParmAlls4$siteDepthID==i)
-	startAve[i] <- rowC[[i]][1]
-	endAve[i] <- rowC[[i]][length(rowC[[i]])]
 
-}
 
 #set up data for plotting
 seqDepth <- seq(0,20,length.out=100)
@@ -265,17 +254,17 @@ datalist <- list(Nobs=dim(ParmAlls4)[1],
 					SoilP=ParmAlls4$Mean,
 					regVege=ParmAlls4$regvegeID,
 					depth=ParmAlls4$depth,
-					AirPbar=airTempCurrentm$meanA,
+					SiteAirMean=airTempCurrentm$meanA,
 					reg=ParmAlls4$regID,
 					sigMod=ParmAlls4$SD,
 					AirP=ParmAlls4$AMean,
 					sig.AirP=ParmAlls4$ASD,
 					pastMax=ParmAlls4$MeanMax1,
 					sig.pastMax=ParmAlls4$SDMax1,
-					meanpastMax=pastMaxave$meanMax,
+					SiteMaxMean=ParmAlls4$meanMax,
 					pastMin=ParmAlls4$MeanMin1,
 					sig.pastMin=ParmAlls4$SDMin1,					
-					meanpastMin=pastMinave$meanMin,
+					SiteMinMean=ParmAlls4$meanMin,
 					NregVege=dim(regVegeDF)[1],
 					regV=regVegeDF$regID,
 					seqDepth=seqDepth,

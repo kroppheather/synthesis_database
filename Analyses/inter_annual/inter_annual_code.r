@@ -11,9 +11,9 @@ model{
 	for(i in 1:Nobs){
 		SoilP[i] ~ dnorm(mu.Soil[i],tau.Soil[i])
 		#mean model
-		mu.Soil[i] <- beta0[regVege[i]]+ beta1[regVege[i]]*depth[i] + beta2[regVege[i]]*(mu.AirP[i]-SiteAirMean[siteDepthID[i]]) 
-						+ beta3[regVege[i]]*(mu.pastMax[i]-SiteMaxMean[siteDepthID[i]])+
-						beta4[regVege[i]]*(mu.pastMin[i]-SiteMinMean[siteDepthID[i]])
+		mu.Soil[i] <- beta0[regVege[i]]+ beta1[regVege[i]]*depth[i] + beta2[regVege[i]]*(mu.AirP[i]-SiteAirMean[reg[i]]) 
+						+ beta3[regVege[i]]*(mu.pastMax[i]-SiteMaxMean[i])+
+						beta4[regVege[i]]*(mu.pastMin[i]-SiteMinMean[i])
 		#standard deviation that accounts for parameter standard deviation
 		tau.Soil[i] <- pow(sig.Soil[i],-2)
 		sig.Soil[i] <- sigMod[i] + sigSoilV[regVege[i]]
@@ -36,7 +36,7 @@ model{
 	for(i in 1:NmuPlot){
 		for(j in 1:NregVege){
 			plotDepth[i,j] <- beta0[j] + beta1[j] * seqDepth[i]
-			plotAir[i,j] <- beta0[j] + beta2[j] * (seqAir[i,regV[j]]-AirPbar[regV[j]])
+			plotAir[i,j] <- beta0[j] + beta2[j] * (seqAir[i,regV[j]]-SiteAirMean[regV[j]])
 			plotMax[i,j] <- beta0[j] + beta3[j] * (seqMax[i,regV[j]])
 			plotMin[i,j] <- beta0[j] + beta4[j] * (seqMin[i,regV[j]])
 		}
