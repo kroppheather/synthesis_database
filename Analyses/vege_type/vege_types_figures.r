@@ -370,3 +370,284 @@ for(i in 1:3){
 	dev.off()
 }
 
+#######################################
+#####plot just intercept          ##### 
+#######################################
+datVI$name2 <- c("herb barren", "graminoid tundra","tussock tundra","short shrub tundra","tall shrub tundra",
+					"wetland","evergreen needleleaf boreal","deciduous needleleaf boreal","mixed boreal")
+wd <- 55
+hd <- 30
+
+
+#make a panel of parameters for each regression
+
+
+xseq <-c(1,4,7,10,13,16,19,22,25)
+
+yli <- c(-35,0,0.2)
+yhi <- c(10,25,.65)
+yii <- c(5,5,.05)
+xl <- -1
+xh <- 27
+#mean line width
+mlw <- 6
+#arrow line width
+alw <- 4
+#lwd of ticks
+tlw <- 5
+#size of x labels
+axc <- 5
+#line of x label
+xll <- 2
+#line for units
+yll1 <- 20
+#line for name
+yll2 <- 30
+#cex of axis label
+mcx <- 6
+
+
+
+jpeg(paste0(plotDI,"\\run",Nrun,"\\intercepts.jpg"), width=2500,height=4100,
+			quality=100,units="px")
+	layout(matrix(seq(1,3),ncol=1), width=rep(lcm(wd),3),height=rep(lcm(hd),3))
+		#plot intercept
+	
+		par(mai=c(1,0,0,0))
+		
+			plot(c(0,1),c(0,1), ylim=c(yli[1],yhi[1]), xlim=c(xl,xh),
+				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+			
+			for(j in 1:9){
+				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
+						c(beta0$X25.[beta0$regID==1&beta0$vegeclass==j],beta0$X75.[beta0$regID==1&beta0$vegeclass==j],
+							beta0$X75.[beta0$regID==1&beta0$vegeclass==j],beta0$X25.[beta0$regID==1&beta0$vegeclass==j]),
+						col="tomato3",border=NA)
+				arrows(xseq[j]-1,beta0$Mean[beta0$regID==1&beta0$vegeclass==j],
+						xseq[j]+1,beta0$Mean[beta0$regID==1&beta0$vegeclass==j],code=0,lwd=mlw)
+				arrows(	xseq[j],beta0$X0.2.[beta0$regID==1&beta0$vegeclass==j],
+						xseq[j],beta0$X99.8.[beta0$regID==1&beta0$vegeclass==j],
+						code=0, lwd=alw)
+				}
+			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw)
+			axis(2, seq(yli[1],yhi[1], by=yii[1]), rep(" ",length(seq(yli[1],yhi[1], by=yii[1]))),
+				 lwd.ticks=tlw)
+			mtext(seq(yli[1],yhi[1], by=yii[1]),at=seq(yli[1],yhi[1], by=yii[1]), side=2, line=xll,cex=axc,las=2)	
+			mtext(expression(paste("(T"[max],","~degree~"C)")),side=2,line=yll1,cex=mcx)
+			mtext("Temperature minimum",side=2,line=yll2,cex=mcx)
+			
+		par(mai=c(1,0,0,0))
+		
+			plot(c(0,1),c(0,1), ylim=c(yli[2],yhi[2]), xlim=c(xl,xh),
+				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+			
+			for(j in 1:9){
+				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
+						c(beta0$X25.[beta0$regID==2&beta0$vegeclass==j],beta0$X75.[beta0$regID==2&beta0$vegeclass==j],
+							beta0$X75.[beta0$regID==2&beta0$vegeclass==j],beta0$X25.[beta0$regID==2&beta0$vegeclass==j]),
+						col="tomato3",border=NA)
+				arrows(xseq[j]-1,beta0$Mean[beta0$regID==2&beta0$vegeclass==j],
+						xseq[j]+1,beta0$Mean[beta0$regID==2&beta0$vegeclass==j],code=0,lwd=mlw)
+				arrows(	xseq[j],beta0$X0.2.[beta0$regID==2&beta0$vegeclass==j],
+						xseq[j],beta0$X99.8.[beta0$regID==2&beta0$vegeclass==j],
+						code=0, lwd=alw)
+				}
+			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw)
+			axis(2, seq(yli[2],yhi[2], by=yii[2]), rep(" ",length(seq(yli[2],yhi[2], by=yii[2]))),
+				 lwd.ticks=tlw)
+			mtext(seq(yli[2],yhi[2], by=yii[2]),at=seq(yli[2],yhi[2], by=yii[2]), side=2, line=xll,cex=axc,las=2)	
+			mtext(expression(paste("(T"[max],","~degree~"C)")),side=2,line=yll1,cex=mcx)			
+			mtext("Temperature maximum",side=2,line=yll2,cex=mcx)
+			
+				
+		par(mai=c(1,0,0,0))
+		
+			plot(c(0,1),c(0,1), ylim=c(yli[3],yhi[3]), xlim=c(xl,xh),
+				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+			
+			for(j in 1:9){
+				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
+						c(beta0$X25.[beta0$regID==3&beta0$vegeclass==j],beta0$X75.[beta0$regID==3&beta0$vegeclass==j],
+							beta0$X75.[beta0$regID==3&beta0$vegeclass==j],beta0$X25.[beta0$regID==3&beta0$vegeclass==j]),
+						col="tomato3",border=NA)
+				arrows(xseq[j]-1,beta0$Mean[beta0$regID==3&beta0$vegeclass==j],
+						xseq[j]+1,beta0$Mean[beta0$regID==3&beta0$vegeclass==j],code=0,lwd=mlw)
+				arrows(	xseq[j],beta0$X0.2.[beta0$regID==3&beta0$vegeclass==j],
+						xseq[j],beta0$X99.8.[beta0$regID==3&beta0$vegeclass==j],
+						code=0, lwd=alw)
+				}
+			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw)
+			axis(2, seq(yli[3],yhi[3], by=yii[3]), rep(" ",length(seq(yli[3],yhi[3], by=yii[3]))),
+				 lwd.ticks=tlw)
+			mtext(seq(yli[3],yhi[3], by=yii[3]),at=seq(yli[3],yhi[3], by=yii[3]), side=2, line=xll,cex=axc,las=2)	
+			mtext(expression(paste("(p"[min],", proportion of water year)")),side=2,line=yll1,cex=mcx)		
+			mtext("Time of minimum",side=2,line=yll2,cex=mcx)			
+			mtext(datVI$name2,at=xseq, side=1, line=xll,cex=axc,las=2)
+
+				
+			
+dev.off()	
+
+
+
+#######################################
+#####plot just air slope          ##### 
+#######################################
+datVI$name2 <- c("herb barren", "graminoid tundra","tussock tundra","short shrub tundra","tall shrub tundra",
+					"wetland","evergreen needleleaf boreal","deciduous needleleaf boreal","mixed boreal")
+wd <- 55
+hd <- 30
+
+
+#make a panel of parameters for each regression
+
+
+xseq <-c(1,4,7,10,13,16,19,22,25)
+
+yli <- c(-1,-1,-2.5)
+yhi <- c(1.5,2,2)
+yii <- c(.5,.5,.5)
+xl <- -1
+xh <- 27
+#mean line width
+mlw <- 6
+#arrow line width
+alw <- 4
+#lwd of ticks
+tlw <- 5
+#size of x labels
+axc <- 5
+#line of x label
+xll <- 2
+#line for units
+yll1 <- 20
+#line for name
+yll2 <- 30
+#second line for name
+yll3 <- 40
+#cex of axis label
+mcx <- 6
+
+
+
+jpeg(paste0(plotDI,"\\run",Nrun,"\\air_slopes.jpg"), width=2700,height=4100,
+			quality=100,units="px")
+	layout(matrix(seq(1,3),ncol=1), width=rep(lcm(wd),3),height=rep(lcm(hd),3))
+		#plot intercept
+	
+		par(mai=c(1,0,0,0))
+		
+			plot(c(0,1),c(0,1), ylim=c(yli[1],yhi[1]), xlim=c(xl,xh),
+				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+			
+			for(j in 1:9){
+				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
+						c(beta2$X25.[beta2$regID==1&beta2$vegeclass==j],beta2$X75.[beta2$regID==1&beta2$vegeclass==j],
+							beta2$X75.[beta2$regID==1&beta2$vegeclass==j],beta2$X25.[beta2$regID==1&beta2$vegeclass==j]),
+						col="tomato3",border=NA)
+				arrows(xseq[j]-1,beta2$Mean[beta2$regID==1&beta2$vegeclass==j],
+						xseq[j]+1,beta2$Mean[beta2$regID==1&beta2$vegeclass==j],code=0,lwd=mlw)
+				arrows(	xseq[j],beta2$X0.2.[beta2$regID==1&beta2$vegeclass==j],
+						xseq[j],beta2$X99.8.[beta2$regID==1&beta2$vegeclass==j],
+						code=0, lwd=alw)
+				}
+			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw)
+			axis(2, seq(yli[1],yhi[1], by=yii[1]), rep(" ",length(seq(yli[1],yhi[1], by=yii[1]))),
+				 lwd.ticks=tlw)
+			mtext(seq(yli[1],yhi[1], by=yii[1]),at=seq(yli[1],yhi[1], by=yii[1]), side=2, line=xll,cex=axc,las=2)	
+			mtext(expression(paste("("~degree~"C soil"~degree~"C air"^"-1",")")),side=2,line=yll1,cex=mcx)
+			mtext("Change in",side=2,line=yll3,cex=mcx)
+			mtext("temperature minimum",side=2,line=yll2,cex=mcx)
+		par(mai=c(1,0,0,0))
+		
+			plot(c(0,1),c(0,1), ylim=c(yli[2],yhi[2]), xlim=c(xl,xh),
+				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+			
+			for(j in 1:9){
+				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
+						c(beta2$X25.[beta2$regID==2&beta2$vegeclass==j],beta2$X75.[beta2$regID==2&beta2$vegeclass==j],
+							beta2$X75.[beta2$regID==2&beta2$vegeclass==j],beta2$X25.[beta2$regID==2&beta2$vegeclass==j]),
+						col="tomato3",border=NA)
+				arrows(xseq[j]-1,beta2$Mean[beta2$regID==2&beta2$vegeclass==j],
+						xseq[j]+1,beta2$Mean[beta2$regID==2&beta2$vegeclass==j],code=0,lwd=mlw)
+				arrows(	xseq[j],beta2$X0.2.[beta2$regID==2&beta2$vegeclass==j],
+						xseq[j],beta2$X99.8.[beta2$regID==2&beta2$vegeclass==j],
+						code=0, lwd=alw)
+				}
+			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw)
+			axis(2, seq(yli[2],yhi[2], by=yii[2]), rep(" ",length(seq(yli[2],yhi[2], by=yii[2]))),
+				 lwd.ticks=tlw)
+			mtext(seq(yli[2],yhi[2], by=yii[2]),at=seq(yli[2],yhi[2], by=yii[2]), side=2, line=xll,cex=axc,las=2)	
+		mtext(expression(paste("("~degree~"C soil"~degree~"C air"^"-1",")")),side=2,line=yll1,cex=mcx)
+			mtext("Change in",side=2,line=yll3,cex=mcx)
+			mtext("temperature maximum",side=2,line=yll2,cex=mcx)
+			
+				
+		par(mai=c(1,0,0,0))
+		
+			plot(c(0,1),c(0,1), ylim=c(yli[3],yhi[3]), xlim=c(xl,xh),
+				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+			
+			for(j in 1:9){
+				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
+						c(beta2$X25.[beta2$regID==3&beta2$vegeclass==j],beta2$X75.[beta2$regID==3&beta2$vegeclass==j],
+							beta2$X75.[beta2$regID==3&beta2$vegeclass==j],beta2$X25.[beta2$regID==3&beta2$vegeclass==j]),
+						col="tomato3",border=NA)
+				arrows(xseq[j]-1,beta2$Mean[beta2$regID==3&beta2$vegeclass==j],
+						xseq[j]+1,beta2$Mean[beta2$regID==3&beta2$vegeclass==j],code=0,lwd=mlw)
+				arrows(	xseq[j],beta2$X0.2.[beta2$regID==3&beta2$vegeclass==j],
+						xseq[j],beta2$X99.8.[beta2$regID==3&beta2$vegeclass==j],
+						code=0, lwd=alw)
+				}
+			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw)
+			axis(2, seq(yli[3],yhi[3], by=yii[3]), rep(" ",length(seq(yli[3],yhi[3], by=yii[3]))),
+				 lwd.ticks=tlw)
+			mtext(seq(yli[3],yhi[3], by=yii[3]),at=seq(yli[3],yhi[3], by=yii[3]), side=2, line=xll,cex=axc,las=2)	
+		mtext(expression(paste("(proportion soil proportion air"^"-1",")")),side=2,line=yll1,cex=mcx)
+			mtext("Change in time of",side=2,line=yll3,cex=mcx)
+			mtext("temperature minimum",side=2,line=yll2,cex=mcx)		
+			mtext(datVI$name2,at=xseq, side=1, line=xll,cex=axc,las=2)
+
+				
+			
+dev.off()		
+
+
+#######################################
+#####plot regression              ##### 
+#######################################
+
+
+
+
+#vege class colors
+
+vegeclassColors <- data.frame(vegeclass=seq(1,9),
+					coli=c("grey50","grey25", "deepskyblue2","steelblue4","seagreen4","hotpink3","gold1","midnightblue","chocolate2"))
+vegeclassColors$colrgb <- c(rgb(127/255	,127/255,127/255,.25), rgb(63/255,63/255,63/255,.25),	rgb(0/255,178/255,238/255,.5),
+						rgb(54/255,100/255,139/255,.25),rgb(46/255,139/255,87/255,.25),rgb(205/255,96/255,144/255,.25),
+						rgb(255/255,215/255,0/255,.25),rgb(25/255,25/255,112/255,.25),rgb(238/255,118/255,33/255,.25))
+vegeclassColors$colrgb2 <- c(rgb(127/255	,127/255,127/255,.5),rgb(63/255,63/255,63/255,.5), 	rgb(0/255,178/255,238/255,.5),	
+						rgb(54/255,100/255,139/255,.5),rgb(46/255,139/255,87/255,.5),rgb(205/255,96/255,144/255,.5),
+						rgb(255/255,215/255,0/255,.5),rgb(25/255,25/255,112/255,.5),rgb(238/255,118/255,33/255,.5))
+
+						
+
+wd <- 30
+hd <- 30
+
+yli <- c(-35,0,0)
+yhi <- c(0,25,0.65)
+xli <- c(-35,0,0)
+xhi <- c(0,25,0.65)
+
+jpeg(paste0(plotDI,"\\run",Nrun,"\\air_slopes.jpg"), width=2700,height=4100,
+			quality=100,units="px")
+	layout(matrix(seq(1,3),ncol=1), width=rep(lcm(wd),3),height=rep(lcm(hd),3))
+		#plot intercept
+	
+		par(mai=c(1,0,0,0))
+		
+			plot(c(0,1),c(0,1), ylim=c(yli[1],yhi[1]), xlim=c(xl[1],xh[1]),
+				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+			
