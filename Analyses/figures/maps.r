@@ -162,7 +162,7 @@ wd2 <- 5
 
 yseq <- seq(1,9)
 
-jpeg(paste0(plotDI,"\\all_site_agg.jpg"),width=1500,height=1000)
+jpeg(paste0(plotDI,"\\all_site_agg.jpg"),width=1800,height=1000)
 	a <- layout(matrix(c(1,2),ncol=2), height=c(lcm(hd),lcm(hd)), width=c(lcm(wd),lcm(wd2)))
 	layout.show(a)
 	#set up empty plot
@@ -174,13 +174,13 @@ jpeg(paste0(plotDI,"\\all_site_agg.jpg"),width=1500,height=1000)
 	#continent color
 	polygon(c(world[,1],rev(world[,1])), c(world[,2],rev(world[,2])),col="cornsilk2",border=NA)
 	draw.pie(xyz.all$x,xyz.all$y,xyz.all$z,radius=250000,col=as.character(vegeclassColors$coli),border=NA)
-	points(mat.bc$x,mat.bc$y,pch=19,col="white",cex=2.5)
-	text(mat.bc$x,mat.bc$y,paste(mat.bc$NpolySite),cex=.9)
+	points(mat.bc$x,mat.bc$y,pch=19,col="white",cex=5)
+	text(mat.bc$x,mat.bc$y,paste(mat.bc$NpolySite),cex=1.5)
 	#plot vegeclass legend
 	plot(c(0,1),c(0,1), type="n", xlim=c(0,1), ylim=c(0,10), xaxs="i",yaxs="i",xlab=" ", ylab=" ",axes=FALSE)
 	for(i in 1:9){
 		polygon(c(0,0,1,1),c(yseq[i]-1,yseq[i],yseq[i],yseq[i]-1),col=as.character(vegeclassColors$coli[i]),border=NA)
 	}
 	axis(4,yseq-.5,rep(" ",9),lwd.ticks=2)
-	mtext(datVI$name,at=yseq-.5,cex=1,line=1,side=4,las=2)
+	mtext(datVI$name,at=yseq-.5,cex=2,line=1,side=4,las=2)
 dev.off()
