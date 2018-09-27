@@ -19,6 +19,7 @@ siteinfo <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\sitei
 datVI$name <- c("herb barren","graminoid tundra","tussock tundra","short shrub tundra","tall shrub tundra","wetland",
 				"evergreen needleleaf boreal","deciduous needleleaf boreal","mixed boreal")
 
+plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\map"				
 #######################################
 #####packages                     ##### 
 #######################################
@@ -123,27 +124,12 @@ all.sumV$propC <- all.sumV$nsites/all.sumV$NpolySite
 
 #join vegeclass colors in
 all.sumV <- join(all.sumV,vegeclassColors, by="vegeclass",type="left")
-
-
-#organize into dataframe
-all.mat <- matrix(rep(0,dim(bc)[1]*9),ncol=9)
-for(k in 1:dim(all.sumV)[1]){
-	for(i in 1:dim(bc)[1]){
-		for(j in 1:9){
-			if(all.sumV$vegeclass[k]==j&all.sumV$polyid[k]==i){
-				all.mat[i,j] <- all.sumV$propC[k]
-			}
-		}
-	}
-}
-
-colnames(all.mat) <- paste0("vegeclass",seq(1,9)) 
-all.mat <- cbind(all.sumS,all.mat)
-#add coords to all mat
-all.mat <- cbind(bc,all.mat)
+#join polygon coordinates
 mat.bc <- cbind(bc,all.sumS)
-
-
+all.sumV <- join(all.sumV,mat.bc,by="polyid",type="left")
+#turn into a smaller  dataframe
+propAll <- data.frame(vegeclass=all.sumV$vegeclass,x=all.sumV$x,y=all.sumV$y,propC=all.sumV$propC)
+xyz.all <- make.xyz(propAll$x,propAll$y,propAll$propC,propAll$vegeclass)
 #######################################
 #####basic map of all sites       ##### 						
 #######################################						
@@ -170,19 +156,31 @@ points(sites,pch=19)
 #####map of all sites aggregated  ##### 						
 #######################################	
 
-wd <- 20
-hd <- 20
+wd <- 30
+hd <- 30
+wd2 <- 5
 
-a <- layout(matrix(c(1),ncol=1), height=rep(lcm(hd),1), width=rep(lcm(wd),1))
-layout.show(a)
-#set up empty plot
-plot(world2,type="n",axes=FALSE,xlab=" ", ylab=" ")
-#color background
-polygon(c(-5000000,-5000000,5000000,5000000),c(-5000000,5000000,5000000,-5000000), border=NA, col=rgb(180/255,205/255,205/255,.5))
-#boundaries
-points(world, type="l", lwd=2, col="grey65")
-#continent color
-polygon(c(world[,1],rev(world[,1])), c(world[,2],rev(world[,2])),col="cornsilk2",border=NA)
+yseq <- seq(1,9)
 
-add.pie(all.sumV$propC[allsumV$polyid==3],mat.bc$x[3],mat.bc$y[3],col=as.character(allsumV$coli[allsumV$polyid==3]))
-
+jpeg(paste0(plotDI,"\\all_site_agg.jpg"),width=1500,height=1000)
+	a <- layout(matrix(c(1,2),ncol=2), height=c(lcm(hd),lcm(hd)), width=c(lcm(wd),lcm(wd2)))
+	layout.show(a)
+	#set up empty plot
+	plot(world2,type="n",axes=FALSE,xlab=" ", ylab=" ")
+	#color background
+	polygon(c(-5000000,-5000000,5000000,5000000),c(-5000000,5000000,5000000,-5000000), border=NA, col=rgb(180/255,205/255,205/255,.5))
+	#boundaries
+	points(world, type="l", lwd=2, col="grey65")
+	#continent color
+	polygon(c(world[,1],rev(world[,1])), c(world[,2],rev(world[,2])),col="cornsilk2",border=NA)
+	draw.pie(xyz.all$x,xyz.all$y,xyz.all$z,radius=250000,col=as.character(vegeclassColors$coli),border=NA)
+	points(mat.bc$x,mat.bc$y,pch=19,col="white",cex=2.5)
+	text(mat.bc$x,mat.bc$y,paste(mat.bc$NpolySite),cex=.9)
+	#plot vegeclass legend
+	plot(c(0,1),c(0,1), type="n", xlim=c(0,1), ylim=c(0,10), xaxs="i",yaxs="i",xlab=" ", ylab=" ",axes=FALSE)
+	for(i in 1:9){
+		polygon(c(0,0,1,1),c(yseq[i]-1,yseq[i],yseq[i],yseq[i]-1),col=as.character(vegeclassColors$coli[i]),border=NA)
+	}
+	axis(4,yseq-.5,rep(" ",9),lwd.ticks=2)
+	mtext(datVI$name,at=yseq-.5,cex=1,line=1,side=4,las=2)
+dev.off()
