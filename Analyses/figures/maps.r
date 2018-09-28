@@ -206,6 +206,65 @@ siteP <- cbind(siteP,sitesV)
 #set up spatial point class
 siteSPV <- SpatialPoints(sitesV)
 
+#####make buffers######
+
+#get buffer around points
+allBufferV <- buffer(siteSPV,70000)
+
+
+t.cV <- list()
+xV <- numeric(0)
+yV <- numeric(0)
+for(i in 1:19){
+	t.cV[[i]]<- allBufferV@polygons[[1]]@Polygons[[i]]@labpt
+	xV[i] <- t.cV[[i]][1]
+	yV[i] <- t.cV[[i]][2]
+	
+}
+bcV <- matrix(c(xV,yV),ncol=2,byrow=FALSE)
+colnames(bcV) <- c("x","y")
+#need to get all points contained in each buffer
+
+#check points in each buffer
+pbV <- list()
+polydfV <- matrix(rep(NA,dim(bcV)[1]*dim(siteP)[1]),ncol=dim(bcV)[1])
+for(i in 1:19){
+	pbV[[i]] <- point.in.polygon(siteP$X,siteP$Y,allBufferV@polygons[[1]]@Polygons[[i]]@coords[,1],allBufferV@polygons[[1]]@Polygons[[i]]@coords[,2])
+	polydfV[,i] <- pbV[[i]]
+}
+#find out which polygon each sties is in
+tpolyV <- numeric()
+for(i in 1:dim(siteP)[1]){
+	tpolyV[i] <- which(polydfV[i,]==1)
+}
+#now add site info to the polygon
+all.polyV <- data.frame(siteP,polyid=tpolyV)
+
+#now summarize the total number of each vege class in each polygon
+all.sumVV <- aggregate(all.polyV$siteid,by=list(all.polyV$vegeclass,all.polyV$polyid), FUN="length")
+colnames(all.sumVV) <- c("vegeclass","polyid","nsites")
+#get the total number of sites in each polygon
+all.sumSV <- aggregate(all.sumVV$nsites,by=list(all.sumVV$polyid),FUN="sum")
+colnames(all.sumSV) <- c("polyid","NpolySite")
+
+#join two back together
+all.sumVV <- join(all.sumVV,all.sumSV, by="polyid",type="left")
+#calculate proportion
+all.sumVV$propC <- all.sumVV$nsites/all.sumVV$NpolySite
+
+#join vegeclass colors in
+all.sumVV <- join(all.sumVV,vegeclassColors, by="vegeclass",type="left")
+#join polygon coordinates
+mat.bcV <- cbind(bcV,all.sumSV)
+all.sumVV <- join(all.sumVV,mat.bcV,by="polyid",type="left")
+#turn into a smaller  dataframe
+propAllV <- data.frame(vegeclass=all.sumVV$vegeclass,x=all.sumVV$x,y=all.sumVV$y,propC=all.sumVV$propC)
+xyz.allV <- make.xyz(propAllV$x,propAllV$y,propAllV$propC,propAllV$vegeclass)
+
+
+
+
+
 #######make plot ######
 
 wd <- 30
@@ -223,7 +282,15 @@ jpeg(paste0(plotDI,"\\vege_site_agg.jpg"),width=1800,height=1000)
 	points(world, type="l", lwd=2, col="grey65")
 	#continent color
 	polygon(c(world[,1],rev(world[,1])), c(world[,2],rev(world[,2])),col="cornsilk2",border=NA)
-	#add vegetation points
-	points(siteP$X,siteP$Y, pch=19,col=as.character(siteP$coli),cex=2)
+	draw.pie(xyz.allV$x,xyz.allV$y,xyz.allV$z,radius=250000,col=as.character(vegeclassColors$coli),border=NA)
+	points(mat.bcV$x,mat.bcV$y,pch=19,col="white",cex=5)
+	text(mat.bcV$x,mat.bcV$y,paste(mat.bcV$NpolySite),cex=1.5)
+	#plot legend
 	plot(c(0,1),c(0,1), type="n", xlim=c(0,1), ylim=c(0,10), xaxs="i",yaxs="i",xlab=" ", ylab=" ",axes=FALSE)
+		for(i in 1:9){
+		polygon(c(0,0,1,1),c(yseq[i]-1,yseq[i],yseq[i],yseq[i]-1),col=as.character(vegeclassColors$coli[i]),border=NA)
+	}
+	axis(4,yseq-.5,rep(" ",9),lwd.ticks=2)
+	mtext(datVI$name,at=yseq-.5,cex=2,line=1,side=4,las=2)
+	
 dev.off()	
