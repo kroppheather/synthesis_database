@@ -184,3 +184,46 @@ jpeg(paste0(plotDI,"\\all_site_agg.jpg"),width=1800,height=1000)
 	axis(4,yseq-.5,rep(" ",9),lwd.ticks=2)
 	mtext(datVI$name,at=yseq-.5,cex=2,line=1,side=4,las=2)
 dev.off()
+
+
+#######################################
+#####map of vege type sites       ##### 						
+#######################################	
+#get coordinates of sites used in vege type analysis
+coord.temp <- data.frame(siteid=siteinfo$site_id,lon=siteinfo$lon,lat=siteinfo$lat)
+siteP <- data.frame(siteid=unique(SoilParm$siteid))
+siteP <- join(siteP,coord.temp, by="siteid",type="left")
+#join vegeclass and 
+siteP <- join(siteP,datV,by="siteid",type="left")
+siteP <- join(siteP,vegeclassColors,by="vegeclass",type="left")
+
+#site coordinates
+sitesV <- project(matrix(c(siteP$lon,siteP$lat),ncol=2,byrow=FALSE),laea)
+colnames(sitesV) <- c("X","Y")
+#add back in to site info
+siteP <- cbind(siteP,sitesV)
+
+#set up spatial point class
+siteSPV <- SpatialPoints(sitesV)
+
+#######make plot ######
+
+wd <- 30
+hd <- 30
+wd2 <- 5
+
+jpeg(paste0(plotDI,"\\vege_site_agg.jpg"),width=1800,height=1000)
+	a <- layout(matrix(c(1,2),ncol=2), height=c(lcm(hd),lcm(hd)), width=c(lcm(wd),lcm(wd2)))
+	layout.show(a)
+	#set up empty plot
+	plot(world2,type="n",axes=FALSE,xlab=" ", ylab=" ")
+	#color background
+	polygon(c(-5000000,-5000000,5000000,5000000),c(-5000000,5000000,5000000,-5000000), border=NA, col=rgb(180/255,205/255,205/255,.5))
+	#boundaries
+	points(world, type="l", lwd=2, col="grey65")
+	#continent color
+	polygon(c(world[,1],rev(world[,1])), c(world[,2],rev(world[,2])),col="cornsilk2",border=NA)
+	#add vegetation points
+	points(siteP$X,siteP$Y, pch=19,col=as.character(siteP$coli),cex=2)
+	plot(c(0,1),c(0,1), type="n", xlim=c(0,1), ylim=c(0,10), xaxs="i",yaxs="i",xlab=" ", ylab=" ",axes=FALSE)
+dev.off()	
