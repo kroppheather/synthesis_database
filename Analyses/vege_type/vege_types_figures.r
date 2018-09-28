@@ -527,6 +527,8 @@ yll2 <- 30
 yll3 <- 40
 #cex of axis label
 mcx <- 6
+#zero line
+zlw <- 10
 
 
 
@@ -539,12 +541,19 @@ jpeg(paste0(plotDI,"\\run",Nrun,"\\air_slopes.jpg"), width=2700,height=4100,
 		
 			plot(c(0,1),c(0,1), ylim=c(yli[1],yhi[1]), xlim=c(xl,xh),
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
-			
+			abline(h=0,	lwd	=zlw, col="grey75",lty=3)
 			for(j in 1:9){
-				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
+				if(beta2$sigID[beta2$regID==1&beta2$vegeclass==j]==1){
+					polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
 						c(beta2$X25.[beta2$regID==1&beta2$vegeclass==j],beta2$X75.[beta2$regID==1&beta2$vegeclass==j],
 							beta2$X75.[beta2$regID==1&beta2$vegeclass==j],beta2$X25.[beta2$regID==1&beta2$vegeclass==j]),
 						col="tomato3",border=NA)
+				}else{
+					polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
+						c(beta2$X25.[beta2$regID==1&beta2$vegeclass==j],beta2$X75.[beta2$regID==1&beta2$vegeclass==j],
+							beta2$X75.[beta2$regID==1&beta2$vegeclass==j],beta2$X25.[beta2$regID==1&beta2$vegeclass==j]),
+						col="grey75",border=NA)
+				}
 				arrows(xseq[j]-1,beta2$Mean[beta2$regID==1&beta2$vegeclass==j],
 						xseq[j]+1,beta2$Mean[beta2$regID==1&beta2$vegeclass==j],code=0,lwd=mlw)
 				arrows(	xseq[j],beta2$X0.2.[beta2$regID==1&beta2$vegeclass==j],
@@ -562,12 +571,19 @@ jpeg(paste0(plotDI,"\\run",Nrun,"\\air_slopes.jpg"), width=2700,height=4100,
 		
 			plot(c(0,1),c(0,1), ylim=c(yli[2],yhi[2]), xlim=c(xl,xh),
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
-			
+			abline(h=0,	lwd	=zlw, col="grey75",lty=3)
 			for(j in 1:9){
-				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
+				if(beta2$sigID[beta2$regID==2&beta2$vegeclass==j]==1){
+					polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
 						c(beta2$X25.[beta2$regID==2&beta2$vegeclass==j],beta2$X75.[beta2$regID==2&beta2$vegeclass==j],
 							beta2$X75.[beta2$regID==2&beta2$vegeclass==j],beta2$X25.[beta2$regID==2&beta2$vegeclass==j]),
 						col="tomato3",border=NA)
+				}else{
+					polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
+						c(beta2$X25.[beta2$regID==2&beta2$vegeclass==j],beta2$X75.[beta2$regID==2&beta2$vegeclass==j],
+							beta2$X75.[beta2$regID==2&beta2$vegeclass==j],beta2$X25.[beta2$regID==2&beta2$vegeclass==j]),
+						col="grey75",border=NA)
+				}
 				arrows(xseq[j]-1,beta2$Mean[beta2$regID==2&beta2$vegeclass==j],
 						xseq[j]+1,beta2$Mean[beta2$regID==2&beta2$vegeclass==j],code=0,lwd=mlw)
 				arrows(	xseq[j],beta2$X0.2.[beta2$regID==2&beta2$vegeclass==j],
@@ -587,12 +603,19 @@ jpeg(paste0(plotDI,"\\run",Nrun,"\\air_slopes.jpg"), width=2700,height=4100,
 		
 			plot(c(0,1),c(0,1), ylim=c(yli[3],yhi[3]), xlim=c(xl,xh),
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
-			
+			abline(h=0,	lwd	=zlw, col="grey75",lty=3)
 			for(j in 1:9){
-				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
+				if(beta2$sigID[beta2$regID==3&beta2$vegeclass==j]==1){
+					polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
 						c(beta2$X25.[beta2$regID==3&beta2$vegeclass==j],beta2$X75.[beta2$regID==3&beta2$vegeclass==j],
 							beta2$X75.[beta2$regID==3&beta2$vegeclass==j],beta2$X25.[beta2$regID==3&beta2$vegeclass==j]),
 						col="tomato3",border=NA)
+				}else{
+					polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
+						c(beta2$X25.[beta2$regID==3&beta2$vegeclass==j],beta2$X75.[beta2$regID==3&beta2$vegeclass==j],
+							beta2$X75.[beta2$regID==3&beta2$vegeclass==j],beta2$X25.[beta2$regID==3&beta2$vegeclass==j]),
+						col="grey75",border=NA)				
+				}
 				arrows(xseq[j]-1,beta2$Mean[beta2$regID==3&beta2$vegeclass==j],
 						xseq[j]+1,beta2$Mean[beta2$regID==3&beta2$vegeclass==j],code=0,lwd=mlw)
 				arrows(	xseq[j],beta2$X0.2.[beta2$regID==3&beta2$vegeclass==j],
