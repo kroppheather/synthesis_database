@@ -95,8 +95,8 @@ for(i in 1:9){
 		}
 	dev.off()
 }	
-test <- c(rgb(86/255,180/255,233/255,.2),rgb(0/255,158/255,115/255,.2),
-		rgb(213/255,94/255,0/255,.2),rgb(240/255,228/255,66/255,.2))
+test <- c(rgb(240/255,228/255,66/255,.1),rgb(213/255,94/255,0/255,.1),
+			rgb(0/255,114/255,178/255,.1),rgb(0/255,158/255,115/255,.1))
 for(i in 1:9){
 	jpeg(paste0(plotDI,"\\individual2d_class",i,".jpg"),width=1000,height=1000,quality=100)
 plot(Soil[[listV[[i]][1]]]$wdoy,Soil[[listV[[i]][1]]]$soil_t,
@@ -125,4 +125,21 @@ plot(Soil[[listV[[i]][1]]]$wdoy,Soil[[listV[[i]][1]]]$soil_t,
 				}	
 		}		
 	dev.off()	
-}		
+}	
+
+
+
+
+for(i in 1:9){
+	jpeg(paste0(plotDI,"\\individual2d_class_col_",i,".jpg"),width=1000,height=1000,quality=100)
+plot(Soil[[listV[[i]][1]]]$wdoy,Soil[[listV[[i]][1]]]$soil_t,
+				type="l", ylim=c(-35,35),xlim=c(0,370),col=rgb(205/255,79/255,57/255,.3),
+				xlab="day of year",ylab="temperature")
+		for(j in 1:length(listV[[i]])){		
+
+				points(Soil[[listV[[i]][j]]]$wdoy,
+					Soil[[listV[[i]][j]]]$soil_t,type="l",
+					col=rgb(205/255,79/255,57/255,.3),lwd=3)
+			}	
+	dev.off()	
+}				
