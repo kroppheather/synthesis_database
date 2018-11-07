@@ -143,43 +143,25 @@ for(i in 1:9){
 			plot(c(0,1),c(0,1), xlim=c(0,370), ylim=c(0,Cyl[i]),type="n",xlab= " ", ylab=" ",axes=FALSE,
 				xaxs="i",yaxs="i")
 			if(length(which(vegeDepth$vegeclass==i&vegeDepth$depthID==1))!=0){	
-
-				polygon( c(countAll[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==1)]]$mids,
-							rev(countAll[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==1)]]$mids)),
-							c(countAll[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==1)]]$counts,
-								rep(0, length(countAll[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==1)]]$counts))),
-						col=test[1],border=NA)		
+	
 				points(countAll[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==1)]]$mids,
 					countAll[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==1)]]$counts,
 					col=test2[1], type="l",lwd=llw)						
 			}
 			if(length(which(vegeDepth$vegeclass==i&vegeDepth$depthID==2))!=0){	
-
-				polygon( c(countAll[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==2)]]$mids,
-							rev(countAll[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==2)]]$mids)),
-							c(countAll[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==2)]]$counts,
-								rep(0, length(countAll[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==2)]]$counts))),
-						col=test[2],border=NA)		
+	
 				points(countAll[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==2)]]$mids,
 					countAll[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==2)]]$counts,
 					col=test2[2], type="l",lwd=llw)						
 			}
 			if(length(which(vegeDepth$vegeclass==i&vegeDepth$depthID==3))!=0){	
-				polygon( c(countAll[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==3)]]$mids,
-							rev(countAll[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==3)]]$mids)),
-							c(countAll[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==3)]]$counts,
-								rep(0, length(countAll[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==3)]]$counts))),
-						col=test[3],border=NA)	
+
 				points(countAll[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==3)]]$mids,
 					countAll[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==3)]]$counts,
 					col=test2[3], type="l",lwd=llw)
 			}
 			if(length(which(vegeDepth$vegeclass==i&vegeDepth$depthID==4))!=0){	
-				polygon( c(countAll[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==4)]]$mids,
-							rev(countAll[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==4)]]$mids)),
-							c(countAll[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==4)]]$counts,
-								rep(0, length(countAll[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==4)]]$counts))),
-						col=test[4],border=NA)	
+
 				points(countAll[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==4)]]$mids,
 					countAll[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==4)]]$counts,
 					col=test2[4], type="l",lwd=llw)
@@ -220,48 +202,28 @@ for(i in 1:9){
 			plot(c(0,1),c(0,1), ylim=c(-41,35), xlim=c(0,1),type="n",xlab= " ", ylab=" ",axes=FALSE,
 				xaxs="i",yaxs="i")
 			if(length(which(vegeDepth$vegeclass==i&vegeDepth$depthID==1))!=0){	
-				polygon(c(tempHist[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==1)]]$density,
-								rep(0, length(tempHist[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==1)]]$density))), 
-								c(tempHist[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==1)]]$mids,
-							rev(tempHist[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==1)]]$mids)),
-							
-						col=test[1],border=NA)
+				
 				points(tempHist[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==1)]]$density,
 				tempHist[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==1)]]$mids,
 					
 					col=test2[1], type="l",lwd=llw)
 			}
 			if(length(which(vegeDepth$vegeclass==i&vegeDepth$depthID==2))!=0){	
-				polygon(c(tempHist[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==2)]]$density,
-								rep(0, length(tempHist[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==2)]]$density))),
-								c(tempHist[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==2)]]$mids,
-							rev(tempHist[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==2)]]$mids)),
-							
-						col=test[2],border=NA)
+			
 				points(tempHist[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==2)]]$density,
 				tempHist[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==2)]]$mids,
 					
 					col=test2[2], type="l",lwd=llw)
 			}
 			if(length(which(vegeDepth$vegeclass==i&vegeDepth$depthID==3))!=0){	
-				polygon( c(tempHist[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==3)]]$density,
-								rep(0, length(tempHist[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==3)]]$density))),
-								c(tempHist[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==3)]]$mids,
-							rev(tempHist[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==3)]]$mids)),
-							
-						col=test[3],border=NA)	
+				
 				points(tempHist[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==3)]]$density,
 				tempHist[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==3)]]$mids,
 					
 					col=test2[3], type="l",lwd=llw)
 			}
 			if(length(which(vegeDepth$vegeclass==i&vegeDepth$depthID==4))!=0){	
-				polygon( c(tempHist[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==4)]]$density,
-								rep(0, length(tempHist[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==4)]]$density))),
-								c(tempHist[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==4)]]$mids,
-							rev(tempHist[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==4)]]$mids)),
-							
-						col=test[4],border=NA)	
+				
 				points(tempHist[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==4)]]$density,
 				tempHist[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==4)]]$mids,
 					
