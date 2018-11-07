@@ -85,17 +85,6 @@ for(i in 1:9){
 	listV[[i]] <- which(datI$vegeclass==i)
 }
 
-for(i in 1:9){
-	jpeg(paste0(plotDI,"\\individual3d_class",i,".jpg"),width=1000,height=1000,quality=100)
-		s3d <- scatterplot3d(Soil[[listV[[i]][1]]]$wdoy,Soil[[listV[[i]][1]]]$st_depth,Soil[[listV[[i]][1]]]$soil_t,
-				type="l", ylim=c(0,20),xlim=c(0,370),zlim=c(-35,35),angle=60,color=rgb(205/255,79/255,57/255,.4),
-				xlab="day of year",ylab="depth",zlab="temperature",box=FALSE)
-		for(j in 1:length(listV[[i]])){			
-			s3d$points3d(Soil[[listV[[i]][j]]]$wdoy,Soil[[listV[[i]][j]]]$st_depth,Soil[[listV[[i]][j]]]$soil_t,type="l",col=rgb(205/255,79/255,57/255,.4))
-		}
-
-	dev.off()
-}	
 
 #get summary information
 #get count of observations for each day of year and depth
@@ -283,17 +272,3 @@ for(i in 1:9){
 
 
 
-
-for(i in 1:9){
-	jpeg(paste0(plotDI,"\\individual2d_class_col_",i,".jpg"),width=1000,height=1000,quality=100)
-plot(Soil[[listV[[i]][1]]]$wdoy,Soil[[listV[[i]][1]]]$soil_t,
-				type="l", ylim=c(-35,35),xlim=c(0,370),col=rgb(205/255,79/255,57/255,.3),
-				xlab="day of year",ylab="temperature")
-		for(j in 1:length(listV[[i]])){		
-
-				points(Soil[[listV[[i]][j]]]$wdoy,
-					Soil[[listV[[i]][j]]]$soil_t,type="l",
-					col=rgb(205/255,79/255,57/255,.3),lwd=3)
-			}	
-	dev.off()	
-}				
