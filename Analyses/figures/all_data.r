@@ -129,8 +129,8 @@ test <- c(rgb(213/255,94/255,0/255,.1),rgb(240/255,228/255,66/255,.1),
 test2 <- c(rgb(213/255,94/255,0/255,.8),rgb(240/255,228/255,66/255,.8),
 			rgb(0/255,114/255,178/255,.8),rgb(0/255,158/255,115/255,.8))	
 #names
-name2 <- c("herb barren", "graminoid tundra","tussock tundra","short shrub tundra","tall shrub tundra",
-					"wetland","evergreen needleleaf boreal","deciduous needleleaf boreal","mixed boreal")			
+name2 <- c("Herb barren", "Graminoid tundra","Tussock tundra","Short shrub tundra","Tall shrub tundra",
+					"Wetland","Evergreen needleleaf boreal","Deciduous needleleaf boreal","Mixed boreal")			
 			
 wd1 <- 40
 hd1 <- 40
@@ -153,21 +153,23 @@ yseq <- seq(-35,25,by=10)
 yseq2 <- seq(0,Cyl,by=50)
 
 #tick width
-lwt <- 4
+lwt <- 5
 #line axis 
 alh <- 6
+#x line axis 
+yllh <- 18
 #cex axis
-mx <- 4
+mx <- 5
 #box line width
 blw <- 2
 #label line
 llh <- 15
 #label size
-lx <- 6
+lx <- 7
 
 	
 for(i in 1:9){
-	jpeg(paste0(plotDI,"\\individual2d_class",i,".jpg"),width=2400,height=2400,quality=100)
+	jpeg(paste0(plotDI,"\\individual2d_class",i,".jpg"),width=2300,height=2300,quality=100)
 	layout(matrix(c(1,2,3,4), ncol=2,nrow=2, byrow=TRUE), widths=c(lcm(wd1),lcm(wd2)),
 			heights=c(lcm(hd2),lcm(hd1)))
 	##daily sample size##		
@@ -200,7 +202,7 @@ for(i in 1:9){
 			}	
 		axis(2, yseq2, rep(" ", length(yseq2)),lwd.ticks=lwt)
 		mtext(yseq2,at=yseq2,side=2,line=alh,cex=mx,las=2)
-		mtext("Measurement count", side=2,line=llh, cex=lx) 
+		mtext("Measurement count", side=2,line=yllh, cex=lx) 
 		mtext(paste(name2[i]), at=300, side=3, line=llh, cex=lx) 
 	##empty##		
 		par(mai=c(0,0,0,0))
@@ -238,7 +240,7 @@ for(i in 1:9){
 		axis(2, yseq, rep(" ", length(yseq)),lwd.ticks=lwt)
 		mtext(yseq,at=yseq,side=2,line=alh,cex=mx,las=2)
 		box(which="plot",lwd=blw)
-		mtext("Soil temperature (C)", side=2,line=llh, cex=lx) 
+		mtext("Soil temperature (C)", side=2,line=yllh, cex=lx) 
 		mtext("Day of water year", side=1,line=llh, cex=lx) 
 	##temperature histogram##
 		par(mai=c(0,0,0,0))
@@ -282,7 +284,7 @@ for(i in 1:9){
 #plot all images
 #read in all images
 
-jpeg(paste0(plotDI,"\\all_panel_ind.jpg"),width=12000,height=5000,quality=100)
+jpeg(paste0(plotDI,"\\all_panel_ind.jpg"),width=7500,height=3000,quality=100)
 	layout(matrix(seq(1,10),ncol=5,byrow=TRUE))
 	for(i in 1:9){
 		par(mai=c(0,0,0,0))
@@ -292,5 +294,6 @@ jpeg(paste0(plotDI,"\\all_panel_ind.jpg"),width=12000,height=5000,quality=100)
 		par(mai=c(0,0,0,0))
 			plot(c(0,1),c(0,1), xlim=c(0,1), ylim=c(0,Tyl[i]),type="n",xlab= " ", ylab=" ",axes=FALSE,
 				xaxs="i",yaxs="i")	
+			legend("center", c("0-5 cm", "5-10 cm", "10-15 cm", "15-20 cm"), col=test2, lwd=6,	bty="n", cex=8)
 dev.off()				
 	
