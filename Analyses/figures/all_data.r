@@ -6,6 +6,7 @@
 library(plyr)
 library(lubridate)
 library(scatterplot3d)
+library(imager)
 
 # set working directory
 setwd("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6")
@@ -163,7 +164,8 @@ blw <- 2
 llh <- 15
 #label size
 lx <- 6
-			
+
+	
 for(i in 1:9){
 	jpeg(paste0(plotDI,"\\individual2d_class",i,".jpg"),width=2400,height=2400,quality=100)
 	layout(matrix(c(1,2,3,4), ncol=2,nrow=2, byrow=TRUE), widths=c(lcm(wd1),lcm(wd2)),
@@ -273,8 +275,22 @@ for(i in 1:9){
 		axis(1, seq(xl2,xh2[i],xi2),rep(" ",length(seq(xl2,xh2[i],xi2))),lwd.ticks=lwt)
 		mtext(seq(xl2+xi2,xh2[i],xi2),at=seq(xl2+xi2,xh2[i],xi2),side=1,line=alh,cex=mx)
 		mtext("Density", side=1,line=llh, cex=lx) 		
-	dev.off()	
+	
+	dev.off()
 }	
 
+#plot all images
+#read in all images
 
-
+jpeg(paste0(plotDI,"\\all_panel_ind.jpg"),width=12000,height=5000,quality=100)
+	layout(matrix(seq(1,10),ncol=5,byrow=TRUE))
+	for(i in 1:9){
+		par(mai=c(0,0,0,0))
+		plot(load.image(paste0(plotDI,"\\individual2d_class",i,".jpg")),axes=FALSE)
+	}	
+		##empty##		
+		par(mai=c(0,0,0,0))
+			plot(c(0,1),c(0,1), xlim=c(0,1), ylim=c(0,Tyl[i]),type="n",xlab= " ", ylab=" ",axes=FALSE,
+				xaxs="i",yaxs="i")	
+dev.off()				
+	
