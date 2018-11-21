@@ -305,8 +305,8 @@ test2 <- c(rgb(213/255,94/255,0/255,.8),rgb(240/255,228/255,66/255,.8),
 			rgb(0/255,114/255,178/255,.8),rgb(0/255,158/255,115/255,.8))
 test3 <- c(rgb(213/255,94/255,0/255),rgb(240/255,228/255,66/255),
 			rgb(0/255,114/255,178/255),rgb(0/255,158/255,115/255))	
-test4 <- c(rgb(213/255,94/255,0/255,.5),rgb(240/255,228/255,66/255,.5),
-			rgb(0/255,114/255,178/255,.5),rgb(0/255,158/255,115/255,.5))			
+test4 <- c(rgb(213/255,94/255,0/255,.4),rgb(240/255,228/255,66/255,.4),
+			rgb(0/255,114/255,178/255,.4),rgb(0/255,158/255,115/255,.4))			
 #names
 name2 <- c("Herb barren", "Graminoid tundra","Tussock tundra","Short shrub tundra","Tall shrub tundra",
 					"Wetland","Evergreen needleleaf boreal","Deciduous needleleaf boreal","Mixed boreal")			
@@ -330,7 +330,8 @@ xi1 <- 50
 yseq <- seq(-35,25,by=10)
 #seq for couns
 yseq2 <- seq(0,Cyl,by=50)
-
+xseq <- c(1,62,124,183,244,305)
+xlseq <- c("Oct","Dec","Feb","Apr","Jun","Aug")
 #tick width
 lwt <- 5
 #line axis 
@@ -348,7 +349,7 @@ lx <- 7
 #mean line width
 mlwd <- 6
 
-lgry <- rgb(165/255,165/255,165/255,.5)
+lgry <- rgb(165/255,165/255,165/255,.2)
 	
 for(i in 1:9){
 	jpeg(paste0(plotDI,"\\individual2d_summary_class",i,".jpg"),width=2500,height=2500,quality=100)
@@ -406,8 +407,8 @@ for(i in 1:9){
 				points(medTDF$wdoy[medTDF$depthID==4&medTDF$vegeclass==i],medTDF$med[medTDF$depthID==4&medTDF$vegeclass==i],
 					type="l",lwd=mlwd,col=test2[4])			
 		}		
-		axis(1, seq(xl1,xh1,xi1),rep(" ",length(seq(xl1,xh1,xi1))),lwd.ticks=lwt)
-		mtext(seq(xl1,xh1,xi1),at=seq(xl1,xh1,xi1),side=1,line=alh,cex=mx)	
+		axis(1, xseq,rep(" ",length(xseq)),lwd.ticks=lwt)
+		mtext(xlseq,at=xseq,side=1,line=alh,cex=mx)	
 		axis(2, yseq, rep(" ", length(yseq)),lwd.ticks=lwt)
 		mtext(yseq,at=yseq,side=2,line=alh,cex=mx,las=2)
 		box(which="plot",lwd=blw)
@@ -446,6 +447,7 @@ for(i in 1:9){
 					
 					col=test2[4], type="l",lwd=llw)
 			}	
+
 		axis(1, seq(xl2,xh2[i],xi2),rep(" ",length(seq(xl2,xh2[i],xi2))),lwd.ticks=lwt)
 		mtext(seq(xl2+xi2,xh2[i],xi2),at=seq(xl2+xi2,xh2[i],xi2),side=1,line=alh,cex=mx)
 		mtext("Density", side=1,line=llh, cex=lx) 		
