@@ -1,12 +1,25 @@
-##########################################################################
-##########################################################################
-########### Data plotting for all temp obs                  ##############
-##########################################################################
+##########################################################
+##########################################################
+########### Data plotting for all temp obs  ##############
+##########################################################
+##########################################################
+### Inputs: model  output using temp_parm_extract.r    ### 
+### dataframes are Nfactor, SoilParm, AirParm          ###
+### AirRepID,SoilRepID, datCSM(list), datCAM (list)    ###
+### datAM: air temperature, datSM soil temperature     ###
+### datAT: site depth id, datAT: site height ID        ###
+### datNI: n factor ids, datAI: site year height ID    ###
+### datSI: site depth year ID                          ###
+##########################################################
+##########################################################
+                   
+#run script that processes model output and puts it into organized dataframes
+source("c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Analyses\\temp_parm_extract.r")
 
 library(plyr)
 library(lubridate)
-library(scatterplot3d)
 library(imager)
+
 
 # set working directory
 setwd("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6")
@@ -31,6 +44,8 @@ datST <- datS[datS$st_depth<=20,]
 #omit site 44 which has problems
 datST <- datST[datST$site_id!=44,]
 
+#get siteid actually used in analyses
+sitesSubs <- unique(data.frame(site_id=SoilParm$siteid,st_depth=SoilParm$depth,wyear=SoilParm$wyear))
 
 
 # set up water year
@@ -48,7 +63,8 @@ datST$wyear <- ifelse(datST$leapid == 1 & datST$doy_st <  275,
 				ifelse(datST$leapid == 0 & datST$doy_st < 274,
 						datST$year_st,datST$year_st+1))	
 						
-						
+#join back into datST
+datST <- join(datST,sitesSubs,by=c("site_id","st_depth","wyear"),type="inner")						
 #add vegetation class	
 datST <- join(datST,datV,by="site_id",type="left")					
 
@@ -94,10 +110,15 @@ datSTn <- na.omit(datST)
 datSTn$depthID <- ifelse(datSTn$st_depth <= 5,1,
 					ifelse(datSTn$st_depth >5 & datSTn$st_depth <= 10, 2,
 					ifelse(datSTn$st_depth > 10 & datSTn$st_depth <= 15, 3, 4)))
+#get the histogram of temperatures across the vegetation classes and depth
 
-#create depth and vegetation id
-vegeDepth <- unique(data.frame(depthID=countAll$depthID,vegeclass=countAll$vegeclass))
+					
+					#create depth and vegetation id
+vegeDepth <- unique(data.frame(depthID=datSTn$depthID,vegeclass=datSTn$vegeclass))
 vegeDepth$vdID <- seq(1,dim(vegeDepth)[1])
+
+#join back into soil
+datSTn <- join(datSTn, vegeDepth, by=c("depthID","vegeclass"), type="left")
 
 countAll <- list()
 maxC <- numeric(0)
@@ -107,19 +128,15 @@ for(i in 1:dim(vegeDepth)[1]){
 }
 
 
-#get the histogram of temperatures across the vegetation classes and depth
-
-
-#join back into soil
-datSTn <- join(datSTn, vegeDepth, by=c("depthID","vegeclass"), type="left")
-
 tempHist <- list()
 maxT <- numeric(0)
 for(i in 1:dim(vegeDepth)[1]){
 	tempHist[[i]] <- hist(datSTn$soil_t[datSTn$vdID==i], breaks=seq(-41,35),freq=FALSE)
 	maxT[i] <- max(tempHist[[i]]$density)
 }
-
+#######################################
+#####figure of data               ##### 
+#######################################
 #get the maximum for each vegetation type
 maxTdf <- aggregate(maxT,by=list(vegeDepth$vegeclass),FUN="max")
 colnames(maxTdf) <- c("vegeclass","maxT")
@@ -138,9 +155,9 @@ wd2 <- 20
 hd2 <- 20
 Cyl <- 	round_any(max(maxC),50,ceiling)
 #seq for x2
-xh2 <- round_any(maxTdf$maxT,.05,ceiling)
+xh2 <- round_any(maxTdf$maxT,.1,ceiling)
 xl2 <- 0
-xi2 <- 0.05
+xi2 <- 0.1
 #line width hist
 llw <- 5
 #x axis days
@@ -169,45 +186,10 @@ lx <- 7
 
 	
 for(i in 1:9){
-	jpeg(paste0(plotDI,"\\individual2d_class",i,".jpg"),width=2300,height=2300,quality=100)
-	layout(matrix(c(1,2,3,4), ncol=2,nrow=2, byrow=TRUE), widths=c(lcm(wd1),lcm(wd2)),
-			heights=c(lcm(hd2),lcm(hd1)))
-	##daily sample size##		
-		par(mai=c(0,0,0,0))
-			plot(c(0,1),c(0,1), xlim=c(xl1,xh1), ylim=c(0,Cyl),type="n",xlab= " ", ylab=" ",axes=FALSE,
-				xaxs="i",yaxs="i")
-			if(length(which(vegeDepth$vegeclass==i&vegeDepth$depthID==1))!=0){	
-	
-				points(countAll[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==1)]]$mids,
-					countAll[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==1)]]$counts,
-					col=test2[1], type="l",lwd=llw)						
-			}
-			if(length(which(vegeDepth$vegeclass==i&vegeDepth$depthID==2))!=0){	
-	
-				points(countAll[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==2)]]$mids,
-					countAll[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==2)]]$counts,
-					col=test2[2], type="l",lwd=llw)						
-			}
-			if(length(which(vegeDepth$vegeclass==i&vegeDepth$depthID==3))!=0){	
+	jpeg(paste0(plotDI,"\\individual2d_class",i,".jpg"),width=2500,height=2500,quality=100)
+	layout(matrix(c(1,2), ncol=2, byrow=TRUE), widths=c(lcm(wd1),lcm(wd2)),
+			heights=c(lcm(hd1)))
 
-				points(countAll[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==3)]]$mids,
-					countAll[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==3)]]$counts,
-					col=test2[3], type="l",lwd=llw)
-			}
-			if(length(which(vegeDepth$vegeclass==i&vegeDepth$depthID==4))!=0){	
-
-				points(countAll[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==4)]]$mids,
-					countAll[[which(vegeDepth$vegeclass==i&vegeDepth$depthID==4)]]$counts,
-					col=test2[4], type="l",lwd=llw)
-			}	
-		axis(2, yseq2, rep(" ", length(yseq2)),lwd.ticks=lwt)
-		mtext(yseq2,at=yseq2,side=2,line=alh,cex=mx,las=2)
-		mtext("Measurement count", side=2,line=yllh, cex=lx) 
-		mtext(paste(name2[i]), at=300, side=3, line=llh, cex=lx) 
-	##empty##		
-		par(mai=c(0,0,0,0))
-			plot(c(0,1),c(0,1), xlim=c(0,1), ylim=c(0,Tyl[i]),type="n",xlab= " ", ylab=" ",axes=FALSE,
-				xaxs="i",yaxs="i")	
 	##temperature##		
 		par(mai=c(0,0,0,0))				
 		plot(Soil[[listV[[i]][1]]]$wdoy,Soil[[listV[[i]][1]]]$soil_t,
@@ -242,6 +224,7 @@ for(i in 1:9){
 		box(which="plot",lwd=blw)
 		mtext("Soil temperature (C)", side=2,line=yllh, cex=lx) 
 		mtext("Day of water year", side=1,line=llh, cex=lx) 
+		mtext(paste(name2[i]), side=3, outer=TRUE,line=-40, cex=lx) 
 	##temperature histogram##
 		par(mai=c(0,0,0,0))
 			plot(c(0,1),c(0,1), ylim=c(-41,35), xlim=c(xl2,xh2[i]),type="n",xlab= " ", ylab=" ",axes=FALSE,
@@ -292,7 +275,7 @@ jpeg(paste0(plotDI,"\\all_panel_ind.jpg"),width=7500,height=3000,quality=100)
 	}	
 		##empty##		
 		par(mai=c(0,0,0,0))
-			plot(c(0,1),c(0,1), xlim=c(0,1), ylim=c(0,Tyl[i]),type="n",xlab= " ", ylab=" ",axes=FALSE,
+			plot(c(0,1),c(0,1), xlim=c(0,1), ylim=c(0,1),type="n",xlab= " ", ylab=" ",axes=FALSE,
 				xaxs="i",yaxs="i")	
 			legend("center", c("0-5 cm", "5-10 cm", "10-15 cm", "15-20 cm"), col=test2, lwd=6,	bty="n", cex=8)
 dev.off()				
