@@ -31,6 +31,7 @@ library(sp)
 library(raster)
 library(plyr)
 library(mapplots)
+library(rgeos)
 #######################################
 #####projection                   ##### 
 #######################################
@@ -61,10 +62,18 @@ siteSP <- SpatialPoints(sites)
 #######################################
 #####vegetation colors            ##### 						
 #######################################	
-
-#set up vegeclass colors
 vegeclassColors <- data.frame(vegeclass=seq(1,9),
-					coli=c("grey50","grey25", "deepskyblue2","steelblue4","seagreen4","hotpink3","gold1","midnightblue","chocolate2"))
+						coli=c(rgb(77/255,77/255,77/255),
+								rgb(0/255,110/255,130/255),
+								rgb(160/255,130/255,180/255),
+								rgb(130/255,160/255,190/255),
+								rgb(250/255,120/255,80/255),
+								rgb(250/255,230/255,140/255),
+								rgb(50/255,80/255,10/255),
+								rgb(170/255,190/255,140/255),
+								rgb(240/255,240/255,50/255)))
+#set up vegeclass colors
+
 vegeclassColors$colrgb <- c(rgb(127/255	,127/255,127/255,.25), rgb(63/255,63/255,63/255,.25),	rgb(0/255,178/255,238/255,.5),
 						rgb(54/255,100/255,139/255,.25),rgb(46/255,139/255,87/255,.25),rgb(205/255,96/255,144/255,.25),
 						rgb(255/255,215/255,0/255,.25),rgb(25/255,25/255,112/255,.25),rgb(238/255,118/255,33/255,.25))
@@ -77,7 +86,7 @@ vegeclassColors$colrgb2 <- c(rgb(127/255	,127/255,127/255,.5),rgb(63/255,63/255,
 #######################################
 
 #get buffer around points
-allBuffer <- buffer(siteSP,70000)
+allBuffer <- buffer(siteSP,70000, dissolve=TRUE)
 
 
 t.c <- list()
@@ -209,7 +218,7 @@ siteSPV <- SpatialPoints(sitesV)
 #####make buffers######
 
 #get buffer around points
-allBufferV <- buffer(siteSPV,70000)
+allBufferV <- buffer(siteSPV,70000, dissolve=TRUE)
 
 
 t.cV <- list()
@@ -266,22 +275,22 @@ xyz.allV <- make.xyz(propAllV$x,propAllV$y,propAllV$propC,propAllV$vegeclass)
 
 
 #######make plot ######
-
+yseq <- seq(1,9)
 wd <- 30
 hd <- 30
 wd2 <- 5
 
-jpeg(paste0(plotDI,"\\vege_site_agg.jpg"),width=1800,height=1000)
+png(paste0(plotDI,"\\vege_site_agg.png"),width=1800,height=1000)
 	a <- layout(matrix(c(1,2),ncol=2), height=c(lcm(hd),lcm(hd)), width=c(lcm(wd),lcm(wd2)))
 	layout.show(a)
 	#set up empty plot
 	plot(world2,type="n",axes=FALSE,xlab=" ", ylab=" ")
 	#color background
-	polygon(c(-5000000,-5000000,5000000,5000000),c(-5000000,5000000,5000000,-5000000), border=NA, col=rgb(180/255,205/255,205/255,.5))
+	polygon(c(-5000000,-5000000,5000000,5000000),c(-5000000,5000000,5000000,-5000000), border=NA, col=rgb(180/255,205/255,205/255,.1))
 	#boundaries
 	points(world, type="l", lwd=2, col="grey65")
 	#continent color
-	polygon(c(world[,1],rev(world[,1])), c(world[,2],rev(world[,2])),col="cornsilk2",border=NA)
+	polygon(c(world[,1],rev(world[,1])), c(world[,2],rev(world[,2])),col=rgb(250/255,230/255,190/255),border=NA)
 	draw.pie(xyz.allV$x,xyz.allV$y,xyz.allV$z,radius=250000,col=as.character(vegeclassColors$coli),border=NA)
 	points(mat.bcV$x,mat.bcV$y,pch=19,col="white",cex=5)
 	text(mat.bcV$x,mat.bcV$y,paste(mat.bcV$NpolySite),cex=1.5)
