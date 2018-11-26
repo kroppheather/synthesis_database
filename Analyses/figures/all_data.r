@@ -333,26 +333,26 @@ yseq2 <- seq(0,Cyl,by=50)
 xseq <- c(1,62,124,183,244,305)
 xlseq <- c("Oct","Dec","Feb","Apr","Jun","Aug")
 #tick width
-lwt <- 5
+lwt <- 6
 #line axis 
 alh <- 6
 #x line axis 
 yllh <- 18
 #cex axis
-mx <- 5
+mx <- 7
 #box line width
 blw <- 2
 #label line
 llh <- 15
 #label size
-lx <- 7
+lx <- 9
 #mean line width
-mlwd <- 6
+mlwd <- 7
 
 lgry <- rgb(165/255,165/255,165/255,.2)
 	
 for(i in 1:9){
-	jpeg(paste0(plotDI,"\\individual2d_summary_class",i,".jpg"),width=2500,height=2500,quality=100)
+	png(paste0(plotDI,"\\individual2d_summary_class",i,".png"),width=2400,height=1800)
 	layout(matrix(c(1,2), ncol=2, byrow=TRUE), widths=c(lcm(wd1),lcm(wd2)),
 			heights=c(lcm(hd1)))
 
@@ -414,7 +414,7 @@ for(i in 1:9){
 		box(which="plot",lwd=blw)
 		mtext("Soil temperature (C)", side=2,line=yllh, cex=lx) 
 		mtext("Day of water year", side=1,line=llh, cex=lx) 
-		mtext(paste(name2[i]), side=3, outer=TRUE,line=-40, cex=lx) 
+		mtext(paste(name2[i]), side=3, outer=TRUE,line=-20, cex=lx) 
 	##temperature histogram##
 		par(mai=c(0,0,0,0))
 			plot(c(0,1),c(0,1), ylim=c(-41,35), xlim=c(xl2,xh2[i]),type="n",xlab= " ", ylab=" ",axes=FALSE,
@@ -458,17 +458,17 @@ for(i in 1:9){
 #plot all images
 #read in all images
 
-jpeg(paste0(plotDI,"\\all_panel_ind_summary.jpg"),width=7500,height=3000,quality=100)
+png(paste0(plotDI,"\\all_panel_ind_summary.png"),width=6600,height=2000)
 	layout(matrix(seq(1,10),ncol=5,byrow=TRUE))
 	for(i in 1:9){
 		par(mai=c(0,0,0,0))
-		plot(load.image(paste0(plotDI,"\\individual2d_summary_class",i,".jpg")),axes=FALSE)
+		plot(load.image(paste0(plotDI,"\\individual2d_summary_class",i,".png")),axes=FALSE)
 	}	
 		##empty##		
 		par(mai=c(0,0,0,0))
 			plot(c(0,1),c(0,1), xlim=c(0,1), ylim=c(0,1),type="n",xlab= " ", ylab=" ",axes=FALSE,
 				xaxs="i",yaxs="i")	
-			legend("center", c("0-5 cm", "5-10 cm", "10-15 cm", "15-20 cm"), col=test2, lwd=6,	bty="n", cex=8)
+			legend("center", c("0-5 cm", "5-10 cm", "10-15 cm", "15-20 cm"), col=test2, lwd=6,	bty="n", cex=10)
 dev.off()				
 	
 
