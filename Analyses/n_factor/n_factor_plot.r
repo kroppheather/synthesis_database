@@ -42,6 +42,21 @@ library(mcmcplots)
 library(plyr)
 
 #######################################
+#####set up colors                ##### 
+#######################################
+
+vegeclassColors <- data.frame(vegeclass=seq(1,9),
+						coli=c(rgb(77/255,77/255,77/255),
+								rgb(0/255,110/255,130/255),
+								rgb(160/255,130/255,180/255),
+								rgb(130/255,160/255,190/255),
+								rgb(250/255,120/255,80/255),
+								rgb(250/255,230/255,140/255),
+								rgb(50/255,80/255,10/255),
+								rgb(170/255,190/255,140/255),
+								rgb(240/255,240/255,50/255)))
+
+#######################################
 #####set directories              ##### 
 #######################################
 
@@ -126,7 +141,7 @@ hd <- 30
 xseq <-c(1,4,7,10,13,16,19,22,25)
 
 yli <- c(0,0)
-yhi <- c(2,2)
+yhi <- c(1.5,1.7)
 yii <- c(.5,.5)
 xl <- -1
 xh <- 27
@@ -137,20 +152,21 @@ alw <- 4
 #lwd of ticks
 tlw <- 5
 #size of x labels
-axc <- 5
+axc <- 6
 #line of x label
 xll <- 2
 #line for units
 yll1 <- 20
 #line for name
-yll2 <- 30
+yll2 <- 15
 #cex of axis label
-mcx <- 6
+mcx <- 9
+#one line width
+zlw <- 7
 
 
-
-jpeg(paste0(plotDI,"\\run",Nrun,"\\intercepts.jpg"), width=3000,height=3500,
-			quality=100,units="px")
+png(paste0(plotDI,"\\run",Nrun,"\\intercepts.png"), width=3000,height=3500,
+			units="px")
 	layout(matrix(seq(1,2),ncol=1), width=rep(lcm(wd),2),height=rep(lcm(hd),2))
 		#plot intercept
 	
@@ -158,12 +174,12 @@ jpeg(paste0(plotDI,"\\run",Nrun,"\\intercepts.jpg"), width=3000,height=3500,
 		
 			plot(c(0,1),c(0,1), ylim=c(yli[1],yhi[1]), xlim=c(xl,xh),
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
-			
+			abline(h=1,	lwd	=zlw, col="grey75",lty=3)
 			for(j in 1:9){
 				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
 						c(beta0$X25.[beta0$regID==1&beta0$vegeclass==j],beta0$X75.[beta0$regID==1&beta0$vegeclass==j],
 							beta0$X75.[beta0$regID==1&beta0$vegeclass==j],beta0$X25.[beta0$regID==1&beta0$vegeclass==j]),
-						col="tomato3",border=NA)
+						col=paste(vegeclassColors$coli[j]),border=NA)
 				arrows(xseq[j]-1,beta0$Mean[beta0$regID==1&beta0$vegeclass==j],
 						xseq[j]+1,beta0$Mean[beta0$regID==1&beta0$vegeclass==j],code=0,lwd=mlw)
 				arrows(	xseq[j],beta0$X0.3.[beta0$regID==1&beta0$vegeclass==j],
@@ -174,19 +190,19 @@ jpeg(paste0(plotDI,"\\run",Nrun,"\\intercepts.jpg"), width=3000,height=3500,
 			axis(2, seq(yli[1],yhi[1], by=yii[1]), rep(" ",length(seq(yli[1],yhi[1], by=yii[1]))),
 				 lwd.ticks=tlw)
 			mtext(seq(yli[1],yhi[1], by=yii[1]),at=seq(yli[1],yhi[1], by=yii[1]), side=2, line=xll,cex=axc,las=2)	
-			mtext(expression(paste("(N"[freeze],")")),side=2,line=yll1,cex=mcx)
-			mtext("Freeze N factor",side=2,line=yll2,cex=mcx)
+			#mtext(expression(paste("(N"[freeze],")")),side=2,line=yll1,cex=mcx)
+			mtext("Freeze n-factor",side=2,line=yll2,cex=mcx)
 			
 		par(mai=c(1,0,0,0))
 		
 			plot(c(0,1),c(0,1), ylim=c(yli[2],yhi[2]), xlim=c(xl,xh),
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
-			
+			abline(h=1,	lwd	=zlw, col="grey75",lty=3)
 			for(j in 1:9){
 				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
 						c(beta0$X25.[beta0$regID==2&beta0$vegeclass==j],beta0$X75.[beta0$regID==2&beta0$vegeclass==j],
 							beta0$X75.[beta0$regID==2&beta0$vegeclass==j],beta0$X25.[beta0$regID==2&beta0$vegeclass==j]),
-						col="tomato3",border=NA)
+						col=paste(vegeclassColors$coli[j]),border=NA)
 				arrows(xseq[j]-1,beta0$Mean[beta0$regID==2&beta0$vegeclass==j],
 						xseq[j]+1,beta0$Mean[beta0$regID==2&beta0$vegeclass==j],code=0,lwd=mlw)
 				arrows(	xseq[j],beta0$X0.3.[beta0$regID==2&beta0$vegeclass==j],
@@ -197,8 +213,8 @@ jpeg(paste0(plotDI,"\\run",Nrun,"\\intercepts.jpg"), width=3000,height=3500,
 			axis(2, seq(yli[2],yhi[2], by=yii[2]), rep(" ",length(seq(yli[2],yhi[2], by=yii[2]))),
 				 lwd.ticks=tlw)
 			mtext(seq(yli[2],yhi[2], by=yii[2]),at=seq(yli[2],yhi[2], by=yii[2]), side=2, line=xll,cex=axc,las=2)	
-			mtext(expression(paste("(N"[thaw],")")),side=2,line=yll1,cex=mcx)			
-			mtext("Thaw N factor",side=2,line=yll2,cex=mcx)
+			#mtext(expression(paste("(N"[thaw],")")),side=2,line=yll1,cex=mcx)			
+			mtext("Thaw n-factor",side=2,line=yll2,cex=mcx)
 			
 			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw)			
 			mtext(datVI$name2,at=xseq, side=1, line=xll,cex=axc,las=2)

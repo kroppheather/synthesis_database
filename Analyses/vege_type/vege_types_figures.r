@@ -53,8 +53,19 @@ plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type
 #model directory
 modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run3"
 Nrun <-3
-
-
+#######################################
+#####set up colors               ##### 
+#######################################
+vegeclassColors <- data.frame(vegeclass=seq(1,9),
+						coli=c(rgb(77/255,77/255,77/255),
+								rgb(0/255,110/255,130/255),
+								rgb(160/255,130/255,180/255),
+								rgb(130/255,160/255,190/255),
+								rgb(250/255,120/255,80/255),
+								rgb(250/255,230/255,140/255),
+								rgb(50/255,80/255,10/255),
+								rgb(170/255,190/255,140/255),
+								rgb(240/255,240/255,50/255)))
 
 #######################################
 #####organize data                ##### 
@@ -174,7 +185,8 @@ beta1 <- data.frame(beta1,regvegeID )
 beta2 <-data.frame(beta2,regvegeID )
 beta3 <-data.frame(beta3,regvegeID )
 
-
+datVI$name2 <- c("herb barren", "graminoid tundra","tussock tundra","short shrub tundra","tall shrub tundra",
+					"wetland","evergreen needleleaf boreal","deciduous needleleaf boreal","mixed boreal")
 
 #######################################
 #####plot parameter comparison   ##### 
@@ -373,8 +385,7 @@ for(i in 1:3){
 #######################################
 #####plot just intercept          ##### 
 #######################################
-datVI$name2 <- c("herb barren", "graminoid tundra","tussock tundra","short shrub tundra","tall shrub tundra",
-					"wetland","evergreen needleleaf boreal","deciduous needleleaf boreal","mixed boreal")
+
 wd <- 55
 hd <- 30
 
@@ -493,8 +504,7 @@ dev.off()
 #######################################
 #####plot just air slope          ##### 
 #######################################
-datVI$name2 <- c("herb barren", "graminoid tundra","tussock tundra","short shrub tundra","tall shrub tundra",
-					"wetland","evergreen needleleaf boreal","deciduous needleleaf boreal","mixed boreal")
+
 wd <- 55
 hd <- 30
 
@@ -636,41 +646,13 @@ jpeg(paste0(plotDI,"\\run",Nrun,"\\air_slopes.jpg"), width=2700,height=4100,
 dev.off()		
 
 
-#######################################
-#####plot regression              ##### 
-#######################################
-
-
-
-
-#vege class colors
-
-vegeclassColors <- data.frame(vegeclass=seq(1,9),
-					coli=c("grey50","grey25", "deepskyblue2","steelblue4","seagreen4","hotpink3","gold1","midnightblue","chocolate2"))
-vegeclassColors$colrgb <- c(rgb(127/255	,127/255,127/255,.25), rgb(63/255,63/255,63/255,.25),	rgb(0/255,178/255,238/255,.5),
-						rgb(54/255,100/255,139/255,.25),rgb(46/255,139/255,87/255,.25),rgb(205/255,96/255,144/255,.25),
-						rgb(255/255,215/255,0/255,.25),rgb(25/255,25/255,112/255,.25),rgb(238/255,118/255,33/255,.25))
-vegeclassColors$colrgb2 <- c(rgb(127/255	,127/255,127/255,.5),rgb(63/255,63/255,63/255,.5), 	rgb(0/255,178/255,238/255,.5),	
-						rgb(54/255,100/255,139/255,.5),rgb(46/255,139/255,87/255,.5),rgb(205/255,96/255,144/255,.5),
-						rgb(255/255,215/255,0/255,.5),rgb(25/255,25/255,112/255,.5),rgb(238/255,118/255,33/255,.5))
-
-						
-
-wd <- 30
-hd <- 30
-
-yli <- c(-35,0,0)
-yhi <- c(0,25,0.65)
-xli <- c(-35,0,0)
-xhi <- c(0,25,0.65)
-
-jpeg(paste0(plotDI,"\\run",Nrun,"\\air_slopes.jpg"), width=2700,height=4100,
-			quality=100,units="px")
-	layout(matrix(seq(1,3),ncol=1), width=rep(lcm(wd),3),height=rep(lcm(hd),3))
-		#plot intercept
-	
-		par(mai=c(1,0,0,0))
-		
-			plot(c(0,1),c(0,1), ylim=c(yli[1],yhi[1]), xlim=c(xl[1],xh[1]),
-				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
 			
+
+				
+#######################################
+#####plot min/max intercept       ##### 
+#######################################					
+
+#######################################
+#####plot min/max air slope       ##### 
+#######################################				
