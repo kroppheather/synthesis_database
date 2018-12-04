@@ -327,9 +327,9 @@ test4 <- c(rgb(213/255,94/255,0/255,.4),rgb(240/255,228/255,66/255,.4),
 name2 <- c("Herb barren", "Graminoid tundra","Tussock tundra","Short shrub tundra","Tall shrub tundra",
 					"Wetland","Evergreen needleleaf boreal","Deciduous needleleaf boreal","Mixed boreal")			
 			
-wd1 <- 50
-hd1 <- 50
-wd2 <- 30
+wd1 <- 54
+hd1 <- 54
+wd2 <- 34
 hd2 <- 20
 Cyl <- 	round_any(max(maxC),50,ceiling)
 #seq for x2
@@ -346,22 +346,25 @@ xi1 <- 50
 yseq <- seq(-35,25,by=10)
 #seq for couns
 yseq2 <- seq(0,Cyl,by=50)
-xseq <- c(1,62,124,183,244,305)
-xlseq <- c("Oct","Dec","Feb","Apr","Jun","Aug")
+#xseq <- c(1,62,124,183,244,305)
+#xlseq <- c("Oct","Dec","Feb","Apr","Jun","Aug")
+xseq <- c(1,124,244)
+xlseq <- c("Oct","Feb","Jun")
 #tick width
 lwt <- 9
 #line axis 
-alh <- 6
-#x line axis 
-yllh <- 19
+alh <- 4
+xalh <- 8
 #cex axis
-mx <- 10
+mx <- 13
 #box line width
 blw <- 3
 #label line
-llh <- 19
+llh <- 23
+#y label line axis 
+yllh <- 23
 #label size
-lx <- 14
+lx <- 17
 #mean line width
 mlwd <- 7
 #density axis line
@@ -370,7 +373,7 @@ dcx <- 3
 lgry <- rgb(165/255,165/255,165/255,.2)
 	
 for(i in 1:9){
-	png(paste0(plotDI,"\\individual2d_summary_class",i,".png"),width=3200,height=2100)
+	png(paste0(plotDI,"\\individual2d_summary_class_b_",i,".png"),width=3500,height=2500)
 	layout(matrix(c(1,2), ncol=2, byrow=TRUE), widths=c(lcm(wd1),lcm(wd2)),
 			heights=c(lcm(hd1)))
 
@@ -426,13 +429,13 @@ for(i in 1:9){
 					type="l",lwd=mlwd,col=test2[4])			
 		}		
 		axis(1, xseq,rep(" ",length(xseq)),lwd.ticks=lwt)
-		mtext(xlseq,at=xseq,side=1,line=alh,cex=mx)	
+		mtext(xlseq,at=xseq,side=1,line=xalh,cex=mx)	
 		axis(2, yseq, rep(" ", length(yseq)),lwd.ticks=lwt)
 		mtext(yseq,at=yseq,side=2,line=alh,cex=mx,las=2)
 		box(which="plot",lwd=blw)
 		mtext("Soil temperature (C)", side=2,line=yllh, cex=lx) 
 		mtext("Day of water year", side=1,line=llh, cex=lx) 
-		mtext(paste(name2[i]), side=3, outer=TRUE,line=-15, cex=lx) 
+		mtext(paste(name2[i]), side=3, outer=TRUE,line=-25, cex=lx) 
 	##temperature histogram##
 		par(mai=c(0,0,0,0))
 			plot(c(0,1),c(0,1), ylim=c(-41,35), xlim=c(xl2,xh2[i]),type="n",xlab= " ", ylab=" ",axes=FALSE,
@@ -467,7 +470,7 @@ for(i in 1:9){
 			}	
 
 		axis(1, seq(xl2,xh2[i],xi2),rep(" ",length(seq(xl2,xh2[i],xi2))),lwd.ticks=lwt)
-		mtext(seq(xl2+xi2,xh2[i],xi2),at=seq(xl2+xi2,xh2[i],xi2),side=1,line=alh,cex=mx, cex.axis=dcx)
+		mtext(seq(xl2+xi2,xh2[i],xi2+xi2),at=seq(xl2+xi2,xh2[i],xi2+xi2),side=1,line=xalh,cex=mx, cex.axis=dcx)
 		mtext("Density", side=1,line=llh, cex=lx) 		
 	
 	dev.off()
@@ -476,11 +479,12 @@ for(i in 1:9){
 #plot all images
 #read in all images
 
-png(paste0(plotDI,"\\all_panel_ind_summary.png"),width=6600,height=2000)
+png(paste0(plotDI,"\\all_panel_ind_summary_b.png"),width=6000,height=2000)
+
 	layout(matrix(seq(1,10),ncol=5,byrow=TRUE))
 	for(i in 1:9){
 		par(mai=c(0,0,0,0))
-		plot(load.image(paste0(plotDI,"\\individual2d_summary_class",i,".png")),axes=FALSE)
+		plot(load.image(paste0(plotDI,"\\individual2d_summary_class_b_",i,".png")),axes=FALSE)
 	}	
 		##empty##		
 		par(mai=c(0,0,0,0))
@@ -488,5 +492,3 @@ png(paste0(plotDI,"\\all_panel_ind_summary.png"),width=6600,height=2000)
 				xaxs="i",yaxs="i")	
 			legend("center", c("0-5 cm", "5-10 cm", "10-15 cm", "15-20 cm"), col=test2, lwd=6,	bty="n", cex=10)
 dev.off()				
-	
-
