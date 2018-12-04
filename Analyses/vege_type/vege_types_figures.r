@@ -687,7 +687,7 @@ mcx <- 6
 
 
 
-png(paste0(plotDI,"\\run",Nrun,"\\intercepts_min_max.png"), width=2700,height=3500,
+png(paste0(plotDI,"\\run",Nrun,"\\intercepts_min_max.png"), width=3000,height=3500,
 			units="px")
 	layout(matrix(seq(1,2),ncol=1), width=rep(lcm(wd),2),height=rep(lcm(hd),2))
 		#plot intercept

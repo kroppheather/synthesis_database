@@ -103,6 +103,22 @@ for(i in 1:9){
 }
 
 
+#look at number of air temp obs used
+datA$leapid<-ifelse(leap_year(datA$year_st)==TRUE,1,0)
+
+
+datA$wdoy<-ifelse(datA$leapid==1&datA$doy_st<=274, datA$doy_st+92,
+		ifelse(datA$leapid==1&datA$doy_st>274, datA$doy_st-274,
+		ifelse(datA$leapid==0&datA$doy_st<=273,datA$doy_st+92,
+		ifelse(datA$leapid==0&datA$doy_st>273,datA$doy_st-273,NA))))
+		
+datA$wyear <- ifelse(datA$leapid == 1 & datA$doy_st <  275,
+				datA$year_st,
+				ifelse(datA$leapid == 0 & datA$doy_st < 274,
+						datA$year_st,datA$year_st+1))	
+siteSubsA <- unique(data.frame(wyear=AirParm$wyear, air_height=AirParm$height,site_id=AirParm$siteid))
+datAS <- join(datA,siteSubsA, by=c("wyear","air_height","site_id"),type="inner")
+datAS <- na.omit(datAS)
 #get summary information
 #get count of observations for each day of year and depth
 datSTn <- na.omit(datST)
@@ -149,7 +165,7 @@ test2 <- c(rgb(213/255,94/255,0/255,.8),rgb(240/255,228/255,66/255,.8),
 name2 <- c("Herb barren", "Graminoid tundra","Tussock tundra","Short shrub tundra","Tall shrub tundra",
 					"Wetland","Evergreen needleleaf boreal","Deciduous needleleaf boreal","Mixed boreal")			
 			
-wd1 <- 40
+wd1 <- 42
 hd1 <- 40
 wd2 <- 20
 hd2 <- 20
@@ -170,7 +186,7 @@ yseq <- seq(-35,25,by=10)
 yseq2 <- seq(0,Cyl,by=50)
 
 #tick width
-lwt <- 5
+lwt <- 8
 #line axis 
 alh <- 6
 #x line axis 
@@ -186,7 +202,7 @@ lx <- 7
 
 	
 for(i in 1:9){
-	jpeg(paste0(plotDI,"\\individual2d_class",i,".jpg"),width=2500,height=2500,quality=100)
+	jpeg(paste0(plotDI,"\\individual2d_class",i,".jpg"),width=2600,height=2500,quality=100)
 	layout(matrix(c(1,2), ncol=2, byrow=TRUE), widths=c(lcm(wd1),lcm(wd2)),
 			heights=c(lcm(hd1)))
 
@@ -311,9 +327,9 @@ test4 <- c(rgb(213/255,94/255,0/255,.4),rgb(240/255,228/255,66/255,.4),
 name2 <- c("Herb barren", "Graminoid tundra","Tussock tundra","Short shrub tundra","Tall shrub tundra",
 					"Wetland","Evergreen needleleaf boreal","Deciduous needleleaf boreal","Mixed boreal")			
 			
-wd1 <- 40
-hd1 <- 40
-wd2 <- 20
+wd1 <- 50
+hd1 <- 50
+wd2 <- 30
 hd2 <- 20
 Cyl <- 	round_any(max(maxC),50,ceiling)
 #seq for x2
@@ -333,26 +349,28 @@ yseq2 <- seq(0,Cyl,by=50)
 xseq <- c(1,62,124,183,244,305)
 xlseq <- c("Oct","Dec","Feb","Apr","Jun","Aug")
 #tick width
-lwt <- 6
+lwt <- 9
 #line axis 
 alh <- 6
 #x line axis 
-yllh <- 18
+yllh <- 19
 #cex axis
-mx <- 7
+mx <- 10
 #box line width
-blw <- 2
+blw <- 3
 #label line
-llh <- 15
+llh <- 19
 #label size
-lx <- 9
+lx <- 14
 #mean line width
 mlwd <- 7
+#density axis line
+dcx <- 3
 
 lgry <- rgb(165/255,165/255,165/255,.2)
 	
 for(i in 1:9){
-	png(paste0(plotDI,"\\individual2d_summary_class",i,".png"),width=2400,height=1800)
+	png(paste0(plotDI,"\\individual2d_summary_class",i,".png"),width=3200,height=2100)
 	layout(matrix(c(1,2), ncol=2, byrow=TRUE), widths=c(lcm(wd1),lcm(wd2)),
 			heights=c(lcm(hd1)))
 
@@ -414,7 +432,7 @@ for(i in 1:9){
 		box(which="plot",lwd=blw)
 		mtext("Soil temperature (C)", side=2,line=yllh, cex=lx) 
 		mtext("Day of water year", side=1,line=llh, cex=lx) 
-		mtext(paste(name2[i]), side=3, outer=TRUE,line=-20, cex=lx) 
+		mtext(paste(name2[i]), side=3, outer=TRUE,line=-15, cex=lx) 
 	##temperature histogram##
 		par(mai=c(0,0,0,0))
 			plot(c(0,1),c(0,1), ylim=c(-41,35), xlim=c(xl2,xh2[i]),type="n",xlab= " ", ylab=" ",axes=FALSE,
@@ -449,7 +467,7 @@ for(i in 1:9){
 			}	
 
 		axis(1, seq(xl2,xh2[i],xi2),rep(" ",length(seq(xl2,xh2[i],xi2))),lwd.ticks=lwt)
-		mtext(seq(xl2+xi2,xh2[i],xi2),at=seq(xl2+xi2,xh2[i],xi2),side=1,line=alh,cex=mx)
+		mtext(seq(xl2+xi2,xh2[i],xi2),at=seq(xl2+xi2,xh2[i],xi2),side=1,line=alh,cex=mx, cex.axis=dcx)
 		mtext("Density", side=1,line=llh, cex=lx) 		
 	
 	dev.off()
