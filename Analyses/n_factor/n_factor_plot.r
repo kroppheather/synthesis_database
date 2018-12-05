@@ -131,8 +131,15 @@ summary(fit2)
 #######################################
 datVI$name2 <- c("herb barren", "graminoid tundra","tussock tundra","short shrub tundra","tall shrub tundra",
 					"wetland","evergreen needleleaf boreal","deciduous needleleaf boreal","mixed boreal")
-wd <- 55
-hd <- 30
+					
+datVI$namel1 <- c("herb", "graminoid","tussock","short","tall",
+					"wetland","evergreen","deciduous","mixed")	
+datVI$namel2 <- c("barren", "tundra","tundra","shrub","shrub",
+					" ","needleleaf","needleleaf","boreal")	
+datVI$namel3 <- c(" ", " "," ","tundra","tundra",
+					" ","boreal","boreal"," ")						
+wd <- 70
+hd <- 40
 
 
 #make a panel of parameters for each regression
@@ -150,22 +157,24 @@ mlw <- 6
 #arrow line width
 alw <- 4
 #lwd of ticks
-tlw <- 5
+tlw <- 7
 #size of x labels
-axc <- 6
+axc <- 8
 #line of x label
-xll <- 2
+xl1 <- 2
+xl2 <- 15
+xl3 <- 30
 #line for units
 yll1 <- 20
 #line for name
 yll2 <- 15
 #cex of axis label
-mcx <- 9
+mcx <- 11
 #one line width
 zlw <- 7
 
 
-png(paste0(plotDI,"\\run",Nrun,"\\intercepts.png"), width=3000,height=3500,
+png(paste0(plotDI,"\\run",Nrun,"\\intercepts.png"), width=3000,height=5000,
 			units="px")
 	layout(matrix(seq(1,2),ncol=1), width=rep(lcm(wd),2),height=rep(lcm(hd),2))
 		#plot intercept
@@ -217,8 +226,9 @@ png(paste0(plotDI,"\\run",Nrun,"\\intercepts.png"), width=3000,height=3500,
 			mtext("Thaw n-factor",side=2,line=yll2,cex=mcx)
 			
 			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw)			
-			mtext(datVI$name2,at=xseq, side=1, line=xll,cex=axc,las=2)
-
+			mtext(datVI$namel1,at=xseq, side=1,cex=axc, line=xl1)
+			mtext(datVI$namel2,at=xseq, side=1,cex=axc, line=xl2)
+			mtext(datVI$namel3,at=xseq, side=1,cex=axc, line=xl3)
 				
 			
 dev.off()	
