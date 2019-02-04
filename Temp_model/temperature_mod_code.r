@@ -38,6 +38,9 @@ model{
 		#cacluation for thawing degree day
 		#set to zero if not above zero		
 		ThawS[i]<-step(TempS[i])*TempS[i]
+		#calculate if day is thawing
+		ThawingDayN[i] <- step(TempS[i])
+		
 	}
 		
 		TempS[1]~dnorm(muS[1], tau.muS)
@@ -57,7 +60,8 @@ model{
 		#cacluation for thawing degree day
 		#set to zero if not above zero		
 		ThawS[1]<-step(TempS[1])*TempS[1]				
-				
+		#calculate if day is thawing
+		ThawingDayN[1] <- step(TempS[1])			
 				
 	#look at a subset of replicated data since there is too much temp data to monitor
 	for(i in 1:NrepS){
@@ -114,13 +118,14 @@ model{
 	for(i in 1:NSDWA){
 		FDDA[i]<-sum(FreezeA[ASY[i]:AEY[i]])
 		TDDA[i]<-sum(ThawA[ASY[i]:AEY[i]])
-		TaverageA[i]<-mean(TempA[ASY[i]:AEY[i]])
+		TaverageA[i]<-mean(TempA[ASY[i]:AEY[i]]) 
 	}		
 	for(i in 1:NSDWS){
 		FDDS[i]<-sum(FreezeS[SSY[i]:SEY[i]])
 		TDDS[i]<-sum(ThawS[SSY[i]:SEY[i]])
 		DayZero[i]<-sum(X[SSY[i]:SEY[i]])
 		TaverageS[i] <- mean(TempS[SSY[i]:SEY[i]])
+		ThawCountN[i] <- sum(ThawingDayN[SSY[i]:SEY[i]])
 	}	
 	
 	#now calculate N factors
