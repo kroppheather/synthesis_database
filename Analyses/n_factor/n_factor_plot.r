@@ -138,8 +138,9 @@ datVI$namel2 <- c("barren", "tundra","tundra","shrub","shrub",
 					" ","needleleaf","needleleaf","boreal")	
 datVI$namel3 <- c(" ", " "," ","tundra","tundra",
 					" ","boreal","boreal"," ")						
-wd <- 70
-hd <- 40
+wd <- 80
+hd <- 73
+
 
 
 #make a panel of parameters for each regression
@@ -157,33 +158,33 @@ mlw <- 6
 #arrow line width
 alw <- 4
 #lwd of ticks
-tlw <- 7
+tlw <- 8
 #size of x labels
-axc <- 8
-#line of x label
-xl1 <- 2
-xl2 <- 15
-xl3 <- 30
+axc <- 10
+#line for label num
+xll <- 2
+
 #line for units
 yll1 <- 20
 #line for name
 yll2 <- 15
 #cex of axis label
-mcx <- 11
+mcx <- 13
 #one line width
-zlw <- 7
+zlw <- 9
 
 
-png(paste0(plotDI,"\\run",Nrun,"\\intercepts.png"), width=3000,height=5000,
+png(paste0(plotDI,"\\run",Nrun,"\\intercepts2.png"), width=3000,height=4200,
 			units="px")
+	#layout(matrix(seq(1,3),ncol=1), width=rep(lcm(wd),3),height=c(rep(lcm(hd),2),lcm(hd2)))
 	layout(matrix(seq(1,2),ncol=1), width=rep(lcm(wd),2),height=rep(lcm(hd),2))
 		#plot intercept
 	
-		par(mai=c(1,0,0,0))
+		par(mai=c(1,6,15,0))
 		
 			plot(c(0,1),c(0,1), ylim=c(yli[1],yhi[1]), xlim=c(xl,xh),
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
-			abline(h=1,	lwd	=zlw, col="grey75",lty=3)
+			points(c(xl,xh),c(1,1),type="l",lwd=zlw, col="grey75",lty=3)
 			for(j in 1:9){
 				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
 						c(beta0$X25.[beta0$regID==1&beta0$vegeclass==j],beta0$X75.[beta0$regID==1&beta0$vegeclass==j],
@@ -202,11 +203,12 @@ png(paste0(plotDI,"\\run",Nrun,"\\intercepts.png"), width=3000,height=5000,
 			#mtext(expression(paste("(N"[freeze],")")),side=2,line=yll1,cex=mcx)
 			mtext("Freeze n-factor",side=2,line=yll2,cex=mcx)
 			
-		par(mai=c(1,0,0,0))
+		par(mai=c(15,6,1,0),xpd=TRUE)
 		
 			plot(c(0,1),c(0,1), ylim=c(yli[2],yhi[2]), xlim=c(xl,xh),
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
-			abline(h=1,	lwd	=zlw, col="grey75",lty=3)
+		
+			points(c(xl,xh),c(1,1),type="l",lwd=zlw, col="grey75",lty=3)
 			for(j in 1:9){
 				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
 						c(beta0$X25.[beta0$regID==2&beta0$vegeclass==j],beta0$X75.[beta0$regID==2&beta0$vegeclass==j],
@@ -224,11 +226,15 @@ png(paste0(plotDI,"\\run",Nrun,"\\intercepts.png"), width=3000,height=5000,
 			mtext(seq(yli[2],yhi[2], by=yii[2]),at=seq(yli[2],yhi[2], by=yii[2]), side=2, line=xll,cex=axc,las=2)	
 			#mtext(expression(paste("(N"[thaw],")")),side=2,line=yll1,cex=mcx)			
 			mtext("Thaw n-factor",side=2,line=yll2,cex=mcx)
+			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw)
+			text(xseq,rep(-.1,length(xseq)),datVI$name2,srt=35, adj=1,cex=axc,xpd=TRUE)
+			#labels
+			#par(mai=c(0,0,1,0),xpd=TRUE)
+			#plot(c(0,1),c(0,1), ylim=c(0,1), xlim=c(xl,xh),
+			#	xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+						
 			
-			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw)			
-			mtext(datVI$namel1,at=xseq, side=1,cex=axc, line=xl1)
-			mtext(datVI$namel2,at=xseq, side=1,cex=axc, line=xl2)
-			mtext(datVI$namel3,at=xseq, side=1,cex=axc, line=xl3)
+
 				
 			
 dev.off()	

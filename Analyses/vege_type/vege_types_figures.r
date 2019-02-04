@@ -654,8 +654,8 @@ dev.off()
 #######################################					
 
 
-wd <- 55
-hd <- 30
+wd <- 80
+hd <- 73
 
 
 #make a panel of parameters for each regression
@@ -673,26 +673,28 @@ mlw <- 6
 #arrow line width
 alw <- 4
 #lwd of ticks
-tlw <- 5
+tlw <- 8
 #size of x labels
-axc <- 5
-#line of x label
+axc <- 10
+#line for label num
 xll <- 2
 #line for units
 yll1 <- 20
 #line for name
-yll2 <- 30
+yll2 <- 33
+#line for name
+yll3 <- 46
 #cex of axis label
-mcx <- 6
+mcx <- 13
 
 
 
-png(paste0(plotDI,"\\run",Nrun,"\\intercepts_min_max.png"), width=3000,height=3500,
+png(paste0(plotDI,"\\run",Nrun,"\\intercepts_min_max2.png"), width=3000,height=4200,
 			units="px")
 	layout(matrix(seq(1,2),ncol=1), width=rep(lcm(wd),2),height=rep(lcm(hd),2))
 		#plot intercept
 	
-		par(mai=c(1,0,0,0))
+		par(mai=c(1,6,15,0))
 		
 			plot(c(0,1),c(0,1), ylim=c(yli[1],yhi[1]), xlim=c(xl,xh),
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
@@ -712,10 +714,10 @@ png(paste0(plotDI,"\\run",Nrun,"\\intercepts_min_max.png"), width=3000,height=35
 			axis(2, seq(yli[1],yhi[1], by=yii[1]), rep(" ",length(seq(yli[1],yhi[1], by=yii[1]))),
 				 lwd.ticks=tlw)
 			mtext(seq(yli[1],yhi[1], by=yii[1]),at=seq(yli[1],yhi[1], by=yii[1]), side=2, line=xll,cex=axc,las=2)	
-			mtext(expression(paste("(T"[max],","~degree~"C)")),side=2,line=yll1,cex=mcx)
-			mtext("Temperature minimum",side=2,line=yll2,cex=mcx)
-			
-		par(mai=c(1,0,0,0))
+			mtext(expression(paste("(T"[min],","~degree~"C)")),side=2,line=yll1,cex=mcx)
+			mtext("minimum",side=2,line=yll2,cex=mcx)
+			mtext("Temperature",side=2,line=yll3,cex=mcx)
+		par(mai=c(15,6,1,0),xpd=TRUE)
 		
 			plot(c(0,1),c(0,1), ylim=c(yli[2],yhi[2]), xlim=c(xl,xh),
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
@@ -736,9 +738,10 @@ png(paste0(plotDI,"\\run",Nrun,"\\intercepts_min_max.png"), width=3000,height=35
 				 lwd.ticks=tlw)
 			mtext(seq(yli[2],yhi[2], by=yii[2]),at=seq(yli[2],yhi[2], by=yii[2]), side=2, line=xll,cex=axc,las=2)	
 			mtext(expression(paste("(T"[max],","~degree~"C)")),side=2,line=yll1,cex=mcx)			
-			mtext("Temperature maximum",side=2,line=yll2,cex=mcx)
+			mtext("maximum",side=2,line=yll2,cex=mcx)
+			mtext("Temperature",side=2,line=yll3,cex=mcx)
 					
-			mtext(datVI$name2,at=xseq, side=1, line=xll,cex=axc,las=2)
+			text(xseq,rep(-1,length(xseq)),datVI$name2,srt=35, adj=1,cex=axc,xpd=TRUE)
 
 				
 			
@@ -749,8 +752,8 @@ dev.off()
 #####plot just air slope          ##### 
 #######################################
 
-wd <- 55
-hd <- 30
+wd <- 80
+hd <- 73
 
 
 #make a panel of parameters for each regression
@@ -768,34 +771,36 @@ mlw <- 6
 #arrow line width
 alw <- 4
 #lwd of ticks
-tlw <- 5
+tlw <- 8
 #size of x labels
-axc <- 5
+axc <- 10
 #line of x label
 xll <- 2
 #line for units
-yll1 <- 15
+yll1 <- 20
 #line for name
-yll2 <- 25
+yll2 <- 33
 #second line for name
-yll3 <- 35
+yll3 <- 46
+#second line for name
+yll4 <- 59
 #cex of axis label
-mcx <- 6
+mcx <- 13
 #zero line
-zlw <- 10
+zlw <- 9
 
 
 
-png(paste0(plotDI,"\\run",Nrun,"\\air_slopes_min_max.png"), width=2800,height=3500,
+png(paste0(plotDI,"\\run",Nrun,"\\air_slopes_min_max2.png"), width=3500,height=4200,
 			units="px")
 	layout(matrix(seq(1,2),ncol=1), width=rep(lcm(wd),2),height=rep(lcm(hd),2))
 		#plot intercept
 	
-		par(mai=c(1,0,0,0))
+		par(mai=c(1,6,15,0))
 		
 			plot(c(0,1),c(0,1), ylim=c(yli[1],yhi[1]), xlim=c(xl,xh),
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
-			abline(h=0,	lwd	=zlw, col="grey75",lty=3)
+			points(c(xl,xh),c(0,0),type="l",lwd=zlw, col="grey75",lty=3)
 			for(j in 1:9){
 		
 					polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
@@ -813,14 +818,15 @@ png(paste0(plotDI,"\\run",Nrun,"\\air_slopes_min_max.png"), width=2800,height=35
 			axis(2, seq(yli[1],yhi[1], by=yii[1]), rep(" ",length(seq(yli[1],yhi[1], by=yii[1]))),
 				 lwd.ticks=tlw)
 			mtext(seq(yli[1],yhi[1], by=yii[1]),at=seq(yli[1],yhi[1], by=yii[1]), side=2, line=xll,cex=axc,las=2)	
-			mtext(expression(paste("("~degree~"C soil"~degree~"C air"^"-1",")")),side=2,line=yll1,cex=mcx)
-			mtext("Change in",side=2,line=yll3,cex=mcx)
-			mtext("temperature minimum",side=2,line=yll2,cex=mcx)
-		par(mai=c(1,0,0,0))
+			mtext(expression(paste("(",degree,"C soil",degree,"C air"^"-1",")")),side=2,line=yll1,cex=mcx)
+			mtext("Change in",side=2,line=yll4,cex=mcx)
+			mtext("temperature",side=2,line=yll3,cex=mcx)
+			mtext("minimum",side=2,line=yll2,cex=mcx)
+		par(mai=c(15,6,1,0),xpd=TRUE)
 		
 			plot(c(0,1),c(0,1), ylim=c(yli[2],yhi[2]), xlim=c(xl,xh),
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
-			abline(h=0,	lwd	=zlw, col="grey75",lty=3)
+			points(c(xl,xh),c(1,1),type="l",lwd=zlw, col="grey75",lty=3)
 			for(j in 1:9){
 		
 					polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
@@ -838,12 +844,12 @@ png(paste0(plotDI,"\\run",Nrun,"\\air_slopes_min_max.png"), width=2800,height=35
 			axis(2, seq(yli[2],yhi[2], by=yii[2]), rep(" ",length(seq(yli[2],yhi[2], by=yii[2]))),
 				 lwd.ticks=tlw)
 			mtext(seq(yli[2],yhi[2], by=yii[2]),at=seq(yli[2],yhi[2], by=yii[2]), side=2, line=xll,cex=axc,las=2)	
-		mtext(expression(paste("("~degree~"C soil"~degree~"C air"^"-1",")")),side=2,line=yll1,cex=mcx)
-			mtext("Change in",side=2,line=yll3,cex=mcx)
-			mtext("temperature maximum",side=2,line=yll2,cex=mcx)
+		mtext(expression(paste("(",degree,"C soil",degree,"C air"^"-1",")")),side=2,line=yll1,cex=mcx)
+			mtext("Change in",side=2,line=yll4,cex=mcx)
+			mtext("temperature",side=2,line=yll3,cex=mcx)
+			mtext(" maximum",side=2,line=yll2,cex=mcx)
 					
-			mtext(datVI$name2,at=xseq, side=1, line=xll,cex=axc,las=2)
-
+			text(xseq,rep(-1.25,length(xseq)),datVI$name2,srt=35, adj=1,cex=axc,xpd=TRUE)
 				
 			
 dev.off()		
