@@ -21,9 +21,9 @@ library(mcmcplots,lib.loc="/home/hkropp/R")
 #set up model run  ######
 #########################
 #run number
-rn <- 1
+rn <- 6
 #output dir
-outDir <- "/home/hkropp/synthesis/output_u10/run1"
+outDir <- "/home/hkropp/synthesis/output_u10/run6"
 
 #########################
 #read in data      ######
