@@ -30,7 +30,7 @@ outDir <- "/home/hkropp/synthesis/output_u10/run3"
 #########################
 # set working directory
 #from db backup 6
-setwd("home/hkropp/synthesis/data")
+setwd("/home/hkropp/synthesis/data")
 #read in soil temperature
 datS<-read.table("soil_temp.csv", sep=",", header=TRUE, na.string=c("NaN"))
 #read in air temperature
