@@ -23,7 +23,7 @@ library(mcmcplots,lib.loc="/home/hkropp/R")
 #run number
 rn <- 23
 #output dir
-outDir <- "/home/hkropp/synthesis/output_u10/run23"
+outDir <- "/home/hkropp/synthesis/output_u10_p2/run23"
 prevDir <- "/home/hkropp/synthesis/output_u10"
 
 #########################

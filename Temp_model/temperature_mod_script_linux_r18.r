@@ -23,7 +23,7 @@ library(mcmcplots,lib.loc="/home/hkropp/R")
 #run number
 rn <- 18
 #output dir
-outDir <- "/home/hkropp/synthesis/output_u10/run18"
+outDir <- "/home/hkropp/synthesis/output_u10_p2/run18"
 prevDir <- "/home/hkropp/synthesis/output_u10"
 
 #########################
@@ -824,7 +824,7 @@ samplelist<-c("T.aveA1","TminA","TmaxA","T.aveS1","TmaxS","TminS","sig.muA","sig
 
 #need to figure out what has been run already			 
 alreadyRun <- list.dirs(paste(prevDir), full.names=FALSE,recursive=FALSE)	
-list.dirs(paste0(prevDir,"/",alreadyRun[1]), full.names=FALSE,recursive=FALSE)
+
 #get sites run in each 
 alreadyRunS <- list()
 siteRunIDS<- list()
