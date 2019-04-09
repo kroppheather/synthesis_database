@@ -18,6 +18,7 @@
 ### datAT: site depth id, datAT: site height ID        ###
 ### datNI: n factor ids, datAI: site year height ID    ###
 ### datSI: site depth year ID                          ###
+### ThawParm: # of days above or at zero               ###
 ##########################################################
 ##########################################################
 
@@ -51,7 +52,7 @@ library(plyr)
 #set up a plot directory
 plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\plots\\model_all"
 #model directory
-modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run3"
+modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run4"
 Nrun <-3
 #indicate if a model run is occuring
 modRun <- 1
