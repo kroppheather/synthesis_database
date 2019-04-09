@@ -27,67 +27,49 @@ library(plyr)
 ############################
 ##Model run specifications##
 ############################
+#directory of output
+mrunDir <- "z:\\projects\\synthesis"
+
+
 #read in model run file
-mrunF <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\site_model_statusr6.csv")
-#get the unique runs
-AllmrunF <- data.frame(model.run=unique(mrunF$model.run))
+#indicates the runs that 
+#had convergence issues
 
+AllmrunF <- read.csv(paste0(mrunDir,"\\mod_run.csv"))
 
-#if in model run 12:
-# sites below 21 are in r1
-# sites above 21 and below 47 are in r4
-# sites 48 - 74 are in r3
-# sites 75- 210 are in r4
+#get directory names
 
-#set up directory depending on the run
+WDRF <- list.dirs(paste0(mrunDir),recursive=FALSE,full.names=FALSE)
 
-WDR <- ifelse(mrunF$model.run=="m12"&mrunF$siteid <=21, "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u7m12\\r1\\output_u7m12r1",
-			ifelse(mrunF$model.run=="m12"&mrunF$siteid >21&mrunF$siteid<=47, "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u7m12\\r4\\output_u7m12r4",
-			ifelse(mrunF$model.run=="m12"&mrunF$siteid >47&mrunF$siteid<=74, "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u7m12\\r3\\output_u7m12r3",
-			ifelse(mrunF$model.run=="m12"&mrunF$siteid >74&mrunF$siteid<=210, "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u7m12\\r2\\output_u7m12r2",
-			ifelse(mrunF$model.run=="m12Br1", "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u8m12B\\r1\\output_u8m12Br1",
-			ifelse(mrunF$model.run=="m12Br2","c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u8m12B\\r2\\output_u8m12Br2",
-			ifelse(mrunF$model.run=="m12Br3","c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u8m12B\\r3\\output_u8m12Br3",
-			ifelse(mrunF$model.run=="m12Br4","c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u8m12B\\r4\\output_u8m12Br4",
-			ifelse(mrunF$model.run=="m12Br5","c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u8m12B\\r5\\output_u8m12Br5",
-			ifelse(mrunF$model.run=="u9m12Br1","c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u9m12B\\r1\\output_u9m12Br1",
-			"c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u9m12B\\r2\\output_u9m12Br2"))))))))))			
-mrunF$WDR <- WDR
-#run id 
+#get directory names for site names within each 
+SDRF <- list()
+WDR <- list()
+mrun <- list()
+for(i in 1:length(WDRF)){
+	SDRF[[i]] <- list.dirs(paste0(mrunDir,"\\",WDRF[i]),recursive=FALSE,full.names=FALSE)
+	WDR[[i]] <- paste0(mrunDir,"\\",WDRF[i],"\\",SDRF[[i]])
+	mrun[[i]] <- data.frame(model.run=rep(as.numeric(gsub("\\D","",WDRF[i])),length(SDRF[[i]])), 
+								siteid=as.numeric(gsub("\\D","",SDRF[[i]])),
+								dir=WDR[[i]],
+								run.dir=rep(paste0(mrunDir,"\\",WDRF[i]),length(SDRF[[i]])))
+}
 
-mrunF$runID <- ifelse(mrunF$model.run=="m12"&mrunF$siteid <=21,1,
-			ifelse(mrunF$model.run=="m12"&mrunF$siteid >21&mrunF$siteid<=47, 2,
-			ifelse(mrunF$model.run=="m12"&mrunF$siteid >47&mrunF$siteid<=74, 3,
-			ifelse(mrunF$model.run=="m12"&mrunF$siteid >74&mrunF$siteid<=210,4,
-			ifelse(mrunF$model.run=="m12Br1", 5,
-			ifelse(mrunF$model.run=="m12Br2",6,
-			ifelse(mrunF$model.run=="m12Br3",7,
-			ifelse(mrunF$model.run=="m12Br4",8,
-			ifelse(mrunF$model.run=="m12Br5",9,
-			ifelse(mrunF$model.run=="u9m12Br1",10,11))))))))))
+mrunF <- ldply(mrun,data.frame)
 
-WDRI <- c ("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u7m12\\r1\\output_u7m12r1",
-			"c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u7m12\\r4\\output_u7m12r4",
-			 "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u7m12\\r3\\output_u7m12r3",
-			 "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u7m12\\r2\\output_u7m12r2",
-			"c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u8m12B\\r1\\output_u8m12Br1",
-			"c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u8m12B\\r2\\output_u8m12Br2",
-			"c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u8m12B\\r3\\output_u8m12Br3",
-			"c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u8m12B\\r4\\output_u8m12Br4",
-			"c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u8m12B\\r5\\output_u8m12Br5",
-			"c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u9m12B\\r1\\output_u9m12Br1",
-			"c:\\Users\\hkropp\\Google Drive\\synthesis_model\\u9m12B\\r2\\output_u9m12Br2")	
+mrunF <- mrunF[order(mrunF$siteid),]	
 
-
-Nruns <- length(WDRI)			
+#pull out sites that had convergence issues
+mrunF <- join(mrunF,AllmrunF, by="siteid",type="left")
+mrunF <- mrunF[is.na(mrunF$noConv),]
+	
 ############################
 ##Read in data            ##
 ############################
 
 #working directory for data
-#always refer to last model run
-#where data from additional sites will be
-dataWD <- WDRI[11]
+#same data saved in each model run
+#so just grab it from first one
+dataWD <-paste0(mrunDir,"\\",WDRF[1])
 
 #read in data
 datAI <- read.csv(paste0(dataWD,"\\AirIDS.csv"))
@@ -106,9 +88,6 @@ datAM$decdateA <- datAM$decdate-1991
 
 datAveIS <- read.csv(paste0(dataWD,"\\SoilTaveIDS_SD.csv"))
 datAveIA <- read.csv(paste0(dataWD,"\\AirTaveIDS_SD.csv"))
-#get a list of the sites that should be expected
-siteall <- data.frame(siteid=unique(datSI$siteid))
-siteall$siteUI <- seq(1,dim(siteall)[1])
 
 #now organize rep IDS, need to pull correct ones for the site
 #in the run it is actually used in
@@ -117,17 +96,17 @@ siteall$siteUI <- seq(1,dim(siteall)[1])
 datSRALL<-list()
 datARALL<-list()
 
-for(i in 1:Nruns){
-	datSRALL[[i]]<-read.csv(paste0(WDRI[i],"\\SoilrepIDS.csv"))
-	datARALL[[i]]<-read.csv(paste0(WDRI[i],"\\AirrepIDS.csv"))
+for(i in 1:dim(mrunF)[1]){
+	datSRALL[[i]]<-read.csv(paste0(mrunF$run.dir[i],"\\SoilrepIDS.csv"))
+	datARALL[[i]]<-read.csv(paste0(mrunF$run.dir[i],"\\AirrepIDS.csv"))
 }
 
 #get the correct IDS for each site generated in the site run
 datSR<-list()
 datAR<-list()
 for(i in 1:dim(mrunF)[1]){
-	datSR[[i]]<-datSRALL[[mrunF$runID[i]]][datSRALL[[mrunF$runID[i]]]$siteid==mrunF$siteid[i],]
-	datAR[[i]]<-datARALL[[mrunF$runID[i]]][datARALL[[mrunF$runID[i]]]$siteid==mrunF$siteid[i],]
+	datSR[[i]]<-datSRALL[[i]][datSRALL[[i]]$siteid==mrunF$siteid[i],]
+	datAR[[i]]<-datARALL[[i]][datARALL[[i]]$siteid==mrunF$siteid[i],]
 }
 
 datSRdf<-ldply(datSR, data.frame)
@@ -140,8 +119,8 @@ datM<-list()
 datQ<-list()
 datC<-list()
 for(i in 1:dim(mrunF)[1]){
-	datM[[i]]<-read.csv(paste0(mrunF$WDR[i],"\\site",mrunF$siteid[i],"Temp_mod_stats.csv"))
-	datQ[[i]]<-read.csv(paste0(mrunF$WDR[i],"\\site",mrunF$siteid[i],"Temp_mod_quant.csv"))
+	datM[[i]]<-read.csv(paste0(mrunF$dir[i],"\\Temp_mod_stats.csv"))
+	datQ[[i]]<-read.csv(paste0(mrunF$dir[i],"\\Temp_mod_quant.csv"))
 	#join means and quantiles
 	datC[[i]]<-cbind(datM[[i]],datQ[[i]])
 	#make parms vectors
@@ -200,6 +179,7 @@ datAreps <- list()
 datSreps <- list()
 datCSM<-list()
 datCAM<-list()
+datThawN <- list()
 
 #now pull out id number
 dexps2<-"\\D"
@@ -230,6 +210,9 @@ for(i in 1:dim(mrunF)[1]){
 	#average temperature
 	datTaverageS[[i]]<-datC[[i]][datC[[i]]$parms1=="TaverageS",]
 	datTaverageS[[i]]$siteSDW <- seq(1,dim(datTaverageS[[i]])[1])
+	#number of days thawed
+	datThawN[[i]] <- datC[[i]][datC[[i]]$parms1=="ThawCountN",]
+	datThawN[[i]]$siteSDW<-seq(1,dim(datThawN[[i]])[1])
 	
 	#now join with ids
 
@@ -241,7 +224,7 @@ for(i in 1:dim(mrunF)[1]){
 	datNthaw[[i]]<-join(datNthaw[[i]], datNIS[[i]], by="Nseq", type="left")
 	datNfreeze[[i]]<-join(datNfreeze[[i]], datNIS[[i]], by="Nseq", type="left")
 	datTaverageS[[i]] <- join(datTaverageS[[i]],SoilSDW[[i]], by="siteSDW", type="left")
-	
+	datThawN[[i]] <- join(datThawN[[i]],SoilSDW[[i]], by="siteSDW", type="left")
 	#pull out reps
 	datAreps[[i]] <- datC[[i]][datC[[i]]$parms1=="TempA.rep",]
 	datSreps[[i]] <- datC[[i]][datC[[i]]$parms1=="TempS.rep",]
@@ -258,7 +241,7 @@ for(i in 1:dim(mrunF)[1]){
 	datAverageS <- ldply(datTaverageS, data.frame)
 	datSreps <- ldply(datSreps)
 	datAreps <- ldply(datAreps)
-	
+	datThawN <- ldply(datThawN,data.frame)
 	
 	
 #subset first to only look at air parms
@@ -360,10 +343,15 @@ TaveA <-data.frame(datAverageA[,1:2], pc2.5=datAverageA[,5],pc97.5=datAverageA[,
 				
 AirParm<-rbind(SpeakA, WpeakA,TminA,TmaxA, TaveA)
 
+ThawParm <- data.frame(datThawN[,1:2], pc2.5=datThawN[,5],pc97.5=datThawN[,9],
+				datThawN[,12:14],parm=datThawN$parms1)
+
+max(ThawParm$Mean)
+
 #join rep id with replicate data
 
 AirRepID <- cbind(datARdf, datAreps)
 SoilRepID <- cbind(datSRdf, datSreps)
 
 rm(list=setdiff(ls(), c("AirParm", "SoilParm","Nfactor", "AirRepID","SoilRepID", "datCSM", "datCAM","datAM", "datSM",
-						"datAT","datST","datNI","datAI","datSI")))
+						"datAT","datST","datNI","datAI","datSI","ThawParm")))
