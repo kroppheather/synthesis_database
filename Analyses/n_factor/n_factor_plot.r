@@ -63,8 +63,8 @@ vegeclassColors <- data.frame(vegeclass=seq(1,9),
 #set up a plot directory
 plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\n_factor\\plots\\model"
 #model directory
-modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\n_factor\\model\\run1"
-Nrun <-1
+modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\n_factor\\model\\run2"
+Nrun <-2
 #indicate if a model run is occuring
 modRun <- 1
 
