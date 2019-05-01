@@ -41,45 +41,33 @@ library(coda)
 library(mcmcplots)
 library(plyr)
 
+
+
 #######################################
 #####set directories              ##### 
 #######################################
 
 #set up a plot directory
-plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\n_factor\\plots\\model"
+plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\thaw\\plots\\model"
 #model directory
-modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\n_factor\\model\\run2"
-Nrun <-2
-#indicate if a model run is occuring
-modRun <- 1
+modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\thaw\\model\\run1"
+Nrun <-1
 
 
 #join vegeclass to data
-Nfactor2 <- join(Nfactor,datV, by="siteid",type="left")
-#create regression id
-Nfactor2$regID <- ifelse(Nfactor2$parm=="Fn",1,2)
-
-
-#create dataframe
-
-regvegeID <- unique(data.frame(vegeclass=Nfactor2$vegeclass,regID=Nfactor2$regID))
-regvegeID <- regvegeID[order(regvegeID$regID,regvegeID$vegeclass),]
-regvegeID$regvegeID <- seq(1,dim(regvegeID)[1])
-
-#join back into Nfactors
-Nfactor2 <- join(Nfactor2,regvegeID, by=c("regID","vegeclass"), type="left")
-
+ThawParm2 <- join(ThawParm,datV, by="siteid",type="left")
+vegeID <- data.frame(vegeclass=unique(ThawParm2$vegeclass))
+vegeIDc <- join(vegeID,datVI,by="vegeclass",type="left")
+vegeIDc <- vegeIDc[order(vegeIDc$vegeclass),]
 #######################################
 #####prepare model run            ##### 
 #######################################
-datalist <- list(Nobs=dim(Nfactor2)[1],
-				SoilP = Nfactor2$Mean,
-				regVege=Nfactor2$regvegeID,
-				depth=Nfactor2$depth,
-				sigMod=Nfactor2$SD,
-				NregVege=dim(regvegeID)[1],
-				regV=regvegeID$regID,
-				Nreg=2)
+datalist <- list(Nobs=dim(ThawParm2)[1],
+				SoilP = ThawParm2$Mean,
+				Vege=ThawParm2$vegeclass,
+				depth=ThawParm2$depth,
+				sigMod=ThawParm2$SD,
+				NVege=dim(vegeIDc)[1])
 				
 #paramters of interest
 parms <- c("beta0","beta1","sigSoilV","repSoilP",
@@ -88,9 +76,9 @@ parms <- c("beta0","beta1","sigSoilV","repSoilP",
 		
 Xcomp <- round(0.05/((9*2)-1),3)
 
-if(modRun==1){
+
 #start model 
-vege.modI<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Analyses\\n_factor\\n_factor_code.r",
+vege.modI<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Analyses\\thaw\\thaw_length_model.r",
 						data=datalist,
 						n.adapt=10000,
 						n.chains=3)
@@ -121,5 +109,3 @@ chain2<-as.matrix(vege.sample [[2]])
 write.table(chain2,paste0(modDI,"\\chain2_coda.csv"), sep=",")
 chain3<-as.matrix(vege.sample [[3]])
 write.table(chain3,paste0(modDI,"\\chain3_coda.csv"), sep=",")		
-
-}	

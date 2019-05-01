@@ -53,7 +53,7 @@ library(plyr)
 plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\plots\\model_all"
 #model directory
 modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run4"
-Nrun <-3
+Nrun <- 4
 #indicate if a model run is occuring
 modRun <- 1
 
