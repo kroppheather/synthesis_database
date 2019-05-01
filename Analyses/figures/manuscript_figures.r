@@ -41,9 +41,12 @@ vegeRS <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\
 vegeRT <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run4\\vege_mod_quant.csv")
 vegeR <- cbind(vegeRS,vegeRT)
 
+#pull out parm names
+dexps <- "\\[*[[:digit:]]*\\]"
+vegeR$parms <- gsub(dexps,"", rownames(vegeR))
 
-
-
+#world clim 2 precip in mm
+datWC <- read.csv("c:\\Users\\hkropp\\Google Drive\\map_synth\\WCprecSites.csv")
 
 #######################################
 #####vegetation colors            ##### 						
@@ -72,6 +75,7 @@ library(plyr)
 library(mapplots)
 library(rgeos)
 library(lubridate)
+library(imager)
 
 ##########################################################################################
 ##########################################################################################
@@ -318,8 +322,75 @@ datSTn <- join(datSTn, vegeDepth, by=c("depthID","vegeclass"), type="left")
 #######################################
 #####work with min and max        ##### 
 #######################################
+#organize soil output
 
-Smax <- SoilParm[SoilParm$parm=="T
+
+#join vege class to soilParm
+SoilParm <- join(SoilParm,datV, by=c("siteid"), type="left")
+unique(SoilParm$vegeclass)
+
+
+#join world clim data
+SoilParm <- join(SoilParm, datWC, by=c("siteid"), type="left")
+
+#create unique names for air
+colnames(AirParm)[1:4] <- paste0("A",colnames(AirParm)[1:4])
+colnames(AirParm)[8] <- paste0("A",colnames(AirParm)[8])
+#pull out each soil parm dataset:
+parmV <- unique(SoilParm$parm)
+parmA <- unique(AirParm$Aparm)
+
+#pull out relevant parameters
+#for analysis: TminS, TmaxS, peakWS
+#and subset to relevant depths
+
+parmVs <- c("TminS","TmaxS", "peakWS") 
+
+parmAs <- c("TminA","TmaxA", "peakWA") 
+
+
+SoilL <- list()
+SoilMs <- numeric(0)
+for(i in 1:length(parmVs)){
+	SoilL[[i]] <- SoilParm[SoilParm$parm==parmVs[i]&SoilParm$depth<=20,]
+	#calculate mean
+	SoilMs[i] <- round(mean(SoilL[[i]]$Mean),3)
+	#add a regression ID
+	SoilL[[i]]$regID <- rep(i,dim(SoilL[[i]])[1])
+}
+
+AirL <- list()
+AirMs <- numeric(0)
+for(i in 1:length(parmAs)){
+	AirL[[i]] <- AirParm[AirParm$Aparm==parmAs[i],]
+	#calculate mean
+	AirMs[i] <- round(mean(AirL[[i]]$AMean),3)
+	#add a regression ID
+	AirL[[i]]$regID <- rep(i,dim(AirL[[i]])[1])
+}
+
+
+#turn back into a data frame
+
+SoilR <- ldply(SoilL,data.frame)
+AirR <- ldply(AirL,data.frame)
+
+
+
+#now join soil and air DF
+ParmAll <- join(SoilR,AirR, by=c("siteid","wyear","regID"),type="left")
+
+
+#get unique veg regression id
+
+regvegeID <- unique(data.frame(vegeclass=ParmAll$vegeclass,regID=ParmAll$regID))
+regvegeID$regvegeID <- seq(1,dim(regvegeID)[1])
+
+#add to intercept
+betaAll <- vegeR[vegeR$parms=="beta0",]
+betaAll <- cbind(betaAll,regvegeID)
+b0Min <- betaAll[betaAll$regID==1,]
+b0Max <- betaAll[betaAll$regID==2,]
 
 #######################################
 #####figure with summary          ##### 
@@ -392,6 +463,12 @@ lx <- 17
 mlwd <- 7
 #density axis line
 dcx <- 3
+#box error bar width
+alw <- 5
+#box mean width
+mlw <- 7
+#sequence for min and max plot
+xseqP <- c(1,2)
 
 lgry <- rgb(165/255,165/255,165/255,.2)
 	
@@ -463,19 +540,37 @@ for(i in 1:9){
 		par(mai=c(0,0,0,0))
 			plot(c(0,1),c(0,1), ylim=c(-41,35), xlim=c(xl2,xh2),type="n",xlab= " ", ylab=" ",axes=FALSE,
 				xaxs="i",yaxs="i")
-			
+					
+				polygon(c(xseqP[1]-.5,xseqP[1]-.5,xseqP[1]+.5,xseqP[1]+.5),
+						c(b0Min$X25.[b0Min$vegeclass==i],b0Min$X75.[b0Min$vegeclass==i],
+							b0Min$X75.[b0Min$vegeclass==i],b0Min$X25.[b0Min$vegeclass==i]),
+						col="tomato3",border=NA)
+				arrows(xseqP[1]-.5,b0Min$Mean[b0Min$vegeclass==i],
+						xseqP[1]+.5,b0Min$Mean[b0Min$vegeclass==i],code=0,lwd=mlw)
+				arrows(	xseqP[1],b0Min$X0.2.[b0Min$vegeclass==i],
+						xseqP[1],b0Min$X99.8.[b0Min$vegeclass==i],
+						code=0, lwd=alw)
+				polygon(c(xseqP[2]-.5,xseqP[2]-.5,xseqP[2]+.5,xseqP[2]+.5),
+						c(b0Max$X25.[b0Max$vegeclass==i],b0Max$X75.[b0Max$vegeclass==i],
+							b0Max$X75.[b0Max$vegeclass==i],b0Max$X25.[b0Max$vegeclass==i]),
+						col="tomato3",border=NA)
+				arrows(xseqP[2]-.5,b0Max$Mean[b0Max$vegeclass==i],
+						xseqP[2]+.5,b0Max$Mean[b0Max$vegeclass==i],code=0,lwd=mlw)
+				arrows(	xseqP[2],b0Max$X0.2.[b0Max$vegeclass==i],
+						xseqP[2],b0Max$X99.8.[b0Max$vegeclass==i],
+						code=0, lwd=alw)			
 	dev.off()
 }	
 
 #plot all images
 #read in all images
 
-png(paste0(plotDI,"\\all_panel_ind_summary_b.png"),width=6000,height=2000)
+png(paste0(plotDI,"\\all_panel_data.png"),width=6000,height=2000)
 
 	layout(matrix(seq(1,10),ncol=5,byrow=TRUE))
 	for(i in 1:9){
 		par(mai=c(0,0,0,0))
-		plot(load.image(paste0(plotDI,"\\individual2d_summary_class_b_",i,".png")),axes=FALSE)
+		plot(load.image(paste0(plotDI,"\\all\\all_data_vege_",i,".png")),axes=FALSE)
 	}	
 		##empty##		
 		par(mai=c(0,0,0,0))
