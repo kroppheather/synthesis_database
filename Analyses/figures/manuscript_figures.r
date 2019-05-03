@@ -48,6 +48,17 @@ vegeR$parms <- gsub(dexps,"", rownames(vegeR))
 #world clim 2 precip in mm
 datWC <- read.csv("c:\\Users\\hkropp\\Google Drive\\map_synth\\WCprecSites.csv")
 
+
+#read in N factor regression results
+Nstats <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\n_factor\\model\\run2\\vege_mod_stats.csv")
+Nquant <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\n_factor\\model\\run2\\vege_mod_quant.csv")
+Ndf <- cbind(Nstats,Nquant)
+
+Ndf$parms <- gsub(dexps,"", rownames(Ndf))
+
+#read in thaw days results
+
+
 #######################################
 #####vegetation colors            ##### 						
 #######################################	
@@ -228,6 +239,8 @@ dev.off()
 ################# Figure 2. all data & summary                           #################
 ##########################################################################################
 ##########################################################################################
+
+
 #######################################
 #####organize temp data for plot  ##### 						
 #######################################	
@@ -579,5 +592,12 @@ png(paste0(plotDI,"\\all_panel_data.png"),width=6000,height=2000)
 			legend("center", c("0-5 cm", "5-10 cm", "10-15 cm", "15-20 cm"), col=test2, lwd=6,	bty="n", cex=10)
 dev.off()				
 
+
+
+##########################################################################################
+##########################################################################################
+################# Figure 3. nfactor & thaw                               #################
+##########################################################################################
+##########################################################################################
 
 
