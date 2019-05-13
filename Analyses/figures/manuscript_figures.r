@@ -57,7 +57,11 @@ Ndf <- cbind(Nstats,Nquant)
 Ndf$parms <- gsub(dexps,"", rownames(Ndf))
 
 #read in thaw days results
+Thawstats <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\thaw\\model\\run1\\vege_mod_stats.csv")
+Thawquant <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\thaw\\model\\run1\\vege_mod_quant.csv")
 
+Thawdf <- cbind(Thawstats,Thawquant)
+Thawdf$parms <- gsub(dexps,"", rownames(Thawdf))
 
 #######################################
 #####vegetation colors            ##### 						
@@ -601,3 +605,162 @@ dev.off()
 ##########################################################################################
 
 
+
+#join vegeclass to data
+Nfactor2 <- join(Nfactor,datV, by="siteid",type="left")
+#create regression id
+Nfactor2$regID <- ifelse(Nfactor2$parm=="Fn",1,2)
+
+
+#create dataframe
+#for n factor regression ids
+regvegeID <- unique(data.frame(vegeclass=Nfactor2$vegeclass,regID=Nfactor2$regID))
+regvegeID <- regvegeID[order(regvegeID$regID,regvegeID$vegeclass),]
+regvegeID$regvegeID <- seq(1,dim(regvegeID)[1])
+
+
+#join vegeclass to data
+ThawParm2 <- join(ThawParm,datV, by="siteid",type="left")
+vegeID <- data.frame(vegeclass=unique(ThawParm2$vegeclass))
+vegeIDc <- join(vegeID,datVI,by="vegeclass",type="left")
+vegeIDc <- vegeIDc[order(vegeIDc$vegeclass),]
+
+#intercept for n factor
+beta0 <- Ndf[Ndf$parms=="beta0",]
+beta0 <- cbind(beta0,regvegeID)
+
+#intercept for thaw days
+Tbeta0 <- Thawdf[Thawdf$parms=="beta0",]
+Tbeta0 <- cbind(Tbeta0,vegeIDc)
+
+#######################################
+#####plot just intercept          ##### 
+#######################################
+datVI$name2 <- c("herb barren", "graminoid tundra","tussock tundra","short shrub tundra","tall shrub tundra",
+					"wetland","evergreen needleleaf boreal","deciduous needleleaf boreal","mixed boreal")
+					
+datVI$namel1 <- c("herb", "graminoid","tussock","short","tall",
+					"wetland","evergreen","deciduous","mixed")	
+datVI$namel2 <- c("barren", "tundra","tundra","shrub","shrub",
+					" ","needleleaf","needleleaf","boreal")	
+datVI$namel3 <- c(" ", " "," ","tundra","tundra",
+					" ","boreal","boreal"," ")						
+
+					
+					
+wd <-100
+hd <- 60
+
+#make a panel of parameters for each regression
+
+
+xseq <-c(1,4,7,10,13,16,19,22,25)
+
+yli <- c(0,0,75)
+yhi <- c(1.5,1.7,200)
+yii <- c(.5,.5,25)
+xl <- -1
+xh <- 27
+#mean line width
+mlw <- 6
+#arrow line width
+alw <- 4
+#lwd of ticks
+tlw <- 10
+#size of x labels
+axc <- 10
+axc2 <- 14
+#line for label num
+xll <- 2
+
+#line for units
+yll1 <- 20
+#line for name
+yll2 <- 35
+#cex of axis label
+mcx <- 13
+#one line width
+zlw <- 9
+
+
+png(paste0(plotDI,"\\intercepts_N.png"), width=3000,height=6200,
+			units="px")
+	layout(matrix(seq(1,4),ncol=1), width=rep(lcm(wd),4),height=c(lcm(hd),lcm(hd),lcm(hd),lcm(35)))
+		#plot intercept
+	
+		par(mai=c(1,6,2,0))
+		
+			plot(c(0,1),c(0,1), ylim=c(yli[1],yhi[1]), xlim=c(xl,xh),
+				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+			points(c(xl,xh),c(1,1),type="l",lwd=zlw, col="grey75",lty=3)
+			for(j in 1:9){
+				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
+						c(beta0$X25.[beta0$regID==1&beta0$vegeclass==j],beta0$X75.[beta0$regID==1&beta0$vegeclass==j],
+							beta0$X75.[beta0$regID==1&beta0$vegeclass==j],beta0$X25.[beta0$regID==1&beta0$vegeclass==j]),
+						col=paste(vegeclassColors$coli[j]),border=NA)
+				arrows(xseq[j]-1,beta0$Mean[beta0$regID==1&beta0$vegeclass==j],
+						xseq[j]+1,beta0$Mean[beta0$regID==1&beta0$vegeclass==j],code=0,lwd=mlw)
+				arrows(	xseq[j],beta0$X0.3.[beta0$regID==1&beta0$vegeclass==j],
+						xseq[j],beta0$X99.7.[beta0$regID==1&beta0$vegeclass==j],
+						code=0, lwd=alw)
+				}
+			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw)
+			axis(2, seq(yli[1],yhi[1], by=yii[1]), rep(" ",length(seq(yli[1],yhi[1], by=yii[1]))),
+				 lwd.ticks=tlw)
+			mtext(seq(yli[1],yhi[1], by=yii[1]),at=seq(yli[1],yhi[1], by=yii[1]), side=2, line=xll,cex=axc,las=2)	
+			#mtext(expression(paste("(N"[freeze],")")),side=2,line=yll1,cex=mcx)
+			mtext("Freeze n-factor",side=2,line=yll2,cex=mcx)
+			
+		par(mai=c(1,6,1,0))
+		
+			plot(c(0,1),c(0,1), ylim=c(yli[2],yhi[2]), xlim=c(xl,xh),
+				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+		
+			points(c(xl,xh),c(1,1),type="l",lwd=zlw, col="grey75",lty=3)
+			for(j in 1:9){
+				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
+						c(beta0$X25.[beta0$regID==2&beta0$vegeclass==j],beta0$X75.[beta0$regID==2&beta0$vegeclass==j],
+							beta0$X75.[beta0$regID==2&beta0$vegeclass==j],beta0$X25.[beta0$regID==2&beta0$vegeclass==j]),
+						col=paste(vegeclassColors$coli[j]),border=NA)
+				arrows(xseq[j]-1,beta0$Mean[beta0$regID==2&beta0$vegeclass==j],
+						xseq[j]+1,beta0$Mean[beta0$regID==2&beta0$vegeclass==j],code=0,lwd=mlw)
+				arrows(	xseq[j],beta0$X0.3.[beta0$regID==2&beta0$vegeclass==j],
+						xseq[j],beta0$X99.7.[beta0$regID==2&beta0$vegeclass==j],
+						code=0, lwd=alw)
+				}
+			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw)
+			axis(2, seq(yli[2],yhi[2], by=yii[2]), rep(" ",length(seq(yli[2],yhi[2], by=yii[2]))),
+				 lwd.ticks=tlw)
+			mtext(seq(yli[2],yhi[2], by=yii[2]),at=seq(yli[2],yhi[2], by=yii[2]), side=2, line=xll,cex=axc,las=2)	
+			#mtext(expression(paste("(N"[thaw],")")),side=2,line=yll1,cex=mcx)			
+			mtext("Thaw n-factor",side=2,line=yll2,cex=mcx)
+
+			
+	par(mai=c(1,6,1,0),xpd=TRUE)
+		plot(c(0,1),c(0,1), ylim=c(yli[3],yhi[3]), xlim=c(xl,xh),
+				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+		
+			for(j in 1:9){
+				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
+						c(Tbeta0$X25.[Tbeta0$vegeclass==j],Tbeta0$X75.[Tbeta0$vegeclass==j],
+							Tbeta0$X75.[Tbeta0$vegeclass==j],Tbeta0$X25.[Tbeta0$vegeclass==j]),
+						col=paste(vegeclassColors$coli[j]),border=NA)
+				arrows(xseq[j]-1,Tbeta0$Mean[Tbeta0$vegeclass==j],
+						xseq[j]+1,Tbeta0$Mean[Tbeta0$vegeclass==j],code=0,lwd=mlw)
+				arrows(	xseq[j],Tbeta0$X0.3.[Tbeta0$vegeclass==j],
+						xseq[j],Tbeta0$X99.7.[Tbeta0$vegeclass==j],
+						code=0, lwd=alw)
+				}		
+			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw)
+			axis(2, seq(yli[3],yhi[3], by=yii[3]), rep(" ",length(seq(yli[3],yhi[3], by=yii[3]))),
+				 lwd.ticks=tlw)
+			mtext(seq(yli[3],yhi[3], by=yii[3]),at=seq(yli[3],yhi[3], by=yii[3]), side=2, line=xll,cex=axc,las=2)	
+			#mtext(expression(paste("(N"[thaw],")")),side=2,line=yll1,cex=mcx)			
+			mtext("Days above freezing",side=2,line=yll2,cex=mcx)
+			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw)
+			
+	par(mai=c(5,6,0,0))
+		plot(c(0,1),c(0,1), ylim=c(-10,0), xlim=c(xl,xh),
+				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+			text(xseq,rep(-.25,length(xseq)),datVI$name2,srt=35, adj=1,cex=axc2,xpd=TRUE)
+dev.off()	
