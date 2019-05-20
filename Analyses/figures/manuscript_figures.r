@@ -45,6 +45,7 @@ vegeR <- cbind(vegeRS,vegeRT)
 dexps <- "\\[*[[:digit:]]*\\]"
 vegeR$parms <- gsub(dexps,"", rownames(vegeR))
 
+
 #world clim 2 precip in mm
 datWC <- read.csv("c:\\Users\\hkropp\\Google Drive\\map_synth\\WCprecSites.csv")
 
@@ -62,6 +63,8 @@ Thawquant <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyse
 
 Thawdf <- cbind(Thawstats,Thawquant)
 Thawdf$parms <- gsub(dexps,"", rownames(Thawdf))
+
+
 
 #######################################
 #####vegetation colors            ##### 						
@@ -568,7 +571,7 @@ dev.off()
 
 ##########################################################################################
 ##########################################################################################
-################# Figure 3. nfactor & thaw                               #################
+################# Figure 3. nfactor & thaw & min                         #################
 ##########################################################################################
 ##########################################################################################
 
@@ -601,6 +604,80 @@ beta0 <- cbind(beta0,regvegeID)
 Tbeta0 <- Thawdf[Thawdf$parms=="beta0",]
 Tbeta0 <- cbind(Tbeta0,vegeIDc)
 
+
+#######################################
+#####work with min and max        ##### 
+#######################################
+#organize soil output
+
+
+#join vege class to soilParm
+SoilParm <- join(SoilParm,datV, by=c("siteid"), type="left")
+unique(SoilParm$vegeclass)
+
+
+#join world clim data
+SoilParm <- join(SoilParm, datWC, by=c("siteid"), type="left")
+
+#create unique names for air
+colnames(AirParm)[1:4] <- paste0("A",colnames(AirParm)[1:4])
+colnames(AirParm)[8] <- paste0("A",colnames(AirParm)[8])
+#pull out each soil parm dataset:
+parmV <- unique(SoilParm$parm)
+parmA <- unique(AirParm$Aparm)
+
+#pull out relevant parameters
+#for analysis: TminS, TmaxS, peakWS
+#and subset to relevant depths
+
+parmVs <- c("TminS","TmaxS", "peakWS") 
+
+parmAs <- c("TminA","TmaxA", "peakWA") 
+
+
+SoilL <- list()
+SoilMs <- numeric(0)
+for(i in 1:length(parmVs)){
+	SoilL[[i]] <- SoilParm[SoilParm$parm==parmVs[i]&SoilParm$depth<=20,]
+	#calculate mean
+	SoilMs[i] <- round(mean(SoilL[[i]]$Mean),3)
+	#add a regression ID
+	SoilL[[i]]$regID <- rep(i,dim(SoilL[[i]])[1])
+}
+
+AirL <- list()
+AirMs <- numeric(0)
+for(i in 1:length(parmAs)){
+	AirL[[i]] <- AirParm[AirParm$Aparm==parmAs[i],]
+	#calculate mean
+	AirMs[i] <- round(mean(AirL[[i]]$AMean),3)
+	#add a regression ID
+	AirL[[i]]$regID <- rep(i,dim(AirL[[i]])[1])
+}
+
+
+#turn back into a data frame
+
+SoilR <- ldply(SoilL,data.frame)
+AirR <- ldply(AirL,data.frame)
+
+
+
+#now join soil and air DF
+ParmAll <- join(SoilR,AirR, by=c("siteid","wyear","regID"),type="left")
+
+
+#get unique veg regression id
+
+regvegeID <- unique(data.frame(vegeclass=ParmAll$vegeclass,regID=ParmAll$regID))
+regvegeID$regvegeID <- seq(1,dim(regvegeID)[1])
+
+#add to intercept
+betaAll <- vegeR[vegeR$parms=="beta0",]
+betaAll <- cbind(betaAll,regvegeID)
+b0Min <- betaAll[betaAll$regID==1,]
+b0Max <- betaAll[betaAll$regID==2,]
+
 #######################################
 #####plot just intercept          ##### 
 #######################################
@@ -616,7 +693,7 @@ datVI$namel3 <- c(" ", " "," ","tundra","tundra",
 
 					
 					
-wd <-100
+wd <-140
 hd <- 60
 
 #make a panel of parameters for each regression
@@ -624,44 +701,47 @@ hd <- 60
 
 xseq <-c(1,4,7,10,13,16,19,22,25)
 
-yli <- c(0,0,75)
-yhi <- c(1.5,1.7,200)
-yii <- c(.5,.5,25)
+yli <- c(0,0,75,-35)
+yhi <- c(1.5,1.7,200,5)
+yii <- c(.5,.5,25,5)
 xl <- -1
 xh <- 27
 #mean line width
 mlw <- 6
 #arrow line width
 alw <- 4
+#axis lwed
+alwd <- 3
 #lwd of ticks
-tlw <- 10
+tlw <- 13
 #size of x labels
-axc <- 10
-axc2 <- 14
+axc <- 12
+axc2 <- 18
 #line for label num
-xll <- 2
+xll <- 3
 
 #line for units
 yll1 <- 20
 #line for name
-yll2 <- 35
+yll2 <- 45
 #cex of axis label
-mcx <- 13
+mcx <- 15
 #one line width
 zlw <- 9
+plotOrder <- c(1,2,4,3,5,6,7,8,9)
 
-
-png(paste0(plotDI,"\\intercepts_N.png"), width=3000,height=6200,
+png(paste0(plotDI,"\\intercepts_N.png"), width=8000,height=5500,
 			units="px")
-	layout(matrix(seq(1,4),ncol=1), width=rep(lcm(wd),4),height=c(lcm(hd),lcm(hd),lcm(hd),lcm(35)))
-		#plot intercept
+	layout(matrix(seq(1,6),ncol=2,byrow=TRUE), width=rep(lcm(wd),6),height=c(rep(lcm(hd),4),lcm(35),lcm(35)))
+		#plot intercept freeze n factor
 	
-		par(mai=c(1,6,2,0))
+		par(mai=c(2.5,13.5,0,0))
 		
 			plot(c(0,1),c(0,1), ylim=c(yli[1],yhi[1]), xlim=c(xl,xh),
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
 			points(c(xl,xh),c(1,1),type="l",lwd=zlw, col="grey75",lty=3)
-			for(j in 1:9){
+			for(i in 1:9){
+				j <- plotOrder[i]
 				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
 						c(beta0$X25.[beta0$regID==1&beta0$vegeclass==j],beta0$X75.[beta0$regID==1&beta0$vegeclass==j],
 							beta0$X75.[beta0$regID==1&beta0$vegeclass==j],beta0$X25.[beta0$regID==1&beta0$vegeclass==j]),
@@ -672,20 +752,22 @@ png(paste0(plotDI,"\\intercepts_N.png"), width=3000,height=6200,
 						xseq[j],beta0$X99.7.[beta0$regID==1&beta0$vegeclass==j],
 						code=0, lwd=alw)
 				}
-			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw)
+			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw,lwd=alwd)
 			axis(2, seq(yli[1],yhi[1], by=yii[1]), rep(" ",length(seq(yli[1],yhi[1], by=yii[1]))),
-				 lwd.ticks=tlw)
+				 lwd.ticks=tlw,lwd=alwd)
 			mtext(seq(yli[1],yhi[1], by=yii[1]),at=seq(yli[1],yhi[1], by=yii[1]), side=2, line=xll,cex=axc,las=2)	
 			#mtext(expression(paste("(N"[freeze],")")),side=2,line=yll1,cex=mcx)
 			mtext("Freeze n-factor",side=2,line=yll2,cex=mcx)
 			
-		par(mai=c(1,6,1,0))
+		#plot intercept thaw n factor	
+		par(mai=c(2.5,3.5,0,10))
 		
 			plot(c(0,1),c(0,1), ylim=c(yli[2],yhi[2]), xlim=c(xl,xh),
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
 		
 			points(c(xl,xh),c(1,1),type="l",lwd=zlw, col="grey75",lty=3)
-			for(j in 1:9){
+			for(i in 1:9){
+				j <- plotOrder[i]
 				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
 						c(beta0$X25.[beta0$regID==2&beta0$vegeclass==j],beta0$X75.[beta0$regID==2&beta0$vegeclass==j],
 							beta0$X75.[beta0$regID==2&beta0$vegeclass==j],beta0$X25.[beta0$regID==2&beta0$vegeclass==j]),
@@ -696,19 +778,50 @@ png(paste0(plotDI,"\\intercepts_N.png"), width=3000,height=6200,
 						xseq[j],beta0$X99.7.[beta0$regID==2&beta0$vegeclass==j],
 						code=0, lwd=alw)
 				}
-			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw)
-			axis(2, seq(yli[2],yhi[2], by=yii[2]), rep(" ",length(seq(yli[2],yhi[2], by=yii[2]))),
-				 lwd.ticks=tlw)
-			mtext(seq(yli[2],yhi[2], by=yii[2]),at=seq(yli[2],yhi[2], by=yii[2]), side=2, line=xll,cex=axc,las=2)	
-			#mtext(expression(paste("(N"[thaw],")")),side=2,line=yll1,cex=mcx)			
-			mtext("Thaw n-factor",side=2,line=yll2,cex=mcx)
+			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw,lwd=alwd)
+			axis(4, seq(yli[2],yhi[2], by=yii[2]), rep(" ",length(seq(yli[2],yhi[2], by=yii[2]))),
+				 lwd.ticks=tlw,lwd=alwd)
+			mtext(seq(yli[2],yhi[2], by=yii[2]),at=seq(yli[2],yhi[2], by=yii[2]), side=4, line=xll,cex=axc,las=2)	
+			#mtext(expression(paste("(N"[thaw],")")),side=2,line=yll1,cex=mcx)		
 
+			mtext("Thaw n-factor",side=4,line=yll2,cex=mcx)
 			
-	par(mai=c(1,6,1,0),xpd=TRUE)
+	#intercept of minimum air temperatures
+
+	par(mai=c(0,13.5,2.5,0),xpd=TRUE)
+		plot(c(0,1),c(0,1), ylim=c(yli[4],yhi[4]), xlim=c(xl,xh),
+				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+		
+			for(i in 1:9){
+				j <- plotOrder[i]
+				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
+						c(b0Min$X25.[b0Min$vegeclass==j],b0Min$X75.[b0Min$vegeclass==j],
+							b0Min$X75.[b0Min$vegeclass==j],b0Min$X25.[b0Min$vegeclass==j]),
+						col=paste(vegeclassColors$coli[j]),border=NA)
+				arrows(xseq[j]-1,b0Min$Mean[b0Min$vegeclass==j],
+						xseq[j]+1,b0Min$Mean[b0Min$vegeclass==j],code=0,lwd=mlw)
+				arrows(	xseq[j],b0Min$X0.2.[b0Min$vegeclass==j],
+						xseq[j],b0Min$X99.8.[b0Min$vegeclass==j],
+						code=0, lwd=alw)
+				}		
+
+			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw,lwd=alwd)
+			axis(2, seq(yli[4],yhi[4], by=yii[4]), rep(" ",length(seq(yli[4],yhi[4], by=yii[4]))),
+				 lwd.ticks=tlw,lwd=alwd)
+			mtext(seq(yli[4],yhi[4], by=yii[4]),at=seq(yli[4],yhi[4], by=yii[4]), side=2, line=xll,cex=axc,las=2)	
+		
+			mtext("Minimum temperature (C)",side=2,line=yll2,cex=mcx)	
+			
+	
+	
+	
+	#days above freezing
+	par(mai=c(0,3.5,2.5,10),xpd=TRUE)
 		plot(c(0,1),c(0,1), ylim=c(yli[3],yhi[3]), xlim=c(xl,xh),
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
 		
-			for(j in 1:9){
+			for(i in 1:9){
+				j <- plotOrder[i]
 				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
 						c(Tbeta0$X25.[Tbeta0$vegeclass==j],Tbeta0$X75.[Tbeta0$vegeclass==j],
 							Tbeta0$X75.[Tbeta0$vegeclass==j],Tbeta0$X25.[Tbeta0$vegeclass==j]),
@@ -719,16 +832,23 @@ png(paste0(plotDI,"\\intercepts_N.png"), width=3000,height=6200,
 						xseq[j],Tbeta0$X99.7.[Tbeta0$vegeclass==j],
 						code=0, lwd=alw)
 				}		
+			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw,lwd=alwd)
+			axis(4, seq(yli[3],yhi[3], by=yii[3]), rep(" ",length(seq(yli[3],yhi[3], by=yii[3]))),
+				 lwd.ticks=tlw,lwd=alwd)
+			mtext(seq(yli[3],yhi[3], by=yii[3]),at=seq(yli[3],yhi[3], by=yii[3]), side=4, line=xll,cex=axc,las=2)	
+				
+			mtext("Days above freezing",side=4,line=yll2,cex=mcx)
 			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw)
-			axis(2, seq(yli[3],yhi[3], by=yii[3]), rep(" ",length(seq(yli[3],yhi[3], by=yii[3]))),
-				 lwd.ticks=tlw)
-			mtext(seq(yli[3],yhi[3], by=yii[3]),at=seq(yli[3],yhi[3], by=yii[3]), side=2, line=xll,cex=axc,las=2)	
-			#mtext(expression(paste("(N"[thaw],")")),side=2,line=yll1,cex=mcx)			
-			mtext("Days above freezing",side=2,line=yll2,cex=mcx)
-			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw)
-			
-	par(mai=c(5,6,0,0))
+
+	#x labels
+	par(mai=c(10,13.5,0,0),xpd=TRUE)
 		plot(c(0,1),c(0,1), ylim=c(-10,0), xlim=c(xl,xh),
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
-			text(xseq,rep(-.25,length(xseq)),datVI$name2,srt=35, adj=1,cex=axc2,xpd=TRUE)
+			text(xseq,rep(-0.25,length(xseq)),datVI$name2[plotOrder],srt=55, adj=1,cex=axc2,xpd=TRUE)	
+
+			#x labels		
+	par(mai=c(10,3.5,0,10),xpd=TRUE)
+		plot(c(0,1),c(0,1), ylim=c(-10,0), xlim=c(xl,xh),
+				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+			text(xseq,rep(-.25,length(xseq)),datVI$name2[plotOrder],srt=55, adj=1,cex=axc2,xpd=TRUE)
 dev.off()	
