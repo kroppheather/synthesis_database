@@ -427,11 +427,11 @@ test4 <- c(rgb(213/255,94/255,0/255,.4),rgb(240/255,228/255,66/255,.4),
 name2 <- c("Herb barren", "Graminoid tundra","Tussock tundra","Short shrub tundra","Tall shrub tundra",
 					"Wetland","Evergreen needleleaf boreal","Deciduous needleleaf boreal","Mixed boreal")			
 			
-wd1 <- 82
-hd1 <- 76
+wd1 <- 60
+hd1 <- 40
 wd2 <- 34
 hd2 <- 20
-Cyl <- 	round_any(max(maxC),50,ceiling)
+
 #seq for x2
 xh2 <- 3
 xl2 <- 0
@@ -444,27 +444,28 @@ xh1 <- 370
 xi1 <- 50
 #seq for y axis labels
 yseq <- seq(-35,25,by=10)
-#seq for couns
-yseq2 <- seq(0,Cyl,by=50)
+
 #xseq <- c(1,62,124,183,244,305)
 #xlseq <- c("Oct","Dec","Feb","Apr","Jun","Aug")
 xseq <- c(1,124,244,335)
 xlseq <- c("Oct","Feb","Jun","Sept")
 #tick width
-lwt <- 9
+lwt <- 14
 #line axis 
 alh <- 4
-xalh <- 8
+xalh <- 12
 #cex axis
-mx <- 13
+mx <- 10
 #box line width
-blw <- 3
+blw <- 6
 #label line
-llh <- 20
+llh <- -30
 #y label line axis 
-yllh <- 22
+yllh <- -22
 #label size
 lx <- 14
+#label vegetation size
+vlx <- 10
 #mean line width
 mlwd <- 7
 #density axis line
@@ -478,20 +479,25 @@ xseqP <- c(1,2)
 
 lgry <- rgb(165/255,165/255,165/255,.2)
 	
-for(i in 1:9){
-	png(paste0(plotDI,"\\all\\all_data_vege_",i,".png"),width=2400,height=2200)
-	layout(matrix(c(1), ncol=1, byrow=TRUE), widths=c(lcm(wd1)),
-			heights=c(lcm(hd1)))
+plotOrder <- c(1,2,4,3,5,6,7,8,9)
+xflag <- c(0,0,0,0,0,0,1,1,1)
+yflag <- c(1,0,0,1,0,0,1,0,0)
 
+
+	png(paste0(plotDI,"\\all_panel_data.png"),width=6000,height=4500)
+	layout(matrix(seq(1,9), ncol=3, byrow=TRUE), widths=rep(lcm(wd1),9),
+			heights=rep(lcm(hd1),9))
+for(j in 1:9){
+	i <- plotOrder[j]
 	##temperature##		
-		par(mai=c(4.5,5.75,0,0))				
+		par(mai=c(1.5,1.5,0,0))				
 		plot(Soil[[listV[[i]][1]]]$wdoy,Soil[[listV[[i]][1]]]$soil_t,
 				type="l", ylim=c(-41,35),xlim=c(0,370),col="white",
 				xlab=" ",ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
-		for(j in 1:length(listV[[i]])){		
+		for(k in 1:length(listV[[i]])){		
 		
-				points(Soil[[listV[[i]][j]]]$wdoy,
-					Soil[[listV[[i]][j]]]$soil_t,type="l",
+				points(Soil[[listV[[i]][k]]]$wdoy,
+					Soil[[listV[[i]][k]]]$soil_t,type="l",
 					col=lgry,lwd=3)
 			}
 	
@@ -533,32 +539,30 @@ for(i in 1:9){
 					col=test4[4],border=NA)
 				points(medTDF$wdoy[medTDF$depthID==4&medTDF$vegeclass==i],medTDF$med[medTDF$depthID==4&medTDF$vegeclass==i],
 					type="l",lwd=mlwd,col=test2[4])			
-		}		
+		}
+				
 		axis(1, c(xseq,400),rep(" ",length(xseq)+1),lwd.ticks=lwt,lwd=blw)
+		if(xflag[j]==1){
 		mtext(xlseq,at=xseq,side=1,line=xalh,cex=mx)	
+		}
 		axis(2, yseq, rep(" ", length(yseq)),lwd.ticks=lwt,lwd=blw)
+		if(yflag[j]==1){
 		mtext(yseq,at=yseq,side=2,line=alh,cex=mx,las=2)
+		}
 		#box(which="plot",lwd=blw)
-		mtext("Soil temperature (C)", side=2,line=yllh, cex=lx) 
-		mtext("Day of water year", side=1,line=llh, cex=lx) 
-		mtext(paste(name2[i]), side=3, outer=TRUE,line=-12, cex=lx) 
+		if(j==1){
+		mtext("Soil temperature (C)", side=2,line=yllh, cex=lx,outer=TRUE) 
+		legend("topleft", c("0-5 cm", "5-10 cm", "10-15 cm", "15-20 cm"), col=test2, lwd=6,	bty="n", cex=10)
+		}
+		if(j==9){
+		mtext("Day of water year", outer=TRUE, side=1,line=llh, cex=lx) 
+		}
+		mtext(paste(name2[i]), side=3, line=-2, cex=vlx) 
 		
-	dev.off()
+	
 }	
-
-#plot all images
-#read in all images
-plotOrder <- c(1,2,4,3,5,6,7,8,9)
-png(paste0(plotDI,"\\all_panel_data.png"),width=6000,height=6000)
-
-	layout(matrix(seq(1,9),ncol=3,byrow=TRUE))
-	for(i in 1:9){
-		j <- plotOrder[i]
-		par(mai=c(0,0,0,0))
-		plot(load.image(paste0(plotDI,"\\all\\all_data_vege_",j,".png")),axes=FALSE)
-	}	
-		
-dev.off()				
+dev.off()
+			
 
 
 
