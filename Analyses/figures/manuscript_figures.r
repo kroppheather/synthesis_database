@@ -64,8 +64,11 @@ Thawquant <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyse
 Thawdf <- cbind(Thawstats,Thawquant)
 Thawdf$parms <- gsub(dexps,"", rownames(Thawdf))
 
-
-
+#read in average pattern results
+patternStat <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\pattern\\model\\run1\\pattern_mod_stats.csv"
+patternQuant <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\pattern\\model\\run1\\pattern_mod_quant.csv"
+patternDF <- cbind(patternStat,patternQuant )
+patternDF$parms <- gsub(dexps,"", rownames(patternDF))
 #######################################
 #####vegetation colors            ##### 						
 #######################################	
@@ -852,3 +855,95 @@ png(paste0(plotDI,"\\intercepts_N.png"), width=8000,height=5500,
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
 			text(xseq,rep(-.25,length(xseq)),datVI$name2[plotOrder],srt=55, adj=1,cex=axc2,xpd=TRUE)
 dev.off()	
+
+##########################################################################################
+##########################################################################################
+################# Figure 4. average patterns                             #################
+##########################################################################################
+##########################################################################################
+
+
+#######################################
+#####organize data                ##### 
+#######################################
+
+
+#join vege class to soilParm
+SoilParm <- join(SoilParm,datV, by=c("siteid"), type="left")
+unique(SoilParm$vegeclass)
+AirParm <- join(AirParm, datV, by=c("siteid"), type="left")
+
+#pull out each soil parm dataset:
+parmV <- unique(SoilParm$parm)
+parmA <- unique(AirParm$parm)
+
+
+SoilL <- list()
+SoilMs <- numeric(0)
+for(i in 1:length(parmV)){
+	SoilL[[i]] <- SoilParm[SoilParm$parm==parmV[i],]
+	SoilMs[i] <- round(mean(SoilL[[i]]$Mean),3)
+}
+#pull out only revelevant comparisons that are meaningful
+
+#Tmin vs Tave
+#Tmax vs Tave
+#set up comparisions
+#x values
+xcomp <- c(4,5)
+ycomp <- c(6,6)
+compNameX <- parmV[xcomp]
+compNameY <- parmV[ycomp]
+xcent <- SoilMs[xcomp]
+
+
+SoilCompDF <- data.frame(xobs = c(SoilL[[xcomp[1]]]$Mean,SoilL[[xcomp[2]]]$Mean),
+						yobs= c(SoilL[[ycomp[1]]]$Mean,SoilL[[ycomp[2]]]$Mean),
+						xSD=c(SoilL[[xcomp[1]]]$SD,SoilL[[xcomp[2]]]$SD),
+						ySD=c(SoilL[[ycomp[1]]]$SD,SoilL[[ycomp[2]]]$SD),
+						vegeClass = c(SoilL[[xcomp[1]]]$vegeclass,SoilL[[xcomp[2]]]$vegeclass),			
+						comp= rep(seq(1,length(xcomp)), each=dim(SoilL[[xcomp[1]]])[1]))
+
+#data frame of vege class and comparision ids
+
+vegeComp <- unique(data.frame(vegeClass=SoilCompDF$vegeClass,comp=SoilCompDF$comp))						
+vegeComp <- vegeComp[order(vegeComp$comp,vegeComp$vegeClass),]						
+vegeComp$vegeCompID <- seq(1,dim(vegeComp)[1])	
+
+#join back into soildf
+SoilCompDF2 <- join(SoilCompDF,vegeComp, by=c("vegeClass","comp"),type="left")
+
+
+#make plotting data
+
+xcompDF <- data.frame(xcomp=xcomp,ycomp=ycomp,compNameY=compNameY,compNameX=compNameX,xcent=xcent,
+				xmin=c(round_any(min(SoilL[[xcomp[1]]]$pc2.5),5,floor),round_any(min(SoilL[[xcomp[2]]]$pc2.5),5,floor)),
+				xmax=c(round_any(max(SoilL[[xcomp[1]]]$pc97.5),5,ceiling),round_any(max(SoilL[[xcomp[2]]]$pc97.5),5,ceiling)),
+				ymin=c(round_any(min(SoilL[[ycomp[1]]]$pc2.5),5,floor),round_any(min(SoilL[[ycomp[2]]]$pc2.5),5,floor)),
+				ymax=c(round_any(max(SoilL[[ycomp[1]]]$pc97.5),5,ceiling),round_any(max(SoilL[[ycomp[2]]]$pc97.5),5,ceiling)))
+
+
+
+
+xplot <- matrix(rep(NA,100*dim(vegeComp)[1]),ncol=dim(vegeComp)[1])
+
+	for(j in 1:dim(vegeComp)[1]){
+		xplot[,j] <- seq(xcompDF$xmin[vegeComp$comp[j]],xcompDF$xmax[vegeComp$comp[j]],length.out=100)
+	}
+xplotDF <- data.frame(xplot=as.vector(xplot),vegeCompID=rep(seq(1,dim(vegeComp)[1]),each=100), comp=rep(vegeComp$comp,each=100),vegeClass=rep(vegeComp$vegeClass,each=100))
+
+
+
+
+hhxplot <- matrix(rep(NA,100*dim(xcompDF)[1]), ncol=dim(xcompDF)[1])
+
+	for(j in 1:dim(xcompDF)[1]){
+		hhxplot[,j] <- seq(xcompDF$xmin[j],xcompDF$xmax[j],length.out=100)
+	}
+
+
+hhxplotDF <- data.frame(hhxplot=as.vector(hhxplot), comp=rep(seq(1,dim(xcompDF)[1]),each=100))
+
+
+#multiple comparision quantile
+mcQ <- round_any(0.05/(dim(vegeComp)[1]-1)	,0.001)
