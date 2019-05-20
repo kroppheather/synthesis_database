@@ -745,16 +745,17 @@ png(paste0(plotDI,"\\intercepts_N.png"), width=8000,height=5500,
 			points(c(xl,xh),c(1,1),type="l",lwd=zlw, col="grey75",lty=3)
 			for(i in 1:9){
 				j <- plotOrder[i]
-				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
+				polygon(c(xseq[i]-1,xseq[i]-1,xseq[i]+1,xseq[i]+1),
 						c(beta0$X25.[beta0$regID==1&beta0$vegeclass==j],beta0$X75.[beta0$regID==1&beta0$vegeclass==j],
 							beta0$X75.[beta0$regID==1&beta0$vegeclass==j],beta0$X25.[beta0$regID==1&beta0$vegeclass==j]),
 						col=paste(vegeclassColors$coli[j]),border=NA)
-				arrows(xseq[j]-1,beta0$Mean[beta0$regID==1&beta0$vegeclass==j],
-						xseq[j]+1,beta0$Mean[beta0$regID==1&beta0$vegeclass==j],code=0,lwd=mlw)
-				arrows(	xseq[j],beta0$X0.3.[beta0$regID==1&beta0$vegeclass==j],
-						xseq[j],beta0$X99.7.[beta0$regID==1&beta0$vegeclass==j],
+				arrows(xseq[i]-1,beta0$Mean[beta0$regID==1&beta0$vegeclass==j],
+						xseq[i]+1,beta0$Mean[beta0$regID==1&beta0$vegeclass==j],code=0,lwd=mlw)
+				arrows(	xseq[i],beta0$X0.3.[beta0$regID==1&beta0$vegeclass==j],
+						xseq[i],beta0$X99.7.[beta0$regID==1&beta0$vegeclass==j],
 						code=0, lwd=alw)
 				}
+				
 			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw,lwd=alwd)
 			axis(2, seq(yli[1],yhi[1], by=yii[1]), rep(" ",length(seq(yli[1],yhi[1], by=yii[1]))),
 				 lwd.ticks=tlw,lwd=alwd)
@@ -771,14 +772,14 @@ png(paste0(plotDI,"\\intercepts_N.png"), width=8000,height=5500,
 			points(c(xl,xh),c(1,1),type="l",lwd=zlw, col="grey75",lty=3)
 			for(i in 1:9){
 				j <- plotOrder[i]
-				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
+				polygon(c(xseq[i]-1,xseq[i]-1,xseq[i]+1,xseq[i]+1),
 						c(beta0$X25.[beta0$regID==2&beta0$vegeclass==j],beta0$X75.[beta0$regID==2&beta0$vegeclass==j],
 							beta0$X75.[beta0$regID==2&beta0$vegeclass==j],beta0$X25.[beta0$regID==2&beta0$vegeclass==j]),
 						col=paste(vegeclassColors$coli[j]),border=NA)
-				arrows(xseq[j]-1,beta0$Mean[beta0$regID==2&beta0$vegeclass==j],
-						xseq[j]+1,beta0$Mean[beta0$regID==2&beta0$vegeclass==j],code=0,lwd=mlw)
-				arrows(	xseq[j],beta0$X0.3.[beta0$regID==2&beta0$vegeclass==j],
-						xseq[j],beta0$X99.7.[beta0$regID==2&beta0$vegeclass==j],
+				arrows(xseq[i]-1,beta0$Mean[beta0$regID==2&beta0$vegeclass==j],
+						xseq[i]+1,beta0$Mean[beta0$regID==2&beta0$vegeclass==j],code=0,lwd=mlw)
+				arrows(	xseq[i],beta0$X0.3.[beta0$regID==2&beta0$vegeclass==j],
+						xseq[i],beta0$X99.7.[beta0$regID==2&beta0$vegeclass==j],
 						code=0, lwd=alw)
 				}
 			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw,lwd=alwd)
@@ -797,14 +798,14 @@ png(paste0(plotDI,"\\intercepts_N.png"), width=8000,height=5500,
 		
 			for(i in 1:9){
 				j <- plotOrder[i]
-				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
+				polygon(c(xseq[i]-1,xseq[i]-1,xseq[i]+1,xseq[i]+1),
 						c(b0Min$X25.[b0Min$vegeclass==j],b0Min$X75.[b0Min$vegeclass==j],
 							b0Min$X75.[b0Min$vegeclass==j],b0Min$X25.[b0Min$vegeclass==j]),
 						col=paste(vegeclassColors$coli[j]),border=NA)
-				arrows(xseq[j]-1,b0Min$Mean[b0Min$vegeclass==j],
-						xseq[j]+1,b0Min$Mean[b0Min$vegeclass==j],code=0,lwd=mlw)
-				arrows(	xseq[j],b0Min$X0.2.[b0Min$vegeclass==j],
-						xseq[j],b0Min$X99.8.[b0Min$vegeclass==j],
+				arrows(xseq[i]-1,b0Min$Mean[b0Min$vegeclass==j],
+						xseq[i]+1,b0Min$Mean[b0Min$vegeclass==j],code=0,lwd=mlw)
+				arrows(	xseq[i],b0Min$X0.2.[b0Min$vegeclass==j],
+						xseq[i],b0Min$X99.8.[b0Min$vegeclass==j],
 						code=0, lwd=alw)
 				}		
 
@@ -825,14 +826,14 @@ png(paste0(plotDI,"\\intercepts_N.png"), width=8000,height=5500,
 		
 			for(i in 1:9){
 				j <- plotOrder[i]
-				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
+				polygon(c(xseq[i]-1,xseq[i]-1,xseq[i]+1,xseq[i]+1),
 						c(Tbeta0$X25.[Tbeta0$vegeclass==j],Tbeta0$X75.[Tbeta0$vegeclass==j],
 							Tbeta0$X75.[Tbeta0$vegeclass==j],Tbeta0$X25.[Tbeta0$vegeclass==j]),
 						col=paste(vegeclassColors$coli[j]),border=NA)
-				arrows(xseq[j]-1,Tbeta0$Mean[Tbeta0$vegeclass==j],
-						xseq[j]+1,Tbeta0$Mean[Tbeta0$vegeclass==j],code=0,lwd=mlw)
-				arrows(	xseq[j],Tbeta0$X0.3.[Tbeta0$vegeclass==j],
-						xseq[j],Tbeta0$X99.7.[Tbeta0$vegeclass==j],
+				arrows(xseq[i]-1,Tbeta0$Mean[Tbeta0$vegeclass==j],
+						xseq[i]+1,Tbeta0$Mean[Tbeta0$vegeclass==j],code=0,lwd=mlw)
+				arrows(	xseq[i],Tbeta0$X0.3.[Tbeta0$vegeclass==j],
+						xseq[i],Tbeta0$X99.7.[Tbeta0$vegeclass==j],
 						code=0, lwd=alw)
 				}		
 			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw,lwd=alwd)
