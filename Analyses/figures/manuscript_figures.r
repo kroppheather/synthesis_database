@@ -346,7 +346,7 @@ datSTn <- join(datSTn, vegeDepth, by=c("depthID","vegeclass"), type="left")
 SoilParm <- join(SoilParm,datV, by=c("siteid"), type="left")
 unique(SoilParm$vegeclass)
 
-
+datWC$siteid <- datWC$site_id
 #join world clim data
 SoilParm <- join(SoilParm, datWC, by=c("siteid"), type="left")
 
@@ -398,17 +398,6 @@ AirR <- ldply(AirL,data.frame)
 ParmAll <- join(SoilR,AirR, by=c("siteid","wyear","regID"),type="left")
 
 
-#get unique veg regression id
-
-regvegeID <- unique(data.frame(vegeclass=ParmAll$vegeclass,regID=ParmAll$regID))
-regvegeID$regvegeID <- seq(1,dim(regvegeID)[1])
-
-#add to intercept
-betaAll <- vegeR[vegeR$parms=="beta0",]
-betaAll <- cbind(betaAll,regvegeID)
-b0Min <- betaAll[betaAll$regID==1,]
-b0Max <- betaAll[betaAll$regID==2,]
-
 #######################################
 #####figure with summary          ##### 
 #######################################
@@ -438,8 +427,8 @@ test4 <- c(rgb(213/255,94/255,0/255,.4),rgb(240/255,228/255,66/255,.4),
 name2 <- c("Herb barren", "Graminoid tundra","Tussock tundra","Short shrub tundra","Tall shrub tundra",
 					"Wetland","Evergreen needleleaf boreal","Deciduous needleleaf boreal","Mixed boreal")			
 			
-wd1 <- 54
-hd1 <- 54
+wd1 <- 82
+hd1 <- 76
 wd2 <- 34
 hd2 <- 20
 Cyl <- 	round_any(max(maxC),50,ceiling)
@@ -459,8 +448,8 @@ yseq <- seq(-35,25,by=10)
 yseq2 <- seq(0,Cyl,by=50)
 #xseq <- c(1,62,124,183,244,305)
 #xlseq <- c("Oct","Dec","Feb","Apr","Jun","Aug")
-xseq <- c(1,124,244)
-xlseq <- c("Oct","Feb","Jun")
+xseq <- c(1,124,244,335)
+xlseq <- c("Oct","Feb","Jun","Sept")
 #tick width
 lwt <- 9
 #line axis 
@@ -471,11 +460,11 @@ mx <- 13
 #box line width
 blw <- 3
 #label line
-llh <- 23
+llh <- 20
 #y label line axis 
-yllh <- 23
+yllh <- 22
 #label size
-lx <- 17
+lx <- 14
 #mean line width
 mlwd <- 7
 #density axis line
@@ -490,12 +479,12 @@ xseqP <- c(1,2)
 lgry <- rgb(165/255,165/255,165/255,.2)
 	
 for(i in 1:9){
-	png(paste0(plotDI,"\\all\\all_data_vege_",i,".png"),width=3500,height=2500)
-	layout(matrix(c(1,2), ncol=2, byrow=TRUE), widths=c(lcm(wd1),lcm(wd2)),
+	png(paste0(plotDI,"\\all\\all_data_vege_",i,".png"),width=2400,height=2200)
+	layout(matrix(c(1), ncol=1, byrow=TRUE), widths=c(lcm(wd1)),
 			heights=c(lcm(hd1)))
 
 	##temperature##		
-		par(mai=c(0,0,0,0))				
+		par(mai=c(4.5,5.75,0,0))				
 		plot(Soil[[listV[[i]][1]]]$wdoy,Soil[[listV[[i]][1]]]$soil_t,
 				type="l", ylim=c(-41,35),xlim=c(0,370),col="white",
 				xlab=" ",ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
@@ -545,55 +534,30 @@ for(i in 1:9){
 				points(medTDF$wdoy[medTDF$depthID==4&medTDF$vegeclass==i],medTDF$med[medTDF$depthID==4&medTDF$vegeclass==i],
 					type="l",lwd=mlwd,col=test2[4])			
 		}		
-		axis(1, xseq,rep(" ",length(xseq)),lwd.ticks=lwt)
+		axis(1, c(xseq,400),rep(" ",length(xseq)+1),lwd.ticks=lwt,lwd=blw)
 		mtext(xlseq,at=xseq,side=1,line=xalh,cex=mx)	
-		axis(2, yseq, rep(" ", length(yseq)),lwd.ticks=lwt)
+		axis(2, yseq, rep(" ", length(yseq)),lwd.ticks=lwt,lwd=blw)
 		mtext(yseq,at=yseq,side=2,line=alh,cex=mx,las=2)
-		box(which="plot",lwd=blw)
+		#box(which="plot",lwd=blw)
 		mtext("Soil temperature (C)", side=2,line=yllh, cex=lx) 
 		mtext("Day of water year", side=1,line=llh, cex=lx) 
-		mtext(paste(name2[i]), side=3, outer=TRUE,line=-25, cex=lx) 
-	##temperature histogram##
-		par(mai=c(0,0,0,0))
-			plot(c(0,1),c(0,1), ylim=c(-41,35), xlim=c(xl2,xh2),type="n",xlab= " ", ylab=" ",axes=FALSE,
-				xaxs="i",yaxs="i")
-					
-				polygon(c(xseqP[1]-.5,xseqP[1]-.5,xseqP[1]+.5,xseqP[1]+.5),
-						c(b0Min$X25.[b0Min$vegeclass==i],b0Min$X75.[b0Min$vegeclass==i],
-							b0Min$X75.[b0Min$vegeclass==i],b0Min$X25.[b0Min$vegeclass==i]),
-						col="tomato3",border=NA)
-				arrows(xseqP[1]-.5,b0Min$Mean[b0Min$vegeclass==i],
-						xseqP[1]+.5,b0Min$Mean[b0Min$vegeclass==i],code=0,lwd=mlw)
-				arrows(	xseqP[1],b0Min$X0.2.[b0Min$vegeclass==i],
-						xseqP[1],b0Min$X99.8.[b0Min$vegeclass==i],
-						code=0, lwd=alw)
-				polygon(c(xseqP[2]-.5,xseqP[2]-.5,xseqP[2]+.5,xseqP[2]+.5),
-						c(b0Max$X25.[b0Max$vegeclass==i],b0Max$X75.[b0Max$vegeclass==i],
-							b0Max$X75.[b0Max$vegeclass==i],b0Max$X25.[b0Max$vegeclass==i]),
-						col="tomato3",border=NA)
-				arrows(xseqP[2]-.5,b0Max$Mean[b0Max$vegeclass==i],
-						xseqP[2]+.5,b0Max$Mean[b0Max$vegeclass==i],code=0,lwd=mlw)
-				arrows(	xseqP[2],b0Max$X0.2.[b0Max$vegeclass==i],
-						xseqP[2],b0Max$X99.8.[b0Max$vegeclass==i],
-						code=0, lwd=alw)			
+		mtext(paste(name2[i]), side=3, outer=TRUE,line=-12, cex=lx) 
+		
 	dev.off()
 }	
 
 #plot all images
 #read in all images
+plotOrder <- c(1,2,4,3,5,6,7,8,9)
+png(paste0(plotDI,"\\all_panel_data.png"),width=6000,height=6000)
 
-png(paste0(plotDI,"\\all_panel_data.png"),width=6000,height=2000)
-
-	layout(matrix(seq(1,10),ncol=5,byrow=TRUE))
+	layout(matrix(seq(1,9),ncol=3,byrow=TRUE))
 	for(i in 1:9){
+		j <- plotOrder[i]
 		par(mai=c(0,0,0,0))
-		plot(load.image(paste0(plotDI,"\\all\\all_data_vege_",i,".png")),axes=FALSE)
+		plot(load.image(paste0(plotDI,"\\all\\all_data_vege_",j,".png")),axes=FALSE)
 	}	
-		##empty##		
-		par(mai=c(0,0,0,0))
-			plot(c(0,1),c(0,1), xlim=c(0,1), ylim=c(0,1),type="n",xlab= " ", ylab=" ",axes=FALSE,
-				xaxs="i",yaxs="i")	
-			legend("center", c("0-5 cm", "5-10 cm", "10-15 cm", "15-20 cm"), col=test2, lwd=6,	bty="n", cex=10)
+		
 dev.off()				
 
 
