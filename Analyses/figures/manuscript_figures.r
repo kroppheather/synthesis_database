@@ -65,8 +65,8 @@ Thawdf <- cbind(Thawstats,Thawquant)
 Thawdf$parms <- gsub(dexps,"", rownames(Thawdf))
 
 #read in average pattern results
-patternStat <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\pattern\\model\\run1\\pattern_mod_stats.csv"
-patternQuant <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\pattern\\model\\run1\\pattern_mod_quant.csv"
+patternStat <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\pattern\\model\\run1\\pattern_mod_stats.csv")
+patternQuant <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\pattern\\model\\run1\\pattern_mod_quant.csv")
 patternDF <- cbind(patternStat,patternQuant )
 patternDF$parms <- gsub(dexps,"", rownames(patternDF))
 #######################################
@@ -948,3 +948,88 @@ hhxplotDF <- data.frame(hhxplot=as.vector(hhxplot), comp=rep(seq(1,dim(xcompDF)[
 
 #multiple comparision quantile
 mcQ <- round_any(0.05/(dim(vegeComp)[1]-1)	,0.001)
+
+#pull out data of interest
+
+muPlot <- patternDF[patternDF$parms=="mu.plot",]
+
+regPlot <- cbind(xplotDF,muPlot)
+
+
+#indicate if slope is significant from zero
+patternSlope <- patternDF[patternDF$parms=="beta1",]
+patternSlope <- cbind(patternSlope,vegeComp)
+#add significance
+patternSlope$sig <- ifelse(patternSlope$X0.3.<0&patternSlope$X99.7.<0,1,
+						ifelse(patternSlope$X0.3.>0&patternSlope$X99.7.>0,1,0))
+#pattern intercept
+patternInt  <- patternDF[patternDF$parms=="beta0",]
+patternInt <- cbind(patternInt,vegeComp)
+#######################################
+#####make plot                    ##### 
+#######################################
+wd <- 40
+hd <- 40
+# axis limits
+aveL <- -15
+aveH <- 10
+minL <- -35
+minH <- 1
+maxL <- 0
+maxH <- 22
+#point size
+px <- 2
+#line width of regression mean
+mlw <- 3
+
+png(paste0(plotDI,"\\patterns_ave.png"), width=3000,height=3000,
+			units="px")
+	layout(matrix(seq(1,2),ncol=2,byrow=TRUE), width=rep(lcm(wd),2),height=rep(lcm(hd),2))
+	par(mai=c(0,0,0,0))
+	plot(c(0,1),c(0,1),type="n", ylim=c(aveL,aveH), xlim=c(minL,minH), xlab=" ", ylab=" ",
+			xaxs="i", yaxs="i", axes=FALSE)
+	
+		#vegetation mean
+	for(j in 1:9){
+		points(SoilL[[xcomp[1]]]$Mean[SoilL[[xcomp[1]]]$vegeclass==j],
+				SoilL[[ycomp[1]]]$Mean[SoilL[[xcomp[1]]]$vegeclass==j], pch=19,
+				col=as.character(paste(vegeclassColors$coli[j])),cex=px)
+	
+	}
+	for(j in 1:9){
+		if(patternSlope$sig[patternSlope$comp==1&patternSlope$vegeClass==j]==1){
+			points(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j],
+					regPlot$Mean[regPlot$comp==1&regPlot$vegeClass==j], type="l",
+					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])))
+		}else{
+			abline(h=patternInt$Mean[patternInt$comp==1&patternInt$vegeClass==j],
+					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])),lty=3)
+		}
+	
+	}
+	
+	
+	par(mai=c(0,0,0,0))
+	plot(c(0,1),c(0,1),type="n", ylim=c(aveL,aveH), xlim=c(maxL,maxH), xlab=" ", ylab=" ",
+			xaxs="i", yaxs="i", axes=FALSE)
+			
+		for(j in 1:9){
+		points(SoilL[[xcomp[2]]]$Mean[SoilL[[xcomp[2]]]$vegeclass==j],
+				SoilL[[ycomp[2]]]$Mean[SoilL[[xcomp[2]]]$vegeclass==j], pch=19,
+				col=as.character(paste(vegeclassColors$coli[j])),cex=px)
+	
+	}
+	
+		for(j in 1:9){
+		if(patternSlope$sig[patternSlope$comp==2&patternSlope$vegeClass==j]==1){
+			points(regPlot$xplot[regPlot$comp==2&regPlot$vegeClass==j],
+					regPlot$Mean[regPlot$comp==2&regPlot$vegeClass==j], type="l",
+					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])))
+		}else{
+			abline(h=patternInt$Mean[patternInt$comp==2&patternInt$vegeClass==j],
+					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])),lty=3)
+		}
+	
+	}
+
+dev.off()	
