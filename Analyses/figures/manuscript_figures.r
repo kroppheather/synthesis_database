@@ -986,7 +986,7 @@ patternInt  <- patternDF[patternDF$parms=="beta0",]
 patternInt <- cbind(patternInt,vegeComp)
 #######################################
 #####make plot                    ##### 
-#####points have colors           #####
+#####points have no colors        #####
 #######################################
 
 datVI$name2 <- c("herb barren", "graminoid tundra","tussock tundra","short shrub tundra","tall shrub tundra",
@@ -1033,7 +1033,7 @@ lgpt <- 7
 vg1 <- c(1,2,3,4)
 vg2 <- c(5,6,7,8,9)
 
-png(paste0(plotDI,"\\patterns_ave.png"), width=3600,height=3600,
+png(paste0(plotDI,"\\patterns_ave_pt_plain.png"), width=3600,height=3600,
 			units="px")
 	layout(matrix(seq(1,4),ncol=2,byrow=FALSE), width=rep(lcm(wd),4),height=rep(lcm(hd),4))
 	par(mai=c(1,0,0,1))
@@ -1045,7 +1045,7 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3600,height=3600,
 		j <- vg1[i]
 		points(SoilL[[xcomp[1]]]$Mean[SoilL[[xcomp[1]]]$vegeclass==j],
 				SoilL[[ycomp[1]]]$Mean[SoilL[[xcomp[1]]]$vegeclass==j], pch=19,
-				col=as.character(paste(vegeclassColors$colt1[j])),cex=px)
+				col=pcol,cex=px)
 	
 	}
 	#credible interval regression
@@ -1084,10 +1084,7 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3600,height=3600,
 	mtext(seqAve,at=seqAve, line=yll, cex=amx,las=2, side=2)
 	
 	
-	legend("bottomright",paste(datVI$name2[vg1], "  "), 
-			col=as.character(paste(vegeclassColors$colt2[vg1])),
-			text.col="white",
-			 pch=19, cex=lgcx,bty="n",pt.cex=lgpt)	
+
 	
 	legend("bottomright",datVI$name2[vg1], col=as.character(paste(vegeclassColors$coli[vg1])),
 			 lwd=lglw, cex=lgcx,bty="n")
@@ -1103,7 +1100,7 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3600,height=3600,
 		j <- vg2[i]
 		points(SoilL[[xcomp[1]]]$Mean[SoilL[[xcomp[1]]]$vegeclass==j],
 				SoilL[[ycomp[1]]]$Mean[SoilL[[xcomp[1]]]$vegeclass==j], pch=19,
-				col=as.character(paste(vegeclassColors$colt1[j])),cex=px)
+				col=pcol,cex=px)
 	
 	}
 	
@@ -1145,11 +1142,7 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3600,height=3600,
 	mtext(seqMin,at=seqMin, line=yll, cex=amx, side=1)
 	mtext("Minimum soil temperature (C)",  line=xll, cex=llmx, side=1)
 
-	
-		legend("bottomright",paste(datVI$name2[vg2], "  "), 
-			col=as.character(paste(vegeclassColors$colt2[vg2])),
-			text.col="white",
-			 pch=19, cex=lgcx,bty="n",pt.cex=lgpt)	
+
 	
 		legend("bottomright",datVI$name2[vg2], col=as.character(paste(vegeclassColors$coli[vg2])),
 			 lwd=lglw, cex=lgcx,bty="n")
@@ -1163,7 +1156,7 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3600,height=3600,
 		j <- vg1[i]
 		points(SoilL[[xcomp[2]]]$Mean[SoilL[[xcomp[2]]]$vegeclass==j],
 				SoilL[[ycomp[2]]]$Mean[SoilL[[xcomp[2]]]$vegeclass==j], pch=19,
-				col=as.character(paste(vegeclassColors$colt2[j])),cex=px)
+				col=pcol,cex=px)
 	
 	}
 		for(i in 1:4){
@@ -1209,7 +1202,7 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3600,height=3600,
 		j <- vg2[i]
 		points(SoilL[[xcomp[2]]]$Mean[SoilL[[xcomp[2]]]$vegeclass==j],
 				SoilL[[ycomp[2]]]$Mean[SoilL[[xcomp[2]]]$vegeclass==j], pch=19,
-				col=as.character(paste(vegeclassColors$colt2[j])),cex=px)
+				col=pcol,cex=px)
 	
 	}
 		for(i in 1:5){
