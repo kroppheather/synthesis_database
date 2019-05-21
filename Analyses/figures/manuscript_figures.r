@@ -1241,3 +1241,24 @@ png(paste0(plotDI,"\\patterns_ave_pt_plain.png"), width=3600,height=3600,
 	mtext(seqMax,at=seqMax, line=yll, cex=amx, side=1)
 	mtext("Maximum soil temperature (C)",  line=xll, cex=llmx, side=1)	
 dev.off()	
+
+
+#######################################
+#####output table of regression   #####
+##### R2 for fit                  #####
+#######################################
+
+regRep <- cbind(patternDF[patternDF$parms=="rep.yvar",], SoilCompDF2)
+
+#get goodness of fit for each group
+vegeCompID <- unique(data.frame(vegeCompID=regRep$vegeCompID,vegeClass=regRep$vegeClass,comp=regRep$comp))
+vegeCompID <- vegeCompID[order(vegeCompID$vegeCompID),]
+
+
+regFit <- list()
+R2 <- numeric(0)
+for(i in 1:dim(vegeCompID)[1]){
+	regFit <- lm(regRep$Mean[regRep$vegeCompID==i]~regRep$yobs[regRep$vegeCompID==i])
+	R2[i] <- 
+
+}
