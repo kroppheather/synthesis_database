@@ -1008,7 +1008,7 @@ seqMin <- seq(-30,0,by=5)
 #point size
 px <- 7
 #point color
-pcol <- "grey85"
+pcol <- rgb(216/255,216/255,216/255,.5)
 #line width of regression mean
 mlw <- 14
 #tick width
