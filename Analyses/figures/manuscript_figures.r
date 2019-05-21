@@ -82,7 +82,16 @@ vegeclassColors <- data.frame(vegeclass=seq(1,9),
 								rgb(50/255,80/255,10/255),
 								rgb(170/255,190/255,140/255),
 								rgb(240/255,240/255,50/255)),
-						colt1=c(rgb(77/255,77/255,77/255,.2),
+						colt1=c(rgb(77/255,77/255,77/255,.1),
+								rgb(0/255,110/255,130/255,.1),
+								rgb(160/255,130/255,180/255,.1),
+								rgb(130/255,160/255,190/255,.1),
+								rgb(250/255,120/255,80/255,.1),
+								rgb(0/255,138/255,213/255,.1),
+								rgb(50/255,80/255,10/255,.1),
+								rgb(170/255,190/255,140/255,.1),
+								rgb(240/255,240/255,50/255,.1)), 
+						colt2=c(rgb(77/255,77/255,77/255,.2),
 								rgb(0/255,110/255,130/255,.2),
 								rgb(160/255,130/255,180/255,.2),
 								rgb(130/255,160/255,190/255,.2),
@@ -90,16 +99,7 @@ vegeclassColors <- data.frame(vegeclass=seq(1,9),
 								rgb(0/255,138/255,213/255,.2),
 								rgb(50/255,80/255,10/255,.2),
 								rgb(170/255,190/255,140/255,.2),
-								rgb(240/255,240/255,50/255,.2)), 
-						colt2=c(rgb(77/255,77/255,77/255,.3),
-								rgb(0/255,110/255,130/255,.3),
-								rgb(160/255,130/255,180/255,.3),
-								rgb(130/255,160/255,190/255,.3),
-								rgb(250/255,120/255,80/255,.3),
-								rgb(0/255,138/255,213/255,.3),
-								rgb(50/255,80/255,10/255,.3),
-								rgb(170/255,190/255,140/255,.3),
-								rgb(240/255,240/255,50/255,.3))								
+								rgb(240/255,240/255,50/255,.2))								
 								)	
 datVI$vegeclassColors <- vegeclassColors$coli
 #######################################
@@ -986,39 +986,62 @@ patternInt  <- patternDF[patternDF$parms=="beta0",]
 patternInt <- cbind(patternInt,vegeComp)
 #######################################
 #####make plot                    ##### 
+#####points have colors           #####
 #######################################
-wd <- 40
-hd <- 40
+
+datVI$name2 <- c("herb barren", "graminoid tundra","tussock tundra","short shrub tundra","tall shrub tundra",
+					"wetland","evergreen needleleaf boreal","deciduous needleleaf boreal","mixed boreal")
+					
+					
+wd <- 50
+hd <- 50
 # axis limits
 aveL <- -15
-aveH <- 10
-minL <- -35
+aveH <- 5
+minL <- -30
 minH <- 1
 maxL <- 0
 maxH <- 20
 seqMax <- seq(0,20,by=5)
-seqAve <- seq(-15,10,by=5)
-seqMin <- seq(
+seqAve <- seq(-15,5,by=5)
+seqMin <- seq(-30,0,by=5)
 #point size
 px <- 7
 #point color
 pcol <- "grey85"
 #line width of regression mean
-mlw <- 8
+mlw <- 14
+#tick width
+lwt <- 8
+#axis line width
+lwa <- 4
+#line location of axis labels
+yll <- 5
+#size of axis labels
+amx <- 6
+#size of plot labels 
+llmx <- 9
+#line of x axis plot labels
+xll <- 15
+#legend lwd
+lglw <- 10
+#legend size
+lgcx <- 6
+#legend point size
+lgpt <- 7
 #break into two panels
-vg1 <- c(1,2,4)
-vg2 <- c(3,5,6)
-vg3 <- c(7,8,9)
+vg1 <- c(1,2,3,4)
+vg2 <- c(5,6,7,8,9)
 
-png(paste0(plotDI,"\\patterns_ave.png"), width=3000,height=4000,
+png(paste0(plotDI,"\\patterns_ave.png"), width=3600,height=3600,
 			units="px")
-	layout(matrix(seq(1,6),ncol=2,byrow=FALSE), width=rep(lcm(wd),6),height=rep(lcm(hd),6))
-	par(mai=c(0,0,0,0))
+	layout(matrix(seq(1,4),ncol=2,byrow=FALSE), width=rep(lcm(wd),4),height=rep(lcm(hd),4))
+	par(mai=c(1,0,0,1))
 	plot(c(0,1),c(0,1),type="n", ylim=c(aveL,aveH), xlim=c(minL,minH), xlab=" ", ylab=" ",
 			xaxs="i", yaxs="i", axes=FALSE)
 	
 		#vegetation mean vs min group 1
-	for(i in 1:3){
+	for(i in 1:4){
 		j <- vg1[i]
 		points(SoilL[[xcomp[1]]]$Mean[SoilL[[xcomp[1]]]$vegeclass==j],
 				SoilL[[ycomp[1]]]$Mean[SoilL[[xcomp[1]]]$vegeclass==j], pch=19,
@@ -1026,7 +1049,7 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3000,height=4000,
 	
 	}
 	#credible interval regression
-	for(i in 1:3){
+	for(i in 1:4){
 		j <- vg1[i]
 		if(patternSlope$sig[patternSlope$comp==1&patternSlope$vegeClass==j]==1){
 			polygon(c(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j],
@@ -1045,7 +1068,7 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3000,height=4000,
 		}
 	}	
 	#regression line	
-	for(i in 1:3){
+	for(i in 1:4){
 		j <- vg1[i]
 		if(patternSlope$sig[patternSlope$comp==1&patternSlope$vegeClass==j]==1){
 			points(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j],
@@ -1057,13 +1080,26 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3000,height=4000,
 		}
 	
 	}
+	axis(2, seqAve, rep(" ",length(seqAve)), lwd.ticks=lwt, lwd=lwa)
+	mtext(seqAve,at=seqAve, line=yll, cex=amx,las=2, side=2)
 	
-	par(mai=c(0,0,0,0))
+	
+	legend("bottomright",paste(datVI$name2[vg1], "  "), 
+			col=as.character(paste(vegeclassColors$colt2[vg1])),
+			text.col="white",
+			 pch=19, cex=lgcx,bty="n",pt.cex=lgpt)	
+	
+	legend("bottomright",datVI$name2[vg1], col=as.character(paste(vegeclassColors$coli[vg1])),
+			 lwd=lglw, cex=lgcx,bty="n")
+	
+	
+	mtext("Average soil temperature (C)", outer=TRUE, line=-12, cex=llmx, side=2)
+	par(mai=c(0,0,1,1))
 	plot(c(0,1),c(0,1),type="n", ylim=c(aveL,aveH), xlim=c(minL,minH), xlab=" ", ylab=" ",
 			xaxs="i", yaxs="i", axes=FALSE)
 	
 		#vegetation mean vs min group 2
-	for(i in 1:3){
+	for(i in 1:5){
 		j <- vg2[i]
 		points(SoilL[[xcomp[1]]]$Mean[SoilL[[xcomp[1]]]$vegeclass==j],
 				SoilL[[ycomp[1]]]$Mean[SoilL[[xcomp[1]]]$vegeclass==j], pch=19,
@@ -1072,7 +1108,7 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3000,height=4000,
 	}
 	
 		#credible interval regression
-	for(i in 1:3){
+	for(i in 1:5){
 		j <- vg2[i]
 		if(patternSlope$sig[patternSlope$comp==1&patternSlope$vegeClass==j]==1){
 			polygon(c(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j],
@@ -1091,7 +1127,7 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3000,height=4000,
 		}
 	}
 	
-	for(i in 1:3){
+	for(i in 1:5){
 		j <- vg2[i]
 		if(patternSlope$sig[patternSlope$comp==1&patternSlope$vegeClass==j]==1){
 			points(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j],
@@ -1103,64 +1139,34 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3000,height=4000,
 		}
 	
 	}
+	axis(2, seqAve, rep(" ",length(seqAve)), lwd.ticks=lwt, lwd=lwa)
+	mtext(seqAve,at=seqAve, line=yll, cex=amx,las=2, side=2)
+	axis(1, seqMin, rep(" ",length(seqMin)), lwd.ticks=lwt, lwd=lwa)
+	mtext(seqMin,at=seqMin, line=yll, cex=amx, side=1)
+	mtext("Minimum soil temperature (C)",  line=xll, cex=llmx, side=1)
+
 	
-	#vegetation mean vs min group 3
+		legend("bottomright",paste(datVI$name2[vg2], "  "), 
+			col=as.character(paste(vegeclassColors$colt2[vg2])),
+			text.col="white",
+			 pch=19, cex=lgcx,bty="n",pt.cex=lgpt)	
 	
-	par(mai=c(0,0,0,0))
-	plot(c(0,1),c(0,1),type="n", ylim=c(aveL,aveH), xlim=c(minL,minH), xlab=" ", ylab=" ",
-			xaxs="i", yaxs="i", axes=FALSE)
-	for(i in 1:3){
-		j <- vg3[i]
-		points(SoilL[[xcomp[1]]]$Mean[SoilL[[xcomp[1]]]$vegeclass==j],
-				SoilL[[ycomp[1]]]$Mean[SoilL[[xcomp[1]]]$vegeclass==j], pch=19,
-				col=as.character(paste(vegeclassColors$colt1[j])),cex=px)
+		legend("bottomright",datVI$name2[vg2], col=as.character(paste(vegeclassColors$coli[vg2])),
+			 lwd=lglw, cex=lgcx,bty="n")
 	
-	}
-	
-		#credible interval regression
-	for(i in 1:3){
-		j <- vg3[i]
-		if(patternSlope$sig[patternSlope$comp==1&patternSlope$vegeClass==j]==1){
-			polygon(c(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j],
-						rev(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j])),
-					c(regPlot$X0.3.[regPlot$comp==1&regPlot$vegeClass==j],	
-					rev(regPlot$X99.7.[regPlot$comp==1&regPlot$vegeClass==j])),	
-					border=NA,col=as.character(paste(vegeclassColors$colt2[j])))
-		}else{
-		polygon(c(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j],
-						rev(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j])),
-				c(rep(patternInt$X0.3.[patternInt$comp==1&patternInt$vegeClass==j], 
-					length(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j])),
-				rep(patternInt$X99.7.[patternInt$comp==1&patternInt$vegeClass==j], 
-					length(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j]))),	
-					border=NA,col=as.character(paste(vegeclassColors$colt2[j])))
-		}
-	}
-	for(i in 1:3){
-		j <- vg3[i]
-		if(patternSlope$sig[patternSlope$comp==1&patternSlope$vegeClass==j]==1){
-			points(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j],
-					regPlot$Mean[regPlot$comp==1&regPlot$vegeClass==j], type="l",
-					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])))
-		}else{
-			abline(h=patternInt$Mean[patternInt$comp==1&patternInt$vegeClass==j],
-					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])),lty=3)
-		}
-	
-	}
 	#average vs max group 1 	
-	par(mai=c(0,0,0,0))
+	par(mai=c(1,1,0,0))
 	plot(c(0,1),c(0,1),type="n", ylim=c(aveL,aveH), xlim=c(maxL,maxH), xlab=" ", ylab=" ",
 			xaxs="i", yaxs="i", axes=FALSE)
 			
-		for(i in 1:3){
+		for(i in 1:4){
 		j <- vg1[i]
 		points(SoilL[[xcomp[2]]]$Mean[SoilL[[xcomp[2]]]$vegeclass==j],
 				SoilL[[ycomp[2]]]$Mean[SoilL[[xcomp[2]]]$vegeclass==j], pch=19,
 				col=as.character(paste(vegeclassColors$colt2[j])),cex=px)
 	
 	}
-		for(i in 1:3){
+		for(i in 1:4){
 		j <- vg1[i]
 		if(patternSlope$sig[patternSlope$comp==2&patternSlope$vegeClass==j]==1){
 			polygon(c(regPlot$xplot[regPlot$comp==2&regPlot$vegeClass==j],
@@ -1178,7 +1184,7 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3000,height=4000,
 					border=NA,col=as.character(paste(vegeclassColors$colt2[j])))
 		}
 	}
-		for(i in 1:3){
+		for(i in 1:4){
 		j <- vg1[i]
 		if(patternSlope$sig[patternSlope$comp==2&patternSlope$vegeClass==j]==1){
 			points(regPlot$xplot[regPlot$comp==2&regPlot$vegeClass==j],
@@ -1190,19 +1196,23 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3000,height=4000,
 		}
 	
 	}
+	
+	axis(4, seqAve, rep(" ",length(seqAve)), lwd.ticks=lwt, lwd=lwa)
+	mtext(seqAve,at=seqAve, line=yll, cex=amx,las=2, side=4)
+	mtext("Average soil temperature (C)", outer=TRUE, line=-12, cex=llmx, side=4)
 	#average vs max group 2 	
-	par(mai=c(0,0,0,0))
+	par(mai=c(0,1,1,0))
 	plot(c(0,1),c(0,1),type="n", ylim=c(aveL,aveH), xlim=c(maxL,maxH), xlab=" ", ylab=" ",
 			xaxs="i", yaxs="i", axes=FALSE)
 			
-		for(i in 1:3){
+		for(i in 1:5){
 		j <- vg2[i]
 		points(SoilL[[xcomp[2]]]$Mean[SoilL[[xcomp[2]]]$vegeclass==j],
 				SoilL[[ycomp[2]]]$Mean[SoilL[[xcomp[2]]]$vegeclass==j], pch=19,
 				col=as.character(paste(vegeclassColors$colt2[j])),cex=px)
 	
 	}
-		for(i in 1:3){
+		for(i in 1:5){
 		j <- vg2[i]
 		if(patternSlope$sig[patternSlope$comp==2&patternSlope$vegeClass==j]==1){
 			polygon(c(regPlot$xplot[regPlot$comp==2&regPlot$vegeClass==j],
@@ -1220,7 +1230,7 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3000,height=4000,
 					border=NA,col=as.character(paste(vegeclassColors$colt2[j])))
 		}
 	}
-		for(i in 1:3){
+		for(i in 1:5){
 		j <- vg2[i]
 		if(patternSlope$sig[patternSlope$comp==2&patternSlope$vegeClass==j]==1){
 			points(regPlot$xplot[regPlot$comp==2&regPlot$vegeClass==j],
@@ -1228,52 +1238,13 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3000,height=4000,
 					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])))
 		}else{
 			abline(h=patternInt$Mean[patternInt$comp==2&patternInt$vegeClass==j],
-					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])),lty=3)
+					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])),lty=2)
 		}
 	
 	}
-	
-	
-		#average vs max group 3 	
-	par(mai=c(0,0,0,0))
-	plot(c(0,1),c(0,1),type="n", ylim=c(aveL,aveH), xlim=c(maxL,maxH), xlab=" ", ylab=" ",
-			xaxs="i", yaxs="i", axes=FALSE)
-			
-		for(i in 1:3){
-		j <- vg3[i]
-		points(SoilL[[xcomp[2]]]$Mean[SoilL[[xcomp[2]]]$vegeclass==j],
-				SoilL[[ycomp[2]]]$Mean[SoilL[[xcomp[2]]]$vegeclass==j], pch=19,
-				col=as.character(paste(vegeclassColors$colt2[j])),cex=px)
-	
-	}
-	for(i in 1:3){
-		j <- vg3[i]
-		if(patternSlope$sig[patternSlope$comp==2&patternSlope$vegeClass==j]==1){
-			polygon(c(regPlot$xplot[regPlot$comp==2&regPlot$vegeClass==j],
-						rev(regPlot$xplot[regPlot$comp==2&regPlot$vegeClass==j])),
-					c(regPlot$X0.3.[regPlot$comp==2&regPlot$vegeClass==j],	
-					rev(regPlot$X99.7.[regPlot$comp==2&regPlot$vegeClass==j])),	
-					border=NA,col=as.character(paste(vegeclassColors$colt2[j])))
-		}else{
-		polygon(c(regPlot$xplot[regPlot$comp==2&regPlot$vegeClass==j],
-						rev(regPlot$xplot[regPlot$comp==2&regPlot$vegeClass==j])),
-				c(rep(patternInt$X0.3.[patternInt$comp==2&patternInt$vegeClass==j], 
-					length(regPlot$xplot[regPlot$comp==2&regPlot$vegeClass==j])),
-				rep(patternInt$X99.7.[patternInt$comp==2&patternInt$vegeClass==j], 
-					length(regPlot$xplot[regPlot$comp==2&regPlot$vegeClass==j]))),	
-					border=NA,col=as.character(paste(vegeclassColors$colt2[j])))
-		}
-	}
-		for(i in 1:3){
-		j <- vg3[i]
-		if(patternSlope$sig[patternSlope$comp==2&patternSlope$vegeClass==j]==1){
-			points(regPlot$xplot[regPlot$comp==2&regPlot$vegeClass==j],
-					regPlot$Mean[regPlot$comp==2&regPlot$vegeClass==j], type="l",
-					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])))
-		}else{
-			abline(h=patternInt$Mean[patternInt$comp==2&patternInt$vegeClass==j],
-					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])),lty=3)
-		}
-	
-	}
+	axis(4, seqAve, rep(" ",length(seqAve)), lwd.ticks=lwt, lwd=lwa)
+	mtext(seqAve,at=seqAve, line=yll, cex=amx,las=2, side=4)
+	axis(1, seqMax, rep(" ",length(seqMax)), lwd.ticks=lwt, lwd=lwa)
+	mtext(seqMax,at=seqMax, line=yll, cex=amx, side=1)
+	mtext("Maximum soil temperature (C)",  line=xll, cex=llmx, side=1)	
 dev.off()	
