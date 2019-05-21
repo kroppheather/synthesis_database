@@ -1259,6 +1259,10 @@ regFit <- list()
 R2 <- numeric(0)
 for(i in 1:dim(vegeCompID)[1]){
 	regFit <- lm(regRep$Mean[regRep$vegeCompID==i]~regRep$yobs[regRep$vegeCompID==i])
-	R2[i] <- 
+	R2[i] <- summary(regFit)$r.squared
 
 }
+
+vegeCompID$r.sq <- round(R2,3) 
+
+write.table(vegeCompID,paste0(plotDI,"\\soil_ave_r2.csv"), sep=",", row.names=FALSE)
