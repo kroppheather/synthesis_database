@@ -18,6 +18,7 @@
 ### CI, and all accompanying IDs and info              ###
 ### dataframes are Nfactor, SoilParm, AirParm,         ###
 ### AirRepID,SoilRepID, datCSM, datCAM (lists)         ###
+### DDsoil,DDair                                       ###
 ##########################################################
 ##########################################################
 
@@ -180,6 +181,10 @@ datSreps <- list()
 datCSM<-list()
 datCAM<-list()
 datThawN <- list()
+datTDDS <- list()
+datFDDS <- list()
+datTDDA <- list()
+datFDDA <- list()
 
 #now pull out id number
 dexps2<-"\\D"
@@ -214,6 +219,20 @@ for(i in 1:dim(mrunF)[1]){
 	datThawN[[i]] <- datC[[i]][datC[[i]]$parms1=="ThawCountN",]
 	datThawN[[i]]$siteSDW<-seq(1,dim(datThawN[[i]])[1])
 	
+	#degree days Soil
+	#freezing
+	datFDDS[[i]] <- datC[[i]][datC[[i]]$parms1=="FDDS",]
+	datFDDS[[i]]$siteSDW<-seq(1,dim(datFDDS[[i]])[1])
+	#thawing
+	datTDDS[[i]] <- datC[[i]][datC[[i]]$parms1=="TDDS",]
+	datTDDS[[i]]$siteSDW<-seq(1,dim(datTDDS[[i]])[1])
+	#degree days Air
+	#freeezing
+	datFDDA[[i]] <- datC[[i]][datC[[i]]$parms1=="FDDA",]
+	datFDDA[[i]]$siteSDW<-seq(1,dim(datFDDA[[i]])[1])	
+	#thawing
+	datTDDA[[i]] <- datC[[i]][datC[[i]]$parms1=="TDDA",]
+	datTDDA[[i]]$siteSDW<-seq(1,dim(datTDDA[[i]])[1])		
 	#now join with ids
 
 	datMax[[i]]<-join(datMax[[i]],SoilSDW[[i]], by="siteSDW", type="left")
@@ -225,9 +244,17 @@ for(i in 1:dim(mrunF)[1]){
 	datNfreeze[[i]]<-join(datNfreeze[[i]], datNIS[[i]], by="Nseq", type="left")
 	datTaverageS[[i]] <- join(datTaverageS[[i]],SoilSDW[[i]], by="siteSDW", type="left")
 	datThawN[[i]] <- join(datThawN[[i]],SoilSDW[[i]], by="siteSDW", type="left")
+	datTDDS[[i]] <- join(datTDDS[[i]],SoilSDW[[i]], by="siteSDW", type="left")
+	datFDDS[[i]] <- join(datFDDS[[i]],SoilSDW[[i]], by="siteSDW", type="left")
+	datTDDA[[i]] <- join(datTDDA[[i]],AirSDW[[i]], by="siteSDW", type="left")
+	datFDDA[[i]] <- join(datFDDA[[i]],AirSDW[[i]], by="siteSDW", type="left")	
+	
 	#pull out reps
 	datAreps[[i]] <- datC[[i]][datC[[i]]$parms1=="TempA.rep",]
 	datSreps[[i]] <- datC[[i]][datC[[i]]$parms1=="TempS.rep",]
+	
+	
+	
 }
 	
 
@@ -242,8 +269,10 @@ for(i in 1:dim(mrunF)[1]){
 	datSreps <- ldply(datSreps)
 	datAreps <- ldply(datAreps)
 	datThawN <- ldply(datThawN,data.frame)
-	
-	
+	datTDDS <- ldply(datTDDS,data.frame)
+	datFDDS <- ldply(datFDDS,data.frame)
+	datTDDA <- ldply(datTDDA,data.frame)
+	datFDDA <- ldply(datFDDA,data.frame)
 #subset first to only look at air parms
 datMaxA<-list()
 datMinA<-list()
@@ -346,7 +375,19 @@ AirParm<-rbind(SpeakA, WpeakA,TminA,TmaxA, TaveA)
 ThawParm <- data.frame(datThawN[,1:2], pc2.5=datThawN[,5],pc97.5=datThawN[,9],
 				datThawN[,12:14],parm=datThawN$parms1)
 
-max(ThawParm$Mean)
+FDDS <-		data.frame(datFDDS[,1:2], pc2.5=datFDDS[,5],pc97.5=datFDDS[,9],
+				datFDDS[,12:14],parm=datFDDS$parms1)
+
+FDDA <-		data.frame(datFDDA[,1:2], pc2.5=datFDDA[,5],pc97.5=datFDDA[,9],
+				datFDDA[,12:14],parm=datFDDA$parms1)				
+TDDS <-		data.frame(datTDDS[,1:2], pc2.5=datTDDS[,5],pc97.5=datTDDS[,9],
+				datTDDS[,12:14],parm=datTDDS$parms1)
+
+TDDA <-		data.frame(datTDDA[,1:2], pc2.5=datTDDA[,5],pc97.5=datTDDA[,9],
+				datTDDA[,12:14],parm=datTDDA$parms1)
+
+DDsoil <- rbind(FDDS,TDDS)				
+DDair <- rbind(FDDA,TDDA)	
 
 #join rep id with replicate data
 
@@ -354,4 +395,4 @@ AirRepID <- cbind(datARdf, datAreps)
 SoilRepID <- cbind(datSRdf, datSreps)
 
 rm(list=setdiff(ls(), c("AirParm", "SoilParm","Nfactor", "AirRepID","SoilRepID", "datCSM", "datCAM","datAM", "datSM",
-						"datAT","datST","datNI","datAI","datSI","ThawParm")))
+						"datAT","datST","datNI","datAI","datSI","ThawParm","DDsoil","DDair")))
