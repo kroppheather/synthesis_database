@@ -45,10 +45,19 @@ plot(DDair$Mean[DDair$parm=="FDDA"]~as.factor(DDair$vegeclass[DDair$parm=="FDDA"
 
 
 #plot air temps
-par(mfrow=c(2,1))
+par(mfrow=c(2,2))
 plot(AirParm$Mean[AirParm$parm=="TmaxA"]~as.factor(AirParm$vegeclass[AirParm$parm=="TmaxA"]),
 		xlab = "vegeclass", ylab="Maximum air temperature")
 		
-abline(h=12, col="tomato3",lwd=2, lty=3)		
+abline(h=12, col="tomato3",lwd=2, lty=3)	
+
+plot(AirParm$Mean[AirParm$parm=="TminA"]~as.factor(AirParm$vegeclass[AirParm$parm=="TminA"]),
+		xlab = "vegeclass", ylab="Maximum air temperature")
+		
+abline(h=-22, col="tomato3",lwd=2, lty=3)	
+	
 plot(DDair$Mean[DDair$parm=="TDDA"]~as.factor(DDair$vegeclass[DDair$parm=="TDDA"]),
+		xlab = "vegeclass", ylab="Thawing degree days")
+	
+plot(DDair$Mean[DDair$parm=="FDDA"]~as.factor(DDair$vegeclass[DDair$parm=="FDDA"]),
 		xlab = "vegeclass", ylab="Thawing degree days")
