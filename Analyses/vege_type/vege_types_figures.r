@@ -52,7 +52,7 @@ library(plyr)
 plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\plots\\model_all"
 #model directory
 modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run5"
-Nrun <-4
+Nrun <- 5
 #######################################
 #####set up colors               ##### 
 #######################################
@@ -111,10 +111,11 @@ AirMs <- numeric(0)
 for(i in 1:length(parmAs)){
 	AirL[[i]] <- AirParm[AirParm$Aparm==parmAs[i],]
 	#calculate mean
-	AirMs[i] <- round(mean(AirL[[i]]$AMean),3)
+	AirMs[i] <- round(mean(AirL[[i]]$AMean),0)
 	#add a regression ID
 	AirL[[i]]$regID <- rep(i,dim(AirL[[i]])[1])
 }
+
 
 #turn back into a data frame
 
@@ -143,7 +144,57 @@ regvegeID$regvegeID <- seq(1,dim(regvegeID)[1])
 ParmAll <- join(ParmAll,regvegeID, by=c("vegeclass","regID"),type="left")
 
 #precip mean
-precMs <- c(100,200,100)
+precMs <- c(mean(ParmAll$precW),mean(ParmAll$precS),mean(ParmAll$precW))
+
+
+#get range of precip and air temps in each vegetation group for each regression
+#get minimumAir
+minAir <- aggregate(ParmAll$AMean,by=list(ParmAll$regvegeID),FUN="min")
+maxAir <- aggregate(ParmAll$AMean,by=list(ParmAll$regvegeID),FUN="max")
+meanAir <- aggregate(ParmAll$AMean,by=list(ParmAll$regvegeID),FUN="mean")
+
+minPrec <- aggregate(ParmAll$precR,by=list(ParmAll$regvegeID),FUN="min")
+maxPrec <- aggregate(ParmAll$precR,by=list(ParmAll$regvegeID),FUN="max")
+meanPrec <- aggregate(ParmAll$precR,by=list(ParmAll$regvegeID),FUN="mean")
+
+
+regvegeID$minAir <- minAir$x
+regvegeID$maxAir <- maxAir$x
+regvegeID$meanAir <- round(meanAir$x,0)
+
+
+regvegeID$minPrec <- minPrec$x
+regvegeID$maxPrec <- maxPrec$x
+regvegeID$meanPrec <- round(meanPrec$x,0)
+
+#get min and max of data for plotting
+#air
+regMinA <- aggregate(ParmAll$AMean,by=list(ParmAll$regID),FUN="min")
+regMinA$x <- round_any(regMinA$x,5,floor)
+
+regMaxA <- aggregate(ParmAll$AMean,by=list(ParmAll$regID),FUN="max")
+regMaxA$x <- round_any(regMaxA$x,5,ceiling)
+
+
+#precip
+regMinP <- aggregate(ParmAll$precR,by=list(ParmAll$regID),FUN="min")
+regMinP$x <- round_any(regMinP$x,10,floor)
+
+regMaxP <- aggregate(ParmAll$precR,by=list(ParmAll$regID),FUN="max")
+regMaxP$x <- round_any(regMaxP$x,10,ceiling)
+
+#set up in matrix for plotting
+regPlotA <- matrix(rep(NA,dim(regvegeID)[1]*200),ncol=dim(regvegeID)[1])
+regTempA <- numeric(0)
+regPlotP <- matrix(rep(NA,dim(regvegeID)[1]*200),ncol=dim(regvegeID)[1])
+regTempP <- numeric(0)
+for(i in 1:dim(regvegeID)[1]){
+	regTempA <- seq(regMinA$x[regvegeID$regID[i]],regMaxA$x[regvegeID$regID[i]],length.out=200)
+	regPlotA[,i] <- regTempA
+	regTempP <- seq(regMinP$x[regvegeID$regID[i]],regMaxP$x[regvegeID$regID[i]],length.out=200)
+	regPlotP[,i] <- regTempP
+}
+
 
 
 
@@ -170,14 +221,14 @@ beta1 <- datC[datC$parms=="beta1",]
 beta2 <- datC[datC$parms=="beta2",]
 beta3 <- datC[datC$parms=="beta3",]
 #add in sig test
-beta1$sigID <- ifelse(beta1$X0.2.<0&beta1$X99.8.<0,1,
-				ifelse(beta1$X0.2.>0&beta1$X99.8.>0,1,0))
+beta1$sigID <- ifelse(beta1$X0.1.<0&beta1$X99.9.<0,1,
+				ifelse(beta1$X0.1.>0&beta1$X99.9.>0,1,0))
 				
-beta2$sigID <- ifelse(beta2$X0.2.<0&beta2$X99.8.<0,1,
-				ifelse(beta2$X0.2.>0&beta2$X99.8.>0,1,0))				
+beta2$sigID <- ifelse(beta2$X0.1.<0&beta2$X99.9.<0,1,
+				ifelse(beta2$X0.1.>0&beta2$X99.9.>0,1,0))				
 				
-beta3$sigID <- ifelse(beta3$X0.2.<0&beta3$X99.8.<0,1,
-				ifelse(beta3$X0.2.>0&beta3$X99.8.>0,1,0))
+beta3$sigID <- ifelse(beta3$X0.1.<0&beta3$X99.9.<0,1,
+				ifelse(beta3$X0.1.>0&beta3$X99.9.>0,1,0))
 
 #add identifier info
 beta0 <- data.frame(beta0,regvegeID )
@@ -246,8 +297,8 @@ for(i in 1:3){
 						col="tomato3",border=NA)
 				arrows(xseq[j]-1,beta0$Mean[beta0$regID==i&beta0$vegeclass==j],
 						xseq[j]+1,beta0$Mean[beta0$regID==i&beta0$vegeclass==j],code=0,lwd=mlw)
-				arrows(	xseq[j],beta0$X0.2.[beta0$regID==i&beta0$vegeclass==j],
-						xseq[j],beta0$X99.8.[beta0$regID==i&beta0$vegeclass==j],
+				arrows(	xseq[j],beta0$X0.1.[beta0$regID==i&beta0$vegeclass==j],
+						xseq[j],beta0$X99.9.[beta0$regID==i&beta0$vegeclass==j],
 						code=0, lwd=alw)
 			}
 		axis(1, xseq,rep("",length(xseq)), lwd.ticks=tlw)
@@ -276,8 +327,8 @@ for(i in 1:3){
 				}
 				arrows(xseq[j]-1,beta1$Mean[beta1$regID==i&beta1$vegeclass==j],
 						xseq[j]+1,beta1$Mean[beta1$regID==i&beta1$vegeclass==j],code=0,lwd=mlw)
-				arrows(	xseq[j],beta1$X0.2.[beta1$regID==i&beta1$vegeclass==j],
-						xseq[j],beta1$X99.8.[beta1$regID==i&beta1$vegeclass==j],
+				arrows(	xseq[j],beta1$X0.1.[beta1$regID==i&beta1$vegeclass==j],
+						xseq[j],beta1$X99.9.[beta1$regID==i&beta1$vegeclass==j],
 						code=0, lwd=alw)
 			}			
 		axis(1, xseq,rep("",length(xseq)), lwd.ticks=tlw)
@@ -306,8 +357,8 @@ for(i in 1:3){
 				}
 				arrows(xseq[j]-1,beta2$Mean[beta2$regID==i&beta2$vegeclass==j],
 						xseq[j]+1,beta2$Mean[beta2$regID==i&beta2$vegeclass==j],code=0,lwd=mlw)
-				arrows(	xseq[j],beta2$X0.2.[beta2$regID==i&beta2$vegeclass==j],
-						xseq[j],beta2$X99.8.[beta2$regID==i&beta2$vegeclass==j],
+				arrows(	xseq[j],beta2$X0.1.[beta2$regID==i&beta2$vegeclass==j],
+						xseq[j],beta2$X99.9.[beta2$regID==i&beta2$vegeclass==j],
 						code=0, lwd=alw)
 		}
 		axis(1, xseq,rep("",length(xseq)), lwd.ticks=tlw)
@@ -337,8 +388,8 @@ for(i in 1:3){
 						
 				arrows(xseq[j]-1,beta3$Mean[beta0$regID==i&beta3$vegeclass==j],
 						xseq[j]+1,beta3$Mean[beta0$regID==i&beta3$vegeclass==j],code=0,lwd=mlw)
-				arrows(	xseq[j],beta3$X0.2.[beta3$regID==i&beta3$vegeclass==j],
-						xseq[j],beta3$X99.8.[beta3$regID==i&beta3$vegeclass==j],
+				arrows(	xseq[j],beta3$X0.1.[beta3$regID==i&beta3$vegeclass==j],
+						xseq[j],beta3$X99.9.[beta3$regID==i&beta3$vegeclass==j],
 						code=0, lwd=alw)
 		}
 		axis(1, xseq,rep("",length(xseq)), lwd.ticks=tlw)
