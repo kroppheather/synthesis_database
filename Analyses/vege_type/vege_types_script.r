@@ -34,9 +34,7 @@ source("c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Analyses\\temp
 #read in vege class data: check that patterns don't vary between vege type
 datV <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\vege_class.csv")
 datVI <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\vegeID.csv")
-#world clim 2 precip in mm
-datWC <- read.csv("c:\\Users\\hkropp\\Google Drive\\map_synth\\WCprecSites.csv")
-colnames(datWC)[1] <- "siteid"
+
 #######################################
 #####libraries                    ##### 
 #######################################
@@ -134,8 +132,7 @@ regvegeID$regvegeID <- seq(1,dim(regvegeID)[1])
 #now join back into parmall
 ParmAll <- join(ParmAll,regvegeID, by=c("vegeclass","regID"),type="left")
 
-#precip mean
-precMs <- c(mean(ParmAll$precW),mean(ParmAll$precS),mean(ParmAll$precW))
+
 
 
 #get range of precip and air temps in each vegetation group for each regression
@@ -144,9 +141,7 @@ minAir <- aggregate(ParmAll$AMean,by=list(ParmAll$regvegeID),FUN="min")
 maxAir <- aggregate(ParmAll$AMean,by=list(ParmAll$regvegeID),FUN="max")
 meanAir <- aggregate(ParmAll$AMean,by=list(ParmAll$regvegeID),FUN="mean")
 
-minPrec <- aggregate(ParmAll$precR,by=list(ParmAll$regvegeID),FUN="min")
-maxPrec <- aggregate(ParmAll$precR,by=list(ParmAll$regvegeID),FUN="max")
-meanPrec <- aggregate(ParmAll$precR,by=list(ParmAll$regvegeID),FUN="mean")
+
 
 
 regvegeID$minAir <- minAir$x
@@ -154,9 +149,6 @@ regvegeID$maxAir <- maxAir$x
 regvegeID$meanAir <- round(meanAir$x,0)
 
 
-regvegeID$minPrec <- minPrec$x
-regvegeID$maxPrec <- maxPrec$x
-regvegeID$meanPrec <- round(meanPrec$x,0)
 
 #get min and max of data for plotting
 #air
@@ -167,24 +159,11 @@ regMaxA <- aggregate(ParmAll$AMean,by=list(ParmAll$regID),FUN="max")
 regMaxA$x <- round_any(regMaxA$x,5,ceiling)
 
 
-#precip
-regMinP <- aggregate(ParmAll$precR,by=list(ParmAll$regID),FUN="min")
-regMinP$x <- round_any(regMinP$x,10,floor)
-
-regMaxP <- aggregate(ParmAll$precR,by=list(ParmAll$regID),FUN="max")
-regMaxP$x <- round_any(regMaxP$x,10,ceiling)
 
 #set up in matrix for plotting
 regPlotA <- matrix(rep(NA,dim(regvegeID)[1]*200),ncol=dim(regvegeID)[1])
 regTempA <- numeric(0)
-regPlotP <- matrix(rep(NA,dim(regvegeID)[1]*200),ncol=dim(regvegeID)[1])
-regTempP <- numeric(0)
-for(i in 1:dim(regvegeID)[1]){
-	regTempA <- seq(regMinA$x[regvegeID$regID[i]],regMaxA$x[regvegeID$regID[i]],length.out=200)
-	regPlotA[,i] <- regTempA
-	regTempP <- seq(regMinP$x[regvegeID$regID[i]],regMaxP$x[regvegeID$regID[i]],length.out=200)
-	regPlotP[,i] <- regTempP
-}
+
 
 
 #######################################
@@ -196,28 +175,23 @@ datalist <- list(Nobs=dim(ParmAll)[1],
 				depth=ParmAll$depth,
 				SoilP=ParmAll$Mean,
 				AirPbar=regvegeID$meanAir,
-				precip=ParmAll$precR,
-				precipbar=regvegeID$meanPrec,
 				sigMod=ParmAll$SD,
 				AirP=ParmAll$AMean,
-				Pcomp=c(100,200,100),
 				Acomp=AirMs,
 				reg=regvegeID$regID,
 				sig.Air=ParmAll$ASD,
 				NregVege=dim(regvegeID)[1],
 				regV=regvegeID$regID,
 				Nreg=3,
-				AcompPlot=regPlotA,
-				PcompPlot=regPlotP
+				AcompPlot=regPlotA
 				)
 				
 #paramters of interest
-parms <- c("beta0","beta1","beta2","beta3","sigSoilV","repSoilP",
-		"mu.beta0","mu.beta1","mu.beta2","mu.beta3",
-		"sig.beta0","sig.beta1","sig.beta2","sig.beta3","meanComp","plotRegA",
-		"plotRegP")	
-#each regression has 4 parameters for each 9 vegetation types		
-Xcomp <- round(0.05/((9*4)-1),3)
+parms <- c("beta0","beta1","beta2","sigSoilV","repSoilP",
+		"mu.beta0","mu.beta1","mu.beta2",
+		"sig.beta0","sig.beta1","sig.beta2","meanComp","plotRegA")	
+#each regression has 3 parameters for each 9 vegetation types		
+Xcomp <- round(0.05/((9*3)-1),3)
 if(modRun==1){
 #start model 
 vege.modI<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Analyses\\vege_type\\vege_types_model_code.r",
@@ -229,9 +203,9 @@ vege.sample <- coda.samples(vege.modI,variable.names=parms,
                        n.iter=300000, thin=100)	
 					
 #model history
-mcmcplot(vege.sample, parms=c("beta0","beta1","beta2","beta3","sigSoilV",
-								"mu.beta0","mu.beta1","mu.beta3","mu.beta3",
-								"sig.beta0","sig.beta1","sig.beta2","sig.beta3"),
+mcmcplot(vege.sample, parms=c("beta0","beta1","beta2","sigSoilV",
+								"mu.beta0","mu.beta1","mu.beta3",
+								"sig.beta0","sig.beta1","sig.beta2"),
 			dir=paste0(modDI,"\\history"))
 
 
