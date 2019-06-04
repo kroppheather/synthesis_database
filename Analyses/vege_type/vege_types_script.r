@@ -52,7 +52,7 @@ library(plyr)
 #set up a plot directory
 plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\plots\\model_all"
 #model directory
-modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run4"
+modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run5"
 Nrun <- 4
 #indicate if a model run is occuring
 modRun <- 1
@@ -102,7 +102,7 @@ AirMs <- numeric(0)
 for(i in 1:length(parmAs)){
 	AirL[[i]] <- AirParm[AirParm$Aparm==parmAs[i],]
 	#calculate mean
-	AirMs[i] <- round(mean(AirL[[i]]$AMean),3)
+	AirMs[i] <- round(mean(AirL[[i]]$AMean),0)
 	#add a regression ID
 	AirL[[i]]$regID <- rep(i,dim(AirL[[i]])[1])
 }
@@ -142,28 +142,50 @@ precMs <- c(mean(ParmAll$precW),mean(ParmAll$precS),mean(ParmAll$precW))
 #get minimumAir
 minAir <- aggregate(ParmAll$AMean,by=list(ParmAll$regvegeID),FUN="min")
 maxAir <- aggregate(ParmAll$AMean,by=list(ParmAll$regvegeID),FUN="max")
-
+meanAir <- aggregate(ParmAll$AMean,by=list(ParmAll$regvegeID),FUN="mean")
 
 minPrec <- aggregate(ParmAll$precR,by=list(ParmAll$regvegeID),FUN="min")
 maxPrec <- aggregate(ParmAll$precR,by=list(ParmAll$regvegeID),FUN="max")
-
-regvegeID$precMeanA <- rep(precMs, each=9)
-regvegeID$airMeanA <- rep(AirMs, each=9)
+meanPrec <- aggregate(ParmAll$precR,by=list(ParmAll$regvegeID),FUN="mean")
 
 
 regvegeID$minAir <- minAir$x
 regvegeID$maxAir <- maxAir$x
+regvegeID$meanAir <- round(meanAir$x,0)
+
 
 regvegeID$minPrec <- minPrec$x
 regvegeID$maxPrec <- maxPrec$x
+regvegeID$meanPrec <- round(meanPrec$x,0)
 
-#now check if mean across all vege types falls into range
-regvegeID$airCheck <- ifelse(regvegeID$airMeanA >= regvegeID$minAir & regvegeID$airMeanA<=regvegeID$maxAir,1,0)
-regvegeID$precCheck <- ifelse(regvegeID$precMeanA >= regvegeID$minPrec & regvegeID$precMeanA<=regvegeID$maxPrec,1,0)
+#get min and max of data for plotting
+#air
+regMinA <- aggregate(ParmAll$AMean,by=list(ParmAll$regID),FUN="min")
+regMinA$x <- round_any(regMinA$x,5,floor)
 
-#50mm has overlap or close overlap for all winter sites
-regvegeID$precCent <- rep(c(100,200,100), each=9)
-regvegeID$precCheck2 <- ifelse(regvegeID$precCent>= regvegeID$minPrec & regvegeID$precCent<=regvegeID$maxPrec,1,0)
+regMaxA <- aggregate(ParmAll$AMean,by=list(ParmAll$regID),FUN="max")
+regMaxA$x <- round_any(regMaxA$x,5,ceiling)
+
+
+#precip
+regMinP <- aggregate(ParmAll$precR,by=list(ParmAll$regID),FUN="min")
+regMinP$x <- round_any(regMinP$x,10,floor)
+
+regMaxP <- aggregate(ParmAll$precR,by=list(ParmAll$regID),FUN="max")
+regMaxP$x <- round_any(regMaxP$x,10,ceiling)
+
+#set up in matrix for plotting
+regPlotA <- matrix(rep(NA,dim(regvegeID)[1]*200),ncol=dim(regvegeID)[1])
+regTempA <- numeric(0)
+regPlotP <- matrix(rep(NA,dim(regvegeID)[1]*200),ncol=dim(regvegeID)[1])
+regTempP <- numeric(0)
+for(i in 1:dim(regvegeID)[1]){
+	regTempA <- seq(regMinA$x[regvegeID$regID[i]],regMaxA$x[regvegeID$regID[i]],length.out=200)
+	regPlotA[,i] <- regTempA
+	regTempP <- seq(regMinP$x[regvegeID$regID[i]],regMaxP$x[regvegeID$regID[i]],length.out=200)
+	regPlotP[,i] <- regTempP
+}
+
 
 #######################################
 #####prepare model run            ##### 
@@ -173,23 +195,29 @@ datalist <- list(Nobs=dim(ParmAll)[1],
 				regVege=ParmAll$regvegeID,
 				depth=ParmAll$depth,
 				SoilP=ParmAll$Mean,
-				reg=ParmAll$regID,
-				AirPbar=AirMs,
+				AirPbar=regvegeID$meanAir,
 				precip=ParmAll$precR,
-				precipbar=c(100,200,100),
+				precipbar=regvegeID$meanPrec,
 				sigMod=ParmAll$SD,
 				AirP=ParmAll$AMean,
+				Pcomp=c(100,200,100),
+				Acomp=AirMs,
+				reg=regvegeID$regID,
 				sig.Air=ParmAll$ASD,
 				NregVege=dim(regvegeID)[1],
 				regV=regvegeID$regID,
-				Nreg=3
+				Nreg=3,
+				AcompPlot=regPlotA,
+				PcompPlot=regPlotP
 				)
 				
 #paramters of interest
 parms <- c("beta0","beta1","beta2","beta3","sigSoilV","repSoilP",
 		"mu.beta0","mu.beta1","mu.beta2","mu.beta3",
-		"sig.beta0","sig.beta1","sig.beta2","sig.beta3")			
-Xcomp <- round(0.05/((9*3)-1),3)
+		"sig.beta0","sig.beta1","sig.beta2","sig.beta3","meanComp","plotRegA",
+		"plotRegP")	
+#each regression has 4 parameters for each 9 vegetation types		
+Xcomp <- round(0.05/((9*4)-1),3)
 if(modRun==1){
 #start model 
 vege.modI<-jags.model(file="c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Analyses\\vege_type\\vege_types_model_code.r",

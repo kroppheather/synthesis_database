@@ -9,7 +9,7 @@ model{
 	for(i in 1:Nobs){
 		SoilP[i] ~ dnorm(mu.Soil[i],tau.Soil[i])
 		#mean model
-		mu.Soil[i] <- beta0[regVege[i]]+ beta1[regVege[i]]*depth[i] + beta2[regVege[i]]*(mu.AirP[i]-AirPbar[reg[i]]) + beta3[regVege[i]]*(precip[i]-precipbar[reg[i]])
+		mu.Soil[i] <- beta0[regVege[i]]+ beta1[regVege[i]]*depth[i] + beta2[regVege[i]]*(mu.AirP[i]-AirPbar[regVege[i]]) + beta3[regVege[i]]*(precip[i]-precipbar[regVege[i]])
 		#standard deviation that accounts for parameter standard deviation
 		tau.Soil[i] <- pow(sig.Soil[i],-2)
 		sig.Soil[i] <- sigMod[i] + sigSoilV[regVege[i]]
@@ -27,6 +27,7 @@ model{
 		beta2[i] ~ dnorm(mu.beta2[regV[i]],tau.beta2[regV[i]])
 		beta3[i] ~ dnorm(mu.beta3[regV[i]],tau.beta3[regV[i]])
 		sigSoilV[i] ~ dunif(0,100)
+		meanComp[i] <- beta0[i]+ beta2[i]*(Acomp[reg[i]]-AirPbar[i]) + beta3[i]*(Pcomp[reg[i]]-precipbar[i])
 	}
 	
 	#hyper priors
@@ -45,5 +46,15 @@ model{
 	sig.beta1[i] ~ dunif(0,100)
 	sig.beta2[i] ~ dunif(0,100)
 	sig.beta3[i] ~ dunif(0,100)
+	}
+	
+	#monitor regression means for plotting
+	for(i in 1:NregVege){
+		for(j in 1:100){
+			plotRegA[j,i] <- beta0[i]+  beta2[i]*(AcompPlot[j,i]-AirPbar[i])
+			plotRegP[j,i] <- beta0[i]+  beta3[i]*(PcompPlot[j,i]-precipbar[i])
+		}
+	
+	
 	}
 }	
