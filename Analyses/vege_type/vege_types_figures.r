@@ -33,9 +33,7 @@ source("c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Analyses\\temp
 #read in vege class data: check that patterns don't vary between vege type
 datV <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\vege_class.csv")
 datVI <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\vegeID.csv")
-#world clim 2 precip in mm
-datWC <- read.csv("c:\\Users\\hkropp\\Google Drive\\map_synth\\WCprecSites.csv")
-colnames(datWC)[1] <- "siteid"
+
 #######################################
 #####libraries                    ##### 
 #######################################
@@ -51,8 +49,8 @@ library(plyr)
 #set up a plot directory
 plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\plots\\model_all"
 #model directory
-modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run5"
-Nrun <- 5
+modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run6"
+Nrun <- 6
 #######################################
 #####set up colors               ##### 
 #######################################
@@ -75,10 +73,6 @@ vegeclassColors <- data.frame(vegeclass=seq(1,9),
 #join vege class to soilParm
 SoilParm <- join(SoilParm,datV, by=c("siteid"), type="left")
 unique(SoilParm$vegeclass)
-
-
-#join world clim data
-SoilParm <- join(SoilParm, datWC, by=c("siteid"), type="left")
 
 #create unique names for air
 colnames(AirParm)[1:4] <- paste0("A",colnames(AirParm)[1:4])
@@ -122,13 +116,6 @@ for(i in 1:length(parmAs)){
 SoilR <- ldply(SoilL,data.frame)
 AirR <- ldply(AirL,data.frame)
 
-#sum up winter months Oct-Mar
-#sum up summer months Aprl-Sept
-SoilR$precW <- rowSums(SoilR[,11:13])+rowSums(SoilR[,20:22])
-SoilR$precS <- rowSums(SoilR[,14:19])
-
-#set up a vector for the matching timeperiod
-SoilR$precR <- ifelse(SoilR$regID==2,SoilR$precS,SoilR$precW)
 
 
 #now join soil and air DF
@@ -143,8 +130,7 @@ regvegeID$regvegeID <- seq(1,dim(regvegeID)[1])
 #now join back into parmall
 ParmAll <- join(ParmAll,regvegeID, by=c("vegeclass","regID"),type="left")
 
-#precip mean
-precMs <- c(mean(ParmAll$precW),mean(ParmAll$precS),mean(ParmAll$precW))
+
 
 
 #get range of precip and air temps in each vegetation group for each regression
@@ -153,9 +139,7 @@ minAir <- aggregate(ParmAll$AMean,by=list(ParmAll$regvegeID),FUN="min")
 maxAir <- aggregate(ParmAll$AMean,by=list(ParmAll$regvegeID),FUN="max")
 meanAir <- aggregate(ParmAll$AMean,by=list(ParmAll$regvegeID),FUN="mean")
 
-minPrec <- aggregate(ParmAll$precR,by=list(ParmAll$regvegeID),FUN="min")
-maxPrec <- aggregate(ParmAll$precR,by=list(ParmAll$regvegeID),FUN="max")
-meanPrec <- aggregate(ParmAll$precR,by=list(ParmAll$regvegeID),FUN="mean")
+
 
 
 regvegeID$minAir <- minAir$x
@@ -163,9 +147,6 @@ regvegeID$maxAir <- maxAir$x
 regvegeID$meanAir <- round(meanAir$x,0)
 
 
-regvegeID$minPrec <- minPrec$x
-regvegeID$maxPrec <- maxPrec$x
-regvegeID$meanPrec <- round(meanPrec$x,0)
 
 #get min and max of data for plotting
 #air
@@ -176,25 +157,16 @@ regMaxA <- aggregate(ParmAll$AMean,by=list(ParmAll$regID),FUN="max")
 regMaxA$x <- round_any(regMaxA$x,5,ceiling)
 
 
-#precip
-regMinP <- aggregate(ParmAll$precR,by=list(ParmAll$regID),FUN="min")
-regMinP$x <- round_any(regMinP$x,10,floor)
-
-regMaxP <- aggregate(ParmAll$precR,by=list(ParmAll$regID),FUN="max")
-regMaxP$x <- round_any(regMaxP$x,10,ceiling)
 
 #set up in matrix for plotting
 regPlotA <- matrix(rep(NA,dim(regvegeID)[1]*200),ncol=dim(regvegeID)[1])
 regTempA <- numeric(0)
-regPlotP <- matrix(rep(NA,dim(regvegeID)[1]*200),ncol=dim(regvegeID)[1])
-regTempP <- numeric(0)
+
 for(i in 1:dim(regvegeID)[1]){
 	regTempA <- seq(regMinA$x[regvegeID$regID[i]],regMaxA$x[regvegeID$regID[i]],length.out=200)
 	regPlotA[,i] <- regTempA
-	regTempP <- seq(regMinP$x[regvegeID$regID[i]],regMaxP$x[regvegeID$regID[i]],length.out=200)
-	regPlotP[,i] <- regTempP
-}
 
+}
 
 
 
@@ -219,22 +191,20 @@ datC$parms <- gsub(dexps,"", rownames(datC))
 beta0 <- datC[datC$parms=="beta0",]
 beta1 <- datC[datC$parms=="beta1",]
 beta2 <- datC[datC$parms=="beta2",]
-beta3 <- datC[datC$parms=="beta3",]
+
 #add in sig test
-beta1$sigID <- ifelse(beta1$X0.1.<0&beta1$X99.9.<0,1,
-				ifelse(beta1$X0.1.>0&beta1$X99.9.>0,1,0))
+beta1$sigID <- ifelse(beta1$X0.2.<0&beta1$X99.8.<0,1,
+				ifelse(beta1$X0.2.>0&beta1$X99.8.>0,1,0))
 				
-beta2$sigID <- ifelse(beta2$X0.1.<0&beta2$X99.9.<0,1,
-				ifelse(beta2$X0.1.>0&beta2$X99.9.>0,1,0))				
-				
-beta3$sigID <- ifelse(beta3$X0.1.<0&beta3$X99.9.<0,1,
-				ifelse(beta3$X0.1.>0&beta3$X99.9.>0,1,0))
+beta2$sigID <- ifelse(beta2$X0.2.<0&beta2$X99.8.<0,1,
+				ifelse(beta2$X0.2.>0&beta2$X99.8.>0,1,0))				
+
 
 #add identifier info
 beta0 <- data.frame(beta0,regvegeID )
 beta1 <- data.frame(beta1,regvegeID )
 beta2 <-data.frame(beta2,regvegeID )
-beta3 <-data.frame(beta3,regvegeID )
+
 
 datVI$name2 <- c("herb barren", "graminoid tundra","tussock tundra","short shrub tundra","tall shrub tundra",
 					"wetland","evergreen needleleaf boreal","deciduous needleleaf boreal","mixed boreal")
@@ -284,7 +254,7 @@ regName <- c("Soil min vs air min","Soil max vs air max", "Time of soil min vs t
 for(i in 1:3){
 	jpeg(paste0(plotDI,"\\run",Nrun,"\\regression_parm",i,".jpg"), width=5500,height=2500,
 			quality=100,units="px")
-	layout(matrix(seq(1,4),ncol=4), width=rep(lcm(wd),4),height=rep(lcm(hd),4))
+	layout(matrix(seq(1,3),ncol=3), width=rep(lcm(wd),3),height=rep(lcm(hd),3))
 		#plot intercept
 		par(mai=c(2,2,2,2))
 			plot(c(0,1),c(0,1), ylim=c(yli[i],yhi[i]), xlim=c(xl,xh),
@@ -297,8 +267,8 @@ for(i in 1:3){
 						col="tomato3",border=NA)
 				arrows(xseq[j]-1,beta0$Mean[beta0$regID==i&beta0$vegeclass==j],
 						xseq[j]+1,beta0$Mean[beta0$regID==i&beta0$vegeclass==j],code=0,lwd=mlw)
-				arrows(	xseq[j],beta0$X0.1.[beta0$regID==i&beta0$vegeclass==j],
-						xseq[j],beta0$X99.9.[beta0$regID==i&beta0$vegeclass==j],
+				arrows(	xseq[j],beta0$X0.2.[beta0$regID==i&beta0$vegeclass==j],
+						xseq[j],beta0$X99.8.[beta0$regID==i&beta0$vegeclass==j],
 						code=0, lwd=alw)
 			}
 		axis(1, xseq,rep("",length(xseq)), lwd.ticks=tlw)
@@ -327,8 +297,8 @@ for(i in 1:3){
 				}
 				arrows(xseq[j]-1,beta1$Mean[beta1$regID==i&beta1$vegeclass==j],
 						xseq[j]+1,beta1$Mean[beta1$regID==i&beta1$vegeclass==j],code=0,lwd=mlw)
-				arrows(	xseq[j],beta1$X0.1.[beta1$regID==i&beta1$vegeclass==j],
-						xseq[j],beta1$X99.9.[beta1$regID==i&beta1$vegeclass==j],
+				arrows(	xseq[j],beta1$X0.2.[beta1$regID==i&beta1$vegeclass==j],
+						xseq[j],beta1$X99.8.[beta1$regID==i&beta1$vegeclass==j],
 						code=0, lwd=alw)
 			}			
 		axis(1, xseq,rep("",length(xseq)), lwd.ticks=tlw)
@@ -357,8 +327,8 @@ for(i in 1:3){
 				}
 				arrows(xseq[j]-1,beta2$Mean[beta2$regID==i&beta2$vegeclass==j],
 						xseq[j]+1,beta2$Mean[beta2$regID==i&beta2$vegeclass==j],code=0,lwd=mlw)
-				arrows(	xseq[j],beta2$X0.1.[beta2$regID==i&beta2$vegeclass==j],
-						xseq[j],beta2$X99.9.[beta2$regID==i&beta2$vegeclass==j],
+				arrows(	xseq[j],beta2$X0.2.[beta2$regID==i&beta2$vegeclass==j],
+						xseq[j],beta2$X99.8.[beta2$regID==i&beta2$vegeclass==j],
 						code=0, lwd=alw)
 		}
 		axis(1, xseq,rep("",length(xseq)), lwd.ticks=tlw)
@@ -368,37 +338,7 @@ for(i in 1:3){
 		mtext("Slope air", side=3, line=5, cex=mlx)
 		box(which="plot")	
 
-		#plot slope 3
-		par(mai=c(2,2,2,2))
-			plot(c(0,1),c(0,1), ylim=c(yls3[i],yhs3[i]), xlim=c(xl,xh),
-				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)	
-			abline(h=0,	lwd	=zlw, col="grey75",lty=3)	
-			for(j in 1:9){
-			if(beta3$sigID[beta3$regID==i&beta3$vegeclass==j]==1){
-				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
-						c(beta3$X25.[beta3$regID==i&beta2$vegeclass==j],beta3$X75.[beta3$regID==i&beta3$vegeclass==j],
-							beta3$X75.[beta3$regID==i&beta3$vegeclass==j],beta3$X25.[beta3$regID==i&beta3$vegeclass==j]),
-						col="tomato3",border=NA)
-			}else{
-				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
-						c(beta3$X25.[beta3$regID==i&beta2$vegeclass==j],beta3$X75.[beta3$regID==i&beta3$vegeclass==j],
-							beta3$X75.[beta3$regID==i&beta3$vegeclass==j],beta3$X25.[beta3$regID==i&beta3$vegeclass==j]),
-						col="grey75",border=NA)
-				}
-						
-				arrows(xseq[j]-1,beta3$Mean[beta0$regID==i&beta3$vegeclass==j],
-						xseq[j]+1,beta3$Mean[beta0$regID==i&beta3$vegeclass==j],code=0,lwd=mlw)
-				arrows(	xseq[j],beta3$X0.1.[beta3$regID==i&beta3$vegeclass==j],
-						xseq[j],beta3$X99.9.[beta3$regID==i&beta3$vegeclass==j],
-						code=0, lwd=alw)
-		}
-		axis(1, xseq,rep("",length(xseq)), lwd.ticks=tlw)
-		mtext(datVI$vegename,at=xseq,cex=alx,line=3,las=2,side=1)
-		
-		axis(2,seq(yls3[i],yhs3[i], by=yi3[i]),rep("",length(seq(yls3[i],yhs3[i], by=yi3[i]))), lwd.ticks=tlw)
-		mtext(seq(yls3[i],yhs3[i], by=yi3[i]),at=seq(yls3[i],yhs3[i], by=yi3[i]),cex=alx,line=3,las=2,side=2)
-		mtext("Slope precipitation", side=3, line=5, cex=mlx)
-		box(which="plot")	
+
 		
 	dev.off()		
 	

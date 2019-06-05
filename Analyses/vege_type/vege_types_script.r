@@ -50,8 +50,8 @@ library(plyr)
 #set up a plot directory
 plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\plots\\model_all"
 #model directory
-modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run5"
-Nrun <- 4
+modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run6"
+Nrun <- 6
 #indicate if a model run is occuring
 modRun <- 1
 
@@ -64,10 +64,6 @@ modRun <- 1
 #join vege class to soilParm
 SoilParm <- join(SoilParm,datV, by=c("siteid"), type="left")
 unique(SoilParm$vegeclass)
-
-
-#join world clim data
-SoilParm <- join(SoilParm, datWC, by=c("siteid"), type="left")
 
 #create unique names for air
 colnames(AirParm)[1:4] <- paste0("A",colnames(AirParm)[1:4])
@@ -111,13 +107,6 @@ for(i in 1:length(parmAs)){
 SoilR <- ldply(SoilL,data.frame)
 AirR <- ldply(AirL,data.frame)
 
-#sum up winter months Oct-Mar
-#sum up summer months Aprl-Sept
-SoilR$precW <- rowSums(SoilR[,11:13])+rowSums(SoilR[,20:22])
-SoilR$precS <- rowSums(SoilR[,14:19])
-
-#set up a vector for the matching timeperiod
-SoilR$precR <- ifelse(SoilR$regID==2,SoilR$precS,SoilR$precW)
 
 
 #now join soil and air DF
@@ -164,7 +153,11 @@ regMaxA$x <- round_any(regMaxA$x,5,ceiling)
 regPlotA <- matrix(rep(NA,dim(regvegeID)[1]*200),ncol=dim(regvegeID)[1])
 regTempA <- numeric(0)
 
+for(i in 1:dim(regvegeID)[1]){
+	regTempA <- seq(regMinA$x[regvegeID$regID[i]],regMaxA$x[regvegeID$regID[i]],length.out=200)
+	regPlotA[,i] <- regTempA
 
+}
 
 #######################################
 #####prepare model run            ##### 
@@ -204,7 +197,7 @@ vege.sample <- coda.samples(vege.modI,variable.names=parms,
 					
 #model history
 mcmcplot(vege.sample, parms=c("beta0","beta1","beta2","sigSoilV",
-								"mu.beta0","mu.beta1","mu.beta3",
+								"mu.beta0","mu.beta1","mu.beta2",
 								"sig.beta0","sig.beta1","sig.beta2"),
 			dir=paste0(modDI,"\\history"))
 

@@ -25,7 +25,7 @@ model{
 		beta0[i] ~ dnorm(mu.beta0[regV[i]],tau.beta0[regV[i]])
 		beta1[i] ~ dnorm(mu.beta1[regV[i]],tau.beta1[regV[i]])
 		beta2[i] ~ dnorm(mu.beta2[regV[i]],tau.beta2[regV[i]])
-		beta3[i] ~ dnorm(mu.beta3[regV[i]],tau.beta3[regV[i]])
+
 		sigSoilV[i] ~ dunif(0,100)
 		meanComp[i] <- beta0[i]+ beta2[i]*(Acomp[reg[i]]-AirPbar[i]) 
 	}
