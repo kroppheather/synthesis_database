@@ -50,7 +50,7 @@ model{
 	
 	#monitor regression means for plotting
 	for(i in 1:NregVege){
-		for(j in 1:100){
+		for(j in 1:200){
 			plotRegA[j,i] <- beta0[i]+  beta2[i]*(AcompPlot[j,i]-AirPbar[i])
 		}
 	

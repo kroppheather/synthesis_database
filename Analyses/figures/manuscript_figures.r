@@ -37,14 +37,14 @@ datVI$name <- c("herb barren","graminoid tundra","tussock tundra","short shrub t
 plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\figures"	
 
 #read in vegetation type regression results
-vegeRS <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run4\\vege_mod_stats.csv")
-vegeRT <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run4\\vege_mod_quant.csv")
+vegeRS <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run6\\vege_mod_stats.csv")
+vegeRT <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run6\\vege_mod_quant.csv")
 vegeR <- cbind(vegeRS,vegeRT)
 
 #pull out parm names
 dexps <- "\\[*[[:digit:]]*\\]"
 vegeR$parms <- gsub(dexps,"", rownames(vegeR))
-
+vegeR$parms2 <- gsub("\\d","",gsub("\\W","",rownames(vegeR)))
 
 #world clim 2 precip in mm
 datWC <- read.csv("c:\\Users\\hkropp\\Google Drive\\map_synth\\WCprecSites.csv")
@@ -1266,3 +1266,239 @@ for(i in 1:dim(vegeCompID)[1]){
 vegeCompID$r.sq <- round(R2,3) 
 
 write.table(vegeCompID,paste0(plotDI,"\\soil_ave_r2.csv"), sep=",", row.names=FALSE)
+
+
+
+##########################################################################################
+##########################################################################################
+################# Figure 5. min/max regression                           #################
+##########################################################################################
+##########################################################################################
+
+
+#######################################
+#####organize data                ##### 
+#######################################
+
+
+#join vege class to soilParm
+SoilParm <- join(SoilParm,datV, by=c("siteid"), type="left")
+unique(SoilParm$vegeclass)
+
+#create unique names for air
+colnames(AirParm)[1:4] <- paste0("A",colnames(AirParm)[1:4])
+colnames(AirParm)[8] <- paste0("A",colnames(AirParm)[8])
+#pull out each soil parm dataset:
+parmV <- unique(SoilParm$parm)
+parmA <- unique(AirParm$Aparm)
+
+#pull out relevant parameters
+#for analysis: TminS, TmaxS, peakWS
+#and subset to relevant depths
+
+parmVs <- c("TminS","TmaxS", "peakWS") 
+
+parmAs <- c("TminA","TmaxA", "peakWA") 
+
+
+SoilL <- list()
+SoilMs <- numeric(0)
+for(i in 1:length(parmVs)){
+	SoilL[[i]] <- SoilParm[SoilParm$parm==parmVs[i]&SoilParm$depth<=20,]
+	#calculate mean
+	SoilMs[i] <- round(mean(SoilL[[i]]$Mean),3)
+	#add a regression ID
+	SoilL[[i]]$regID <- rep(i,dim(SoilL[[i]])[1])
+}
+
+AirL <- list()
+AirMs <- numeric(0)
+for(i in 1:length(parmAs)){
+	AirL[[i]] <- AirParm[AirParm$Aparm==parmAs[i],]
+	#calculate mean
+	AirMs[i] <- round(mean(AirL[[i]]$AMean),0)
+	#add a regression ID
+	AirL[[i]]$regID <- rep(i,dim(AirL[[i]])[1])
+}
+
+
+#turn back into a data frame
+
+SoilR <- ldply(SoilL,data.frame)
+AirR <- ldply(AirL,data.frame)
+
+
+
+#now join soil and air DF
+ParmAll <- join(SoilR,AirR, by=c("siteid","wyear","regID"),type="left")
+
+
+#get unique veg regression id
+
+regvegeID <- unique(data.frame(vegeclass=ParmAll$vegeclass,regID=ParmAll$regID))
+regvegeID$regvegeID <- seq(1,dim(regvegeID)[1])
+
+#now join back into parmall
+ParmAll <- join(ParmAll,regvegeID, by=c("vegeclass","regID"),type="left")
+
+
+
+
+#get range of precip and air temps in each vegetation group for each regression
+#get minimumAir
+minAir <- aggregate(ParmAll$AMean,by=list(ParmAll$regvegeID),FUN="min")
+maxAir <- aggregate(ParmAll$AMean,by=list(ParmAll$regvegeID),FUN="max")
+meanAir <- aggregate(ParmAll$AMean,by=list(ParmAll$regvegeID),FUN="mean")
+
+
+
+
+regvegeID$minAir <- minAir$x
+regvegeID$maxAir <- maxAir$x
+regvegeID$meanAir <- round(meanAir$x,0)
+
+
+
+#get min and max of data for plotting
+#air
+regMinA <- aggregate(ParmAll$AMean,by=list(ParmAll$regID),FUN="min")
+regMinA$x <- round_any(regMinA$x,5,floor)
+
+regMaxA <- aggregate(ParmAll$AMean,by=list(ParmAll$regID),FUN="max")
+regMaxA$x <- round_any(regMaxA$x,5,ceiling)
+
+
+
+#set up in matrix for plotting
+regPlotA <- matrix(rep(NA,dim(regvegeID)[1]*200),ncol=dim(regvegeID)[1])
+regTempA <- numeric(0)
+
+for(i in 1:dim(regvegeID)[1]){
+	regTempA <- seq(regMinA$x[regvegeID$regID[i]],regMaxA$x[regvegeID$regID[i]],length.out=200)
+	regPlotA[,i] <- regTempA
+
+}
+
+#######################################
+#####organize model output        ##### 
+#######################################
+
+regMu <- vegeR[vegeR$parms2=="plotRegA",]
+regMu$regvegeID <- rep(seq(1,dim(regvegeID)[1]),each=100)
+
+regMu <- join(regMu,regvegeID, by="regvegeID", type="left")
+
+datVI$name2 <- c("herb barren", "graminoid tundra","tussock tundra","short shrub tundra","tall shrub tundra",
+					"wetland","evergreen needleleaf boreal","deciduous needleleaf boreal","mixed boreal")
+					
+	
+
+#isolate betas
+
+beta0 <- vegeR[vegeR$parms=="beta0",]
+beta1 <- vegeR[vegeR$parms=="beta1",]
+beta2 <- vegeR[vegeR$parms=="beta2",]
+
+#add in sig test
+beta1$sigID <- ifelse(beta1$X0.2.<0&beta1$X99.8.<0,1,
+				ifelse(beta1$X0.2.>0&beta1$X99.8.>0,1,0))
+				
+beta2$sigID <- ifelse(beta2$X0.2.<0&beta2$X99.8.<0,1,
+				ifelse(beta2$X0.2.>0&beta2$X99.8.>0,1,0))	
+
+
+
+
+	
+wd <- 50
+hd <- 50
+# axis limits
+
+SminL <- -35
+SminH <- 1
+SmaxL <- 0
+SmaxH <- 20
+
+AminL <- regMinA$x[1]
+AminH <- regMaxA$x[1]
+AmaxL <- regMinA$x[2]
+AmaxH <- regMaxA$x[2]
+
+seqMax <- seq(0,20,by=5)
+seqAve <- seq(-15,5,by=5)
+seqMin <- seq(-30,0,by=5)
+#point size
+px <- 7
+#point color
+pcol <- rgb(216/255,216/255,216/255,.5)
+#line width of regression mean
+mlw <- 14
+#tick width
+lwt <- 8
+#axis line width
+lwa <- 4
+#line location of axis labels
+yll <- 5
+#size of axis labels
+amx <- 6
+#size of plot labels 
+llmx <- 9
+#line of x axis plot labels
+xll <- 15
+#legend lwd
+lglw <- 10
+#legend size
+lgcx <- 6
+#legend point size
+lgpt <- 7
+#break into two panels
+vg1 <- c(1,2,3,4)
+vg2 <- c(5,6,7,8,9)
+
+png(paste0(plotDI,"\\patterns_ave_pt_plain.png"), width=3600,height=3600,
+			units="px")
+	layout(matrix(seq(1,4),ncol=2,byrow=FALSE), width=rep(lcm(wd),4),height=rep(lcm(hd),4))
+	par(mai=c(1,0,0,1))
+	plot(c(0,1),c(0,1),type="n", xlim=c(AminL,AminH), ylim=c(SminL,SminH), xlab=" ", ylab=" ",
+			xaxs="i", yaxs="i", axes=FALSE)
+	
+		#vegetation mean vs min group 1
+	for(i in 1:4){
+		j <- vg1[i]
+		points(regPlotA[,regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==1]],
+				regMu$Mean[regMu$vegeclass==j&regMu$regID==1], pch=19,
+				col=as.character(paste(vegeclassColors$colt1[j])),cex=px)
+	
+	}
+	#credible interval regression
+	for(i in 1:4){
+		j <- vg1[i]
+
+		polygon(c(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j],
+						rev(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j])),
+				c(rep(patternInt$X0.3.[patternInt$comp==1&patternInt$vegeClass==j], 
+					length(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j])),
+				rep(patternInt$X99.7.[patternInt$comp==1&patternInt$vegeClass==j], 
+					length(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j]))),	
+					border=NA,col=as.character(paste(vegeclassColors$colt2[j])))
+	}
+	#regression line	
+	for(i in 1:4){
+		j <- vg1[i]
+			points(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j],
+					regPlot$Mean[regPlot$comp==1&regPlot$vegeClass==j], type="l",
+					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])))
+		
+	
+	}
+	axis(2, seqAve, rep(" ",length(seqAve)), lwd.ticks=lwt, lwd=lwa)
+	mtext(seqAve,at=seqAve, line=yll, cex=amx,las=2, side=2)
+	
+	
+
+	
+	legend("bottomright",datVI$name2[vg1], col=as.character(paste(vegeclassColors$coli[vg1])),
+			 lwd=lglw, cex=lgcx,bty="n")
+	
+	
+	mtext("Average soil temperature (C)", outer=TRUE, line=-12, cex=llmx, side=2)
