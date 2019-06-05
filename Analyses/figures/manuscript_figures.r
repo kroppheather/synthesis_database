@@ -1384,7 +1384,7 @@ for(i in 1:dim(regvegeID)[1]){
 #######################################
 
 regMu <- vegeR[vegeR$parms2=="plotRegA",]
-regMu$regvegeID <- rep(seq(1,dim(regvegeID)[1]),each=100)
+regMu$regvegeID <- rep(seq(1,dim(regvegeID)[1]),each=200)
 
 regMu <- join(regMu,regvegeID, by="regvegeID", type="left")
 
@@ -1424,9 +1424,10 @@ AminH <- regMaxA$x[1]
 AmaxL <- regMinA$x[2]
 AmaxH <- regMaxA$x[2]
 
-seqMax <- seq(0,20,by=5)
-seqAve <- seq(-15,5,by=5)
-seqMin <- seq(-30,0,by=5)
+seqSMax <- seq(0,20,by=5)
+seqSMin <- seq(-35,0,by=5)
+seqAMin <- seq(-40,-5,by=5)
+seqAMax <- seq(5,25,by=5)
 #point size
 px <- 7
 #point color
@@ -1455,7 +1456,7 @@ lgpt <- 7
 vg1 <- c(1,2,3,4)
 vg2 <- c(5,6,7,8,9)
 
-png(paste0(plotDI,"\\patterns_ave_pt_plain.png"), width=3600,height=3600,
+png(paste0(plotDI,"\\Air_reg.png"), width=3600,height=3600,
 			units="px")
 	layout(matrix(seq(1,4),ncol=2,byrow=FALSE), width=rep(lcm(wd),4),height=rep(lcm(hd),4))
 	par(mai=c(1,0,0,1))
@@ -1465,8 +1466,8 @@ png(paste0(plotDI,"\\patterns_ave_pt_plain.png"), width=3600,height=3600,
 		#vegetation mean vs min group 1
 	for(i in 1:4){
 		j <- vg1[i]
-		points(regPlotA[,regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==1]],
-				regMu$Mean[regMu$vegeclass==j&regMu$regID==1], pch=19,
+		points(ParmAll$AMean[ParmAll$vegeclass==j&ParmAll$regID==1],
+				ParmAll$Mean[ParmAll$vegeclass==j&ParmAll$regID==1], pch=19,
 				col=as.character(paste(vegeclassColors$colt1[j])),cex=px)
 	
 	}
@@ -1474,26 +1475,23 @@ png(paste0(plotDI,"\\patterns_ave_pt_plain.png"), width=3600,height=3600,
 	for(i in 1:4){
 		j <- vg1[i]
 
-		polygon(c(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j],
-						rev(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j])),
-				c(rep(patternInt$X0.3.[patternInt$comp==1&patternInt$vegeClass==j], 
-					length(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j])),
-				rep(patternInt$X99.7.[patternInt$comp==1&patternInt$vegeClass==j], 
-					length(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j]))),	
+		polygon(c(regPlotA[,regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==1]],
+						rev(regPlotA[,regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==1]])),
+				c(regMu$X0.2[regMu$vegeclass==j&regMu$regID==1], 
+				rev(regMu$X99.8[regMu$vegeclass==j&regMu$regID==1])), 
 					border=NA,col=as.character(paste(vegeclassColors$colt2[j])))
 	}
 	#regression line	
 	for(i in 1:4){
 		j <- vg1[i]
-			points(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j],
-					regPlot$Mean[regPlot$comp==1&regPlot$vegeClass==j], type="l",
+			points(regPlotA[,regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==1]],
+					regMu$Mean[regMu$vegeclass==j&regMu$regID==1], type="l",
 					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])))
 		
 	
 	}
-	axis(2, seqAve, rep(" ",length(seqAve)), lwd.ticks=lwt, lwd=lwa)
-	mtext(seqAve,at=seqAve, line=yll, cex=amx,las=2, side=2)
-	
+	axis(2, seqSMin, rep(" ",length(seqSMin)), lwd.ticks=lwt, lwd=lwa)
+	mtext(seqSMin,at=seqSMin, line=yll, cex=amx,las=2, side=2)
 	
 
 	
@@ -1501,4 +1499,124 @@ png(paste0(plotDI,"\\patterns_ave_pt_plain.png"), width=3600,height=3600,
 			 lwd=lglw, cex=lgcx,bty="n")
 	
 	
-	mtext("Average soil temperature (C)", outer=TRUE, line=-12, cex=llmx, side=2)
+	mtext("Minimum soil temperature (C)", outer=TRUE, line=-12, cex=llmx, side=2)
+	
+	#minimum temp group 2
+	par(mai=c(0,0,1,1))
+	plot(c(0,1),c(0,1),type="n", xlim=c(AminL,AminH), ylim=c(SminL,SminH), xlab=" ", ylab=" ",
+			xaxs="i", yaxs="i", axes=FALSE)
+	#data points		
+	for(i in 1:5){
+		j <- vg2[i]		
+		points(ParmAll$AMean[ParmAll$vegeclass==j&ParmAll$regID==1],
+				ParmAll$Mean[ParmAll$vegeclass==j&ParmAll$regID==1], pch=19,
+				col=as.character(paste(vegeclassColors$colt1[j])),cex=px)
+	
+	}
+	
+		#credible interval regression
+	for(i in 1:5){
+		j <- vg2[i]
+	
+		polygon(c(regPlotA[,regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==1]],
+						rev(regPlotA[,regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==1]])),
+				c(regMu$X0.2[regMu$vegeclass==j&regMu$regID==1], 
+				rev(regMu$X99.8[regMu$vegeclass==j&regMu$regID==1])), 
+					border=NA,col=as.character(paste(vegeclassColors$colt2[j])))
+		
+	}
+	#regression line
+	for(i in 1:5){
+		j <- vg2[i]
+
+	points(regPlotA[,regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==1]],
+					regMu$Mean[regMu$vegeclass==j&regMu$regID==1], type="l",
+					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])))
+
+	
+	}
+	axis(2, seqSMin, rep(" ",length(seqSMin)), lwd.ticks=lwt, lwd=lwa)
+	mtext(seqSMin,at=seqSMin, line=yll, cex=amx,las=2, side=2)
+	axis(1, seqAMin, rep(" ",length(seqAMin)), lwd.ticks=lwt, lwd=lwa)
+	mtext(seqAMin,at=seqAMin, line=yll, cex=amx, side=1)
+	mtext("Minimum air temperature (C)",  line=xll, cex=llmx, side=1)
+
+
+	
+		legend("bottomright",datVI$name2[vg2], col=as.character(paste(vegeclassColors$coli[vg2])),
+			 lwd=lglw, cex=lgcx,bty="n")
+	
+	#max group 1 	
+	par(mai=c(1,1,0,0))
+	plot(c(0,1),c(0,1),type="n", ylim=c(SmaxL,SmaxH), xlim=c(AmaxL,AmaxH), xlab=" ", ylab=" ",
+			xaxs="i", yaxs="i", axes=FALSE)
+			
+		for(i in 1:4){
+		j <- vg1[i]
+		points(ParmAll$AMean[ParmAll$vegeclass==j&ParmAll$regID==2],
+				ParmAll$Mean[ParmAll$vegeclass==j&ParmAll$regID==2], pch=19,
+				col=as.character(paste(vegeclassColors$colt1[j])),cex=px)
+	
+	}
+		for(i in 1:4){
+		j <- vg1[i]
+	
+		polygon(c(regPlotA[,regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==2]],
+						rev(regPlotA[,regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==2]])),
+				c(regMu$X0.2[regMu$vegeclass==j&regMu$regID==2], 
+				rev(regMu$X99.8[regMu$vegeclass==j&regMu$regID==2])), 
+					border=NA,col=as.character(paste(vegeclassColors$colt2[j])))
+
+	}
+		for(i in 1:4){
+		j <- vg1[i]
+	
+	points(regPlotA[,regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==2]],
+					regMu$Mean[regMu$vegeclass==j&regMu$regID==2], type="l",
+					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])))
+
+	
+	}
+	
+	axis(4, seqSMax, rep(" ",length( seqSMax)), lwd.ticks=lwt, lwd=lwa)
+	mtext( seqSMax,at= seqSMax, line=yll, cex=amx,las=2, side=4)
+	mtext("Maximum soil temperature (C)", outer=TRUE, line=-12, cex=llmx, side=4)
+	
+	
+	#average vs max group 2 	
+	par(mai=c(0,1,1,0))
+	plot(c(0,1),c(0,1),type="n",ylim=c(SmaxL,SmaxH), xlim=c(AmaxL,AmaxH), xlab=" ", ylab=" ",
+			xaxs="i", yaxs="i", axes=FALSE)
+			
+		for(i in 1:5){
+		j <- vg2[i]
+		points(ParmAll$AMean[ParmAll$vegeclass==j&ParmAll$regID==2],
+				ParmAll$Mean[ParmAll$vegeclass==j&ParmAll$regID==2], pch=19,
+				col=as.character(paste(vegeclassColors$colt1[j])),cex=px)
+	
+	}
+		for(i in 1:5){
+		j <- vg2[i]
+	
+		polygon(c(regPlotA[,regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==2]],
+						rev(regPlotA[,regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==2]])),
+				c(regMu$X0.2[regMu$vegeclass==j&regMu$regID==2], 
+				rev(regMu$X99.8[regMu$vegeclass==j&regMu$regID==2])), 
+					border=NA,col=as.character(paste(vegeclassColors$colt2[j])))
+
+	}
+		for(i in 1:5){
+		j <- vg2[i]
+	
+	points(regPlotA[,regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==2]],
+					regMu$Mean[regMu$vegeclass==j&regMu$regID==2], type="l",
+					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])))
+
+	
+	}
+	axis(4, seqSMax, rep(" ",length( seqSMax)), lwd.ticks=lwt, lwd=lwa)
+	mtext( seqSMax,at= seqSMax, line=yll, cex=amx,las=2, side=4)
+	axis(1, seqAMax, rep(" ",length(seqAMax)), lwd.ticks=lwt, lwd=lwa)
+	mtext(seqAMax,at=seqAMax, line=yll, cex=amx, side=1)
+	mtext("Maximum air temperature (C)",  line=xll, cex=llmx, side=1)	
+dev.off()	
