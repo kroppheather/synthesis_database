@@ -1134,7 +1134,7 @@ lgpt <- 7
 vg1 <- c(1,2,3,4)
 vg2 <- c(5,6,7,8,9)
 
-png(paste0(plotDI,"\\patterns_ave_pt_plain.png"), width=3600,height=3600,
+png(paste0(plotDI,"\\patterns_ave.png"), width=3600,height=3600,
 			units="px")
 	layout(matrix(seq(1,4),ncol=2,byrow=FALSE), width=rep(lcm(wd),4),height=rep(lcm(hd),4))
 	par(mai=c(1,0,0,1))
@@ -1146,7 +1146,7 @@ png(paste0(plotDI,"\\patterns_ave_pt_plain.png"), width=3600,height=3600,
 		j <- vg1[i]
 		points(SoilL[[xcomp[1]]]$Mean[SoilL[[xcomp[1]]]$vegeclass==j],
 				SoilL[[ycomp[1]]]$Mean[SoilL[[xcomp[1]]]$vegeclass==j], pch=19,
-				col=pcol,cex=px)
+				col=as.character(paste(vegeclassColors$colt1[j])),cex=px)
 	
 	}
 	#credible interval regression
@@ -1201,7 +1201,7 @@ png(paste0(plotDI,"\\patterns_ave_pt_plain.png"), width=3600,height=3600,
 		j <- vg2[i]
 		points(SoilL[[xcomp[1]]]$Mean[SoilL[[xcomp[1]]]$vegeclass==j],
 				SoilL[[ycomp[1]]]$Mean[SoilL[[xcomp[1]]]$vegeclass==j], pch=19,
-				col=pcol,cex=px)
+				col=as.character(paste(vegeclassColors$colt1[j])),cex=px)
 	
 	}
 	
@@ -1257,7 +1257,7 @@ png(paste0(plotDI,"\\patterns_ave_pt_plain.png"), width=3600,height=3600,
 		j <- vg1[i]
 		points(SoilL[[xcomp[2]]]$Mean[SoilL[[xcomp[2]]]$vegeclass==j],
 				SoilL[[ycomp[2]]]$Mean[SoilL[[xcomp[2]]]$vegeclass==j], pch=19,
-				col=pcol,cex=px)
+				col=as.character(paste(vegeclassColors$colt1[j])),cex=px)
 	
 	}
 		for(i in 1:4){
@@ -1303,7 +1303,7 @@ png(paste0(plotDI,"\\patterns_ave_pt_plain.png"), width=3600,height=3600,
 		j <- vg2[i]
 		points(SoilL[[xcomp[2]]]$Mean[SoilL[[xcomp[2]]]$vegeclass==j],
 				SoilL[[ycomp[2]]]$Mean[SoilL[[xcomp[2]]]$vegeclass==j], pch=19,
-				col=pcol,cex=px)
+				col=as.character(paste(vegeclassColors$colt1[j])),cex=px)
 	
 	}
 		for(i in 1:5){
