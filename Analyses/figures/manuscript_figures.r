@@ -24,9 +24,9 @@ source("c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Analyses\\temp
 datV <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\vege_class.csv")
 datVI <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\vegeID.csv")
 #read in soil temperature
-datS<-read.table("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\soil_temp.csv", sep=",", header=TRUE, na.string=c("NaN"))
+datS<-read.csv("z:\\projects\\synthesis\\run1\\Tsoil_model.csv")
 #read in air temperature
-datA<-read.table("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\air_temp.csv", sep=",", header=TRUE, na.string=c("NaN"))
+datA<-read.csv("z:\\projects\\synthesis\\run1\\Tair_model.csv")
 #read in siteinfo 
 siteinfo <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\siteinfo.csv")
 
@@ -69,6 +69,11 @@ patternStat <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analy
 patternQuant <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\pattern\\model\\run1\\pattern_mod_quant.csv")
 patternDF <- cbind(patternStat,patternQuant )
 patternDF$parms <- gsub(dexps,"", rownames(patternDF))
+
+#read in info about sites for data table
+tabA <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\air_obs_summary.csv")
+tabS <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\soil_obs_summary.csv")
+
 #######################################
 #####vegetation colors            ##### 						
 #######################################	
@@ -274,48 +279,24 @@ dev.off()
 #####organize temp data for plot  ##### 						
 #######################################	
 
-#filter soil temp to only focus on sites with 20cm or less depth
-datST <- datS[datS$st_depth<=20,]
-#omit site 44 which has problems
-datST <- datST[datST$site_id!=44,]
-
-#get siteid actually used in analyses
-sitesSubs <- unique(data.frame(site_id=SoilParm$siteid,st_depth=SoilParm$depth,wyear=SoilParm$wyear))
 
 
-# set up water year
-#create a leap year flag
-datST$leapid<-ifelse(leap_year(datST$year)==TRUE,1,0)
-
-
-datST$wdoy<-ifelse(datST$leapid==1&datST$doy<=274, datST$doy+92,
-		ifelse(datST$leapid==1&datST$doy>274, datST$doy-274,
-		ifelse(datST$leapid==0&datST$doy<=273,datST$doy+92,
-		ifelse(datST$leapid==0&datST$doy>273,datST$doy-273,NA))))
-		
-datST$wyear <- ifelse(datST$leapid == 1 & datST$doy_st <  275,
-				datST$year_st,
-				ifelse(datST$leapid == 0 & datST$doy_st < 274,
-						datST$year_st,datST$year_st+1))	
-						
-#join back into datST
-datST <- join(datST,sitesSubs,by=c("site_id","st_depth","wyear"),type="inner")						
+				
 #add vegetation class	
-datST <- join(datST,datV,by="site_id",type="left")					
+datST <- join(datS,datV,by="siteid",type="left")					
 
 #organize into a matrix with NA for each day
 #get each unique depth, year, site
-datI <- unique(data.frame(wyear=datST$wyear,st_depth=datST$st_depth,site_id=datST$site_id))
+datI <- unique(data.frame(wyear=datST$wyear,depth=datST$depth,siteid=datST$siteid))
 datI$sID <- seq(1,dim(datI)[1])
 
 #join vegeclass
 
-datV$site_id <- datV$siteid
-datI <- join(datI,datV,by="site_id",type="left")
+datI <- join(datI,datV,by="siteid",type="left")
 
 #join index back into datST
 
-datST <- join(datST,datI, by=c("wyear","st_depth","site_id"),type="left")	
+datST <- join(datST,datI, by=c("wyear","depth","siteid"),type="left")	
 
 #create a list of dataframes where each year is filled in with NA for plotting		
 dayAll <- data.frame(wdoy=seq(1,366))			
@@ -346,9 +327,9 @@ for(i in 1:9){
 #get count of observations for each day of year and depth
 datSTn <- na.omit(datST)
 #create a depth ID
-datSTn$depthID <- ifelse(datSTn$st_depth <= 5,1,
-					ifelse(datSTn$st_depth >5 & datSTn$st_depth <= 10, 2,
-					ifelse(datSTn$st_depth > 10 & datSTn$st_depth <= 15, 3, 4)))
+datSTn$depthID <- ifelse(datSTn$depth <= 5,1,
+					ifelse(datSTn$depth >5 & datSTn$depth <= 10, 2,
+					ifelse(datSTn$depth > 10 & datSTn$depth <= 15, 3, 4)))
 #get the histogram of temperatures across the vegetation classes and depth
 
 					
@@ -362,123 +343,16 @@ datSTn <- join(datSTn, vegeDepth, by=c("depthID","vegeclass"), type="left")
 
 
 #######################################
-#####work with min and max        ##### 
-#######################################
-
-                    
-#run script that processes model output and puts it into organized dataframes
-source("c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Analyses\\temp_parm_extract.r")
-
-#read in vege class data: check that patterns don't vary between vege type
-datV <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\vege_class.csv")
-datVI <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\vegeID.csv")
-#read in soil temperature
-datS<-read.table("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\soil_temp.csv", sep=",", header=TRUE, na.string=c("NaN"))
-#read in air temperature
-datA<-read.table("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\air_temp.csv", sep=",", header=TRUE, na.string=c("NaN"))
-#read in siteinfo 
-siteinfo <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\siteinfo.csv")
-
-#add shorter name to datVI
-datVI$name <- c("herb barren","graminoid tundra","tussock tundra","short shrub tundra","tall shrub tundra","wetland",
-				"evergreen needleleaf boreal","deciduous needleleaf boreal","mixed boreal")
-
-plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\figures"	
-
-#read in vegetation type regression results
-vegeRS <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run6\\vege_mod_stats.csv")
-vegeRT <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run6\\vege_mod_quant.csv")
-vegeR <- cbind(vegeRS,vegeRT)
-
-#pull out parm names
-dexps <- "\\[*[[:digit:]]*\\]"
-vegeR$parms <- gsub(dexps,"", rownames(vegeR))
-vegeR$parms2 <- gsub("\\d","",gsub("\\W","",rownames(vegeR)))
-
-#world clim 2 precip in mm
-datWC <- read.csv("c:\\Users\\hkropp\\Google Drive\\map_synth\\WCprecSites.csv")
-
-
-#read in N factor regression results
-Nstats <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\n_factor\\model\\run2\\vege_mod_stats.csv")
-Nquant <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\n_factor\\model\\run2\\vege_mod_quant.csv")
-Ndf <- cbind(Nstats,Nquant)
-
-Ndf$parms <- gsub(dexps,"", rownames(Ndf))
-
-#read in thaw days results
-Thawstats <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\thaw\\model\\run1\\vege_mod_stats.csv")
-Thawquant <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\thaw\\model\\run1\\vege_mod_quant.csv")
-
-Thawdf <- cbind(Thawstats,Thawquant)
-Thawdf$parms <- gsub(dexps,"", rownames(Thawdf))
-
-#read in average pattern results
-patternStat <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\pattern\\model\\run1\\pattern_mod_stats.csv")
-patternQuant <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\pattern\\model\\run1\\pattern_mod_quant.csv")
-patternDF <- cbind(patternStat,patternQuant )
-patternDF$parms <- gsub(dexps,"", rownames(patternDF))
-#######################################
-#####vegetation colors            ##### 						
-#######################################	
-vegeclassColors <- data.frame(vegeclass=seq(1,9),
-						coli=c(rgb(77/255,77/255,77/255),
-								rgb(0/255,110/255,130/255),
-								rgb(160/255,130/255,180/255),
-								rgb(130/255,160/255,190/255),
-								rgb(250/255,120/255,80/255),
-								rgb(0/255,138/255,213/255),
-								rgb(50/255,80/255,10/255),
-								rgb(170/255,190/255,140/255),
-								rgb(240/255,240/255,50/255)),
-						colt1=c(rgb(77/255,77/255,77/255,.1),
-								rgb(0/255,110/255,130/255,.1),
-								rgb(160/255,130/255,180/255,.1),
-								rgb(130/255,160/255,190/255,.1),
-								rgb(250/255,120/255,80/255,.1),
-								rgb(0/255,138/255,213/255,.1),
-								rgb(50/255,80/255,10/255,.1),
-								rgb(170/255,190/255,140/255,.1),
-								rgb(240/255,240/255,50/255,.1)), 
-						colt2=c(rgb(77/255,77/255,77/255,.2),
-								rgb(0/255,110/255,130/255,.2),
-								rgb(160/255,130/255,180/255,.2),
-								rgb(130/255,160/255,190/255,.2),
-								rgb(250/255,120/255,80/255,.2),
-								rgb(0/255,138/255,213/255,.2),
-								rgb(50/255,80/255,10/255,.2),
-								rgb(170/255,190/255,140/255,.2),
-								rgb(240/255,240/255,50/255,.2))								
-								)	
-datVI$vegeclassColors <- vegeclassColors$coli
-#######################################
-#####packages                     ##### 
-#######################################
-
-library(maps)
-library(mapproj)
-library(rgdal)
-library(sp)
-library(raster)
-library(plyr)
-library(mapplots)
-library(rgeos)
-library(lubridate)
-library(imager)
-
-
-
-#######################################
 #####figure with summary          ##### 
 #######################################
 #get summary
 
 #get daily mean temp for each depth and vege class
-medTDF <- aggregate(datSTn$soil_t,by=list(datSTn$wdoy,datSTn$depthID,datSTn$vegeclass),FUN="mean")
+medTDF <- aggregate(as.numeric(datSTn$T),by=list(datSTn$wdoy,datSTn$depthID,datSTn$vegeclass),FUN="mean")
 colnames(medTDF) <- c("wdoy","depthID","vegeclass","med")
-pclTDF <- aggregate(datSTn$soil_t,by=list(datSTn$wdoy,datSTn$depthID,datSTn$vegeclass),FUN="quantile",prob=.25)
+pclTDF <- aggregate(datSTn$T,by=list(datSTn$wdoy,datSTn$depthID,datSTn$vegeclass),FUN="quantile",prob=.25)
 colnames(pclTDF) <- c("wdoy","depthID","vegeclass","pcl")
-pchTDF <- aggregate(datSTn$soil_t,by=list(datSTn$wdoy,datSTn$depthID,datSTn$vegeclass),FUN="quantile",prob=.75)
+pchTDF <- aggregate(datSTn$T,by=list(datSTn$wdoy,datSTn$depthID,datSTn$vegeclass),FUN="quantile",prob=.75)
 colnames(pchTDF) <- c("wdoy","depthID","vegeclass","pch")
 
 
@@ -567,7 +441,7 @@ for(j in 1:9){
 		for(k in 1:length(listV[[i]])){		
 		
 				points(Soil[[listV[[i]][k]]]$wdoy,
-					Soil[[listV[[i]][k]]]$soil_t,type="l",
+					Soil[[listV[[i]][k]]]$T,type="l",
 					col=lgry,lwd=3)
 			}
 	
@@ -900,30 +774,31 @@ png(paste0(plotDI,"\\intercepts_N.png"), width=8000,height=5500,
 	
 	
 	
-	#days above freezing
+	#maximum temp
 	par(mai=c(0,3.5,2.5,10),xpd=TRUE)
-		plot(c(0,1),c(0,1), ylim=c(yli[3],yhi[3]), xlim=c(xl,xh),
+	
+			plot(c(0,1),c(0,1), ylim=c(0,20), xlim=c(xl,xh),
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
 		
 			for(i in 1:9){
 				j <- plotOrder[i]
 				polygon(c(xseq[i]-1,xseq[i]-1,xseq[i]+1,xseq[i]+1),
-						c(Tbeta0$X25.[Tbeta0$vegeclass==j],Tbeta0$X75.[Tbeta0$vegeclass==j],
-							Tbeta0$X75.[Tbeta0$vegeclass==j],Tbeta0$X25.[Tbeta0$vegeclass==j]),
+						c(compAll$X25.[compAll$vegeclass==j&compAll$regID==2],compAll$X75.[compAll$vegeclass==j&compAll$regID==2],
+							compAll$X75.[compAll$vegeclass==j&compAll$regID==2],compAll$X25.[compAll$vegeclass==j&compAll$regID==2]),
 						col=paste(vegeclassColors$coli[j]),border=NA)
-				arrows(xseq[i]-1,Tbeta0$Mean[Tbeta0$vegeclass==j],
-						xseq[i]+1,Tbeta0$Mean[Tbeta0$vegeclass==j],code=0,lwd=mlw)
-				arrows(	xseq[i],Tbeta0$X0.3.[Tbeta0$vegeclass==j],
-						xseq[i],Tbeta0$X99.7.[Tbeta0$vegeclass==j],
+				arrows(xseq[i]-1,compAll$Mean[compAll$vegeclass==j&compAll$regID==2],
+						xseq[i]+1,compAll$Mean[compAll$vegeclass==j&compAll$regID==2],code=0,lwd=mlw)
+				arrows(	xseq[i],compAll$X0.2.[compAll$vegeclass==j&compAll$regID==2],
+						xseq[i],compAll$X99.8.[compAll$vegeclass==j&compAll$regID==2],
 						code=0, lwd=alw)
 				}		
-			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw,lwd=alwd)
-			axis(4, seq(yli[3],yhi[3], by=yii[3]), rep(" ",length(seq(yli[3],yhi[3], by=yii[3]))),
+	
+	axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw,lwd=alwd)
+			axis(4, seq(0,20, by=5), rep(" ",length(seq(0,20, by=5))),
 				 lwd.ticks=tlw,lwd=alwd)
-			mtext(seq(yli[3],yhi[3], by=yii[3]),at=seq(yli[3],yhi[3], by=yii[3]), side=4, line=xll,cex=axc,las=2)	
-				
-			mtext("Days above freezing",side=4,line=yll2,cex=mcx)
-			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw)
+			mtext(seq(0,20, by=5),at=seq(0,20, by=5), side=4, line=xll,cex=axc,las=2)	
+			mtext("Maximum temperature (C)",side=4,line=yll2,cex=mcx)
+					
 
 	#x labels
 	par(mai=c(10,13.5,0,0),xpd=TRUE)
@@ -950,27 +825,31 @@ png(paste0(plotDI,"\\intercepts_max_supp.png"), width=4000,height=5000,
 	layout(matrix(c(1,2),ncol=1,byrow=TRUE), width=rep(lcm(wd),2),height=c(lcm(hd),lcm(70)))
 	par(mai=c(.5,13.5,0,0))
 		
-	plot(c(0,1),c(0,1), ylim=c(0,20), xlim=c(xl,xh),
+	plot(c(0,1),c(0,1), ylim=c(yli[3],yhi[3]), xlim=c(xl,xh),
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+	
 		
 			for(i in 1:9){
 				j <- plotOrder[i]
 				polygon(c(xseq[i]-1,xseq[i]-1,xseq[i]+1,xseq[i]+1),
-						c(compAll$X25.[compAll$vegeclass==j&compAll$regID==2],compAll$X75.[compAll$vegeclass==j&compAll$regID==2],
-							compAll$X75.[compAll$vegeclass==j&compAll$regID==2],compAll$X25.[compAll$vegeclass==j&compAll$regID==2]),
+						c(Tbeta0$X25.[Tbeta0$vegeclass==j],Tbeta0$X75.[Tbeta0$vegeclass==j],
+							Tbeta0$X75.[Tbeta0$vegeclass==j],Tbeta0$X25.[Tbeta0$vegeclass==j]),
 						col=paste(vegeclassColors$coli[j]),border=NA)
-				arrows(xseq[i]-1,compAll$Mean[compAll$vegeclass==j&compAll$regID==2],
-						xseq[i]+1,compAll$Mean[compAll$vegeclass==j&compAll$regID==2],code=0,lwd=mlw)
-				arrows(	xseq[i],compAll$X0.2.[compAll$vegeclass==j&compAll$regID==2],
-						xseq[i],compAll$X99.8.[compAll$vegeclass==j&compAll$regID==2],
+				arrows(xseq[i]-1,Tbeta0$Mean[Tbeta0$vegeclass==j],
+						xseq[i]+1,Tbeta0$Mean[Tbeta0$vegeclass==j],code=0,lwd=mlw)
+				arrows(	xseq[i],Tbeta0$X0.3.[Tbeta0$vegeclass==j],
+						xseq[i],Tbeta0$X99.7.[Tbeta0$vegeclass==j],
 						code=0, lwd=alw)
 				}		
-	axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw,lwd=alwd)
-			axis(2, seq(0,20, by=5), rep(" ",length(seq(0,20, by=5))),
+			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw,lwd=alwd)
+			axis(2, seq(yli[3],yhi[3], by=yii[3]), rep(" ",length(seq(yli[3],yhi[3], by=yii[3]))),
 				 lwd.ticks=tlw,lwd=alwd)
-			mtext(seq(0,20, by=5),at=seq(0,20, by=5), side=2, line=xll,cex=axc,las=2)	
-			mtext("Maximum temperature (C)",side=2,line=yll2,cex=mcx)
+			mtext(seq(yli[3],yhi[3], by=yii[3]),at=seq(yli[3],yhi[3], by=yii[3]), side=2, line=xll,cex=axc,las=2)	
 				
+			mtext("Days above freezing",side=2,line=yll2,cex=mcx)
+			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw)
+	
+
 	par(mai=c(17,13.5,0,0),xpd=TRUE)
 		plot(c(0,1),c(0,1), ylim=c(-10,0), xlim=c(xl,xh),
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
@@ -1765,3 +1644,65 @@ png(paste0(plotDI,"\\Air_reg.png"), width=3600,height=3600,
 	mtext(seqAMax,at=seqAMax, line=yll, cex=amx, side=1)
 	mtext("Maximum air temperature (C)",  line=xll, cex=llmx, side=1)	
 dev.off()	
+
+
+
+
+##########################################################################################
+##########################################################################################
+################# Appendix data summary table                            #################
+##########################################################################################
+##########################################################################################
+
+
+#######################################
+#####organize data                ##### 
+#######################################
+
+colnames(tabA) [4] <- "nA"
+
+tabSum <- join(tabA,tabS, by=c("siteid","wyear"),type="full")
+
+tabSum <- tabSum[order(tabSum$siteid),]
+
+#fix wyear with incorrect number
+tabSum$wyear <- ifelse(tabSum$wyear<1000&tabSum$wyear<50,tabSum$wyear+2000,
+						ifelse(tabSum$wyear<1000&tabSum$wyear>=50, tabSum$wyear+1990,tabSum$wyear))
+
+#organize to match requirements
+
+tabSub <- tabSum[tabSum$nA>=floor(365*.75) & tabSum$n>=floor(365*.75) & tabSum$height >= 1 & tabSum$depth <= 20,]
+
+#create a summary table
+#for full data and for data used
+#site id, years, air heights, soil depths, 
+
+#start with all data
+#get unique siteid
+siteSum <- unique(data.frame(siteid=tabSum$siteid))
+
+
+
+#years
+yearSiL <- list()
+yearSi <- character()
+for(i in 1:dim(siteSum)[1]){
+
+	yearSiL[[i]] <- unique(tabSum$wyear[tabSum$siteid==siteSum$siteid[i]])
+	yearSi[i] <- paste(yearSiL[[i]],collapse=", ")
+}
+
+#depths
+depthSiL <- list()
+depthSi <- character()
+for(i in 1:dim(siteSum)[1]){
+
+	depthSiL[[i]] <- unique(tabSum$depth[tabSum$siteid==siteSum$siteid[i]])
+	depthSiL[[i]] <- depthSiL[[i]][!is.na(depthSiL[[i]])]
+	depthSi[i] <- paste(depthSiL[[i]],collapse=", ")
+}
+
+siteSum$depth <- depthSi
+siteSum$wyear <- yearSi
+
+write.table(siteSum, paste0(plotDI,"\\summary_all_sites.csv"),sep=",",row.names=FALSE)
