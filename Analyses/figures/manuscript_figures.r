@@ -1702,7 +1702,40 @@ for(i in 1:dim(siteSum)[1]){
 	depthSi[i] <- paste(depthSiL[[i]],collapse=", ")
 }
 
+#air height
+heightSiL <- list()
+heightSi <- character()
+for(i in 1:dim(siteSum)[1]){
+
+	heightSiL[[i]] <- unique(tabSum$height[tabSum$siteid==siteSum$siteid[i]])
+	heightSiL[[i]] <- heightSiL[[i]][!is.na(heightSiL[[i]])]
+	heightSi[i] <- paste(heightSiL[[i]],collapse=", ")
+}
+
+
 siteSum$depth <- depthSi
 siteSum$wyear <- yearSi
+siteSum$height <- heightSi
 
-write.table(siteSum, paste0(plotDI,"\\summary_all_sites.csv"),sep=",",row.names=FALSE)
+#add in more site info that is relevant
+#first subset siteinfo relevant info
+siteToJoin <- data.frame(siteid=siteinfo$site_id, latitude=siteinfo$lat,longitude=siteinfo$lon)
+
+siteSum <- join(siteSum, siteToJoin, by="siteid",type="left")
+#join in vegetation class
+datVI$name2 <- c("herb barren", "graminoid tundra","tussock tundra","short shrub tundra","tall shrub tundra",
+					"wetland","evergreen needleleaf boreal","deciduous needleleaf boreal","mixed boreal")
+
+
+					
+vegeToJoin1 <- data.frame(vegeclass=datVI$vegeclass,vegetation.type=datVI$name2)
+
+vegeToJoin2 <- join(datV,vegeToJoin1, by="vegeclass")
+
+siteSum <- join(siteSum, vegeToJoin2, by="siteid", type="left")
+
+#reorganize table
+siteSumSave <- data.frame(siteid=siteSum$siteid,latitude=siteSum$latitude,longitude=siteSum$longitude,
+						vegetation.type=siteSum$vegetation.type,wyear=siteSum$wyear,depth=siteSum$depth,height=siteSum$height)	
+
+write.table(siteSumSave, paste0(plotDI,"\\summary_all_sites.csv"),sep=",",row.names=FALSE)
