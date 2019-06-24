@@ -1739,3 +1739,6 @@ siteSumSave <- data.frame(siteid=siteSum$siteid,latitude=siteSum$latitude,longit
 						vegetation.type=siteSum$vegetation.type,wyear=siteSum$wyear,depth=siteSum$depth,height=siteSum$height)	
 
 write.table(siteSumSave, paste0(plotDI,"\\summary_all_sites.csv"),sep=",",row.names=FALSE)
+
+
+#now just subset sites, years and depths used in the analysis
