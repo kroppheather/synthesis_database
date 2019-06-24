@@ -52,10 +52,10 @@ library(plyr)
 #set up a plot directory
 plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\plots"
 #model directory
-modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model\\run2"
-Nrun <-2
+modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model\\run3"
+Nrun <- 3
 #indicate if a model run is occuring
-modRun <- 0
+modRun <- 1
 
 
 #######################################
