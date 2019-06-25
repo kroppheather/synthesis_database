@@ -1742,3 +1742,58 @@ write.table(siteSumSave, paste0(plotDI,"\\summary_all_sites.csv"),sep=",",row.na
 
 
 #now just subset sites, years and depths used in the analysis
+
+#get unique values from soil parm
+sumS <- unique(data.frame(siteid=SoilParm$siteid,depth=SoilParm$depth,wyear=SoilParm$wyear))
+
+sumA <- unique(data.frame(siteid=AirParm$siteid, height=AirParm$height))
+sumSsites <- unique(data.frame(siteid=sumS$siteid))
+#sumarize all
+#years
+syearSiL <- list()
+syearSi <- character()
+
+for(i in 1:dim(sumSsites)[1]){
+
+	syearSiL[[i]] <- unique(sumS$wyear[sumS$siteid==sumSsites$siteid[i]])
+	syearSi[i] <- paste(syearSiL[[i]],collapse=", ")
+}
+
+#depths
+sdepthSiL <- list()
+sdepthSi <- character()
+for(i in 1:dim(sumSsites)[1]){
+
+	sdepthSiL[[i]] <- unique(sumS$depth[sumS$siteid==sumSsites$siteid[i]])
+	sdepthSiL[[i]] <- sdepthSiL[[i]][!is.na(sdepthSiL[[i]])]
+	sdepthSi[i] <- paste(sdepthSiL[[i]],collapse=", ")
+}
+
+#air height
+sheightSiL <- list()
+sheightSi <- character()
+for(i in 1:dim(sumSsites)[1]){
+
+	sheightSiL[[i]] <- unique(sumA$height[sumA$siteid==sumSsites$siteid[i]])
+	sheightSiL[[i]] <- sheightSiL[[i]][!is.na(sheightSiL[[i]])]
+	sheightSi[i] <- paste(sheightSiL[[i]],collapse=", ")
+}
+
+
+sumSsites$depth <- sdepthSi
+sumSsites$wyear <- syearSi
+sumSsites$height <- sheightSi
+
+#join together
+sumAll <- join(sumSsites,vegeToJoin2, by=c("siteid"), type="left")
+
+sumAll <- data.frame(sumAll[,1:4],vegetation.type=sumAll$vegetation.type)
+#join other siteinfo
+sumAll <- join(sumAll,siteToJoin, by="siteid",type="left")
+
+sumAllSave <- data.frame(siteid=sumAll$siteid,latitude=sumAll$latitude,longitude=sumAll$longitude,
+						vegetation.type=sumAll$vegetation.type,wyear=sumAll$wyear,
+						depth=sumAll$depth,height=sumAll$height)	
+
+
+write.table(sumAllSave, paste0(plotDI,"\\summary_analysis_sites.csv"),sep=",",row.names=FALSE)
