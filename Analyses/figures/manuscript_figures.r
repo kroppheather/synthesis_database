@@ -74,6 +74,11 @@ patternDF$parms <- gsub(dexps,"", rownames(patternDF))
 tabA <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\air_obs_summary.csv")
 tabS <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\soil_obs_summary.csv")
 
+#read in permafrost shapefile
+shapeC <- readOGR("e:\\GIS\\NSIDC\\cont_dissolve.shp")
+shapeD <- readOGR("e:\\GIS\\NSIDC\\discont_dissolve.shp")
+shapeS <- readOGR("e:\\GIS\\NSIDC\\spor_dissolve.shp")
+
 #######################################
 #####vegetation colors            ##### 						
 #######################################	
@@ -157,6 +162,9 @@ world2 <- project(matrix(c(worldmap2$x,worldmap2$y), ncol=2,byrow=FALSE),laea)
 #set up spatial point class
 siteSP <- SpatialPoints(sites)
 
+shapeCp <- spTransform(shapeC, laea)
+shapeDp <- spTransform(shapeD, laea)
+shapeSp <- spTransform(shapeS, laea)
 #######################################
 #####aggregate sites              ##### 						
 #######################################	
@@ -243,11 +251,14 @@ yseq <- seq(1,9)
 wd <- 30
 hd <- 30
 wd2 <- 5
+hd2 <- 5
 
-png(paste0(plotDI,"\\vege_site_agg.png"),width=1800,height=1000)
-	a <- layout(matrix(c(1,2),ncol=2), height=c(lcm(hd),lcm(hd)), width=c(lcm(wd),lcm(wd2)))
+png(paste0(plotDI,"\\vege_site_agg.png"),width=1800,height=1500)
+	a <- layout(matrix(c(1,2),ncol=2, byrow=TRUE), height=c(lcm(hd),lcm(hd)), 
+					width=c(lcm(wd),lcm(wd2)))
 	layout.show(a)
 	#set up empty plot
+	
 	plot(world2,type="n",axes=FALSE,xlab=" ", ylab=" ",xlim=c(-3500000,3500000),ylim=c(-3500000,3500000))
 	#color background
 	polygon(c(-5000000,-5000000,5000000,5000000),c(-5000000,5000000,5000000,-5000000), border=NA, col=rgb(202/255,242/255,255/255,.3))
@@ -255,9 +266,18 @@ png(paste0(plotDI,"\\vege_site_agg.png"),width=1800,height=1000)
 	points(world, type="l", lwd=2, col="grey65")
 	#continent color
 	polygon(c(world[,1],rev(world[,1])), c(world[,2],rev(world[,2])),col=rgb(253/255,245/255,208/255),border=NA)
+	#midnight blue
+	plot(shapeCp, col=rgb(0/255,51/255,102/255),add=TRUE,border=NA)
+	#royalblue3 rgb(58/255,95/255,205/255)
+	plot(shapeDp, col=rgb(0/255,51/255,102/255,.7),add=TRUE,border=NA)
+	#darkseagreen2
+	plot(shapeSp, col=rgb(0/255,51/255,102/255,.25),add=TRUE,border=NA)
 	draw.pie(xyz.allV$x,xyz.allV$y,xyz.allV$z,radius=220000,col=as.character(vegeclassColors$coli),border=NA)
 	points(mat.bcV$x,mat.bcV$y,pch=19,col="white",cex=4.75)
 	text(mat.bcV$x,mat.bcV$y,paste(mat.bcV$NpolySite),cex=1.5)
+	legend(-3700000,-3900000,c("continuous","discontinuous","sporadic"), 
+			fill=c( "midnightblue",rgb(0/255,51/255,102/255,.7),rgb(0/255,51/255,102/255,.25)),
+			horiz=TRUE,bty="n",cex=2.25,border=NA,xpd=TRUE)
 	#plot legend
 	plot(c(0,1),c(0,1), type="n", xlim=c(0,1), ylim=c(0,10), xaxs="i",yaxs="i",xlab=" ", ylab=" ",axes=FALSE)
 		for(i in 1:9){
@@ -265,7 +285,7 @@ png(paste0(plotDI,"\\vege_site_agg.png"),width=1800,height=1000)
 	}
 	axis(4,yseq-.5,rep(" ",9),lwd.ticks=2)
 	mtext(datVI$name,at=yseq-.5,cex=2,line=1,side=4,las=2)
-	
+
 dev.off()	
 
 ##########################################################################################
@@ -815,6 +835,7 @@ dev.off()
 
 
 
+
 #######################################
 #####make a plot of the minimum   #####
 #####to be used in supplement     #####
@@ -855,7 +876,16 @@ png(paste0(plotDI,"\\intercepts_max_supp.png"), width=4000,height=5000,
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
 			text(xseq,rep(-.25,length(xseq)),datVI$name2[plotOrder],srt=55, adj=1,cex=15,xpd=TRUE)	
 	
-dev.off()	
+dev.off()
+
+#######################################
+#####write tables to reference    #####
+#####results in text              #####
+#######################################
+#first join vegetation id into both
+compAll <- join(compAll, datVI, by="vegeclass", type="left")
+
+	
 ##########################################################################################
 ##########################################################################################
 ################# Figure 4. average patterns                             #################
