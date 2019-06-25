@@ -884,8 +884,20 @@ dev.off()
 #######################################
 #first join vegetation id into both
 compAll <- join(compAll, datVI, by="vegeclass", type="left")
+compAll <- data.frame(Mean=compAll$Mean, pc.l =compAll$X0.2., pc.h = compAll$X99.8,
+				vegeclass=compAll$vegeclass, name=compAll$name,regID=compAll$regID)		
+write.table(compAll, paste0(plotDI,"\\mean_comp.csv")	, sep=",", row.names=FALSE)
 
-	
+#output n factors
+beta0 <- join(beta0, datVI, by="vegeclass", type="left")
+beta0 <- data.frame(Mean=beta0$Mean, pc.l =beta0$X0.3., pc.h = beta0$X99.7,
+				vegeclass=beta0$vegeclass, name=beta0$name,regID=beta0$regID)	
+write.table(beta0, paste0(plotDI,"\\inter_n_factor.csv")	, sep=",", row.names=FALSE)
+
+#thawing days
+Tbeta0 <- data.frame(Mean=Tbeta0$Mean, pc.l =Tbeta0$X0.3., pc.h = Tbeta0$X99.7,
+				vegeclass=Tbeta0$vegeclass, name=Tbeta0$name)
+write.table(Tbeta0, paste0(plotDI,"\\inter_thawing_days.csv")	, sep=",", row.names=FALSE)
 ##########################################################################################
 ##########################################################################################
 ################# Figure 4. average patterns                             #################
