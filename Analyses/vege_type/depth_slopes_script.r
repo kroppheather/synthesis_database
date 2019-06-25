@@ -223,7 +223,7 @@ slopeS <- cbind(slopeS,SYPid)
 vegMI <- data.frame(vegeclass=unique(slopeS$vegeclass))
 vegMI <- join(vegMI, datVI, by="vegeclass",type="left")
 #now make 3 plots of the slopes
-
+parmName <- c("Minimum soil temperature (C)", "Maximum soil temperature (C)", "Timing of Minimum")
 hd <- 30
 wd <- 30
 
@@ -263,6 +263,7 @@ for(i in 1:length(parmVs)){
 	if(j==1){
 		axis(2, seq(yls[i],yhs[i], by=yis[i]), rep(" ", length(seq(yls[i],yhs[i], by=yis[i]))),lwd.ticks=5)
 		mtext(seq(yls[i],yhs[i], by=yis[i]),at=seq(yls[i],yhs[i], by=yis[i]), las=2, cex=5, line=5, side=2)
+		mtext(paste(parmName[i]), side=2,line=20,cex=7)
 		}
 	}
 	dev.off()
