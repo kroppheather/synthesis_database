@@ -74,10 +74,7 @@ patternDF$parms <- gsub(dexps,"", rownames(patternDF))
 tabA <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\air_obs_summary.csv")
 tabS <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\soil_obs_summary.csv")
 
-#read in permafrost shapefile
-shapeC <- readOGR("e:\\GIS\\NSIDC\\cont_dissolve.shp")
-shapeD <- readOGR("e:\\GIS\\NSIDC\\discont_dissolve.shp")
-shapeS <- readOGR("e:\\GIS\\NSIDC\\spor_dissolve.shp")
+
 
 #######################################
 #####vegetation colors            ##### 						
@@ -112,6 +109,21 @@ vegeclassColors <- data.frame(vegeclass=seq(1,9),
 								rgb(240/255,240/255,50/255,.2))								
 								)	
 datVI$vegeclassColors <- vegeclassColors$coli
+
+#add a color for height
+heightCols <- data.frame(vegeH=c(1,2,3), heightName=c("short","mixed","tall"),
+						colsH=c(rgb(60/255,60/255,110/255),
+						rgb(0/255,90/255,200/255),
+						rgb(170/255,10/255,60/255)))
+								
+vegeHeight <- data.frame(vegeclass=seq(1,9),vegeH=c(1,1,2,1,3,2,3,3,3))
+
+#join height info with vegeclass
+vegeHeight <- join(vegeHeight,heightCols,by="vegeH",type="left")
+
+#join into vegeclass colors
+vegeclassColors <- join(vegeclassColors,vegeHeight,by="vegeclass",type="left")
+
 #######################################
 #####packages                     ##### 
 #######################################
@@ -132,7 +144,10 @@ library(imager)
 ################# Figure 1. create map of study sites                    #################
 ##########################################################################################
 ##########################################################################################
-
+#read in permafrost shapefile
+shapeC <- readOGR("e:\\GIS\\NSIDC\\cont_dissolve.shp")
+shapeD <- readOGR("e:\\GIS\\NSIDC\\discont_dissolve.shp")
+shapeS <- readOGR("e:\\GIS\\NSIDC\\spor_dissolve.shp")
 #######################################
 #####projection                   ##### 
 #######################################
@@ -252,10 +267,12 @@ wd <- 30
 hd <- 30
 wd2 <- 5
 hd2 <- 5
-
-png(paste0(plotDI,"\\vege_site_agg.png"),width=1800,height=1500)
-	a <- layout(matrix(c(1,2),ncol=2, byrow=TRUE), height=c(lcm(hd),lcm(hd)), 
-					width=c(lcm(wd),lcm(wd2)))
+plotorder <- c(1,2,4,3,6,5,7,8,9)
+Hseqh <- c(3,5,9)
+Hseql <- c(0,3,5)
+png(paste0(plotDI,"\\vege_site_agg.png"),width=1500,height=1100)
+	a <- layout(matrix(c(1,2,3,4,5),ncol=5, byrow=TRUE), height=c(lcm(hd),lcm(hd),lcm(hd),lcm(hd),lcm(hd)), 
+					width=c(lcm(wd),lcm(wd2),lcm(wd2),lcm(wd2),lcm(wd2)))
 	layout.show(a)
 	#set up empty plot
 	
@@ -273,19 +290,29 @@ png(paste0(plotDI,"\\vege_site_agg.png"),width=1800,height=1500)
 	#darkseagreen2
 	plot(shapeSp, col=rgb(0/255,51/255,102/255,.25),add=TRUE,border=NA)
 	draw.pie(xyz.allV$x,xyz.allV$y,xyz.allV$z,radius=220000,col=as.character(vegeclassColors$coli),border=NA)
-	points(mat.bcV$x,mat.bcV$y,pch=19,col="white",cex=4.75)
-	text(mat.bcV$x,mat.bcV$y,paste(mat.bcV$NpolySite),cex=1.5)
-	legend(-3700000,-3900000,c("continuous","discontinuous","sporadic"), 
+	points(mat.bcV$x,mat.bcV$y,pch=19,col="white",cex=7.5)
+	text(mat.bcV$x,mat.bcV$y,paste(mat.bcV$NpolySite),cex=2.5)
+	legend(-3700000,-3800000,c("continuous","discontinuous","sporadic"), 
 			fill=c( "midnightblue",rgb(0/255,51/255,102/255,.7),rgb(0/255,51/255,102/255,.25)),
-			horiz=TRUE,bty="n",cex=2.25,border=NA,xpd=TRUE)
+			horiz=TRUE,bty="n",cex=3,border=NA,xpd=TRUE)
 	#plot legend
 	plot(c(0,1),c(0,1), type="n", xlim=c(0,1), ylim=c(0,10), xaxs="i",yaxs="i",xlab=" ", ylab=" ",axes=FALSE)
-		for(i in 1:9){
-		polygon(c(0,0,1,1),c(yseq[i]-1,yseq[i],yseq[i],yseq[i]-1),col=as.character(vegeclassColors$coli[i]),border=NA)
+		for(j in 1:9){
+			i <- plotorder[j]
+			polygon(c(0,0,1,1),c(yseq[j]-1,yseq[j],yseq[j],yseq[j]-1),col=as.character(vegeclassColors$coli[i]),border=NA)
 	}
 	axis(4,yseq-.5,rep(" ",9),lwd.ticks=2)
-	mtext(datVI$name,at=yseq-.5,cex=2,line=1,side=4,las=2)
-
+	mtext(datVI$name,at=yseq-.5,cex=2,line=1,side=4,las=2,col=as.character(vegeclassColors$colsH[plotorder]))
+	plot(c(0,1),c(0,1), type="n", xlim=c(0,1), ylim=c(0,10), xaxs="i",yaxs="i",xlab=" ", ylab=" ",axes=FALSE)
+	plot(c(0,1),c(0,1), type="n", xlim=c(0,1), ylim=c(0,10), xaxs="i",yaxs="i",xlab=" ", ylab=" ",axes=FALSE)
+	plot(c(0,1),c(0,1), type="n", xlim=c(0,1), ylim=c(0,10), xaxs="i",yaxs="i",xlab=" ", ylab=" ",axes=FALSE)
+	for(i in 1:3){
+		polygon(c(0,0,1,1),c(Hseql[i],Hseqh[i],Hseqh[i],Hseql[i]),col=as.character(heightCols$colsH[i]),border=NA)
+		
+	}
+	text(.5,1.5,"short",srt=90,cex=4,col="white")
+	text(.5,4,"mixed",srt=90,cex=4,col="white")
+	text(.5,7,"tall",srt=90,cex=4,col="white")
 dev.off()	
 
 ##########################################################################################
