@@ -112,9 +112,9 @@ datVI$vegeclassColors <- vegeclassColors$coli
 
 #add a color for height
 heightCols <- data.frame(vegeH=c(1,2,3), heightName=c("short","mixed","tall"),
-						colsH=c(rgb(60/255,60/255,110/255),
-						rgb(0/255,90/255,200/255),
-						rgb(170/255,10/255,60/255)))
+						colsH=c(rgb(10/255,100/255,160/255),
+						rgb(190/255,160/255,120/255),
+						rgb(250/255,40/255,0/255)))
 								
 vegeHeight <- data.frame(vegeclass=seq(1,9),vegeH=c(1,1,2,1,3,2,3,3,3))
 
@@ -302,7 +302,7 @@ png(paste0(plotDI,"\\vege_site_agg.png"),width=1500,height=1100)
 			polygon(c(0,0,1,1),c(yseq[j]-1,yseq[j],yseq[j],yseq[j]-1),col=as.character(vegeclassColors$coli[i]),border=NA)
 	}
 	axis(4,yseq-.5,rep(" ",9),lwd.ticks=2)
-	mtext(datVI$name,at=yseq-.5,cex=2,line=1,side=4,las=2,col=as.character(vegeclassColors$colsH[plotorder]))
+	mtext(datVI$name[plotorder],at=yseq-.5,cex=2,line=1,side=4,las=2,col=as.character(vegeclassColors$colsH[plotorder]))
 	plot(c(0,1),c(0,1), type="n", xlim=c(0,1), ylim=c(0,10), xaxs="i",yaxs="i",xlab=" ", ylab=" ",axes=FALSE)
 	plot(c(0,1),c(0,1), type="n", xlim=c(0,1), ylim=c(0,10), xaxs="i",yaxs="i",xlab=" ", ylab=" ",axes=FALSE)
 	plot(c(0,1),c(0,1), type="n", xlim=c(0,1), ylim=c(0,10), xaxs="i",yaxs="i",xlab=" ", ylab=" ",axes=FALSE)
