@@ -705,7 +705,8 @@ hd <- 60
 
 
 xseq <-c(1,4,7,10,13,16,19,22,25)
-
+Hseql <- c(0,9,15)
+Hseqh <- c(9,15,26)
 yli <- c(0,0,75,-35)
 yhi <- c(1.5,1.7,200,5)
 yii <- c(.5,.5,25,5)
@@ -735,9 +736,10 @@ mcx <- 15
 zlw <- 9
 plotOrder <- c(1,2,4,3,6,5,7,8,9)
 
-png(paste0(plotDI,"\\intercepts_N.png"), width=8000,height=5500,
+png(paste0(plotDI,"\\intercepts_N.png"), width=8000,height=6500,
 			units="px")
-	layout(matrix(seq(1,6),ncol=2,byrow=TRUE), width=rep(lcm(wd),6),height=c(rep(lcm(hd),4),lcm(35),lcm(35)))
+	layout(matrix(seq(1,8),ncol=2,byrow=TRUE), width=c(lcm(wd),lcm(wd)),
+				height=c(lcm(hd),lcm(hd),lcm(75),lcm(10)))
 		#plot intercept freeze n factor
 	
 		par(mai=c(2.5,13.5,0,0))
@@ -848,18 +850,41 @@ png(paste0(plotDI,"\\intercepts_N.png"), width=8000,height=5500,
 					
 
 	#x labels
-	par(mai=c(10,13.5,0,0),xpd=TRUE)
+	par(mai=c(0,13.5,0,0),xpd=TRUE)
 		plot(c(0,1),c(0,1), ylim=c(-10,0), xlim=c(xl,xh),
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
-			text(xseq,rep(-0.25,length(xseq)),datVI$name2[plotOrder],col=as.character(vegeclassColors$colsH[plotOrder]),
-			srt=55, adj=1,cex=axc2,xpd=TRUE)	
+			text(xseq,rep(-0.25,length(xseq)),datVI$name2[plotOrder],
+			srt=90, adj=1,cex=axc2,xpd=TRUE)	
 
 			#x labels		
-	par(mai=c(10,3.5,0,10),xpd=TRUE)
+	par(mai=c(0,3.5,0,10),xpd=TRUE)
 		plot(c(0,1),c(0,1), ylim=c(-10,0), xlim=c(xl,xh),
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
-			text(xseq,rep(-.25,length(xseq)),datVI$name2[plotOrder],col=as.character(vegeclassColors$colsH[plotOrder]),
-			,srt=55, adj=1,cex=axc2,xpd=TRUE)
+			text(xseq,rep(-.25,length(xseq)),datVI$name2[plotOrder],
+			,srt=90, adj=1,cex=axc2,xpd=TRUE)
+
+	
+	par(mai=c(0,13.5,0,0),xpd=TRUE)
+	plot(c(0,1),c(0,1), type="n", xlim=c(xl,xh), ylim=c(0,1), xaxs="i",yaxs="i",xlab=" ", ylab=" ",axes=FALSE)
+	for(i in 1:3){
+		polygon(c(Hseql[i],Hseql[i],Hseqh[i],Hseqh[i]),c(0,1,1,0),col=as.character(heightCols$colsH[i]),border=NA)
+		
+	}
+	
+	text(4.5,0.5,"short",cex=axc2,col="white")
+	text(12,0.5,"mixed",cex=axc2,col="white")
+	text(20.5,0.5,"tall",cex=axc2,col="white")		
+	
+	par(mai=c(0,3.5,0,10),xpd=TRUE)	
+	plot(c(0,1),c(0,1), type="n", xlim=c(xl,xh), ylim=c(0,1), xaxs="i",yaxs="i",xlab=" ", ylab=" ",axes=FALSE)
+	for(i in 1:3){
+		polygon(c(Hseql[i],Hseql[i],Hseqh[i],Hseqh[i]),c(0,1,1,0),col=as.character(heightCols$colsH[i]),border=NA)
+		
+	}
+	text(4.5,0.5,"short",cex=axc2,col="white")
+	text(12,0.5,"mixed",cex=axc2,col="white")
+	text(20.5,0.5,"tall",cex=axc2,col="white")		
+				
 dev.off()
 
 
@@ -872,7 +897,7 @@ dev.off()
 	
 png(paste0(plotDI,"\\intercepts_max_supp.png"), width=4000,height=5000,
 			units="px")
-	layout(matrix(c(1,2),ncol=1,byrow=TRUE), width=rep(lcm(wd),2),height=c(lcm(hd),lcm(70)))
+	layout(matrix(c(1,2,3),ncol=1,byrow=TRUE), width=lcm(wd),height=c(lcm(hd),lcm(70),lcm(10)))
 	par(mai=c(.5,13.5,0,0))
 		
 	plot(c(0,1),c(0,1), ylim=c(yli[3],yhi[3]), xlim=c(xl,xh),
@@ -900,10 +925,20 @@ png(paste0(plotDI,"\\intercepts_max_supp.png"), width=4000,height=5000,
 			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw)
 	
 
-	par(mai=c(17,13.5,0,0),xpd=TRUE)
+	par(mai=c(0,13.5,0,0),xpd=TRUE)
 		plot(c(0,1),c(0,1), ylim=c(-10,0), xlim=c(xl,xh),
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
-			text(xseq,rep(-.25,length(xseq)),datVI$name2[plotOrder],srt=55, adj=1,cex=15,xpd=TRUE)	
+			text(xseq,rep(-.25,length(xseq)),datVI$name2[plotOrder],srt=55, adj=1,cex=15,xpd=TRUE)
+
+	par(mai=c(0,13.5,0,0),xpd=TRUE)	
+	plot(c(0,1),c(0,1), type="n", xlim=c(xl,xh), ylim=c(0,1), xaxs="i",yaxs="i",xlab=" ", ylab=" ",axes=FALSE)
+	for(i in 1:3){
+		polygon(c(Hseql[i],Hseql[i],Hseqh[i],Hseqh[i]),c(0,1,1,0),col=as.character(heightCols$colsH[i]),border=NA)
+		
+	}
+	text(4.5,0.5,"short",cex=axc2,col="white")
+	text(12,0.5,"mixed",cex=axc2,col="white")
+	text(20.5,0.5,"tall",cex=axc2,col="white")					
 	
 dev.off()
 
