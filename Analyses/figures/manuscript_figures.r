@@ -928,7 +928,7 @@ png(paste0(plotDI,"\\intercepts_max_supp.png"), width=4000,height=5000,
 	par(mai=c(0,13.5,0,0),xpd=TRUE)
 		plot(c(0,1),c(0,1), ylim=c(-10,0), xlim=c(xl,xh),
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
-			text(xseq,rep(-.25,length(xseq)),datVI$name2[plotOrder],srt=55, adj=1,cex=15,xpd=TRUE)
+			text(xseq,rep(-.25,length(xseq)),datVI$name2[plotOrder],srt=90, adj=1,cex=15,xpd=TRUE)
 
 	par(mai=c(0,13.5,0,0),xpd=TRUE)	
 	plot(c(0,1),c(0,1), type="n", xlim=c(xl,xh), ylim=c(0,1), xaxs="i",yaxs="i",xlab=" ", ylab=" ",axes=FALSE)
