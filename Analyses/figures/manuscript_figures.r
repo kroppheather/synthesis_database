@@ -113,7 +113,7 @@ datVI$vegeclassColors <- vegeclassColors$coli
 #add a color for height
 heightCols <- data.frame(vegeH=c(1,2,3), heightName=c("short","mixed","tall"),
 						colsH=c(rgb(10/255,100/255,160/255),
-						rgb(190/255,160/255,120/255),
+						rgb(170/255,190/255,140/255),
 						rgb(250/255,40/255,0/255)))
 								
 vegeHeight <- data.frame(vegeclass=seq(1,9),vegeH=c(1,1,2,1,3,2,3,3,3))
@@ -302,7 +302,7 @@ png(paste0(plotDI,"\\vege_site_agg.png"),width=1500,height=1100)
 			polygon(c(0,0,1,1),c(yseq[j]-1,yseq[j],yseq[j],yseq[j]-1),col=as.character(vegeclassColors$coli[i]),border=NA)
 	}
 	axis(4,yseq-.5,rep(" ",9),lwd.ticks=2)
-	mtext(datVI$name[plotorder],at=yseq-.5,cex=2,line=1,side=4,las=2,col=as.character(vegeclassColors$colsH[plotorder]))
+	mtext(datVI$name[plotorder],at=yseq-.5,cex=2,line=1,side=4,las=2)
 	plot(c(0,1),c(0,1), type="n", xlim=c(0,1), ylim=c(0,10), xaxs="i",yaxs="i",xlab=" ", ylab=" ",axes=FALSE)
 	plot(c(0,1),c(0,1), type="n", xlim=c(0,1), ylim=c(0,10), xaxs="i",yaxs="i",xlab=" ", ylab=" ",axes=FALSE)
 	plot(c(0,1),c(0,1), type="n", xlim=c(0,1), ylim=c(0,10), xaxs="i",yaxs="i",xlab=" ", ylab=" ",axes=FALSE)
@@ -470,7 +470,7 @@ xseqP <- c(1,2)
 
 lgry <- rgb(165/255,165/255,165/255,.2)
 	
-plotOrder <- c(1,2,4,3,5,6,7,8,9)
+plotOrder <- c(1,2,4,3,6,5,7,8,9)
 xflag <- c(0,0,0,0,0,0,1,1,1)
 yflag <- c(1,0,0,1,0,0,1,0,0)
 
@@ -548,7 +548,7 @@ for(j in 1:9){
 		if(j==9){
 		mtext("Day of water year", outer=TRUE, side=1,line=llh, cex=lx) 
 		}
-		mtext(paste(name2[i]), side=3, line=-2, cex=vlx) 
+		mtext(paste(name2[i]),col=as.character(vegeclassColors$colsH[i]), side=3, line=-2, cex=vlx) 
 		
 	
 }	
@@ -733,7 +733,7 @@ yll2 <- 45
 mcx <- 15
 #one line width
 zlw <- 9
-plotOrder <- c(1,2,4,3,5,6,7,8,9)
+plotOrder <- c(1,2,4,3,6,5,7,8,9)
 
 png(paste0(plotDI,"\\intercepts_N.png"), width=8000,height=5500,
 			units="px")
@@ -851,13 +851,15 @@ png(paste0(plotDI,"\\intercepts_N.png"), width=8000,height=5500,
 	par(mai=c(10,13.5,0,0),xpd=TRUE)
 		plot(c(0,1),c(0,1), ylim=c(-10,0), xlim=c(xl,xh),
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
-			text(xseq,rep(-0.25,length(xseq)),datVI$name2[plotOrder],srt=55, adj=1,cex=axc2,xpd=TRUE)	
+			text(xseq,rep(-0.25,length(xseq)),datVI$name2[plotOrder],col=as.character(vegeclassColors$colsH[plotOrder]),
+			srt=55, adj=1,cex=axc2,xpd=TRUE)	
 
 			#x labels		
 	par(mai=c(10,3.5,0,10),xpd=TRUE)
 		plot(c(0,1),c(0,1), ylim=c(-10,0), xlim=c(xl,xh),
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
-			text(xseq,rep(-.25,length(xseq)),datVI$name2[plotOrder],srt=55, adj=1,cex=axc2,xpd=TRUE)
+			text(xseq,rep(-.25,length(xseq)),datVI$name2[plotOrder],col=as.character(vegeclassColors$colsH[plotOrder]),
+			,srt=55, adj=1,cex=axc2,xpd=TRUE)
 dev.off()
 
 
