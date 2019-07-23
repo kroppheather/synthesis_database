@@ -188,7 +188,7 @@ datalist <- list(Nobs=dim(ParmAll)[1],
 parms <- c("beta0","beta1","beta2","sigSoilV","repSoilP",
 		"mu.beta0","mu.beta1","mu.beta2",
 		"sig.beta0","sig.beta1","sig.beta2","meanComp","plotRegA",
-		"mu.Air")	
+		"mu.AirP")	
 #each regression has 3 parameters for each 9 vegetation types		
 Xcomp <- round(0.05/((9*3)-1),3)
 if(modRun==1){
