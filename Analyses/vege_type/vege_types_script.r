@@ -50,8 +50,8 @@ library(plyr)
 #set up a plot directory
 plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\plots\\model_all"
 #model directory
-modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run6"
-Nrun <- 6
+modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run7"
+Nrun <- 7
 #indicate if a model run is occuring
 modRun <- 1
 
@@ -73,12 +73,12 @@ parmV <- unique(SoilParm$parm)
 parmA <- unique(AirParm$Aparm)
 
 #pull out relevant parameters
-#for analysis: TminS, TmaxS, peakWS
+#for analysis: TminS, TmaxS, average
 #and subset to relevant depths
 
-parmVs <- c("TminS","TmaxS", "peakWS") 
+parmVs <- c("TminS","TmaxS", "TaverageS") 
 
-parmAs <- c("TminA","TmaxA", "peakWA") 
+parmAs <- c("TminA","TmaxA", "TaverageA") 
 
 
 SoilL <- list()
@@ -180,13 +180,15 @@ datalist <- list(Nobs=dim(ParmAll)[1],
 				NregVege=dim(regvegeID)[1],
 				regV=regvegeID$regID,
 				Nreg=3,
-				AcompPlot=regPlotA
+				#put in dummy number if not used
+				AcompPlot=regPlotA,tau.Air=ifelse(ParmAll$ASD == 0, 10000000, ParmAll$ASD^-2)
 				)
 				
 #paramters of interest
 parms <- c("beta0","beta1","beta2","sigSoilV","repSoilP",
 		"mu.beta0","mu.beta1","mu.beta2",
-		"sig.beta0","sig.beta1","sig.beta2","meanComp","plotRegA")	
+		"sig.beta0","sig.beta1","sig.beta2","meanComp","plotRegA",
+		"mu.Air")	
 #each regression has 3 parameters for each 9 vegetation types		
 Xcomp <- round(0.05/((9*3)-1),3)
 if(modRun==1){

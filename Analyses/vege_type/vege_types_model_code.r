@@ -16,8 +16,8 @@ model{
 		#replicated data
 		repSoilP[i] ~ dnorm(mu.Soil[i],tau.Soil[i])
 		#error model for air parameter 
-		mu.AirP[i] ~ dnorm(AirP[i], tau.Air[i])
-		tau.Air[i] <- pow(sig.Air[i],-2)
+		mu.AirP[i] <- ifelse(sig.Air[i] == 0, AirP[i], stoch.AirP[i])
+		stoch.AirP[i] ~ dnorm(AirP[i], tau.Air[i])
 		
 	}
 	#priors for parameters
