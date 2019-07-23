@@ -141,7 +141,7 @@ library(imager)
 
 ##########################################################################################
 ##########################################################################################
-################# Figure 1. create map of study sites                    #################
+################# Figure 1a. create map of study sites to go with data   #################
 ##########################################################################################
 ##########################################################################################
 #read in permafrost shapefile
@@ -263,16 +263,16 @@ xyz.allV <- make.xyz(propAllV$x,propAllV$y,propAllV$propC,propAllV$vegeclass)
 
 #######make plot ######
 yseq <- seq(1,9)
-wd <- 30
-hd <- 30
-wd2 <- 5
-hd2 <- 5
+wd <- 45
+hd <- 45
+
 plotorder <- c(1,2,4,3,6,5,7,8,9)
 Hseqh <- c(3,5,9)
 Hseql <- c(0,3,5)
-png(paste0(plotDI,"\\vege_site_agg.png"),width=1500,height=1100)
-	a <- layout(matrix(c(1,2,3,4,5),ncol=5, byrow=TRUE), height=c(lcm(hd),lcm(hd),lcm(hd),lcm(hd),lcm(hd)), 
-					width=c(lcm(wd),lcm(wd2),lcm(wd2),lcm(wd2),lcm(wd2)))
+#,width=1500,height=1500,
+png(paste0(plotDI,"\\vege_site_agg.png"), width = 20, height = 20, units = "in", res=300)
+	a <- layout(matrix(c(1),ncol=1, byrow=TRUE), height=c(lcm(hd)), 
+					width=c(lcm(wd)))
 	layout.show(a)
 	#set up empty plot
 	
@@ -286,33 +286,16 @@ png(paste0(plotDI,"\\vege_site_agg.png"),width=1500,height=1100)
 	#midnight blue
 	plot(shapeCp, col=rgb(0/255,51/255,102/255),add=TRUE,border=NA)
 	#royalblue3 rgb(58/255,95/255,205/255)
-	plot(shapeDp, col=rgb(0/255,51/255,102/255,.7),add=TRUE,border=NA)
+	plot(shapeDp, col=rgb(57/255,105/255,153/255),add=TRUE,border=NA)
 	#darkseagreen2
-	plot(shapeSp, col=rgb(0/255,51/255,102/255,.25),add=TRUE,border=NA)
+	plot(shapeSp, col=rgb(236/255,245/255,255/255),add=TRUE,border=NA)
 	draw.pie(xyz.allV$x,xyz.allV$y,xyz.allV$z,radius=220000,col=as.character(vegeclassColors$coli),border=NA)
-	points(mat.bcV$x,mat.bcV$y,pch=19,col="white",cex=7.5)
+	points(mat.bcV$x,mat.bcV$y,pch=19,col="white",cex=8)
 	text(mat.bcV$x,mat.bcV$y,paste(mat.bcV$NpolySite),cex=2.5)
 	legend(-3700000,-3800000,c("continuous","discontinuous","sporadic"), 
-			fill=c( "midnightblue",rgb(0/255,51/255,102/255,.7),rgb(0/255,51/255,102/255,.25)),
+			fill=c( rgb(0/255,51/255,102/255),rgb(57/255,105/255,153/255),rgb(236/255,245/255,255/255)),
 			horiz=TRUE,bty="n",cex=3,border=NA,xpd=TRUE)
-	#plot legend
-	plot(c(0,1),c(0,1), type="n", xlim=c(0,1), ylim=c(0,10), xaxs="i",yaxs="i",xlab=" ", ylab=" ",axes=FALSE)
-		for(j in 1:9){
-			i <- plotorder[j]
-			polygon(c(0,0,1,1),c(yseq[j]-1,yseq[j],yseq[j],yseq[j]-1),col=as.character(vegeclassColors$coli[i]),border=NA)
-	}
-	axis(4,yseq-.5,rep(" ",9),lwd.ticks=2)
-	mtext(datVI$name[plotorder],at=yseq-.5,cex=2,line=1,side=4,las=2)
-	plot(c(0,1),c(0,1), type="n", xlim=c(0,1), ylim=c(0,10), xaxs="i",yaxs="i",xlab=" ", ylab=" ",axes=FALSE)
-	plot(c(0,1),c(0,1), type="n", xlim=c(0,1), ylim=c(0,10), xaxs="i",yaxs="i",xlab=" ", ylab=" ",axes=FALSE)
-	plot(c(0,1),c(0,1), type="n", xlim=c(0,1), ylim=c(0,10), xaxs="i",yaxs="i",xlab=" ", ylab=" ",axes=FALSE)
-	for(i in 1:3){
-		polygon(c(0,0,1,1),c(Hseql[i],Hseqh[i],Hseqh[i],Hseql[i]),col=as.character(heightCols$colsH[i]),border=NA)
-		
-	}
-	text(.5,1.5,"short",srt=90,cex=4,col="white")
-	text(.5,4,"mixed",srt=90,cex=4,col="white")
-	text(.5,7,"tall",srt=90,cex=4,col="white")
+	
 dev.off()	
 
 ##########################################################################################
