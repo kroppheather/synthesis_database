@@ -401,9 +401,6 @@ test4 <- c(rgb(213/255,94/255,0/255,.4),rgb(240/255,228/255,66/255,.4),
 name2 <- c("Herb barren", "Graminoid tundra","Tussock tundra","Short shrub tundra","Tall shrub tundra",
 					"Wetland","Evergreen needleleaf boreal","Deciduous needleleaf boreal","Mixed boreal")			
 			
-wd1 <- 80
-hd1 <- 50
-hd2 <- 15
 
 #seq for x2
 xh2 <- 3
@@ -423,12 +420,12 @@ yseq <- seq(-35,25,by=10)
 xseq <- c(1,124,244,335)
 xlseq <- c("Oct","Feb","Jun","Sept")
 #tick width
-lwt <- 14
+lwt <- 6
 #line axis 
 alh <- 4
-xalh <- 12
+xalh <- 6
 #cex axis
-mx <- 10
+mx <- 6
 #box line width
 blw <- 6
 #label line
@@ -436,11 +433,11 @@ llh <- -30
 #y label line axis 
 yllh <- -22
 #label size
-lx <- 14
+lx <- 3
 #label vegetation size
-vlx <- 15
+vlx <- 5
 #mean line width
-mlwd <- 7
+mlwd <- 5
 #density axis line
 dcx <- 3
 #box error bar width
@@ -450,8 +447,10 @@ mlw <- 7
 #sequence for min and max plot
 xseqP <- c(1,2)
 #title line
-tlll <- -10
-
+tlll <- -6
+#vegetation stature text size
+stcx <- 12
+stll <- -5
 lgry <- rgb(165/255,165/255,165/255,.2)
 	
 plotOrder <- c(1,2,4,3,6,5,7,8,9)
@@ -459,11 +458,26 @@ xflag <- c(0,0,0,0,0,0,1,1,1)
 yflag <- c(1,0,0,1,0,0,1,0,0)
 
 
-png(paste0(plotDI,"\\all_panel_datab.png"),width=15000,height=10000)
+
+			
+#for(i in 1:36){
+#plot(c(0,1),c(0,1))
+#box(which="plot")
+#}			
+#dev.off()
+
+			
+wd1 <- 32
+hd1 <- 20
+hd2 <- 7
+png(paste0(plotDI,"\\all_panel_datab.png"),width=80,height=40, units="in",res=300)
 	layout(matrix(seq(1,36), ncol=6, byrow=FALSE), widths=rep(lcm(wd1),6),
-			heights=c(lcm(hd2),rep(lcm(hd1),4),lcm(hd2))
+			heights=c(lcm(hd2),rep(lcm(hd1),4),lcm(hd2)))
+			
+par(mai=c(1,0,0,0))
 plot(c(0,1),c(0,1), type="n",	xlab=" ",ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
-polygon(c(0,0,1,1),c(0,1,1,0), col=heightCols$colsH[1], border=NA)			
+polygon(c(0,0,1,1),c(0,1,1,0), col=paste(heightCols$colsH[1]), border=NA)
+mtext( "Short", cex=stcx,side=1,line=stll col="white")			
 #plot short tundra			
 for(j in 1:3){
 	i <- plotOrder[j]
@@ -531,7 +545,7 @@ for(j in 1:3){
 	
 }	
 #blank plots
-for(n in 1:12{
+for(n in 1:12){
 	plot(c(0,1),c(0,1), type="n",	xlab=" ",ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
 
 }
@@ -602,8 +616,13 @@ for(j in 4){
 	mtext(paste(name2[i]),col=as.character(vegeclassColors$coli[i]), side=3, line=tlll, cex=vlx) 
 	
 }	
+par(mai=c(0,0,1,0), xpd=NA)
+plot(c(0,1),c(0,1), type="n",	xlab=" ",ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+polygon(c(0,0,1,1),c(0,1,1,0), col=paste(heightCols$colsH[2]), border=NA)	
+text(0.95,0.5, "Mixed", cex=stcx, col="white", xpd=NA)
+par(xpd=TRUE)
 #blank plots
-for(n in 1:5){
+for(n in 1:4){
 	plot(c(0,1),c(0,1), type="n",	xlab=" ",ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
 
 }
@@ -674,13 +693,18 @@ for(j in 5){
 	mtext(paste(name2[i]),col=as.character(vegeclassColors$coli[i]), side=3, line=tlll, cex=vlx) 
 	
 }	
+par(mai=c(0,0,1,0))
+plot(c(0,1),c(0,1), type="n",	xlab=" ",ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+polygon(c(0,0,1,1),c(0,1,1,0), col=paste(heightCols$colsH[2]), border=NA)
 #blank plots
-for(n in 1:7){
+for(n in 1:6){
 	plot(c(0,1),c(0,1), type="n",	xlab=" ",ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
 
 }
+par(mai=c(1,0,0,0))
 plot(c(0,1),c(0,1), type="n",	xlab=" ",ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
-polygon(c(0,0,1,1),c(0,1,1,0), col=heightCols$colsH[3], border=NA)
+polygon(c(0,0,1,1),c(0,1,1,0), col=paste(heightCols$colsH[3]), border=NA)
+text(0.5,0.5, "Tall", cex=stcx, col="white")
 #plot tall			
 for(j in 6:9){
 	i <- plotOrder[j]
