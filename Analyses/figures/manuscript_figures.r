@@ -479,8 +479,8 @@ wd1 <- 35
 wd2 <- 15
 hd1 <- 20
 hd2 <- 7
-png(paste0(plotDI,"\\all_panel_datab.png"),width=80,height=40, units="in",res=300)
-	layout(matrix(seq(1,36), ncol=6, byrow=FALSE), widths=rep(lcm(wd1),6),
+png(paste0(plotDI,"\\all_panel_datab.png"),width=71,height=40, units="in",res=300)
+	layout(matrix(seq(1,36), ncol=6, byrow=FALSE), widths=c(lcm(wd1),lcm(wd2),lcm(wd1),lcm(wd1),lcm(wd2),lcm(wd1)),
 			heights=c(lcm(hd2),rep(lcm(hd1),4),lcm(hd2)))
 			
 par(mai=c(1,0,0,0))
@@ -553,7 +553,7 @@ for(j in 1:3){
 	mtext(paste(name2[i]),col="white", side=3, line=tlll, cex=vlx) 
 	
 		if(j==2){
-		mtext("Soil temperature (C)", side=2,line=yllh, cex=lx,outer=TRUE, at = 0.75) 
+		mtext("Soil temperature (C)", side=2,line=yllh, cex=lx,outer=TRUE, at = 0.6) 
 		}
 	
 	if(j == 3){
@@ -798,7 +798,7 @@ for(j in 6:9){
 	
 	}
 		if(j==6){
-		mtext("Soil temperature (C)", side=2,line=-487, cex=lx,outer=TRUE, at = 0.5) 
+		mtext("Soil temperature (C)", side=2,line=-413, cex=lx,outer=TRUE, at = 0.5) 
 		}
 }
 plot(c(0,1),c(0,1), type="n",	xlab=" ",ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
