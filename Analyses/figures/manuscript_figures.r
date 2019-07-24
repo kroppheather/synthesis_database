@@ -422,18 +422,24 @@ xlseq <- c("Oct","Feb","Jun","Sept")
 #tick width
 lwt <- 6
 #line axis 
-alh <- 4
+alh <- 3
 xalh <- 6
 #cex axis
 mx <- 6
 #box line width
 blw <- 6
-#label line
-llh <- -30
-#y label line axis 
-yllh <- -22
+#x label line
+llhx <- 15
+#if outer
+llhxo <- -29
+#y label line axis for soil temp
+#if outer
+yllh <- -10
+yllh2 <- -80
+#if inner
+yllhi <- 16
 #label size
-lx <- 3
+lx <- 6
 #label vegetation size
 vlx <- 5
 #mean line width
@@ -446,19 +452,21 @@ alw <- 5
 mlw <- 7
 #sequence for min and max plot
 xseqP <- c(1,2)
-#title line
-tlll <- -6
+#title line for vege type
+tlll <- -5.25
 #vegetation stature text size
-stcx <- 12
-stll <- -5
+stcx <- 8
+stll <- -10
 lgry <- rgb(165/255,165/255,165/255,.2)
-	
+#depth legend cex
+lcex <- 5
 plotOrder <- c(1,2,4,3,6,5,7,8,9)
 xflag <- c(0,0,0,0,0,0,1,1,1)
 yflag <- c(1,0,0,1,0,0,1,0,0)
 
 
-
+xpolyL <- c(7,7,363,363)
+ypolyL <- c(28,37,37,28)
 			
 #for(i in 1:36){
 #plot(c(0,1),c(0,1))
@@ -467,7 +475,8 @@ yflag <- c(1,0,0,1,0,0,1,0,0)
 #dev.off()
 
 			
-wd1 <- 32
+wd1 <- 35
+wd2 <- 15
 hd1 <- 20
 hd2 <- 7
 png(paste0(plotDI,"\\all_panel_datab.png"),width=80,height=40, units="in",res=300)
@@ -477,14 +486,14 @@ png(paste0(plotDI,"\\all_panel_datab.png"),width=80,height=40, units="in",res=30
 par(mai=c(1,0,0,0))
 plot(c(0,1),c(0,1), type="n",	xlab=" ",ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
 polygon(c(0,0,1,1),c(0,1,1,0), col=paste(heightCols$colsH[1]), border=NA)
-mtext( "Short", cex=stcx,side=1,line=stll col="white")			
+mtext( "Short", cex=stcx,side=3,line=stll, col="white")			
 #plot short tundra			
 for(j in 1:3){
 	i <- plotOrder[j]
 	##temperature##		
 		par(mai=c(1.5,1.5,0,0))				
 		plot(Soil[[listV[[i]][1]]]$wdoy,Soil[[listV[[i]][1]]]$soil_t,
-				type="l", ylim=c(-41,35),xlim=c(0,370),col="white",
+				type="l", ylim=c(-41,37),xlim=c(0,370),col="white",
 				xlab=" ",ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
 		for(k in 1:length(listV[[i]])){		
 		
@@ -492,7 +501,7 @@ for(j in 1:3){
 					Soil[[listV[[i]][k]]]$T,type="l",
 					col=lgry,lwd=3)
 			}
-	
+		polygon(xpolyL ,ypolyL,col=as.character(vegeclassColors$coli[i]),border=NA)
 		
 		#add summary
 		if(length(which(vegeDepth$vegeclass==i&vegeDepth$depthID==1))!=0){
@@ -541,8 +550,16 @@ for(j in 1:3){
 		
 		mtext(yseq,at=yseq,side=2,line=alh,cex=mx,las=2)
 		
-	mtext(paste(name2[i]),col=as.character(vegeclassColors$coli[i]), side=3, line=tlll, cex=vlx) 
+	mtext(paste(name2[i]),col="white", side=3, line=tlll, cex=vlx) 
 	
+		if(j==2){
+		mtext("Soil temperature (C)", side=2,line=yllh, cex=lx,outer=TRUE, at = 0.75) 
+		}
+	
+	if(j == 3){
+	legend("bottomright", c("0-5 cm", "5-10 cm", "10-15 cm", "15-20 cm"), col=test2, lwd=6,	bty="n", cex=lcex)
+	mtext("Day of water year",  side=1,line=llhx, cex=lx)
+	}
 }	
 #blank plots
 for(n in 1:12){
@@ -556,7 +573,7 @@ for(j in 4){
 	##temperature##		
 		par(mai=c(1.5,1.5,0,0))				
 		plot(Soil[[listV[[i]][1]]]$wdoy,Soil[[listV[[i]][1]]]$soil_t,
-				type="l", ylim=c(-41,35),xlim=c(0,370),col="white",
+				type="l", ylim=c(-41,37),xlim=c(0,370),col="white",
 				xlab=" ",ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
 		for(k in 1:length(listV[[i]])){		
 		
@@ -565,7 +582,7 @@ for(j in 4){
 					col=lgry,lwd=3)
 			}
 	
-		
+		polygon(xpolyL ,ypolyL,col=as.character(vegeclassColors$coli[i]),border=NA)
 		#add summary
 		if(length(which(vegeDepth$vegeclass==i&vegeDepth$depthID==1))!=0){
 		polygon(c(pclTDF$wdoy[pclTDF$depthID==1&pclTDF$vegeclass==i],
@@ -613,13 +630,15 @@ for(j in 4){
 		
 		mtext(yseq,at=yseq,side=2,line=alh,cex=mx,las=2)
 		
-	mtext(paste(name2[i]),col=as.character(vegeclassColors$coli[i]), side=3, line=tlll, cex=vlx) 
-	
+	mtext(paste(name2[i]),col="white", side=3, line=tlll, cex=vlx) 
+			
+		mtext("Soil temperature (C)", side=2,line=yllhi, cex=lx) 
+		mtext("Day of water year",  side=1,line=llhxo, cex=lx, outer=TRUE)
 }	
 par(mai=c(0,0,1,0), xpd=NA)
 plot(c(0,1),c(0,1), type="n",	xlab=" ",ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
 polygon(c(0,0,1,1),c(0,1,1,0), col=paste(heightCols$colsH[2]), border=NA)	
-text(0.95,0.5, "Mixed", cex=stcx, col="white", xpd=NA)
+
 par(xpd=TRUE)
 #blank plots
 for(n in 1:4){
@@ -633,7 +652,7 @@ for(j in 5){
 	##temperature##		
 		par(mai=c(1.5,1.5,0,0))				
 		plot(Soil[[listV[[i]][1]]]$wdoy,Soil[[listV[[i]][1]]]$soil_t,
-				type="l", ylim=c(-41,35),xlim=c(0,370),col="white",
+				type="l", ylim=c(-41,37),xlim=c(0,370),col="white",
 				xlab=" ",ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
 		for(k in 1:length(listV[[i]])){		
 		
@@ -642,7 +661,7 @@ for(j in 5){
 					col=lgry,lwd=3)
 			}
 	
-		
+		polygon(xpolyL ,ypolyL,col=as.character(vegeclassColors$coli[i]),border=NA)
 		#add summary
 		if(length(which(vegeDepth$vegeclass==i&vegeDepth$depthID==1))!=0){
 		polygon(c(pclTDF$wdoy[pclTDF$depthID==1&pclTDF$vegeclass==i],
@@ -690,12 +709,16 @@ for(j in 5){
 		
 		mtext(yseq,at=yseq,side=2,line=alh,cex=mx,las=2)
 		
-	mtext(paste(name2[i]),col=as.character(vegeclassColors$coli[i]), side=3, line=tlll, cex=vlx) 
+	mtext(paste(name2[i]),col="white", side=3, line=tlll, cex=vlx) 
+	
+	legend("bottomright", c("0-5 cm", "5-10 cm", "10-15 cm", "15-20 cm"), col=test2, lwd=6,	bty="n", cex=lcex)
+	
 	
 }	
 par(mai=c(0,0,1,0))
 plot(c(0,1),c(0,1), type="n",	xlab=" ",ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
 polygon(c(0,0,1,1),c(0,1,1,0), col=paste(heightCols$colsH[2]), border=NA)
+mtext( "Mixed",at=0,line=stll,side=3, cex=stcx, col="white", xpd=NA)
 #blank plots
 for(n in 1:6){
 	plot(c(0,1),c(0,1), type="n",	xlab=" ",ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
@@ -704,14 +727,14 @@ for(n in 1:6){
 par(mai=c(1,0,0,0))
 plot(c(0,1),c(0,1), type="n",	xlab=" ",ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
 polygon(c(0,0,1,1),c(0,1,1,0), col=paste(heightCols$colsH[3]), border=NA)
-text(0.5,0.5, "Tall", cex=stcx, col="white")
+mtext( "Tall", cex=stcx,side=3,line=stll, col="white")
 #plot tall			
 for(j in 6:9){
 	i <- plotOrder[j]
 	##temperature##		
 		par(mai=c(1.5,1.5,0,0))				
 		plot(Soil[[listV[[i]][1]]]$wdoy,Soil[[listV[[i]][1]]]$soil_t,
-				type="l", ylim=c(-41,35),xlim=c(0,370),col="white",
+				type="l", ylim=c(-41,37),xlim=c(0,370),col="white",
 				xlab=" ",ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
 		for(k in 1:length(listV[[i]])){		
 		
@@ -720,7 +743,7 @@ for(j in 6:9){
 					col=lgry,lwd=3)
 			}
 	
-		
+		polygon(xpolyL ,ypolyL,col=as.character(vegeclassColors$coli[i]),border=NA)
 		#add summary
 		if(length(which(vegeDepth$vegeclass==i&vegeDepth$depthID==1))!=0){
 		polygon(c(pclTDF$wdoy[pclTDF$depthID==1&pclTDF$vegeclass==i],
@@ -768,22 +791,20 @@ for(j in 6:9){
 		
 		mtext(yseq,at=yseq,side=2,line=alh,cex=mx,las=2)
 		
-	mtext(paste(name2[i]),col=as.character(vegeclassColors$coli[i]), side=3, line=tlll, cex=vlx) 
+	mtext(paste(name2[i]),col="white", side=3, line=tlll, cex=vlx) 
+	if(j == 9){
+	legend("bottomright", c("0-5 cm", "5-10 cm", "10-15 cm", "15-20 cm"), col=test2, lwd=6,	bty="n", cex=lcex)
+	mtext("Day of water year",  side=1,line=llhx, cex=lx)
 	
+	}
+		if(j==6){
+		mtext("Soil temperature (C)", side=2,line=-487, cex=lx,outer=TRUE, at = 0.5) 
+		}
 }
 plot(c(0,1),c(0,1), type="n",	xlab=" ",ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
 dev.off()
 			
 
-		#box(which="plot",lwd=blw)
-		if(j==1){
-		mtext("Soil temperature (C)", side=2,line=yllh, cex=lx,outer=TRUE) 
-		legend("topleft", c("0-5 cm", "5-10 cm", "10-15 cm", "15-20 cm"), col=test2, lwd=6,	bty="n", cex=10)
-		}
-		if(j==9){
-		mtext("Day of water year", outer=TRUE, side=1,line=llh, cex=lx) 
-		}
-		
 		
 
 ##########################################################################################
