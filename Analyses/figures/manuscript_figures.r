@@ -37,8 +37,8 @@ datVI$name <- c("herb barren","graminoid tundra","tussock tundra","short shrub t
 plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\figures"	
 
 #read in vegetation type regression results
-vegeRS <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run6\\vege_mod_stats.csv")
-vegeRT <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run6\\vege_mod_quant.csv")
+vegeRS <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run7\\vege_mod_stats.csv")
+vegeRT <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run7\\vege_mod_quant.csv")
 vegeR <- cbind(vegeRS,vegeRT)
 
 #pull out parm names
@@ -864,9 +864,9 @@ parmA <- unique(AirParm$Aparm)
 #for analysis: TminS, TmaxS, peakWS
 #and subset to relevant depths
 
-parmVs <- c("TminS","TmaxS", "peakWS") 
+parmVs <- c("TminS","TmaxS", "TaverageS") 
 
-parmAs <- c("TminA","TmaxA", "peakWA") 
+parmAs <- c("TminA","TmaxA", "TaverageA") 
 
 
 SoilL <- list()
@@ -957,9 +957,9 @@ hd <- 60
 xseq <-c(1,4,7,10,13,16,19,22,25)
 Hseql <- c(0,9,15)
 Hseqh <- c(9,15,26)
-yli <- c(0,0,75,-35)
-yhi <- c(1.5,1.7,200,5)
-yii <- c(.5,.5,25,5)
+yli <- c(0,0,75,-35,-12)
+yhi <- c(1.5,1.7,200,5,2)
+yii <- c(.5,.5,25,5,2)
 xl <- -1
 xh <- 27
 #mean line width
@@ -995,33 +995,33 @@ png(paste0(plotDI,"\\intercepts_N.png"), width=6000,height=8000,
 			units="px")
 	layout(matrix(seq(1,5),ncol=1,byrow=TRUE), width=c(lcm(wd)),
 				height=c(lcm(hd),lcm(hd),lcm(hd),lcm(75),lcm(10)))
-	#comparision of minimum air temperatures
+	#comparision of average soil temperatures
 
 	par(mai=c(0,0,2.5,0),xpd=TRUE)
-		plot(c(0,1),c(0,1), ylim=c(yli[4],yhi[4]), xlim=c(xl,xh),
+		plot(c(0,1),c(0,1), ylim=c(yli[5],yhi[5]), xlim=c(xl,xh),
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
-		points(c(xl,xh),c(-22,-22),type="l",lwd=zlw, col="grey75",lty=3)
+		points(c(xl,xh),c(-6,-6),type="l",lwd=zlw, col="grey75",lty=3)
 			for(i in 1:9){
 				j <- plotOrder[i]
 				polygon(c(xseq[i]-1,xseq[i]-1,xseq[i]+1,xseq[i]+1),
-						c(compAll$X25.[compAll$vegeclass==j&compAll$regID==1],compAll$X75.[compAll$vegeclass==j&compAll$regID==1],
-							compAll$X75.[compAll$vegeclass==j&compAll$regID==1],compAll$X25.[compAll$vegeclass==j&compAll$regID==1]),
+						c(compAll$X25.[compAll$vegeclass==j&compAll$regID==3],compAll$X75.[compAll$vegeclass==j&compAll$regID==3],
+							compAll$X75.[compAll$vegeclass==j&compAll$regID==3],compAll$X25.[compAll$vegeclass==j&compAll$regID==3]),
 						col=paste(vegeclassColors$coli[j]),border=NA)
-				arrows(xseq[i]-1,compAll$Mean[compAll$vegeclass==j&compAll$regID==1],
-						xseq[i]+1,compAll$Mean[compAll$vegeclass==j&compAll$regID==1],code=0,lwd=mlw)
-				arrows(	xseq[i],compAll$X0.2.[compAll$vegeclass==j&compAll$regID==1],
-						xseq[i],compAll$X99.8.[compAll$vegeclass==j&compAll$regID==1],
+				arrows(xseq[i]-1,compAll$Mean[compAll$vegeclass==j&compAll$regID==3],
+						xseq[i]+1,compAll$Mean[compAll$vegeclass==j&compAll$regID==3],code=0,lwd=mlw)
+				arrows(	xseq[i],compAll$X0.2.[compAll$vegeclass==j&compAll$regID==3],
+						xseq[i],compAll$X99.8.[compAll$vegeclass==j&compAll$regID==3],
 						code=0, lwd=alw)
 				}		
 		
 			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw,lwd=alwd)
-			axis(2, seq(yli[4],yhi[4], by=yii[4]), rep(" ",length(seq(yli[4],yhi[4], by=yii[4]))),
+			axis(2, seq(yli[5],yhi[5], by=yii[5]), rep(" ",length(seq(yli[5],yhi[5], by=yii[5]))),
 				 lwd.ticks=tlw,lwd=alwd)
-			mtext(seq(yli[4],yhi[4], by=yii[4]),at=seq(yli[4],yhi[4], by=yii[4]), side=2, line=xll,cex=axc,las=2)	
+			mtext(seq(yli[5],yhi[5], by=yii[5]),at=seq(yli[5],yhi[5], by=yii[5]), side=2, line=xll,cex=axc,las=2)	
 		
-			mtext("Minimum",side=2,line=yll2,cex=mcx)		
+			mtext("Average",side=2,line=yll2,cex=mcx)		
 			mtext("temperature (C)",side=2,line=yll3,cex=mcx)
-			text(xc,yhi[4]-(yhi[4]*yc), "a",cex=tcc)
+			text(xc,yhi[5]-(yhi[5]*yc), "a",cex=tcc)
 		#plot intercept thaw n factor	
 		par(mai=c(0,0,2.5,0))
 		
@@ -1111,11 +1111,11 @@ dev.off()
 
 
 #######################################
-#####make a plot of the minimum   #####
+#####make a plot of the days thaw #####
 #####to be used in supplement     #####
 #######################################
 	
-png(paste0(plotDI,"\\intercepts_max_supp.png"), width=4000,height=5000,
+png(paste0(plotDI,"\\supp_days_thaw.png"), width=4000,height=5000,
 			units="px")
 	layout(matrix(c(1,2,3),ncol=1,byrow=TRUE), width=lcm(wd),height=c(lcm(hd),lcm(70),lcm(10)))
 	par(mai=c(.5,13.5,0,0))
@@ -1163,14 +1163,63 @@ png(paste0(plotDI,"\\intercepts_max_supp.png"), width=4000,height=5000,
 dev.off()
 
 
+#######################################
+#####make a plot of the minimum   #####
+#####to be used in supplement     #####
+#######################################
+#comparision of minimum air temperatures
+png(paste0(plotDI,"\\supp_comp_min.png"), width=4000,height=5000,
+			units="px")
+layout(matrix(c(1,2,3),ncol=1,byrow=TRUE), width=lcm(wd),height=c(lcm(hd),lcm(70),lcm(10)))
+	par(mai=c(.5,13.5,0,0))
+		plot(c(0,1),c(0,1), ylim=c(yli[4],yhi[4]), xlim=c(xl,xh),
+				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+		points(c(xl,xh),c(-22,-22),type="l",lwd=zlw, col="grey75",lty=3)
+			for(i in 1:9){
+				j <- plotOrder[i]
+				polygon(c(xseq[i]-1,xseq[i]-1,xseq[i]+1,xseq[i]+1),
+						c(compAll$X25.[compAll$vegeclass==j&compAll$regID==1],compAll$X75.[compAll$vegeclass==j&compAll$regID==1],
+							compAll$X75.[compAll$vegeclass==j&compAll$regID==1],compAll$X25.[compAll$vegeclass==j&compAll$regID==1]),
+						col=paste(vegeclassColors$coli[j]),border=NA)
+				arrows(xseq[i]-1,compAll$Mean[compAll$vegeclass==j&compAll$regID==1],
+						xseq[i]+1,compAll$Mean[compAll$vegeclass==j&compAll$regID==1],code=0,lwd=mlw)
+				arrows(	xseq[i],compAll$X0.2.[compAll$vegeclass==j&compAll$regID==1],
+						xseq[i],compAll$X99.8.[compAll$vegeclass==j&compAll$regID==1],
+						code=0, lwd=alw)
+				}		
+		
+			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw,lwd=alwd)
+			axis(2, seq(yli[4],yhi[4], by=yii[4]), rep(" ",length(seq(yli[4],yhi[4], by=yii[4]))),
+				 lwd.ticks=tlw,lwd=alwd)
+			mtext(seq(yli[4],yhi[4], by=yii[4]),at=seq(yli[4],yhi[4], by=yii[4]), side=2, line=xll,cex=axc,las=2)	
+		
+			mtext("Minimum",side=2,line=yll2,cex=mcx)		
+			mtext("temperature (C)",side=2,line=yll3,cex=mcx)
+			
+	par(mai=c(0,13.5,0,0),xpd=TRUE)
+		plot(c(0,1),c(0,1), ylim=c(-10,0), xlim=c(xl,xh),
+				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+			text(xseq,rep(-.25,length(xseq)),datVI$name2[plotOrder],srt=90, adj=1,cex=15,xpd=TRUE)
 
+	
+	par(mai=c(0,13.5,0,0),xpd=TRUE)	
+	plot(c(0,1),c(0,1), type="n", xlim=c(xl,xh), ylim=c(0,1), xaxs="i",yaxs="i",xlab=" ", ylab=" ",axes=FALSE)
+	for(i in 1:3){
+		polygon(c(Hseql[i],Hseql[i],Hseqh[i],Hseqh[i]),c(0,1,1,0),col=as.character(heightCols$colsH[i]),border=NA)
+		
+	}
+	text(4.5,0.5,"short",cex=axc2,col="white")
+	text(12,0.5,"mixed",cex=axc2,col="white")
+	text(20.5,0.5,"tall",cex=axc2,col="white")					
+			
+dev.off()			
 #######################################
 #####make a plot of the freeze   #####
 #####n-factor for supplement     #####
 #######################################
 
 #plot intercept freeze n factor
-png(paste0(plotDI,"\\intercepts_freezeN_supp.png"), width=4000,height=5000,
+png(paste0(plotDI,"\\supp_intercepts_freezeN.png"), width=4000,height=5000,
 			units="px")
 	layout(matrix(c(1,2,3),ncol=1,byrow=TRUE), width=lcm(wd),height=c(lcm(hd),lcm(70),lcm(10)))
 	par(mai=c(.5,13.5,0,0))
