@@ -434,7 +434,7 @@ llhx <- 15
 llhxo <- -29
 #y label line axis for soil temp
 #if outer
-yllh <- -10
+yllh <- -7
 yllh2 <- -80
 #if inner
 yllhi <- 16
@@ -476,10 +476,10 @@ ypolyL <- c(28,37,37,28)
 
 			
 wd1 <- 35
-wd2 <- 15
+wd2 <- 5
 hd1 <- 20
 hd2 <- 7
-png(paste0(plotDI,"\\all_panel_datab.png"),width=71,height=40, units="in",res=300)
+png(paste0(plotDI,"\\all_panel_datab.png"),width=62,height=40, units="in",res=300)
 	layout(matrix(seq(1,36), ncol=6, byrow=FALSE), widths=c(lcm(wd1),lcm(wd2),lcm(wd1),lcm(wd1),lcm(wd2),lcm(wd1)),
 			heights=c(lcm(hd2),rep(lcm(hd1),4),lcm(hd2)))
 			
@@ -798,7 +798,7 @@ for(j in 6:9){
 	
 	}
 		if(j==6){
-		mtext("Soil temperature (C)", side=2,line=-413, cex=lx,outer=TRUE, at = 0.5) 
+		mtext("Soil temperature (C)", side=2,line=-348, cex=lx,outer=TRUE, at = 0.5) 
 		}
 }
 plot(c(0,1),c(0,1), type="n",	xlab=" ",ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
