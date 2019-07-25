@@ -278,7 +278,7 @@ png(paste0(plotDI,"\\vege_site_agg.png"), width = 20, height = 20, units = "in",
 	
 	plot(world2,type="n",axes=FALSE,xlab=" ", ylab=" ",xlim=c(-3500000,3500000),ylim=c(-3500000,3500000))
 	#color background
-	polygon(c(-5000000,-5000000,5000000,5000000),c(-5000000,5000000,5000000,-5000000), border=NA, col=rgb(202/255,242/255,255/255,.3))
+	polygon(c(-5000000,-5000000,5000000,5000000),c(-5000000,5000000,5000000,-5000000), border=NA, col=rgb(114/255,207/255,252/255,.3))
 	#boundaries
 	points(world, type="l", lwd=2, col="grey65")
 	#continent color
