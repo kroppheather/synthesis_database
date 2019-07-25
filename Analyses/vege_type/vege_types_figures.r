@@ -49,8 +49,8 @@ library(plyr)
 #set up a plot directory
 plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\plots\\model_all"
 #model directory
-modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run6"
-Nrun <- 6
+modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run7"
+Nrun <- 7
 #######################################
 #####set up colors               ##### 
 #######################################
@@ -85,9 +85,9 @@ parmA <- unique(AirParm$Aparm)
 #for analysis: TminS, TmaxS, peakWS
 #and subset to relevant depths
 
-parmVs <- c("TminS","TmaxS", "peakWS") 
+parmVs <- c("TminS","TmaxS", "TaverageS") 
 
-parmAs <- c("TminA","TmaxA", "peakWA") 
+parmAs <- c("TminA","TmaxA", "TaverageA") 
 
 
 SoilL <- list()
@@ -224,14 +224,13 @@ hd <- 40
 
 xseq <-c(1,4,7,10,13,16,19,22,25)
 
-yli <- c(-35,0,0.2)
-yhi <- c(10,25,.65)
-yls1 <- c(-1,-1,-.01)
-yhs1 <- c(1,.5,.01)
+yli <- c(-35,0,-15)
+yhi <- c(10,25,15)
+yls1 <- c(-1,-1,-1)
+yhs1 <- c(1,.5,1)
 yls2 <- c(-1,-1,-2.5)
 yhs2 <- c(1.5,2,2)
-yls3 <- c(-.5,-.15,-.005)
-yhs3 <- c(.5,.15,.005)
+
 
 xl <- -1
 xh <- 27
@@ -243,10 +242,10 @@ tlw <- 4
 alx <- 4
 mlx <- 7
 
-yii <- c(5,5,.1)
-yi1 <- c(.1,.1,.005)
+yii <- c(5,5,1)
+yi1 <- c(.1,.1,.5)
 yi2 <- c(.5,.5,.5)
-yi3 <- c(.1,.1,.001)
+yi3 <- c(.1,.1,.1)
 #three regressions
 regName <- c("Soil min vs air min","Soil max vs air max", "Time of soil min vs time of air min")
 
@@ -350,13 +349,13 @@ for(i in 1:3){
 #######################################
 reps <- datC$Mean[datC$parms=="repSoilP"]
 
-ll <- c(-35,0,0)
-hh <- c(0,30,.65)
-lname <- c("Temperature minimum (C)", "Temperature maximum (C)","Minimum time")
-tx1 <- c(-15,15,.35)
-ty1 <- c(-3,25,.6)
-tx2 <- c(-15,15,.35)
-ty2 <- c(-7,20,.5)
+ll <- c(-35,0,-15)
+hh <- c(0,30,15)
+lname <- c("Temperature minimum (C)", "Temperature maximum (C)","Average")
+tx1 <- c(-15,15,0)
+ty1 <- c(-3,25,12)
+tx2 <- c(-15,15,10)
+ty2 <- c(-7,20,0)
 for(i in 1:3){
 
 	jpeg(paste0(plotDI,"\\run",Nrun,"\\regression_fit",i,".jpg"), width=700,height=700,
@@ -372,477 +371,3 @@ for(i in 1:3){
 	text(tx2[i],ty2[i], paste("R2=", round(summary(fit)$r.squared,2)), col="red",cex=2)
 	dev.off()
 }
-
-#######################################
-#####plot just intercept          ##### 
-#######################################
-
-wd <- 55
-hd <- 30
-
-
-#make a panel of parameters for each regression
-
-
-xseq <-c(1,4,7,10,13,16,19,22,25)
-
-yli <- c(-35,0,0.2)
-yhi <- c(10,25,.65)
-yii <- c(5,5,.05)
-xl <- -1
-xh <- 27
-#mean line width
-mlw <- 6
-#arrow line width
-alw <- 4
-#lwd of ticks
-tlw <- 5
-#size of x labels
-axc <- 5
-#line of x label
-xll <- 2
-#line for units
-yll1 <- 20
-#line for name
-yll2 <- 30
-#cex of axis label
-mcx <- 6
-
-
-
-jpeg(paste0(plotDI,"\\run",Nrun,"\\intercepts.jpg"), width=2500,height=4100,
-			quality=100,units="px")
-	layout(matrix(seq(1,3),ncol=1), width=rep(lcm(wd),3),height=rep(lcm(hd),3))
-		#plot intercept
-	
-		par(mai=c(1,0,0,0))
-		
-			plot(c(0,1),c(0,1), ylim=c(yli[1],yhi[1]), xlim=c(xl,xh),
-				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
-			
-			for(j in 1:9){
-				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
-						c(beta0$X25.[beta0$regID==1&beta0$vegeclass==j],beta0$X75.[beta0$regID==1&beta0$vegeclass==j],
-							beta0$X75.[beta0$regID==1&beta0$vegeclass==j],beta0$X25.[beta0$regID==1&beta0$vegeclass==j]),
-						col="tomato3",border=NA)
-				arrows(xseq[j]-1,beta0$Mean[beta0$regID==1&beta0$vegeclass==j],
-						xseq[j]+1,beta0$Mean[beta0$regID==1&beta0$vegeclass==j],code=0,lwd=mlw)
-				arrows(	xseq[j],beta0$X0.2.[beta0$regID==1&beta0$vegeclass==j],
-						xseq[j],beta0$X99.8.[beta0$regID==1&beta0$vegeclass==j],
-						code=0, lwd=alw)
-				}
-			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw)
-			axis(2, seq(yli[1],yhi[1], by=yii[1]), rep(" ",length(seq(yli[1],yhi[1], by=yii[1]))),
-				 lwd.ticks=tlw)
-			mtext(seq(yli[1],yhi[1], by=yii[1]),at=seq(yli[1],yhi[1], by=yii[1]), side=2, line=xll,cex=axc,las=2)	
-			mtext(expression(paste("(T"[max],","~degree~"C)")),side=2,line=yll1,cex=mcx)
-			mtext("Temperature minimum",side=2,line=yll2,cex=mcx)
-			
-		par(mai=c(1,0,0,0))
-		
-			plot(c(0,1),c(0,1), ylim=c(yli[2],yhi[2]), xlim=c(xl,xh),
-				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
-			
-			for(j in 1:9){
-				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
-						c(beta0$X25.[beta0$regID==2&beta0$vegeclass==j],beta0$X75.[beta0$regID==2&beta0$vegeclass==j],
-							beta0$X75.[beta0$regID==2&beta0$vegeclass==j],beta0$X25.[beta0$regID==2&beta0$vegeclass==j]),
-						col="tomato3",border=NA)
-				arrows(xseq[j]-1,beta0$Mean[beta0$regID==2&beta0$vegeclass==j],
-						xseq[j]+1,beta0$Mean[beta0$regID==2&beta0$vegeclass==j],code=0,lwd=mlw)
-				arrows(	xseq[j],beta0$X0.2.[beta0$regID==2&beta0$vegeclass==j],
-						xseq[j],beta0$X99.8.[beta0$regID==2&beta0$vegeclass==j],
-						code=0, lwd=alw)
-				}
-			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw)
-			axis(2, seq(yli[2],yhi[2], by=yii[2]), rep(" ",length(seq(yli[2],yhi[2], by=yii[2]))),
-				 lwd.ticks=tlw)
-			mtext(seq(yli[2],yhi[2], by=yii[2]),at=seq(yli[2],yhi[2], by=yii[2]), side=2, line=xll,cex=axc,las=2)	
-			mtext(expression(paste("(T"[max],","~degree~"C)")),side=2,line=yll1,cex=mcx)			
-			mtext("Temperature maximum",side=2,line=yll2,cex=mcx)
-			
-				
-		par(mai=c(1,0,0,0))
-		
-			plot(c(0,1),c(0,1), ylim=c(yli[3],yhi[3]), xlim=c(xl,xh),
-				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
-			
-			for(j in 1:9){
-				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
-						c(beta0$X25.[beta0$regID==3&beta0$vegeclass==j],beta0$X75.[beta0$regID==3&beta0$vegeclass==j],
-							beta0$X75.[beta0$regID==3&beta0$vegeclass==j],beta0$X25.[beta0$regID==3&beta0$vegeclass==j]),
-						col="tomato3",border=NA)
-				arrows(xseq[j]-1,beta0$Mean[beta0$regID==3&beta0$vegeclass==j],
-						xseq[j]+1,beta0$Mean[beta0$regID==3&beta0$vegeclass==j],code=0,lwd=mlw)
-				arrows(	xseq[j],beta0$X0.2.[beta0$regID==3&beta0$vegeclass==j],
-						xseq[j],beta0$X99.8.[beta0$regID==3&beta0$vegeclass==j],
-						code=0, lwd=alw)
-				}
-			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw)
-			axis(2, seq(yli[3],yhi[3], by=yii[3]), rep(" ",length(seq(yli[3],yhi[3], by=yii[3]))),
-				 lwd.ticks=tlw)
-			mtext(seq(yli[3],yhi[3], by=yii[3]),at=seq(yli[3],yhi[3], by=yii[3]), side=2, line=xll,cex=axc,las=2)	
-			mtext(expression(paste("(p"[min],", proportion of water year)")),side=2,line=yll1,cex=mcx)		
-			mtext("Time of minimum",side=2,line=yll2,cex=mcx)			
-			mtext(datVI$name2,at=xseq, side=1, line=xll,cex=axc,las=2)
-
-				
-			
-dev.off()	
-
-
-
-#######################################
-#####plot just air slope          ##### 
-#######################################
-
-wd <- 55
-hd <- 30
-
-
-#make a panel of parameters for each regression
-
-
-xseq <-c(1,4,7,10,13,16,19,22,25)
-
-yli <- c(-1,-1,-2.5)
-yhi <- c(1.5,2,2)
-yii <- c(.5,.5,.5)
-xl <- -1
-xh <- 27
-#mean line width
-mlw <- 6
-#arrow line width
-alw <- 4
-#lwd of ticks
-tlw <- 5
-#size of x labels
-axc <- 5
-#line of x label
-xll <- 2
-#line for units
-yll1 <- 20
-#line for name
-yll2 <- 30
-#second line for name
-yll3 <- 40
-#cex of axis label
-mcx <- 6
-#zero line
-zlw <- 10
-
-
-
-jpeg(paste0(plotDI,"\\run",Nrun,"\\air_slopes.jpg"), width=2700,height=4100,
-			quality=100,units="px")
-	layout(matrix(seq(1,3),ncol=1), width=rep(lcm(wd),3),height=rep(lcm(hd),3))
-		#plot intercept
-	
-		par(mai=c(1,0,0,0))
-		
-			plot(c(0,1),c(0,1), ylim=c(yli[1],yhi[1]), xlim=c(xl,xh),
-				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
-			abline(h=0,	lwd	=zlw, col="grey75",lty=3)
-			for(j in 1:9){
-				if(beta2$sigID[beta2$regID==1&beta2$vegeclass==j]==1){
-					polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
-						c(beta2$X25.[beta2$regID==1&beta2$vegeclass==j],beta2$X75.[beta2$regID==1&beta2$vegeclass==j],
-							beta2$X75.[beta2$regID==1&beta2$vegeclass==j],beta2$X25.[beta2$regID==1&beta2$vegeclass==j]),
-						col="tomato3",border=NA)
-				}else{
-					polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
-						c(beta2$X25.[beta2$regID==1&beta2$vegeclass==j],beta2$X75.[beta2$regID==1&beta2$vegeclass==j],
-							beta2$X75.[beta2$regID==1&beta2$vegeclass==j],beta2$X25.[beta2$regID==1&beta2$vegeclass==j]),
-						col="grey75",border=NA)
-				}
-				arrows(xseq[j]-1,beta2$Mean[beta2$regID==1&beta2$vegeclass==j],
-						xseq[j]+1,beta2$Mean[beta2$regID==1&beta2$vegeclass==j],code=0,lwd=mlw)
-				arrows(	xseq[j],beta2$X0.2.[beta2$regID==1&beta2$vegeclass==j],
-						xseq[j],beta2$X99.8.[beta2$regID==1&beta2$vegeclass==j],
-						code=0, lwd=alw)
-				}
-			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw)
-			axis(2, seq(yli[1],yhi[1], by=yii[1]), rep(" ",length(seq(yli[1],yhi[1], by=yii[1]))),
-				 lwd.ticks=tlw)
-			mtext(seq(yli[1],yhi[1], by=yii[1]),at=seq(yli[1],yhi[1], by=yii[1]), side=2, line=xll,cex=axc,las=2)	
-			mtext(expression(paste("("~degree~"C soil"~degree~"C air"^"-1",")")),side=2,line=yll1,cex=mcx)
-			mtext("Change in",side=2,line=yll3,cex=mcx)
-			mtext("temperature minimum",side=2,line=yll2,cex=mcx)
-		par(mai=c(1,0,0,0))
-		
-			plot(c(0,1),c(0,1), ylim=c(yli[2],yhi[2]), xlim=c(xl,xh),
-				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
-			abline(h=0,	lwd	=zlw, col="grey75",lty=3)
-			for(j in 1:9){
-				if(beta2$sigID[beta2$regID==2&beta2$vegeclass==j]==1){
-					polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
-						c(beta2$X25.[beta2$regID==2&beta2$vegeclass==j],beta2$X75.[beta2$regID==2&beta2$vegeclass==j],
-							beta2$X75.[beta2$regID==2&beta2$vegeclass==j],beta2$X25.[beta2$regID==2&beta2$vegeclass==j]),
-						col="tomato3",border=NA)
-				}else{
-					polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
-						c(beta2$X25.[beta2$regID==2&beta2$vegeclass==j],beta2$X75.[beta2$regID==2&beta2$vegeclass==j],
-							beta2$X75.[beta2$regID==2&beta2$vegeclass==j],beta2$X25.[beta2$regID==2&beta2$vegeclass==j]),
-						col="grey75",border=NA)
-				}
-				arrows(xseq[j]-1,beta2$Mean[beta2$regID==2&beta2$vegeclass==j],
-						xseq[j]+1,beta2$Mean[beta2$regID==2&beta2$vegeclass==j],code=0,lwd=mlw)
-				arrows(	xseq[j],beta2$X0.2.[beta2$regID==2&beta2$vegeclass==j],
-						xseq[j],beta2$X99.8.[beta2$regID==2&beta2$vegeclass==j],
-						code=0, lwd=alw)
-				}
-			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw)
-			axis(2, seq(yli[2],yhi[2], by=yii[2]), rep(" ",length(seq(yli[2],yhi[2], by=yii[2]))),
-				 lwd.ticks=tlw)
-			mtext(seq(yli[2],yhi[2], by=yii[2]),at=seq(yli[2],yhi[2], by=yii[2]), side=2, line=xll,cex=axc,las=2)	
-		mtext(expression(paste("("~degree~"C soil"~degree~"C air"^"-1",")")),side=2,line=yll1,cex=mcx)
-			mtext("Change in",side=2,line=yll3,cex=mcx)
-			mtext("temperature maximum",side=2,line=yll2,cex=mcx)
-			
-				
-		par(mai=c(1,0,0,0))
-		
-			plot(c(0,1),c(0,1), ylim=c(yli[3],yhi[3]), xlim=c(xl,xh),
-				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
-			abline(h=0,	lwd	=zlw, col="grey75",lty=3)
-			for(j in 1:9){
-				if(beta2$sigID[beta2$regID==3&beta2$vegeclass==j]==1){
-					polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
-						c(beta2$X25.[beta2$regID==3&beta2$vegeclass==j],beta2$X75.[beta2$regID==3&beta2$vegeclass==j],
-							beta2$X75.[beta2$regID==3&beta2$vegeclass==j],beta2$X25.[beta2$regID==3&beta2$vegeclass==j]),
-						col="tomato3",border=NA)
-				}else{
-					polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
-						c(beta2$X25.[beta2$regID==3&beta2$vegeclass==j],beta2$X75.[beta2$regID==3&beta2$vegeclass==j],
-							beta2$X75.[beta2$regID==3&beta2$vegeclass==j],beta2$X25.[beta2$regID==3&beta2$vegeclass==j]),
-						col="grey75",border=NA)				
-				}
-				arrows(xseq[j]-1,beta2$Mean[beta2$regID==3&beta2$vegeclass==j],
-						xseq[j]+1,beta2$Mean[beta2$regID==3&beta2$vegeclass==j],code=0,lwd=mlw)
-				arrows(	xseq[j],beta2$X0.2.[beta2$regID==3&beta2$vegeclass==j],
-						xseq[j],beta2$X99.8.[beta2$regID==3&beta2$vegeclass==j],
-						code=0, lwd=alw)
-				}
-			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw)
-			axis(2, seq(yli[3],yhi[3], by=yii[3]), rep(" ",length(seq(yli[3],yhi[3], by=yii[3]))),
-				 lwd.ticks=tlw)
-			mtext(seq(yli[3],yhi[3], by=yii[3]),at=seq(yli[3],yhi[3], by=yii[3]), side=2, line=xll,cex=axc,las=2)	
-		mtext(expression(paste("(proportion soil proportion air"^"-1",")")),side=2,line=yll1,cex=mcx)
-			mtext("Change in time of",side=2,line=yll3,cex=mcx)
-			mtext("temperature minimum",side=2,line=yll2,cex=mcx)		
-			mtext(datVI$name2,at=xseq, side=1, line=xll,cex=axc,las=2)
-
-				
-			
-dev.off()		
-
-
-			
-
-				
-#######################################
-#####plot min/max intercept       ##### 
-#######################################					
-
-
-wd <- 80
-hd <- 73
-
-
-#make a panel of parameters for each regression
-
-
-xseq <-c(1,4,7,10,13,16,19,22,25)
-
-yli <- c(-35,0)
-yhi <- c(10,25)
-yii <- c(5,5)
-xl <- -1
-xh <- 27
-#mean line width
-mlw <- 6
-#arrow line width
-alw <- 4
-#lwd of ticks
-tlw <- 8
-#size of x labels
-axc <- 10
-#line for label num
-xll <- 2
-#line for units
-yll1 <- 20
-#line for name
-yll2 <- 33
-#line for name
-yll3 <- 46
-#cex of axis label
-mcx <- 13
-
-
-
-png(paste0(plotDI,"\\run",Nrun,"\\intercepts_min_max2.png"), width=3000,height=4200,
-			units="px")
-	layout(matrix(seq(1,2),ncol=1), width=rep(lcm(wd),2),height=rep(lcm(hd),2))
-		#plot intercept
-	
-		par(mai=c(1,6,15,0))
-		
-			plot(c(0,1),c(0,1), ylim=c(yli[1],yhi[1]), xlim=c(xl,xh),
-				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
-			
-			for(j in 1:9){
-				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
-						c(beta0$X25.[beta0$regID==1&beta0$vegeclass==j],beta0$X75.[beta0$regID==1&beta0$vegeclass==j],
-							beta0$X75.[beta0$regID==1&beta0$vegeclass==j],beta0$X25.[beta0$regID==1&beta0$vegeclass==j]),
-						col=paste(vegeclassColors$coli[j]),border=NA)
-				arrows(xseq[j]-1,beta0$Mean[beta0$regID==1&beta0$vegeclass==j],
-						xseq[j]+1,beta0$Mean[beta0$regID==1&beta0$vegeclass==j],code=0,lwd=mlw)
-				arrows(	xseq[j],beta0$X0.2.[beta0$regID==1&beta0$vegeclass==j],
-						xseq[j],beta0$X99.8.[beta0$regID==1&beta0$vegeclass==j],
-						code=0, lwd=alw)
-				}
-			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw)
-			axis(2, seq(yli[1],yhi[1], by=yii[1]), rep(" ",length(seq(yli[1],yhi[1], by=yii[1]))),
-				 lwd.ticks=tlw)
-			mtext(seq(yli[1],yhi[1], by=yii[1]),at=seq(yli[1],yhi[1], by=yii[1]), side=2, line=xll,cex=axc,las=2)	
-			mtext(expression(paste("(T"[min],","~degree~"C)")),side=2,line=yll1,cex=mcx)
-			mtext("minimum",side=2,line=yll2,cex=mcx)
-			mtext("Temperature",side=2,line=yll3,cex=mcx)
-		par(mai=c(15,6,1,0),xpd=TRUE)
-		
-			plot(c(0,1),c(0,1), ylim=c(yli[2],yhi[2]), xlim=c(xl,xh),
-				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
-			
-			for(j in 1:9){
-				polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
-						c(beta0$X25.[beta0$regID==2&beta0$vegeclass==j],beta0$X75.[beta0$regID==2&beta0$vegeclass==j],
-							beta0$X75.[beta0$regID==2&beta0$vegeclass==j],beta0$X25.[beta0$regID==2&beta0$vegeclass==j]),
-						col=paste(vegeclassColors$coli[j]),border=NA)
-				arrows(xseq[j]-1,beta0$Mean[beta0$regID==2&beta0$vegeclass==j],
-						xseq[j]+1,beta0$Mean[beta0$regID==2&beta0$vegeclass==j],code=0,lwd=mlw)
-				arrows(	xseq[j],beta0$X0.2.[beta0$regID==2&beta0$vegeclass==j],
-						xseq[j],beta0$X99.8.[beta0$regID==2&beta0$vegeclass==j],
-						code=0, lwd=alw)
-				}
-			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw)
-			axis(2, seq(yli[2],yhi[2], by=yii[2]), rep(" ",length(seq(yli[2],yhi[2], by=yii[2]))),
-				 lwd.ticks=tlw)
-			mtext(seq(yli[2],yhi[2], by=yii[2]),at=seq(yli[2],yhi[2], by=yii[2]), side=2, line=xll,cex=axc,las=2)	
-			mtext(expression(paste("(T"[max],","~degree~"C)")),side=2,line=yll1,cex=mcx)			
-			mtext("maximum",side=2,line=yll2,cex=mcx)
-			mtext("Temperature",side=2,line=yll3,cex=mcx)
-					
-			text(xseq,rep(-1,length(xseq)),datVI$name2,srt=35, adj=1,cex=axc,xpd=TRUE)
-
-				
-			
-dev.off()	
-	
-
-#######################################
-#####plot just air slope          ##### 
-#######################################
-
-wd <- 80
-hd <- 73
-
-
-#make a panel of parameters for each regression
-
-
-xseq <-c(1,4,7,10,13,16,19,22,25)
-
-yli <- c(-1,-1)
-yhi <- c(1.5,2)
-yii <- c(.5,.5)
-xl <- -1
-xh <- 27
-#mean line width
-mlw <- 6
-#arrow line width
-alw <- 4
-#lwd of ticks
-tlw <- 8
-#size of x labels
-axc <- 10
-#line of x label
-xll <- 2
-#line for units
-yll1 <- 20
-#line for name
-yll2 <- 33
-#second line for name
-yll3 <- 46
-#second line for name
-yll4 <- 59
-#cex of axis label
-mcx <- 13
-#zero line
-zlw <- 9
-
-
-
-png(paste0(plotDI,"\\run",Nrun,"\\air_slopes_min_max2.png"), width=3500,height=4200,
-			units="px")
-	layout(matrix(seq(1,2),ncol=1), width=rep(lcm(wd),2),height=rep(lcm(hd),2))
-		#plot intercept
-	
-		par(mai=c(1,6,15,0))
-		
-			plot(c(0,1),c(0,1), ylim=c(yli[1],yhi[1]), xlim=c(xl,xh),
-				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
-			points(c(xl,xh),c(0,0),type="l",lwd=zlw, col="grey75",lty=3)
-			for(j in 1:9){
-		
-					polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
-						c(beta2$X25.[beta2$regID==1&beta2$vegeclass==j],beta2$X75.[beta2$regID==1&beta2$vegeclass==j],
-							beta2$X75.[beta2$regID==1&beta2$vegeclass==j],beta2$X25.[beta2$regID==1&beta2$vegeclass==j]),
-						col=paste(vegeclassColors$coli[j]),border=NA)
-				
-				arrows(xseq[j]-1,beta2$Mean[beta2$regID==1&beta2$vegeclass==j],
-						xseq[j]+1,beta2$Mean[beta2$regID==1&beta2$vegeclass==j],code=0,lwd=mlw)
-				arrows(	xseq[j],beta2$X0.2.[beta2$regID==1&beta2$vegeclass==j],
-						xseq[j],beta2$X99.8.[beta2$regID==1&beta2$vegeclass==j],
-						code=0, lwd=alw)
-				}
-			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw)
-			axis(2, seq(yli[1],yhi[1], by=yii[1]), rep(" ",length(seq(yli[1],yhi[1], by=yii[1]))),
-				 lwd.ticks=tlw)
-			mtext(seq(yli[1],yhi[1], by=yii[1]),at=seq(yli[1],yhi[1], by=yii[1]), side=2, line=xll,cex=axc,las=2)	
-			mtext(expression(paste("(",degree,"C soil",degree,"C air"^"-1",")")),side=2,line=yll1,cex=mcx)
-			mtext("Change in",side=2,line=yll4,cex=mcx)
-			mtext("temperature",side=2,line=yll3,cex=mcx)
-			mtext("minimum",side=2,line=yll2,cex=mcx)
-		par(mai=c(15,6,1,0),xpd=TRUE)
-		
-			plot(c(0,1),c(0,1), ylim=c(yli[2],yhi[2]), xlim=c(xl,xh),
-				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
-			points(c(xl,xh),c(1,1),type="l",lwd=zlw, col="grey75",lty=3)
-			for(j in 1:9){
-		
-					polygon(c(xseq[j]-1,xseq[j]-1,xseq[j]+1,xseq[j]+1),
-						c(beta2$X25.[beta2$regID==2&beta2$vegeclass==j],beta2$X75.[beta2$regID==2&beta2$vegeclass==j],
-							beta2$X75.[beta2$regID==2&beta2$vegeclass==j],beta2$X25.[beta2$regID==2&beta2$vegeclass==j]),
-						col=paste(vegeclassColors$coli[j]),border=NA)
-		
-				arrows(xseq[j]-1,beta2$Mean[beta2$regID==2&beta2$vegeclass==j],
-						xseq[j]+1,beta2$Mean[beta2$regID==2&beta2$vegeclass==j],code=0,lwd=mlw)
-				arrows(	xseq[j],beta2$X0.2.[beta2$regID==2&beta2$vegeclass==j],
-						xseq[j],beta2$X99.8.[beta2$regID==2&beta2$vegeclass==j],
-						code=0, lwd=alw)
-				}
-			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw)
-			axis(2, seq(yli[2],yhi[2], by=yii[2]), rep(" ",length(seq(yli[2],yhi[2], by=yii[2]))),
-				 lwd.ticks=tlw)
-			mtext(seq(yli[2],yhi[2], by=yii[2]),at=seq(yli[2],yhi[2], by=yii[2]), side=2, line=xll,cex=axc,las=2)	
-		mtext(expression(paste("(",degree,"C soil",degree,"C air"^"-1",")")),side=2,line=yll1,cex=mcx)
-			mtext("Change in",side=2,line=yll4,cex=mcx)
-			mtext("temperature",side=2,line=yll3,cex=mcx)
-			mtext(" maximum",side=2,line=yll2,cex=mcx)
-					
-			text(xseq,rep(-1.25,length(xseq)),datVI$name2,srt=35, adj=1,cex=axc,xpd=TRUE)
-				
-			
-dev.off()		
-
-		
