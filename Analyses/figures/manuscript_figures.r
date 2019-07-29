@@ -106,7 +106,16 @@ vegeclassColors <- data.frame(vegeclass=seq(1,9),
 								rgb(0/255,138/255,213/255,.2),
 								rgb(50/255,80/255,10/255,.2),
 								rgb(170/255,190/255,140/255,.2),
-								rgb(240/255,240/255,50/255,.2))								
+								rgb(240/255,240/255,50/255,.2)),
+						colt3=c(rgb(77/255,77/255,77/255,.4),
+								rgb(0/255,110/255,130/255,.4),
+								rgb(160/255,130/255,180/255,.4),
+								rgb(130/255,160/255,190/255,.4),
+								rgb(250/255,120/255,80/255,.4),
+								rgb(0/255,138/255,213/255,.4),
+								rgb(50/255,80/255,10/255,.4),
+								rgb(170/255,190/255,140/255,.4),
+								rgb(240/255,240/255,50/255,.4))								
 								)	
 datVI$vegeclassColors <- vegeclassColors$coli
 
@@ -1384,7 +1393,20 @@ mcQ <- round_any(0.05/(dim(vegeComp)[1]-1)	,0.001)
 muPlot <- patternDF[patternDF$parms=="mu.plot",]
 
 regPlot <- cbind(xplotDF,muPlot)
+#alter reg plot so that it stays in the range of the actual data
+minData <- aggregate(SoilCompDF$xobs, by=list(SoilCompDF$vegeClass,SoilCompDF$comp),FUN="min")
+colnames(minData) <- c("vegeClass","comp","xminS")
 
+maxData <- aggregate(SoilCompDF$xobs, by=list(SoilCompDF$vegeClass,SoilCompDF$comp),FUN="max")
+colnames(maxData) <- c("vegeClass","comp","xmaxS")
+minData$xminR <- floor(minData$xminS)
+maxData$xmaxR <- ceiling(maxData$xmaxS)
+#join together
+mmData <- join(maxData,minData,by=c("vegeClass","comp"),type="full")
+#now join back into regPlot
+regPlot <- join(regPlot,mmData, by=c("vegeClass","comp"),type="left")
+#subset regplot so not extrapolating
+regPlot <- regPlot[regPlot$xplot>=regPlot$xminS&regPlot$xplot<=regPlot$xmaxS,]
 
 #indicate if slope is significant from zero
 patternSlope <- patternDF[patternDF$parms=="beta1",]
@@ -1456,7 +1478,7 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3600,height=3600,
 		j <- vg1[i]
 		points(SoilL[[xcomp[1]]]$Mean[SoilL[[xcomp[1]]]$vegeclass==j],
 				SoilL[[ycomp[1]]]$Mean[SoilL[[xcomp[1]]]$vegeclass==j], pch=19,
-				col=as.character(paste(vegeclassColors$colt1[j])),cex=px)
+				col=as.character(paste(vegeclassColors$colt2[j])),cex=px)
 	
 	}
 	#credible interval regression
@@ -1467,7 +1489,7 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3600,height=3600,
 						rev(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j])),
 					c(regPlot$X0.3.[regPlot$comp==1&regPlot$vegeClass==j],	
 					rev(regPlot$X99.7.[regPlot$comp==1&regPlot$vegeClass==j])),	
-					border=NA,col=as.character(paste(vegeclassColors$colt2[j])))
+					border=NA,col=as.character(paste(vegeclassColors$colt3[j])))
 		}else{
 		polygon(c(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j],
 						rev(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j])),
@@ -1475,7 +1497,7 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3600,height=3600,
 					length(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j])),
 				rep(patternInt$X99.7.[patternInt$comp==1&patternInt$vegeClass==j], 
 					length(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j]))),	
-					border=NA,col=as.character(paste(vegeclassColors$colt2[j])))
+					border=NA,col=as.character(paste(vegeclassColors$colt3[j])))
 		}
 	}	
 	#regression line	
@@ -1486,8 +1508,9 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3600,height=3600,
 					regPlot$Mean[regPlot$comp==1&regPlot$vegeClass==j], type="l",
 					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])))
 		}else{
-			abline(h=patternInt$Mean[patternInt$comp==1&patternInt$vegeClass==j],
-					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])),lty=3)
+			points(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j],
+			rep(patternInt$Mean[patternInt$comp==1&patternInt$vegeClass==j],length(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j])),
+					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])),lty=3,type="l")
 		}
 	
 	}
@@ -1511,7 +1534,7 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3600,height=3600,
 		j <- vg2[i]
 		points(SoilL[[xcomp[1]]]$Mean[SoilL[[xcomp[1]]]$vegeclass==j],
 				SoilL[[ycomp[1]]]$Mean[SoilL[[xcomp[1]]]$vegeclass==j], pch=19,
-				col=as.character(paste(vegeclassColors$colt1[j])),cex=px)
+				col=as.character(paste(vegeclassColors$colt2[j])),cex=px)
 	
 	}
 	
@@ -1523,7 +1546,7 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3600,height=3600,
 						rev(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j])),
 					c(regPlot$X0.3.[regPlot$comp==1&regPlot$vegeClass==j],	
 					rev(regPlot$X99.7.[regPlot$comp==1&regPlot$vegeClass==j])),	
-					border=NA,col=as.character(paste(vegeclassColors$colt2[j])))
+					border=NA,col=as.character(paste(vegeclassColors$colt3[j])))
 		}else{
 		polygon(c(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j],
 						rev(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j])),
@@ -1531,7 +1554,7 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3600,height=3600,
 					length(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j])),
 				rep(patternInt$X99.7.[patternInt$comp==1&patternInt$vegeClass==j], 
 					length(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j]))),	
-					border=NA,col=as.character(paste(vegeclassColors$colt2[j])))
+					border=NA,col=as.character(paste(vegeclassColors$colt3[j])))
 		}
 	}
 	
@@ -1542,8 +1565,9 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3600,height=3600,
 					regPlot$Mean[regPlot$comp==1&regPlot$vegeClass==j], type="l",
 					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])))
 		}else{
-			abline(h=patternInt$Mean[patternInt$comp==1&patternInt$vegeClass==j],
-					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])),lty=3)
+			points(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j],
+			rep(patternInt$Mean[patternInt$comp==1&patternInt$vegeClass==j],length(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j])),
+					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])),lty=3,type="l")
 		}
 	
 	}
@@ -1567,7 +1591,7 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3600,height=3600,
 		j <- vg1[i]
 		points(SoilL[[xcomp[2]]]$Mean[SoilL[[xcomp[2]]]$vegeclass==j],
 				SoilL[[ycomp[2]]]$Mean[SoilL[[xcomp[2]]]$vegeclass==j], pch=19,
-				col=as.character(paste(vegeclassColors$colt1[j])),cex=px)
+				col=as.character(paste(vegeclassColors$colt2[j])),cex=px)
 	
 	}
 		for(i in 1:4){
@@ -1577,7 +1601,7 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3600,height=3600,
 						rev(regPlot$xplot[regPlot$comp==2&regPlot$vegeClass==j])),
 					c(regPlot$X0.3.[regPlot$comp==2&regPlot$vegeClass==j],	
 					rev(regPlot$X99.7.[regPlot$comp==2&regPlot$vegeClass==j])),	
-					border=NA,col=as.character(paste(vegeclassColors$colt2[j])))
+					border=NA,col=as.character(paste(vegeclassColors$colt3[j])))
 		}else{
 		polygon(c(regPlot$xplot[regPlot$comp==2&regPlot$vegeClass==j],
 						rev(regPlot$xplot[regPlot$comp==2&regPlot$vegeClass==j])),
@@ -1585,7 +1609,7 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3600,height=3600,
 					length(regPlot$xplot[regPlot$comp==2&regPlot$vegeClass==j])),
 				rep(patternInt$X99.7.[patternInt$comp==2&patternInt$vegeClass==j], 
 					length(regPlot$xplot[regPlot$comp==2&regPlot$vegeClass==j]))),	
-					border=NA,col=as.character(paste(vegeclassColors$colt2[j])))
+					border=NA,col=as.character(paste(vegeclassColors$colt3[j])))
 		}
 	}
 		for(i in 1:4){
@@ -1595,8 +1619,9 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3600,height=3600,
 					regPlot$Mean[regPlot$comp==2&regPlot$vegeClass==j], type="l",
 					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])))
 		}else{
-			abline(h=patternInt$Mean[patternInt$comp==2&patternInt$vegeClass==j],
-					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])),lty=3)
+			points(regPlot$xplot[regPlot$comp==2&regPlot$vegeClass==j],
+			rep(patternInt$Mean[patternInt$comp==2&patternInt$vegeClass==j],length(regPlot$xplot[regPlot$comp==2&regPlot$vegeClass==j])),
+					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])),lty=3,type="l")
 		}
 	
 	}
@@ -1613,7 +1638,7 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3600,height=3600,
 		j <- vg2[i]
 		points(SoilL[[xcomp[2]]]$Mean[SoilL[[xcomp[2]]]$vegeclass==j],
 				SoilL[[ycomp[2]]]$Mean[SoilL[[xcomp[2]]]$vegeclass==j], pch=19,
-				col=as.character(paste(vegeclassColors$colt1[j])),cex=px)
+				col=as.character(paste(vegeclassColors$colt2[j])),cex=px)
 	
 	}
 		for(i in 1:5){
@@ -1623,7 +1648,7 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3600,height=3600,
 						rev(regPlot$xplot[regPlot$comp==2&regPlot$vegeClass==j])),
 					c(regPlot$X0.3.[regPlot$comp==2&regPlot$vegeClass==j],	
 					rev(regPlot$X99.7.[regPlot$comp==2&regPlot$vegeClass==j])),	
-					border=NA,col=as.character(paste(vegeclassColors$colt2[j])))
+					border=NA,col=as.character(paste(vegeclassColors$colt3[j])))
 		}else{
 		polygon(c(regPlot$xplot[regPlot$comp==2&regPlot$vegeClass==j],
 						rev(regPlot$xplot[regPlot$comp==2&regPlot$vegeClass==j])),
@@ -1631,7 +1656,7 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3600,height=3600,
 					length(regPlot$xplot[regPlot$comp==2&regPlot$vegeClass==j])),
 				rep(patternInt$X99.7.[patternInt$comp==2&patternInt$vegeClass==j], 
 					length(regPlot$xplot[regPlot$comp==2&regPlot$vegeClass==j]))),	
-					border=NA,col=as.character(paste(vegeclassColors$colt2[j])))
+					border=NA,col=as.character(paste(vegeclassColors$colt3[j])))
 		}
 	}
 		for(i in 1:5){
@@ -1641,8 +1666,9 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3600,height=3600,
 					regPlot$Mean[regPlot$comp==2&regPlot$vegeClass==j], type="l",
 					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])))
 		}else{
-			abline(h=patternInt$Mean[patternInt$comp==2&patternInt$vegeClass==j],
-					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])),lty=2)
+			points(regPlot$xplot[regPlot$comp==2&regPlot$vegeClass==j],
+			rep(patternInt$Mean[patternInt$comp==2&patternInt$vegeClass==j],length(regPlot$xplot[regPlot$comp==2&regPlot$vegeClass==j])),
+					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])),lty=3,type="l")
 		}
 	
 	}
@@ -1867,6 +1893,7 @@ lgpt <- 7
 #break into two panels
 vg1 <- c(1,2,3,4)
 vg2 <- c(5,6,7,8,9)
+
 
 png(paste0(plotDI,"\\Air_reg.png"), width=3600,height=3600,
 			units="px")
