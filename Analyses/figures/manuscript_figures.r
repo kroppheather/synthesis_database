@@ -270,7 +270,7 @@ plotorder <- c(1,2,4,3,6,5,7,8,9)
 Hseqh <- c(3,5,9)
 Hseql <- c(0,3,5)
 #,width=1500,height=1500,
-png(paste0(plotDI,"\\vege_site_agg.png"), width = 20, height = 20, units = "in", res=300)
+png(paste0(plotDI,"\\vege_site_agg.png"), width = 18, height = 18, units = "in", res=300)
 	a <- layout(matrix(c(1),ncol=1, byrow=TRUE), height=c(lcm(hd)), 
 					width=c(lcm(wd)))
 	layout.show(a)
@@ -278,7 +278,7 @@ png(paste0(plotDI,"\\vege_site_agg.png"), width = 20, height = 20, units = "in",
 	
 	plot(world2,type="n",axes=FALSE,xlab=" ", ylab=" ",xlim=c(-3500000,3500000),ylim=c(-3500000,3500000))
 	#color background
-	polygon(c(-5000000,-5000000,5000000,5000000),c(-5000000,5000000,5000000,-5000000), border=NA, col=rgb(114/255,207/255,252/255,.3))
+	polygon(c(-5000000,-5000000,5000000,5000000),c(-5000000,5000000,5000000,-5000000), border=NA, col=rgb(114/255,207/255,252/255,.6))
 	#boundaries
 	points(world, type="l", lwd=2, col="grey65")
 	#continent color
@@ -292,9 +292,9 @@ png(paste0(plotDI,"\\vege_site_agg.png"), width = 20, height = 20, units = "in",
 	draw.pie(xyz.allV$x,xyz.allV$y,xyz.allV$z,radius=220000,col=as.character(vegeclassColors$coli),border=NA)
 	points(mat.bcV$x,mat.bcV$y,pch=19,col="white",cex=8)
 	text(mat.bcV$x,mat.bcV$y,paste(mat.bcV$NpolySite),cex=2.5)
-	legend(-3700000,-3800000,c("continuous","discontinuous","sporadic"), 
+	legend(-3700000,-3700000,c("continuous","discontinuous","sporadic"), 
 			fill=c( rgb(0/255,51/255,102/255),rgb(57/255,105/255,153/255),rgb(236/255,245/255,255/255)),
-			horiz=TRUE,bty="n",cex=3,border=NA,xpd=TRUE)
+			horiz=TRUE,bty="n",cex=4,border=NA,xpd=TRUE)
 	
 dev.off()	
 
