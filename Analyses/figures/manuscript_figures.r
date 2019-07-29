@@ -465,7 +465,7 @@ xflag <- c(0,0,0,0,0,0,1,1,1)
 yflag <- c(1,0,0,1,0,0,1,0,0)
 #line width of sites
 slwd <- 7
-vegelabcol <- "grey85"
+vegelabcol <- "black"
 
 xpolyL <- c(-3,-3,370,370)
 ypolyL <- c(27,38,38,27)
