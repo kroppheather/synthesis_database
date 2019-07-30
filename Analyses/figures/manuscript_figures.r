@@ -1151,9 +1151,10 @@ png(paste0(plotDI,"\\supp_n_thaw.png"), width=4000,height=5000,
 			axis(2, seq(yli[2],yhi[2], by=yii[2]), rep(" ",length(seq(yli[2],yhi[2], by=yii[2]))),
 				 lwd.ticks=tlw,lwd=alwd)
 			mtext(seq(yli[2],yhi[2], by=yii[2]),at=seq(yli[2],yhi[2], by=yii[2]), side=2, line=xll,cex=axc,las=2)	
-			#mtext(expression(paste("(N"[thaw],")")),side=2,line=yll1,cex=mcx)		
+				
 
 			mtext("Thaw n-factor",side=2,line=yll2,cex=mcx)
+			#mtext(expression(paste("(N"[thaw],")")),side=2,line=yll1,cex=mcx)	
 			mtext(" (-) ",side=2,line=yll3,cex=mcx)	
 
 	par(mai=c(0,13.5,0,0),xpd=TRUE)
