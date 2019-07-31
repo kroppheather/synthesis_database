@@ -379,7 +379,24 @@ vegeDepth$vdID <- seq(1,dim(vegeDepth)[1])
 #join back into soil
 datSTn <- join(datSTn, vegeDepth, by=c("depthID","vegeclass"), type="left")
 
+#get summary information for manuscript
+#join vegeclass into air
+datAT <- join(datA,datV,by="siteid",type="left")
+datATn <- datAT[is.na(datAT$A)==FALSE,]
+dim(datSTn)
+dim(datATn)
 
+#now get number of observations for each vegetation class
+airAllCount <- aggregate(datATn$A, by=list(datATn$vegeclass),FUN="length")
+soilAllCount <- aggregate(datSTn$T, by=list(datSTn$vegeclass),FUN="length")
+#get the number of sites in each
+soilSitesCount1 <- aggregate(datSTn$T, by=list(datSTn$siteid,datSTn$vegeclass),FUN="length")
+colnames(soilSitesCount1 ) <- c("siteid","vegeclass","ncountT")
+airSitesCount1 <- aggregate(datATn$A, by=list(datATn$siteid,datATn$vegeclass),FUN="length")
+colnames(airSitesCount1 ) <- c("siteid","vegeclass","ncountA")
+
+#get count of sites
+SitesCount2 <- aggregate(soilSitesCount1$siteid,by=list(soilSitesCount1$vegeclass),FUN="length")
 
 #######################################
 #####figure with summary          ##### 
