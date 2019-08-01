@@ -1472,7 +1472,7 @@ llmx <- 9
 #line of x axis plot labels
 xll <- 15
 #legend lwd
-lglw <- 10
+lglw <- 14
 #legend size
 lgcx <- 6
 #legend point size
@@ -1480,6 +1480,8 @@ lgpt <- 7
 #break into two panels
 vg1 <- c(1,2,3,4)
 vg2 <- c(5,6,7,8,9)
+#text legend size
+lgtxc <- 10
 
 png(paste0(plotDI,"\\patterns_ave.png"), width=3600,height=3600,
 			units="px")
@@ -1531,7 +1533,7 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3600,height=3600,
 	}
 	axis(2, seqAve, rep(" ",length(seqAve)), lwd.ticks=lwt, lwd=lwa)
 	mtext(seqAve,at=seqAve, line=yll, cex=amx,las=2, side=2)
-	
+	text(-28,4.45,"a", cex=lgtxc)
 	
 
 	
@@ -1591,7 +1593,7 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3600,height=3600,
 	axis(1, seqMin, rep(" ",length(seqMin)), lwd.ticks=lwt, lwd=lwa)
 	mtext(seqMin,at=seqMin, line=yll, cex=amx, side=1)
 	mtext("Minimum soil temperature (C)",  line=xll, cex=llmx, side=1)
-
+	text(-28,4.45,"b", cex=lgtxc)
 
 	
 		legend("bottomright",datVI$name2[vg2], col=as.character(paste(vegeclassColors$coli[vg2])),
@@ -1644,6 +1646,7 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3600,height=3600,
 	axis(4, seqAve, rep(" ",length(seqAve)), lwd.ticks=lwt, lwd=lwa)
 	mtext(seqAve,at=seqAve, line=yll, cex=amx,las=2, side=4)
 	mtext("Average soil temperature (C)", outer=TRUE, line=-12, cex=llmx, side=4)
+	text(1,4.45,"c", cex=lgtxc)
 	#average vs max group 2 	
 	par(mai=c(0,1,1,0))
 	plot(c(0,1),c(0,1),type="n", ylim=c(aveL,aveH), xlim=c(maxL,maxH), xlab=" ", ylab=" ",
@@ -1691,7 +1694,8 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3600,height=3600,
 	mtext(seqAve,at=seqAve, line=yll, cex=amx,las=2, side=4)
 	axis(1, seqMax, rep(" ",length(seqMax)), lwd.ticks=lwt, lwd=lwa)
 	mtext(seqMax,at=seqMax, line=yll, cex=amx, side=1)
-	mtext("Maximum soil temperature (C)",  line=xll, cex=llmx, side=1)	
+	mtext("Maximum soil temperature (C)",  line=xll, cex=llmx, side=1)
+	text(1,4.45,"d", cex=lgtxc)	
 dev.off()	
 
 
@@ -1723,7 +1727,7 @@ write.table(vegeCompID,paste0(plotDI,"\\soil_ave_r2.csv"), sep=",", row.names=FA
 
 ##########################################################################################
 ##########################################################################################
-################# Figure 5. min/max regression                           #################
+################# Figure SX. min/max regression with air                 #################
 ##########################################################################################
 ##########################################################################################
 
@@ -1745,12 +1749,12 @@ parmV <- unique(SoilParm$parm)
 parmA <- unique(AirParm$Aparm)
 
 #pull out relevant parameters
-#for analysis: TminS, TmaxS, peakWS
+#for analysis: TminS, TmaxS, average
 #and subset to relevant depths
 
-parmVs <- c("TminS","TmaxS", "peakWS") 
+parmVs <- c("TminS","TmaxS", "TaverageS") 
 
-parmAs <- c("TminA","TmaxA", "peakWA") 
+parmAs <- c("TminA","TmaxA", "TaverageA") 
 
 
 SoilL <- list()
@@ -1831,6 +1835,18 @@ for(i in 1:dim(regvegeID)[1]){
 
 }
 
+#alter reg plot so that it stays in the range of the actual data
+colnames(minAir) <- c("regvegeID","minA")
+colnames(maxAir) <- c("regvegeID","maxA")
+minAir$xminR <- floor(minAir$minA)
+maxAir$xmaxR <- ceiling(maxAir$maxA)
+#join together
+mmData <- join(minAir,maxAir,by=c("regvegeID"),type="full")
+
+#organize regPlot into a dataframe
+regPlotAp <- data.frame(regPlot=as.vector(regPlotA), regvegeID=rep(seq(1,dim(regvegeID)[1]),each=200))
+
+
 #######################################
 #####organize model output        ##### 
 #######################################
@@ -1843,7 +1859,13 @@ regMu <- join(regMu,regvegeID, by="regvegeID", type="left")
 datVI$name2 <- c("herb barren", "graminoid tundra","tussock tundra","short shrub tundra","tall shrub tundra",
 					"wetland","evergreen needleleaf boreal","deciduous needleleaf boreal","mixed boreal")
 					
-	
+#subset regplot so not extrapolating
+regAll <- cbind(regMu,regPlotAp)
+#join mm into plot
+regAll <- join(regAll,mmData, by="regvegeID",type="left")
+
+
+regAll <- regAll[regAll$regPlot>=regAll$xminR&regAll$regPlot<=regAll$xmaxR,]	
 
 #isolate betas
 
@@ -1910,7 +1932,7 @@ vg1 <- c(1,2,3,4)
 vg2 <- c(5,6,7,8,9)
 
 
-png(paste0(plotDI,"\\Air_reg.png"), width=3600,height=3600,
+png(paste0(plotDI,"\\supp_air_reg.png"), width=3600,height=3600,
 			units="px")
 	layout(matrix(seq(1,4),ncol=2,byrow=FALSE), width=rep(lcm(wd),4),height=rep(lcm(hd),4))
 	par(mai=c(1,0,0,1))
@@ -1928,31 +1950,33 @@ png(paste0(plotDI,"\\Air_reg.png"), width=3600,height=3600,
 	#credible interval regression
 	for(i in 1:4){
 		j <- vg1[i]
+		ID <- regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==1]
 	if(beta2$sigID[beta2$vegeclass==j&beta2$regID==1]==1){
-		polygon(c(regPlotA[,regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==1]],
-						rev(regPlotA[,regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==1]])),
-				c(regMu$X0.2[regMu$vegeclass==j&regMu$regID==1], 
-				rev(regMu$X99.8[regMu$vegeclass==j&regMu$regID==1])), 
+		polygon(c(regAll$regPlot[regAll$regvegeID==ID],
+						rev(regAll$regPlot[regAll$regvegeID==ID])),
+				c(regAll$X0.2.[regAll$regvegeID==ID], 
+				rev(regAll$X99.8.[regAll$regvegeID==ID])), 
 					border=NA,col=as.character(paste(vegeclassColors$colt2[j])))
 	}else{
-		polygon(c(regPlotA[,regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==1]],
-						rev(regPlotA[,regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==1]])),
-				c(rep(beta0$X0.2[beta0$vegeclass==j&beta0$regID==1],200), 
-				rev(rep(beta0$X99.8[beta0$vegeclass==j&beta0$regID==1],200))), 
+		polygon(c(regAll$regPlot[regAll$regvegeID==ID],
+						rev(regAll$regPlot[regAll$regvegeID==ID])),
+				c(rep(beta0$X0.2[beta0$vegeclass==j&beta0$regID==1],length(regAll$regPlot[regAll$regvegeID==ID])), 
+				rev(rep(beta0$X99.8[beta0$vegeclass==j&beta0$regID==1],length(regAll$regPlot[regAll$regvegeID==ID])))), 
 					border=NA,col=as.character(paste(vegeclassColors$colt2[j])))
 		}
 	}
 	#regression line	
 	for(i in 1:4){
 		j <- vg1[i]
+		ID <- regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==1]
 		if(beta2$sigID[beta2$vegeclass==j&beta2$regID==1]==1){
-			points(regPlotA[,regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==1]],
-					regMu$Mean[regMu$vegeclass==j&regMu$regID==1], type="l",
+			points(regAll$regPlot[regAll$regvegeID==ID],
+					regAll$Mean[regAll$regvegeID==ID], type="l",
 					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])))
 		}else{
-		
-		abline(h=beta0$Mean[beta0$vegeclass==j&beta0$regID==1],
-					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])),lty=2)
+		points(regAll$regPlot[regAll$regvegeID==ID],
+			rep(beta0$Mean[beta0$vegeclass==j&beta0$regID==1],length(regAll$regPlot[regAll$regvegeID==ID])),
+					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])),lty=2, type="l")
 		}
 	
 	}
@@ -1981,35 +2005,39 @@ png(paste0(plotDI,"\\Air_reg.png"), width=3600,height=3600,
 	}
 	
 		#credible interval regression
+		#credible interval regression
 	for(i in 1:5){
 		j <- vg2[i]
+		ID <- regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==1]
 	if(beta2$sigID[beta2$vegeclass==j&beta2$regID==1]==1){
-		polygon(c(regPlotA[,regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==1]],
-						rev(regPlotA[,regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==1]])),
-				c(regMu$X0.2[regMu$vegeclass==j&regMu$regID==1], 
-				rev(regMu$X99.8[regMu$vegeclass==j&regMu$regID==1])), 
+		polygon(c(regAll$regPlot[regAll$regvegeID==ID],
+						rev(regAll$regPlot[regAll$regvegeID==ID])),
+				c(regAll$X0.2.[regAll$regvegeID==ID], 
+				rev(regAll$X99.8.[regAll$regvegeID==ID])), 
 					border=NA,col=as.character(paste(vegeclassColors$colt2[j])))
-		
 	}else{
-			polygon(c(regPlotA[,regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==1]],
-						rev(regPlotA[,regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==1]])),
-				c(rep(beta0$X0.2[beta0$vegeclass==j&beta0$regID==1],200), 
-				rev(rep(beta0$X99.8[beta0$vegeclass==j&beta0$regID==1],200))), 
+		polygon(c(regAll$regPlot[regAll$regvegeID==ID],
+						rev(regAll$regPlot[regAll$regvegeID==ID])),
+				c(rep(beta0$X0.2[beta0$vegeclass==j&beta0$regID==1],length(regAll$regPlot[regAll$regvegeID==ID])), 
+				rev(rep(beta0$X99.8[beta0$vegeclass==j&beta0$regID==1],length(regAll$regPlot[regAll$regvegeID==ID])))), 
 					border=NA,col=as.character(paste(vegeclassColors$colt2[j])))
 		}
 	}
-	#regression line
+	#regression line	
 	for(i in 1:5){
 		j <- vg2[i]
-	if(beta2$sigID[beta2$vegeclass==j&beta2$regID==1]==1){
-		points(regPlotA[,regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==1]],
-					regMu$Mean[regMu$vegeclass==j&regMu$regID==1], type="l",
+		ID <- regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==1]
+		if(beta2$sigID[beta2$vegeclass==j&beta2$regID==1]==1){
+			points(regAll$regPlot[regAll$regvegeID==ID],
+					regAll$Mean[regAll$regvegeID==ID], type="l",
 					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])))
-
-	}else{
-			abline(h=beta0$Mean[beta0$vegeclass==j&beta0$regID==1],
-					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])),lty=2)
+		}else{
+		
+		points(regAll$regPlot[regAll$regvegeID==ID],
+			rep(beta0$Mean[beta0$vegeclass==j&beta0$regID==1],length(regAll$regPlot[regAll$regvegeID==ID])),
+					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])),lty=2, type="l")
 		}
+	
 	}
 	axis(2, seqSMin, rep(" ",length(seqSMin)), lwd.ticks=lwt, lwd=lwa)
 	mtext(seqSMin,at=seqSMin, line=yll, cex=amx,las=2, side=2)
@@ -2034,33 +2062,38 @@ png(paste0(plotDI,"\\Air_reg.png"), width=3600,height=3600,
 				col=as.character(paste(vegeclassColors$colt1[j])),cex=px)
 	
 	}
-		for(i in 1:4){
+	#credible interval regression
+	for(i in 1:4){
 		j <- vg1[i]
-		if(beta2$sigID[beta2$vegeclass==j&beta2$regID==2]==1){
-			polygon(c(regPlotA[,regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==2]],
-						rev(regPlotA[,regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==2]])),
-				c(regMu$X0.2[regMu$vegeclass==j&regMu$regID==2], 
-				rev(regMu$X99.8[regMu$vegeclass==j&regMu$regID==2])), 
+		ID <- regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==2]
+	if(beta2$sigID[beta2$vegeclass==j&beta2$regID==2]==1){
+		polygon(c(regAll$regPlot[regAll$regvegeID==ID],
+						rev(regAll$regPlot[regAll$regvegeID==ID])),
+				c(regAll$X0.2.[regAll$regvegeID==ID], 
+				rev(regAll$X99.8.[regAll$regvegeID==ID])), 
 					border=NA,col=as.character(paste(vegeclassColors$colt2[j])))
-		}else{
-		
-					polygon(c(regPlotA[,regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==2]],
-						rev(regPlotA[,regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==2]])),
-				c(rep(beta0$X0.2[beta0$vegeclass==j&beta0$regID==2],200), 
-				rev(rep(beta0$X99.8[beta0$vegeclass==j&beta0$regID==2],200))), 
+	}else{
+		polygon(c(regAll$regPlot[regAll$regvegeID==ID],
+						rev(regAll$regPlot[regAll$regvegeID==ID])),
+				c(rep(beta0$X0.2[beta0$vegeclass==j&beta0$regID==2],length(regAll$regPlot[regAll$regvegeID==ID])), 
+				rev(rep(beta0$X99.8[beta0$vegeclass==j&beta0$regID==2],length(regAll$regPlot[regAll$regvegeID==ID])))), 
 					border=NA,col=as.character(paste(vegeclassColors$colt2[j])))
 		}
 	}
-		for(i in 1:4){
+	#regression line	
+	for(i in 1:4){
 		j <- vg1[i]
-	if(beta2$sigID[beta2$vegeclass==j&beta2$regID==2]==1){
-		points(regPlotA[,regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==2]],
-					regMu$Mean[regMu$vegeclass==j&regMu$regID==2], type="l",
+		ID <- regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==2]
+		if(beta2$sigID[beta2$vegeclass==j&beta2$regID==2]==1){
+			points(regAll$regPlot[regAll$regvegeID==ID],
+					regAll$Mean[regAll$regvegeID==ID], type="l",
 					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])))
-	}else{
-				abline(h=beta0$Mean[beta0$vegeclass==j&beta0$regID==2],
-					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])),lty=2)
-	}
+		}else{
+		
+		points(regAll$regPlot[regAll$regvegeID==ID],
+			rep(beta0$Mean[beta0$vegeclass==j&beta0$regID==2],length(regAll$regPlot[regAll$regvegeID==ID])),
+					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])),lty=2, type="l")
+		}
 	
 	}
 	
@@ -2081,35 +2114,38 @@ png(paste0(plotDI,"\\Air_reg.png"), width=3600,height=3600,
 				col=as.character(paste(vegeclassColors$colt1[j])),cex=px)
 	
 	}
-		for(i in 1:5){
+	for(i in 1:5){
 		j <- vg2[i]
-		if(beta2$sigID[beta2$vegeclass==j&beta2$regID==2]==1){
-		polygon(c(regPlotA[,regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==2]],
-						rev(regPlotA[,regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==2]])),
-				c(regMu$X0.2[regMu$vegeclass==j&regMu$regID==2], 
-				rev(regMu$X99.8[regMu$vegeclass==j&regMu$regID==2])), 
+		ID <- regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==2]
+	if(beta2$sigID[beta2$vegeclass==j&beta2$regID==2]==1){
+		polygon(c(regAll$regPlot[regAll$regvegeID==ID],
+						rev(regAll$regPlot[regAll$regvegeID==ID])),
+				c(regAll$X0.2.[regAll$regvegeID==ID], 
+				rev(regAll$X99.8.[regAll$regvegeID==ID])), 
 					border=NA,col=as.character(paste(vegeclassColors$colt2[j])))
-		}else{
-				polygon(c(regPlotA[,regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==2]],
-						rev(regPlotA[,regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==2]])),
-				c(rep(beta0$X0.2[beta0$vegeclass==j&beta0$regID==2],200), 
-				rev(rep(beta0$X99.8[beta0$vegeclass==j&beta0$regID==2],200))), 
+	}else{
+		polygon(c(regAll$regPlot[regAll$regvegeID==ID],
+						rev(regAll$regPlot[regAll$regvegeID==ID])),
+				c(rep(beta0$X0.2[beta0$vegeclass==j&beta0$regID==2],length(regAll$regPlot[regAll$regvegeID==ID])), 
+				rev(rep(beta0$X99.8[beta0$vegeclass==j&beta0$regID==2],length(regAll$regPlot[regAll$regvegeID==ID])))), 
 					border=NA,col=as.character(paste(vegeclassColors$colt2[j])))
-	
 		}
 	}
-		for(i in 1:5){
+	#regression line	
+	for(i in 1:5){
 		j <- vg2[i]
-	if(beta2$sigID[beta2$vegeclass==j&beta2$regID==2]==1){
-		points(regPlotA[,regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==2]],
-					regMu$Mean[regMu$vegeclass==j&regMu$regID==2], type="l",
+		ID <- regvegeID$regvegeID[regvegeID$vegeclass==j&regvegeID$regID==2]
+		if(beta2$sigID[beta2$vegeclass==j&beta2$regID==2]==1){
+			points(regAll$regPlot[regAll$regvegeID==ID],
+					regAll$Mean[regAll$regvegeID==ID], type="l",
 					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])))
-
-	}else{
-					abline(h=beta0$Mean[beta0$vegeclass==j&beta0$regID==2],
-					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])),lty=2)
+		}else{
+		
+		points(regAll$regPlot[regAll$regvegeID==ID],
+			rep(beta0$Mean[beta0$vegeclass==j&beta0$regID==2],length(regAll$regPlot[regAll$regvegeID==ID])),
+					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])),lty=2, type="l")
+		}
 	
-	}
 	}
 	axis(4, seqSMax, rep(" ",length( seqSMax)), lwd.ticks=lwt, lwd=lwa)
 	mtext( seqSMax,at= seqSMax, line=yll, cex=amx,las=2, side=4)
