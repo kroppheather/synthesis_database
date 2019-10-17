@@ -75,7 +75,6 @@ tabA <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\ai
 tabS <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\soil_obs_summary.csv")
 
 
-
 #######################################
 #####vegetation colors            ##### 						
 #######################################	
@@ -2060,3 +2059,60 @@ sumAllSave <- data.frame(siteid=sumAll$siteid,latitude=sumAll$latitude,longitude
 
 
 write.table(sumAllSave, paste0(plotDI,"\\summary_analysis_sites.csv"),sep=",",row.names=FALSE)
+
+
+
+##########################################################################################
+##########################################################################################
+################# Figure ?. map comparison of study sites with landcover #################
+##########################################################################################
+##########################################################################################
+
+#######################################
+#####landcover                  ##### 
+#######################################
+esa <- raster("z:\\data_repo\\gis_data\\esa_cci_landcover\\ESACCI-LC-L4-LCCS-Map-300m-P1Y-1992_2015-v2.0.7\\scratch\\ESACCI-LC-L4-LCCS-Map-300m-P1Y-1992_2015-v2.0.7.tif")
+plot(esa)
+cavm <- raster("z:\\data_repo\\gis_data\\raster_CAVM\\raster_cavm_v1.tif")
+#######################################
+#####projection                   ##### 
+#######################################
+
+laea <- "+proj=laea +lat_0=90 +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs" 
+
+#######################################
+#####world data                   ##### 
+#######################################
+
+worldmap <- map("world", ylim=c(50,90), fill=TRUE)
+#focus on a smaller extent
+worldmap2 <- map("world", ylim=c(55,90))
+
+
+
+#######################################
+#####reproject data               ##### 
+#######################################
+
+#reproject into lambers equal aarea
+
+#world map
+world <- project(matrix(c(worldmap$x,worldmap$y), ncol=2,byrow=FALSE),laea)
+world2 <- project(matrix(c(worldmap2$x,worldmap2$y), ncol=2,byrow=FALSE),laea)
+#set up spatial point class
+
+
+
+coord.temp <- data.frame(siteid=siteinfo$site_id,lon=siteinfo$lon,lat=siteinfo$lat)
+siteP <- data.frame(siteid=unique(SoilParm$siteid))
+siteP <- join(siteP,coord.temp, by="siteid",type="left")
+#join vegeclass and 
+siteP <- join(siteP,datV,by="siteid",type="left")
+siteP <- join(siteP,vegeclassColors,by="vegeclass",type="left")
+
+#site coordinates
+sitesV <- project(matrix(c(siteP$lon,siteP$lat),ncol=2,byrow=FALSE),laea)
+colnames(sitesV) <- c("X","Y")
+#add back in to site info
+siteP <- cbind(siteP,sitesV)
+siteSP <- SpatialPoints(data.frame(siteP[,"X"],siteP[,"Y"]), proj4string=CRS(laea))
