@@ -2072,7 +2072,8 @@ write.table(sumAllSave, paste0(plotDI,"\\summary_analysis_sites.csv"),sep=",",ro
 #####landcover                  ##### 
 #######################################
 esa <- raster("z:\\data_repo\\gis_data\\esa_cci_landcover\\ESACCI-LC-L4-LCCS-Map-300m-P1Y-1992_2015-v2.0.7\\scratch\\ESACCI-LC-L4-LCCS-Map-300m-P1Y-1992_2015-v2.0.7.tif")
-plot(esa)
+
+
 cavm <- raster("z:\\data_repo\\gis_data\\raster_CAVM\\raster_cavm_v1.tif")
 #######################################
 #####projection                   ##### 
@@ -2088,7 +2089,13 @@ worldmap <- map("world", ylim=c(50,90), fill=TRUE)
 #focus on a smaller extent
 worldmap2 <- map("world", ylim=c(55,90))
 
-
+#######################################
+#####landcover    org             ##### 
+#######################################
+str(esa)
+res(esa)
+res(cavm)
+esaP <- projectRaster(esa,res=1000,crs=laea,progress='text')
 
 #######################################
 #####reproject data               ##### 
