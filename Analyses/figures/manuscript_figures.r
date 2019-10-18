@@ -2099,7 +2099,7 @@ str(esa)
 res(esa)
 res(cavm)
 
-e <- as(extent( -180,180, 50, 85), 'SpatialPolygons')
+e <- as(extent( -180,180, 50, 90), 'SpatialPolygons')
 crs(e) <- "+proj=longlat +datum=WGS84 +no_defs"
 esaC <- crop(esa, e)
 plot(esaC)
@@ -2114,6 +2114,10 @@ plot(cavmNA)
 #project
 cavmNAP <- projectRaster(cavmNA,res=1000,crs=laea,progress='text')
 #merge cavm & esa choosing cavm values when they are not NA
+
+cavmRE <- resample(cavmNAP,esaP)
+plot(cavmRE)
+plot(esaP)
 landAll <- merge(cavmNAP,esaP)
 
 
