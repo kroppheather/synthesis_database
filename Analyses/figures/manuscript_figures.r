@@ -2095,6 +2095,11 @@ worldmap2 <- map("world", ylim=c(55,90))
 str(esa)
 res(esa)
 res(cavm)
+
+e <- as(extent( -180,180, 50, 85), 'SpatialPolygons')
+crs(e) <- "+proj=longlat +datum=WGS84 +no_defs"
+esaC <- crop(esa, e)
+plot(esaC)
 esaP <- projectRaster(esa,res=1000,crs=laea,progress='text')
 
 #######################################
