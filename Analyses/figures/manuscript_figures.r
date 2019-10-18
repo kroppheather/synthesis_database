@@ -74,6 +74,9 @@ patternDF$parms <- gsub(dexps,"", rownames(patternDF))
 tabA <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\air_obs_summary.csv")
 tabS <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\soil_obs_summary.csv")
 
+#table for cavm ids
+cavmIDS <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\GIS\\CAVM_vege_link_table.csv")
+esaIDS <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\GIS\\esa_link.csv")
 
 #######################################
 #####vegetation colors            ##### 						
@@ -2100,7 +2103,24 @@ e <- as(extent( -180,180, 50, 85), 'SpatialPolygons')
 crs(e) <- "+proj=longlat +datum=WGS84 +no_defs"
 esaC <- crop(esa, e)
 plot(esaC)
-esaP <- projectRaster(esa,res=1000,crs=laea,progress='text')
+esaP <- projectRaster(esaC,res=1000,crs=laea,progress='text')
+plot(esaP)
+
+plot(cavm)
+
+#remove non arctic values & add 500 to make identifiable from esa
+cavmNA <- setValues(cavm,ifelse(getValues(cavm)>80,NA,getValues(cavm)+500))
+plot(cavmNA)
+#project
+cavmNAP <- projectRaster(cavmNA,res=1000,crs=laea,progress='text')
+#merge cavm & esa choosing cavm values when they are not NA
+landAll <- merge(cavmNAP,esaP)
+
+
+
+#######################################
+#####need to merge two rasters    ##### 
+#######################################
 
 #######################################
 #####reproject data               ##### 
