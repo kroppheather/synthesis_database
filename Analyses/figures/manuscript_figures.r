@@ -2158,3 +2158,6 @@ colnames(sitesV) <- c("X","Y")
 #add back in to site info
 siteP <- cbind(siteP,sitesV)
 siteSP <- SpatialPoints(data.frame(siteP[,"X"],siteP[,"Y"]), proj4string=CRS(laea))
+#check that points all within the extent
+plot(landAll)
+points(siteSP, pch=19, cex=2)
