@@ -2103,7 +2103,7 @@ e <- as(extent( -180,180, 55, 90), 'SpatialPolygons')
 crs(e) <- "+proj=longlat +datum=WGS84 +no_defs"
 esaC <- crop(esa, e)
 #plot(esaC)
-esaP <- projectRaster(esaC,res=1000,crs=laea,progress='text')
+esaP <- projectRaster(esaC,res=1000,crs=laea,progress='text', method="ngb")
 #plot(esaP)
 #clear out extra memory
 rm("esa")
@@ -2113,14 +2113,14 @@ rm("esa")
 cavmNA <- setValues(cavm,ifelse(getValues(cavm)>80,NA,getValues(cavm)+500))
 #plot(cavmNA)
 #project
-cavmNAP <- projectRaster(cavmNA,res=1000,crs=laea,progress='text')
+cavmNAP <- projectRaster(cavmNA,res=1000,crs=laea,progress='text', method="ngb")
 #clear up memory
 rm("cavm")
 #run garbage collector
 gc()
 #merge cavm & esa choosing cavm values when they are not NA
 #first resample cavm to match esa
-cavmRE <- resample(cavmNAP,esaP)
+cavmRE <- resample(cavmNAP,esaP,method="ngb")
 
 
 #merge two rasters, values default to cavm when no na
@@ -2161,3 +2161,5 @@ siteSP <- SpatialPoints(data.frame(siteP[,"X"],siteP[,"Y"]), proj4string=CRS(lae
 #check that points all within the extent
 plot(landAll)
 points(siteSP, pch=19, cex=2)
+
+siteClass <- extract(landAll, siteSP)
