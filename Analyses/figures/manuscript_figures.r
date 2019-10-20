@@ -2099,26 +2099,32 @@ str(esa)
 res(esa)
 res(cavm)
 
-e <- as(extent( -180,180, 50, 90), 'SpatialPolygons')
+e <- as(extent( -180,180, 55, 90), 'SpatialPolygons')
 crs(e) <- "+proj=longlat +datum=WGS84 +no_defs"
 esaC <- crop(esa, e)
-plot(esaC)
+#plot(esaC)
 esaP <- projectRaster(esaC,res=1000,crs=laea,progress='text')
-plot(esaP)
-
-plot(cavm)
+#plot(esaP)
+#clear out extra memory
+rm("esa")
+#plot(cavm)
 
 #remove non arctic values & add 500 to make identifiable from esa
 cavmNA <- setValues(cavm,ifelse(getValues(cavm)>80,NA,getValues(cavm)+500))
-plot(cavmNA)
+#plot(cavmNA)
 #project
 cavmNAP <- projectRaster(cavmNA,res=1000,crs=laea,progress='text')
+#clear up memory
+rm("cavm")
+#run garbage collector
+gc()
 #merge cavm & esa choosing cavm values when they are not NA
-
+#first resample cavm to match esa
 cavmRE <- resample(cavmNAP,esaP)
-plot(cavmRE)
-plot(esaP)
-landAll <- merge(cavmNAP,esaP)
+
+
+#merge two rasters, values default to cavm when no na
+landAll <- merge(cavmRE,esaP)
 
 
 
