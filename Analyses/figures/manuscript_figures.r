@@ -266,7 +266,22 @@ all.sumVV <- join(all.sumVV,mat.bcV,by="polyid",type="left")
 propAllV <- data.frame(vegeclass=all.sumVV$vegeclass,x=all.sumVV$x,y=all.sumVV$y,propC=all.sumVV$propC)
 xyz.allV <- make.xyz(propAllV$x,propAllV$y,propAllV$propC,propAllV$vegeclass)
 
-
+###make polygon to cover up non study area####
+#make a point at center of map
+pt1 <- SpatialPoints(data.frame(x=0,y=0), CRS(laea))
+#make a buffer around center of plot choosing distance that is relevant
+ptBuff <- buffer(pt1,3700000)
+#set up bounds to extend beyond study area
+xcor <- c(-8000000,-8000000,8000000,8000000)
+ycor <- c(-8000000,8000000,8000000,-8000000)
+#make empty plot polygon
+boxC <- cbind(xcor,ycor)
+p <- Polygon(boxC)
+ps <- Polygons(list(p),1)
+sps <- SpatialPolygons(list(ps))
+proj4string(sps) = CRS("+proj=laea +lat_0=90 +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs" )
+#remove study area from empty plot
+PolyBlock <- gDifference(sps,ptBuff, byid=TRUE)
 #######################################
 #####map of vege type sites       ##### 						
 #######################################	
@@ -308,6 +323,7 @@ png(paste0(plotDI,"\\vege_site_agg.png"), width = 18, height = 18, units = "in",
 	legend(-3700000,-3700000,c("continuous","discontinuous","sporadic"), 
 			fill=c( rgb(0/255,51/255,102/255),rgb(57/255,105/255,153/255),rgb(236/255,245/255,255/255)),
 			horiz=TRUE,bty="n",cex=3.5,border=NA,xpd=TRUE)
+	plot(PolyBlock, col="white",border="white", add=TRUE)		
 	#plot legend
 	plot(c(0,1),c(0,1), type="n", xlim=c(0,1), ylim=c(0,10), xaxs="i",yaxs="i",xlab=" ", ylab=" ",axes=FALSE)
 		for(j in 1:9){
@@ -2310,6 +2326,22 @@ all.sumVV <- join(all.sumVV,mat.bcV,by="polyid",type="left")
 propAllV <- data.frame(vegeclass=all.sumVV$vegeclass,x=all.sumVV$x,y=all.sumVV$y,propC=all.sumVV$propC)
 xyz.allV <- make.xyz(propAllV$x,propAllV$y,propAllV$propC,propAllV$vegeclass)
 
+###make polygon to cover up non study area####
+#make a point at center of map
+pt1 <- SpatialPoints(data.frame(x=0,y=0), CRS(laea))
+#make a buffer around center of plot choosing distance that is relevant
+ptBuff <- buffer(pt1,3700000)
+#set up bounds to extend beyond study area
+xcor <- c(-8000000,-8000000,8000000,8000000)
+ycor <- c(-8000000,8000000,8000000,-8000000)
+#make empty plot polygon
+boxC <- cbind(xcor,ycor)
+p <- Polygon(boxC)
+ps <- Polygons(list(p),1)
+sps <- SpatialPolygons(list(ps))
+proj4string(sps) = CRS("+proj=laea +lat_0=90 +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs" )
+#remove study area from empty plot
+PolyBlock <- gDifference(sps,ptBuff, byid=TRUE)
 
 #######################################
 #####map of vege type sites       ##### 						
@@ -2352,6 +2384,7 @@ png(paste0(plotDI,"\\Supp_vege_site_agg_all.png"), width = 18, height = 18, unit
 	legend(-3700000,-3700000,c("continuous","discontinuous","sporadic"), 
 			fill=c( rgb(0/255,51/255,102/255),rgb(57/255,105/255,153/255),rgb(236/255,245/255,255/255)),
 			horiz=TRUE,bty="n",cex=3.5,border=NA,xpd=TRUE)
+	plot(PolyBlock, col="white",border="white", add=TRUE)		
 	#plot legend
 	plot(c(0,1),c(0,1), type="n", xlim=c(0,1), ylim=c(0,10), xaxs="i",yaxs="i",xlab=" ", ylab=" ",axes=FALSE)
 		for(j in 1:9){
