@@ -2122,18 +2122,18 @@ gc()
 #first resample cavm to match esa
 cavmRE <- resample(cavmNAP,esaP,method="ngb")
 
-
+#######################################
+#####need to merge two rasters    ##### 
+#######################################
 #merge two rasters, values default to cavm when no na
 landAll <- merge(cavmRE,esaP)
 
 
 
-#######################################
-#####need to merge two rasters    ##### 
-#######################################
+
 
 #######################################
-#####reproject data               ##### 
+#####world data data               ##### 
 #######################################
 
 #reproject into lambers equal aarea
@@ -2144,7 +2144,9 @@ world2 <- project(matrix(c(worldmap2$x,worldmap2$y), ncol=2,byrow=FALSE),laea)
 #set up spatial point class
 
 
-
+#######################################
+#####compare to sites             ##### 
+#######################################
 coord.temp <- data.frame(siteid=siteinfo$site_id,lon=siteinfo$lon,lat=siteinfo$lat)
 siteP <- data.frame(siteid=unique(SoilParm$siteid))
 siteP <- join(siteP,coord.temp, by="siteid",type="left")
@@ -2162,4 +2164,211 @@ siteSP <- SpatialPoints(data.frame(siteP[,"X"],siteP[,"Y"]), proj4string=CRS(lae
 plot(landAll)
 points(siteSP, pch=19, cex=2)
 
-siteClass <- extract(landAll, siteSP)
+siteP$siteClass <- extract(landAll, siteSP)
+
+#join two land class tables
+
+landClassIDS <- data.frame(siteClass = c(cavmIDS$CavmID + 500, esaIDS$NB_LAB), 
+							originalName = c(as.character(cavmIDS$CAVMnames),as.character(esaIDS$LCCOwnLabel)),  
+							vegeclassMatch= c(cavmIDS$vegeclassMatch,esaIDS$vegeclassMatch))
+							
+#join into siteP
+siteP2 <- join(siteP,landClassIDS, by="siteClass",type="left")				
+
+#compare classifications
+siteP2$comp <- ifelse(siteP2$vegeclass == siteP2$vegeclassMatch, 1, 0)
+#set sites with na as no match
+siteP2$comp2 <-		ifelse(is.na(siteP2$vegeclassMatch), 0,siteP2$comp )
+
+ClassComp <- sum(siteP2$comp2)	/ length(siteP2$comp2)
+
+
+#######################################
+#####plot all data                ##### 
+#######################################
+
+#make a raster color table
+
+ClassDF <-	data.frame(siteClass = unique(getValues(landAll)))
+#join into ID table
+ClassDF <- join(ClassDF, landClassIDS, by="siteClass", type="left")
+
+
+
+##########################################################################################
+##########################################################################################
+################# Figure SX. create map of all study sites before qaqc   #################
+##########################################################################################
+##########################################################################################
+#read in permafrost shapefile
+shapeC <- readOGR("e:\\GIS\\NSIDC\\cont_dissolve.shp")
+shapeD <- readOGR("e:\\GIS\\NSIDC\\discont_dissolve.shp")
+shapeS <- readOGR("e:\\GIS\\NSIDC\\spor_dissolve.shp")
+#######################################
+#####projection                   ##### 
+#######################################
+
+laea <- "+proj=laea +lat_0=90 +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs" 
+
+#######################################
+#####world data                   ##### 
+#######################################
+
+worldmap <- map("world", ylim=c(50,90), fill=TRUE)
+#focus on a smaller extent
+worldmap2 <- map("world", ylim=c(55,90))
+
+
+
+#######################################
+#####reproject data               ##### 
+#######################################
+
+#reproject into lambers equal aarea
+#site coordinates
+sites <- project(matrix(c(siteinfo$lon,siteinfo$lat),ncol=2,byrow=FALSE),laea)
+#world map
+world <- project(matrix(c(worldmap$x,worldmap$y), ncol=2,byrow=FALSE),laea)
+world2 <- project(matrix(c(worldmap2$x,worldmap2$y), ncol=2,byrow=FALSE),laea)
+#set up spatial point class
+siteSP <- SpatialPoints(sites)
+
+shapeCp <- spTransform(shapeC, laea)
+shapeDp <- spTransform(shapeD, laea)
+shapeSp <- spTransform(shapeS, laea)
+#######################################
+#####aggregate sites              ##### 						
+#######################################	
+#get coordinates of sites used in vege type analysis
+coord.temp <- data.frame(siteid=siteinfo$site_id,lon=siteinfo$lon,lat=siteinfo$lat)
+
+#join vegeclass and 
+siteP <- join(coord.temp,datV,by="siteid",type="left")
+siteP <- join(siteP,vegeclassColors,by="vegeclass",type="left")
+
+#site coordinates
+sitesV <- project(matrix(c(siteP$lon,siteP$lat),ncol=2,byrow=FALSE),laea)
+colnames(sitesV) <- c("X","Y")
+#add back in to site info
+siteP <- cbind(siteP,sitesV)
+
+#set up spatial point class
+siteSPV <- SpatialPoints(sitesV)
+
+#####make buffers######
+
+#get buffer around points
+allBufferV <- buffer(siteSPV,100000, dissolve=TRUE)
+
+
+t.cV <- list()
+xV <- numeric(0)
+yV <- numeric(0)
+for(i in 1:23){
+	t.cV[[i]]<- allBufferV@polygons[[1]]@Polygons[[i]]@labpt
+	xV[i] <- t.cV[[i]][1]
+	yV[i] <- t.cV[[i]][2]
+	
+}
+bcV <- matrix(c(xV,yV),ncol=2,byrow=FALSE)
+colnames(bcV) <- c("x","y")
+#need to get all points contained in each buffer
+
+#check points in each buffer
+pbV <- list()
+polydfV <- matrix(rep(NA,dim(bcV)[1]*dim(siteP)[1]),ncol=dim(bcV)[1])
+for(i in 1:23){
+	pbV[[i]] <- point.in.polygon(siteP$X,siteP$Y,allBufferV@polygons[[1]]@Polygons[[i]]@coords[,1],allBufferV@polygons[[1]]@Polygons[[i]]@coords[,2])
+	polydfV[,i] <- pbV[[i]]
+}
+#find out which polygon each sties is in
+tpolyV <- numeric()
+for(i in 1:dim(siteP)[1]){
+	tpolyV[i] <- which(polydfV[i,]==1)
+}
+#now add site info to the polygon
+all.polyV <- data.frame(siteP,polyid=tpolyV)
+
+#now summarize the total number of each vege class in each polygon
+all.sumVV <- aggregate(all.polyV$siteid,by=list(all.polyV$vegeclass,all.polyV$polyid), FUN="length")
+colnames(all.sumVV) <- c("vegeclass","polyid","nsites")
+#get the total number of sites in each polygon
+all.sumSV <- aggregate(all.sumVV$nsites,by=list(all.sumVV$polyid),FUN="sum")
+colnames(all.sumSV) <- c("polyid","NpolySite")
+
+#join two back together
+all.sumVV <- join(all.sumVV,all.sumSV, by="polyid",type="left")
+#calculate proportion
+all.sumVV$propC <- all.sumVV$nsites/all.sumVV$NpolySite
+
+#join vegeclass colors in
+all.sumVV <- join(all.sumVV,vegeclassColors, by="vegeclass",type="left")
+#join polygon coordinates
+mat.bcV <- cbind(bcV,all.sumSV)
+all.sumVV <- join(all.sumVV,mat.bcV,by="polyid",type="left")
+#turn into a smaller  dataframe
+propAllV <- data.frame(vegeclass=all.sumVV$vegeclass,x=all.sumVV$x,y=all.sumVV$y,propC=all.sumVV$propC)
+xyz.allV <- make.xyz(propAllV$x,propAllV$y,propAllV$propC,propAllV$vegeclass)
+
+
+#######################################
+#####map of vege type sites       ##### 						
+#######################################	
+
+
+#######make plot ######
+yseq <- seq(1,9)
+wd <- 25
+hd <- 25
+wd2 <- 5
+hd2 <- 5
+
+plotorder <- c(1,2,4,3,6,5,7,8,9)
+Hseqh <- c(3,5,9)
+Hseql <- c(0,3,5)
+#,width=1500,height=1500,
+png(paste0(plotDI,"\\Supp_vege_site_agg_all.png"), width = 18, height = 18, units = "in", res=300)
+	a <- layout(matrix(c(1,2,3,4,5),ncol=5, byrow=TRUE), height=c(lcm(hd),lcm(hd),lcm(hd),lcm(hd),lcm(hd)), 
+					width=c(lcm(wd),lcm(wd2),lcm(wd2),lcm(wd2),lcm(wd2)))
+	layout.show(a)
+	#set up empty plot
+	
+	plot(world2,type="n",axes=FALSE,xlab=" ", ylab=" ",xlim=c(-3500000,3500000),ylim=c(-3500000,3500000))
+	#color background
+	polygon(c(-5000000,-5000000,5000000,5000000),c(-5000000,5000000,5000000,-5000000), border=NA, col=rgb(114/255,207/255,252/255,.6))
+	#boundaries
+	points(world, type="l", lwd=2, col="grey65")
+	#continent color
+	polygon(c(world[,1],rev(world[,1])), c(world[,2],rev(world[,2])),col=rgb(253/255,245/255,208/255),border=NA)
+	#midnight blue
+	plot(shapeCp, col=rgb(0/255,51/255,102/255),add=TRUE,border=NA)
+	#royalblue3 rgb(58/255,95/255,205/255)
+	plot(shapeDp, col=rgb(57/255,105/255,153/255),add=TRUE,border=NA)
+	#darkseagreen2
+	plot(shapeSp, col=rgb(236/255,245/255,255/255),add=TRUE,border=NA)
+	draw.pie(xyz.allV$x,xyz.allV$y,xyz.allV$z,radius=220000,col=as.character(vegeclassColors$coli),border=NA)
+	points(mat.bcV$x,mat.bcV$y,pch=19,col="white",cex=7)
+	text(mat.bcV$x,mat.bcV$y,paste(mat.bcV$NpolySite),cex=2.5)
+	legend(-3700000,-3700000,c("continuous","discontinuous","sporadic"), 
+			fill=c( rgb(0/255,51/255,102/255),rgb(57/255,105/255,153/255),rgb(236/255,245/255,255/255)),
+			horiz=TRUE,bty="n",cex=3.5,border=NA,xpd=TRUE)
+	#plot legend
+	plot(c(0,1),c(0,1), type="n", xlim=c(0,1), ylim=c(0,10), xaxs="i",yaxs="i",xlab=" ", ylab=" ",axes=FALSE)
+		for(j in 1:9){
+			i <- plotorder[j]
+			polygon(c(0,0,1,1),c(yseq[j]-1,yseq[j],yseq[j],yseq[j]-1),col=as.character(vegeclassColors$coli[i]),border=NA)
+	}
+	axis(4,yseq-.5,rep(" ",9),lwd.ticks=2)
+	mtext(datVI$name[plotorder],at=yseq-.5,cex=2,line=1,side=4,las=2)
+	plot(c(0,1),c(0,1), type="n", xlim=c(0,1), ylim=c(0,10), xaxs="i",yaxs="i",xlab=" ", ylab=" ",axes=FALSE)
+	plot(c(0,1),c(0,1), type="n", xlim=c(0,1), ylim=c(0,10), xaxs="i",yaxs="i",xlab=" ", ylab=" ",axes=FALSE)
+	plot(c(0,1),c(0,1), type="n", xlim=c(0,1), ylim=c(0,10), xaxs="i",yaxs="i",xlab=" ", ylab=" ",axes=FALSE)
+	for(i in 1:3){
+		polygon(c(0,0,1,1),c(Hseql[i],Hseqh[i],Hseqh[i],Hseql[i]),col=as.character(heightCols$colsH[i]),border=NA)
+		
+	}
+	text(.5,1.5,"short",srt=90,cex=4,col="white")
+	text(.5,4,"mixed",srt=90,cex=4,col="white")
+	text(.5,7,"tall",srt=90,cex=4,col="white")		
+	
+dev.off()	
