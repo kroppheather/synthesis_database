@@ -352,7 +352,12 @@ Tmax<-data.frame(datTmax[,1:2], pc2.5=datTmax[,5],pc97.5=datTmax[,9],
 Tave <- data.frame(datAverageS[,1:2], pc2.5=datAverageS[,5],pc97.5=datAverageS[,9],
 				datAverageS[,12:14],parm=datAverageS$parms1)
 
-SoilParm<-rbind(zeroC,Speak,Wpeak,Tmin,Tmax, Tave)				
+SoilParm<-rbind(zeroC,Speak,Wpeak,Tmin,Tmax, Tave)	
+
+#fix an issue in the current soil temperature database
+SoilParm$depth <- ifelse(SoilParm$depth == 0.1 & SoilParm$siteid == 10, 10,
+					ifelse(SoilParm$depth == 0.1 & SoilParm$siteid == 11,10, SoilParm$depth))
+			
 
 SpeakA<-data.frame(datSpeakA[,1:2], pc2.5=datSpeakA[,5],pc97.5=datSpeakA[,9],
 					datSpeakA[,12:14],parm=datSpeakA$parms1)			
