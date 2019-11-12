@@ -65,8 +65,8 @@ Thawdf <- cbind(Thawstats,Thawquant)
 Thawdf$parms <- gsub(dexps,"", rownames(Thawdf))
 
 #read in average pattern results
-patternStat <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\pattern\\model\\run1\\pattern_mod_stats.csv")
-patternQuant <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\pattern\\model\\run1\\pattern_mod_quant.csv")
+patternStat <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\pattern\\model\\run2\\pattern_mod_stats.csv")
+patternQuant <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\pattern\\model\\run2\\pattern_mod_quant.csv")
 patternDF <- cbind(patternStat,patternQuant )
 patternDF$parms <- gsub(dexps,"", rownames(patternDF))
 
