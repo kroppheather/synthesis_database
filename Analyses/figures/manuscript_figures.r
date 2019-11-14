@@ -37,8 +37,9 @@ datVI$name <- c("herb barren","graminoid tundra","tussock tundra","short shrub t
 plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\figures"	
 
 #read in vegetation type regression results
-vegeRS <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run7\\vege_mod_stats.csv")
-vegeRT <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run7\\vege_mod_quant.csv")
+#updated 11/13
+vegeRS <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run8\\vege_mod_stats.csv")
+vegeRT <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run8\\vege_mod_quant.csv")
 vegeR <- cbind(vegeRS,vegeRT)
 
 #pull out parm names
@@ -51,20 +52,23 @@ datWC <- read.csv("c:\\Users\\hkropp\\Google Drive\\map_synth\\WCprecSites.csv")
 
 
 #read in N factor regression results
-Nstats <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\n_factor\\model\\run2\\vege_mod_stats.csv")
-Nquant <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\n_factor\\model\\run2\\vege_mod_quant.csv")
+#updated 11/14
+Nstats <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\n_factor\\model\\run3\\vege_mod_stats.csv")
+Nquant <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\n_factor\\model\\run3\\vege_mod_quant.csv")
 Ndf <- cbind(Nstats,Nquant)
 
 Ndf$parms <- gsub(dexps,"", rownames(Ndf))
 
 #read in thaw days results
-Thawstats <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\thaw\\model\\run1\\vege_mod_stats.csv")
-Thawquant <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\thaw\\model\\run1\\vege_mod_quant.csv")
+#update 11/14
+Thawstats <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\thaw\\model\\run2\\vege_mod_stats.csv")
+Thawquant <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\thaw\\model\\run2\\vege_mod_quant.csv")
 
 Thawdf <- cbind(Thawstats,Thawquant)
 Thawdf$parms <- gsub(dexps,"", rownames(Thawdf))
 
 #read in average pattern results
+#updated 11/12
 patternStat <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\pattern\\model\\run2\\pattern_mod_stats.csv")
 patternQuant <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\pattern\\model\\run2\\pattern_mod_quant.csv")
 patternDF <- cbind(patternStat,patternQuant )
