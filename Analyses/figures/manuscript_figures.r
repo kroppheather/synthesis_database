@@ -787,7 +787,7 @@ xll <- 3
 yll1 <- 20
 #line for name
 yll2 <- 65
-yll3 <- 45
+yll3 <- 35
 #cex of axis label
 mcx <- 15
 #text coordinates
@@ -828,8 +828,8 @@ png(paste0(plotDI,"\\intercepts_N.png"), width=6000,height=8000,
 				 lwd.ticks=tlw,lwd=alwd)
 			mtext(seq(yli[5],yhi[5], by=yii[5]),at=seq(yli[5],yhi[5], by=yii[5]), side=2, line=xll,cex=axc,las=2)	
 		
-			mtext("Average",side=2,line=yll2,cex=mcx)		
-			mtext("temperature (C)",side=2,line=yll3,cex=mcx)
+			mtext("Average soil",side=2,line=yll2,cex=mcx)		
+			mtext(expression(paste("temperature (",degree,"C)")),side=2,line=yll3,cex=mcx)
 			text(xc,yhi[5]-(yhi[5]*yc), "a",cex=tcc)	
 		
 			#plot days freezing	
@@ -882,8 +882,8 @@ png(paste0(plotDI,"\\intercepts_N.png"), width=6000,height=8000,
 			axis(2, seq(0,20, by=5), rep(" ",length(seq(0,20, by=5))),
 				 lwd.ticks=tlw,lwd=alwd)
 			mtext(seq(0,20, by=5),at=seq(0,20, by=5), side=2, line=xll,cex=axc,las=2)	
-			mtext("Maximum",side=2,line=yll2,cex=mcx)
-			mtext("temperature (C)",side=2,line=yll3,cex=mcx)	
+			mtext("Maximum soil",side=2,line=yll2,cex=mcx)
+			mtext(expression(paste("temperature (",degree,"C)")),side=2,line=yll3,cex=mcx)	
 			
 	text(xc,20-(20*yc), "c",cex=tcc)
 	
@@ -946,9 +946,9 @@ png(paste0(plotDI,"\\supp_n_thaw.png"), width=4000,height=5000,
 			mtext(seq(yli[2],yhi[2], by=yii[2]),at=seq(yli[2],yhi[2], by=yii[2]), side=2, line=xll,cex=axc,las=2)	
 				
 
-			mtext("Thaw n-factor",side=2,line=yll2,cex=mcx)
+			mtext("Ratio of soil:air thawing degree days",side=2,line=-50,outer=TRUE,cex=mcx)
 			#mtext(expression(paste("(N"[thaw],")")),side=2,line=yll1,cex=mcx)	
-			mtext(" (-) ",side=2,line=yll3,cex=mcx)	
+			mtext(" (-) ",side=2,line=-70,outer=TRUE,,cex=mcx)	
 
 	par(mai=c(0,13.5,0,0),xpd=TRUE)
 		plot(c(0,1),c(0,1), ylim=c(-10,0), xlim=c(xl,xh),
@@ -998,8 +998,8 @@ layout(matrix(c(1,2,3),ncol=1,byrow=TRUE), width=lcm(wd),height=c(lcm(hd),lcm(70
 				 lwd.ticks=tlw,lwd=alwd)
 			mtext(seq(yli[4],yhi[4], by=yii[4]),at=seq(yli[4],yhi[4], by=yii[4]), side=2, line=xll,cex=axc,las=2)	
 		
-			mtext("Minimum",side=2,line=yll2,cex=mcx)		
-			mtext("temperature (C)",side=2,line=yll3,cex=mcx)
+			mtext("Minimum soil",side=2,line=yll2,cex=mcx)		
+			mtext(expression(paste("temperature (",degree,"C)")),side=2,line=yll3,cex=mcx)
 			
 	par(mai=c(0,13.5,0,0),xpd=TRUE)
 		plot(c(0,1),c(0,1), ylim=c(-10,0), xlim=c(xl,xh),
