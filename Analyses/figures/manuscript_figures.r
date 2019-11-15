@@ -596,7 +596,7 @@ for(j in 1:9){
 		}
 		#box(which="plot",lwd=blw)
 		if(j==1){
-		mtext("Soil temperature (C)", side=2,line=yllh, cex=lx,outer=TRUE) 
+		mtext(expression(paste("Soil temperature (",degree,"C)")), side=2,line=yllh, cex=lx,outer=TRUE) 
 		legend("bottomright", c("0-5 cm", "5-10 cm", "10-15 cm", "15-20 cm"), col=test2, lwd=7,	bty="n", cex=10)
 		}
 		if(j==9){
