@@ -948,7 +948,7 @@ png(paste0(plotDI,"\\supp_n_thaw.png"), width=4000,height=5000,
 
 			mtext("Ratio of soil:air thawing degree days",side=2,line=-50,outer=TRUE,cex=mcx)
 			#mtext(expression(paste("(N"[thaw],")")),side=2,line=yll1,cex=mcx)	
-			mtext(" (-) ",side=2,line=-70,outer=TRUE,,cex=mcx)	
+			mtext(" (-) ",side=2,line=-70,outer=TRUE,cex=mcx)	
 
 	par(mai=c(0,13.5,0,0),xpd=TRUE)
 		plot(c(0,1),c(0,1), ylim=c(-10,0), xlim=c(xl,xh),
@@ -1050,7 +1050,8 @@ png(paste0(plotDI,"\\supp_intercepts_freezeN.png"), width=4000,height=5000,
 				 lwd.ticks=tlw,lwd=alwd)
 			mtext(seq(yli[1],yhi[1], by=yii[1]),at=seq(yli[1],yhi[1], by=yii[1]), side=2, line=xll,cex=axc,las=2)	
 			#mtext(expression(paste("(N"[freeze],")")),side=2,line=yll1,cex=mcx)
-			mtext("Freeze n-factor",side=2,line=yll2,cex=mcx)
+			mtext("Ratio of soil:air freezing degree days",side=2,,line=-50,outer=TRUE,cex=mcx)
+			mtext(" (-) ",side=2,line=-70,outer=TRUE,cex=mcx)	
 	par(mai=c(0,13.5,0,0),xpd=TRUE)
 		plot(c(0,1),c(0,1), ylim=c(-10,0), xlim=c(xl,xh),
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
