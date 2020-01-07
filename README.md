@@ -15,3 +15,6 @@ Contains database schema and descritption of data tables for data used in synthe
 
 ## archive
 Contains scripts from analyses not included in the paper for openness in analysis that could not be included in manuscript writing. Many of these analysis were abandoned due to low data availability in plant functional types that limited the geographic scope.  
+
+## SQL files
+Code for compiling data in data tables as the synthesis database evolved throughout submissions. The rebuild file represents code from a database rebuild after changes to local hardware.
