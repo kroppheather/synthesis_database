@@ -2,7 +2,7 @@
 #### code edited by Heather Kropp
 A repository associated with a Pan-Arctic vegetation and air-soil temperature data synthesis of 235 sites across the permafrost region. This repository contains setup to the permafrost vegetation synthesis database and data analyses. Statistical models of annual temperature were fit to a subset of sites that met basic standards and analyzed for patterns between plant functional types
 
-### Guide to repository 
+# Guide to repository 
 ## Temp_model
 Statistical model for raw temperature data that fits a phenomenological model that describes annual variability in daily temperature. This model fills in missing data (only sites with <25% of a year missing included) and estimates parameters that describe annual variability in temperature such as maximum and minimum temperatures. Sites were run in a linux HPC environment.
 
