@@ -1218,8 +1218,8 @@ datVI$name2 <- c("herb barren", "graminoid tundra","tussock tundra","short shrub
 					"wetland","evergreen needleleaf boreal","deciduous needleleaf boreal","mixed boreal")
 					
 					
-wd <- 50
-hd <- 50
+wd <- 54
+hd <- 54
 # axis limits
 aveL <- -15
 aveH <- 5
@@ -1251,7 +1251,7 @@ xll <- 15
 #legend lwd
 lglw <- 14
 #legend size
-lgcx <- 6
+lgcx <- 7
 #legend point size
 lgpt <- 7
 #break into two panels
@@ -1260,7 +1260,7 @@ vg2 <- c(5,6,7,8,9)
 #text legend size
 lgtxc <- 10
 
-png(paste0(plotDI,"\\patterns_ave.png"), width=3600,height=3600,
+png(paste0(plotDI,"\\patterns_ave.png"), width=3900,height=3900,
 			units="px")
 	layout(matrix(seq(1,4),ncol=2,byrow=FALSE), width=rep(lcm(wd),4),height=rep(lcm(hd),4))
 	par(mai=c(1,0,0,1))
@@ -1318,7 +1318,7 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3600,height=3600,
 			 lwd=lglw, cex=lgcx,bty="n")
 	
 	
-	mtext("Average soil temperature (C)", outer=TRUE, line=-12, cex=llmx, side=2)
+	mtext(expression(paste("Average soil temperature (",degree,"C)")), outer=TRUE, line=-12, cex=llmx, side=2)
 	par(mai=c(0,0,1,1))
 	plot(c(0,1),c(0,1),type="n", ylim=c(aveL,aveH), xlim=c(minL,minH), xlab=" ", ylab=" ",
 			xaxs="i", yaxs="i", axes=FALSE)
@@ -1369,7 +1369,7 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3600,height=3600,
 	mtext(seqAve,at=seqAve, line=yll, cex=amx,las=2, side=2)
 	axis(1, seqMin, rep(" ",length(seqMin)), lwd.ticks=lwt, lwd=lwa)
 	mtext(seqMin,at=seqMin, line=yll, cex=amx, side=1)
-	mtext("Minimum soil temperature (C)",  line=xll, cex=llmx, side=1)
+	mtext(expression(paste("Minimum soil temperature (",degree,"C)")),  line=xll, cex=llmx, side=1)
 	text(-28,4.45,"b", cex=lgtxc)
 
 	
@@ -1422,7 +1422,7 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3600,height=3600,
 	
 	axis(4, seqAve, rep(" ",length(seqAve)), lwd.ticks=lwt, lwd=lwa)
 	mtext(seqAve,at=seqAve, line=yll, cex=amx,las=2, side=4)
-	mtext("Average soil temperature (C)", outer=TRUE, line=-12, cex=llmx, side=4)
+	mtext(expression(paste("Average soil temperature (",degree,"C)")), outer=TRUE, line=-12, cex=llmx, side=4)
 	text(1,4.45,"c", cex=lgtxc)
 	#average vs max group 2 	
 	par(mai=c(0,1,1,0))
@@ -1471,7 +1471,7 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3600,height=3600,
 	mtext(seqAve,at=seqAve, line=yll, cex=amx,las=2, side=4)
 	axis(1, seqMax, rep(" ",length(seqMax)), lwd.ticks=lwt, lwd=lwa)
 	mtext(seqMax,at=seqMax, line=yll, cex=amx, side=1)
-	mtext("Maximum soil temperature (C)",  line=xll, cex=llmx, side=1)
+	mtext(expression(paste("Maximum soil temperature (",degree,"C)")),  line=xll, cex=llmx, side=1)
 	text(1,4.45,"d", cex=lgtxc)	
 dev.off()	
 
@@ -1766,7 +1766,7 @@ png(paste0(plotDI,"\\supp_air_reg.png"), width=3600,height=3600,
 			 lwd=lglw, cex=lgcx,bty="n")
 	
 	
-	mtext("Minimum soil temperature (C)", outer=TRUE, line=-12, cex=llmx, side=2)
+	mtext(expression(paste("Minimum soil temperature (",degree,"C)")), outer=TRUE, line=-12, cex=llmx, side=2)
 	
 	#minimum temp group 2
 	par(mai=c(0,0,1,1))
@@ -1820,7 +1820,7 @@ png(paste0(plotDI,"\\supp_air_reg.png"), width=3600,height=3600,
 	mtext(seqSMin,at=seqSMin, line=yll, cex=amx,las=2, side=2)
 	axis(1, seqAMin, rep(" ",length(seqAMin)), lwd.ticks=lwt, lwd=lwa)
 	mtext(seqAMin,at=seqAMin, line=yll, cex=amx, side=1)
-	mtext("Minimum air temperature (C)",  line=xll, cex=llmx, side=1)
+	mtext(expression(paste("Minimum air temperature (",degree,"C)")),  line=xll, cex=llmx, side=1)
 
 
 	
@@ -1876,7 +1876,7 @@ png(paste0(plotDI,"\\supp_air_reg.png"), width=3600,height=3600,
 	
 	axis(4, seqSMax, rep(" ",length( seqSMax)), lwd.ticks=lwt, lwd=lwa)
 	mtext( seqSMax,at= seqSMax, line=yll, cex=amx,las=2, side=4)
-	mtext("Maximum soil temperature (C)", outer=TRUE, line=-12, cex=llmx, side=4)
+	mtext(expression(paste("Maximum soil temperature (",degree,"C)")), outer=TRUE, line=-12, cex=llmx, side=4)
 	
 	
 	#average vs max group 2 	
@@ -1928,7 +1928,7 @@ png(paste0(plotDI,"\\supp_air_reg.png"), width=3600,height=3600,
 	mtext( seqSMax,at= seqSMax, line=yll, cex=amx,las=2, side=4)
 	axis(1, seqAMax, rep(" ",length(seqAMax)), lwd.ticks=lwt, lwd=lwa)
 	mtext(seqAMax,at=seqAMax, line=yll, cex=amx, side=1)
-	mtext("Maximum air temperature (C)",  line=xll, cex=llmx, side=1)	
+	mtext(expression(paste("Maximum air temperature (",degree,"C)")),  line=xll, cex=llmx, side=1)	
 dev.off()	
 
 
