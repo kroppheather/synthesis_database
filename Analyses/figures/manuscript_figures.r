@@ -24,6 +24,8 @@ source("c:\\Users\\hkropp\\Documents\\GitHub\\synthesis_database\\Analyses\\temp
 datV <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\vege_class.csv")
 datVI <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\vegeID.csv")
 #read in soil temperature
+#note some sites are in here but are excluded from soil parm data due
+#to convergence issues
 datS<-read.csv("z:\\projects\\synthesis\\run1\\Tsoil_model.csv")
 #read in air temperature
 datA<-read.csv("z:\\projects\\synthesis\\run1\\Tair_model.csv")
@@ -364,7 +366,16 @@ dev.off()
 
 				
 #add vegetation class	
-datST <- join(datS,datV,by="siteid",type="left")					
+datST <- join(datS,datV,by="siteid",type="left")		
+#only plot data that made it into final analysis
+
+parmsOnly <- unique(data.frame(siteid=SoilParm$siteid))
+
+#join into datST
+
+datST <- join(datST, parmsOnly, by=c("siteid"),type="inner")			
+
+length(unique(datST$siteid))
 
 #organize into a matrix with NA for each day
 #get each unique depth, year, site
@@ -431,6 +442,8 @@ dim(datATn)
 #now get number of observations for each vegetation class
 airAllCount <- aggregate(datATn$A, by=list(datATn$vegeclass),FUN="length")
 soilAllCount <- aggregate(datSTn$T, by=list(datSTn$vegeclass),FUN="length")
+sum(soilAllCount$x)
+sum(airAllCount$x)
 #get the number of sites in each
 soilSitesCount1 <- aggregate(datSTn$T, by=list(datSTn$siteid,datSTn$vegeclass),FUN="length")
 colnames(soilSitesCount1 ) <- c("siteid","vegeclass","ncountT")
@@ -492,7 +505,7 @@ yseq <- seq(-35,25,by=10)
 xseq <- c(1,124,244,335)
 xlseq <- c("Oct","Feb","Jun","Sept")
 #tick width
-lwt <- 14
+lwt <- 18
 #line axis 
 alh <- 4
 xalh <- 12
@@ -519,7 +532,7 @@ mlw <- 7
 #sequence for min and max plot
 xseqP <- c(1,2)
 
-lgry <- rgb(165/255,165/255,165/255,.4)
+lgry <- rgb(165/255,165/255,165/255,.6)
 xpolyL <- c(-3,-3,370,370)
 ypolyL <- c(27,40,40,27)
 	
@@ -2410,3 +2423,12 @@ png(paste0(plotDI,"\\Supp_vege_site_agg_all.png"), width = 18, height = 18, unit
 	text(.5,7,"tall",srt=90,cex=4,col="white")		
 	
 dev.off()	
+
+
+#######################################
+#####site years  data table       ##### 						
+#######################################	
+
+head(SoilParm)
+
+length(unique(SoilParm$siteid))
