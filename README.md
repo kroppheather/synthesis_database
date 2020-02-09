@@ -1,6 +1,7 @@
 # An analysis of air-soil coupling in the permafrost region
 #### code edited by Heather Kropp
-A repository associated with a Pan-Arctic vegetation and air-soil temperature data synthesis of 235 sites across the permafrost region. This repository contains setup to the permafrost vegetation synthesis database and data analyses. Statistical models of annual temperature were fit to a subset of sites that met basic standards and analyzed for patterns between plant functional types
+A repository associated with a Pan-Arctic vegetation and air-soil temperature data synthesis of 235 sites across the permafrost region. This repository contains setup to the permafrost vegetation synthesis database and data analyses. Statistical models of annual temperature were fit to a subset of sites that met basic standards and analyzed for patterns between plant functional types.
+![Sites in pan-Arctic soil temperature database](https://github.com/kroppheather/synthesis_database/blob/master/documentation/Supp_vege_site_agg_all.png)
 
 # Guide to repository 
 ## Temp_model
@@ -14,3 +15,6 @@ Contains database schema and descritption of data tables for data used in synthe
 
 ## archive
 Contains scripts from analyses not included in the paper for openness in analysis that could not be included in manuscript writing. Many of these analysis were abandoned due to low data availability in plant functional types that limited the geographic scope.  
+
+## SQL files
+Code for compiling data in data tables as the synthesis database evolved throughout submissions. The rebuild file represents code from a database rebuild after changes to local hardware.
