@@ -2435,3 +2435,4 @@ sitexyear <- unique(data.frame(siteid=SoilParm$siteid,wyear=SoilParm$wyear))
 sitexyear <- join(sitexyear,datV, by="siteid", type="left")
 sxyCount <- aggregate(sitexyear$siteid, by=list(sitexyear$vegeclass),FUN="length")
 sum(sxyCount$x)
+
