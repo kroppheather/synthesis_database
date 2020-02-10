@@ -348,26 +348,38 @@ for(i in 1:3){
 #####check fit                    ##### 
 #######################################
 reps <- datC$Mean[datC$parms=="repSoilP"]
+plotDI2 <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\figures"	
+
 
 ll <- c(-35,0,-15)
-hh <- c(0,30,15)
-lname <- c("Temperature minimum (C)", "Temperature maximum (C)","Average")
-tx1 <- c(-15,15,0)
-ty1 <- c(-3,25,12)
-tx2 <- c(-15,15,10)
-ty2 <- c(-7,20,0)
-for(i in 1:3){
+hh <- c(0,25,10)
+lname <- c("minimum soil temperature (C)", "maximum soil temperature (C)","mean annual soil temperature (C)")
+tx1 <- c(-23,8,-7)
+ty1 <- c(-1,24,9)
+tx2 <- c(-23,8,-7)
+ty2 <- c(-4,22,7)
 
-	jpeg(paste0(plotDI,"\\run",Nrun,"\\regression_fit",i,".jpg"), width=700,height=700,
-			quality=100,units="px")
-	plot(ParmAll$Mean[ParmAll$regID==i], reps[ParmAll$regID==i], xlim=c(ll[i],hh[i]), ylim=c(ll[i],hh[i]),
-			xlab=lname[i],ylab=lname[i],pch=19)
-	fit <- lm(reps[ParmAll$regID==i]~ParmAll$Mean[ParmAll$regID==i])
-	abline(fit, lwd=2,lty=3)
-	abline(0,1,lwd=2,col="red")
-	text(tx1[i],ty1[i], paste("y=",round(summary(fit)$coefficients[1,1],2),
-				"+",round(summary(fit)$coefficients[2,1],2),"x"), col="red",cex=2)
+
+hd <- 20
+wd <- 20
+
+png(paste0(plotDI2,"\\supp_vege_fit.png"), width=1800,height=700,
+			units="px")
+	layout(matrix(seq(1,3),ncol=3,byrow=TRUE), width=c(lcm(wd),lcm(wd),lcm(wd)),height=lcm(hd))
 	
-	text(tx2[i],ty2[i], paste("R2=", round(summary(fit)$r.squared,2)), col="red",cex=2)
-	dev.off()
+for(i in 1:3){
+	par(mai=c(1,1,1,1))
+	plot(ParmAll$Mean[ParmAll$regID==i], reps[ParmAll$regID==i],
+		xlim=c(ll[i],hh[i]), ylim=c(ll[i],hh[i]),
+			xlab=paste("Observed",lname[i]),ylab=paste("Predicted",lname[i]),
+			cex.lab=2.5, cex.axis=2, cex=2, col=rgb(.5,.5,.5,.3), pch=19)
+	fit <- lm(reps[ParmAll$regID==i]~ParmAll$Mean[ParmAll$regID==i])
+	abline(fit, lwd=3,lty=3)
+	abline(0,1,lwd=3,col="red")
+	text(tx1[i],ty1[i], paste("Predicted=",round(summary(fit)$coefficients[1,1],2),
+				"+",round(summary(fit)$coefficients[2,1],2),"Observed"),cex=2)
+	
+	text(tx2[i],ty2[i], paste("R2=", round(summary(fit)$r.squared,2)), cex=2)
+	
 }
+dev.off()
