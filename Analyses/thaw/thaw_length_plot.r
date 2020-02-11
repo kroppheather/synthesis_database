@@ -188,4 +188,45 @@ png(paste0(plotDI,"\\run",Nrun,"\\intercepts.png"), width=2500,height=2500,
 			mtext(seq(yli[1],yhi[1], by=yii[1]),at=seq(yli[1],yhi[1], by=yii[1]), side=2, line=xll,cex=axc,las=2)	
 			mtext("Thaw days",side=2,line=yll2,cex=mcx)
 			text(xseq,rep(98.1,length(xseq)),datVI$name2,srt=35, adj=1,cex=axc,xpd=TRUE)
-dev.off()			
+dev.off()
+
+
+
+#fit
+
+plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\figures"	
+
+fitS <- lm(repN$Mean~ ThawParm2$Mean)
+summary(fitS)
+
+hd <- 30
+wd <- 30
+#soil range
+tl1 <-90
+th1 <- 180
+
+
+lws <- 4
+sseq <- seq(100,180, by=20)
+
+png(paste0(plotDI,"\\supp_thawDays_fit.png"), width=1000,height=1000,
+			units="px")
+	layout(matrix(c(1),ncol=1,byrow=TRUE), width=c(lcm(wd)),height=lcm(hd))
+	par(mai=c(1,1,1,1))
+		
+			plot(c(0,1),c(0,1), ylim=c(tl1,th1), xlim=c(tl1,th1),
+				xlab="Observed soil thawing days ", 
+				ylab="Predicted soil thawing days ",xaxs="i",yaxs="i",axes=FALSE, cex.lab=2.5)
+			points(ThawParm2$Mean,repN$Mean, pch=19, col=rgb(.5,.5,.5,.15), cex=1.5	)
+	text(120,170, paste("R squared =", round(summary(fitS)$r.squared,2)), cex=2)
+	text(120,165, paste("Predicted =", round(summary(fitS)$coefficients[1,1],2),
+		"+",round(summary(fitS)$coefficients[2,1],2),"observed"), cex=2)
+	
+	abline(0,1,col="red", lwd=lws)
+	abline(fitS,col="cornflowerblue", lty=3, lwd= lws)
+	axis(1, sseq, cex.axis=1.5)
+	axis(2, sseq, cex.axis=1.5, las=2)
+
+	
+dev.off()	
+			

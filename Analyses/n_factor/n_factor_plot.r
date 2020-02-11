@@ -241,3 +241,62 @@ dev.off()
 
 				
 
+				
+#######
+	plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\figures"			
+plot( Nfactor2$Mean[Nfactor2$regID==1],repN$Mean[Nfactor2$regID==1])	
+abline(0,1)	
+fit1 <- 	lm(repN$Mean[Nfactor2$regID==1]~Nfactor2$Mean[Nfactor2$regID==1])
+summary(fit1)
+
+plot( Nfactor2$Mean[Nfactor2$regID==2],repN$Mean[Nfactor2$regID==2])	
+abline(0,1)	
+fit2 <- 	lm(repN$Mean[Nfactor2$regID==2]~Nfactor2$Mean[Nfactor2$regID==2])
+summary(fit2)
+
+
+
+hd <- 30
+wd <- 30
+#soil range
+tl1 <-0
+th1 <- 1.3
+tl2 <-0
+th2 <- 1.5
+
+lws <- 4
+sseq <- seq(0,1.2, by=.2)
+sseq2 <- seq(0,1.4, by=.2)
+png(paste0(plotDI,"\\supp_n_fit.png"), width=2000,height=1000,
+			units="px")
+	layout(matrix(c(1,2),ncol=2,byrow=TRUE), width=c(lcm(wd),lcm(wd)),height=lcm(hd))
+	par(mai=c(1,1,1,1))
+		
+			plot(c(0,1),c(0,1), ylim=c(tl1,th1), xlim=c(tl1,th1),
+				xlab="Observed freezing n-factor ", 
+				ylab="Predicted freezing n-factor ",xaxs="i",yaxs="i",axes=FALSE, cex.lab=2.5)
+			points(Nfactor2$Mean[Nfactor2$regID==1],repN$Mean[Nfactor2$regID==1], pch=19, col=rgb(.5,.5,.5,.15), cex=1.5	)
+	text(.3,1.15, paste("R squared =", round(summary(fit1)$r.squared,2)), cex=2)
+	text(.4,1.1, paste("Predicted =", round(summary(fit1)$coefficients[1,1],2),
+		"+",round(summary(fit1)$coefficients[2,1],2),"observed"), cex=2)
+	
+	abline(0,1,col="red", lwd=lws)
+	abline(fit1,col="cornflowerblue", lty=3, lwd= lws)
+	axis(1, sseq, cex.axis=1.5)
+	axis(2, sseq, cex.axis=1.5, las=2)
+	par(mai=c(1,1,1,1))
+		
+			plot(c(0,1),c(0,1), ylim=c(tl2,th2), xlim=c(tl2,th2),
+				xlab="Observed thawing n-factor ", 
+				ylab="Predicted thawing n-factor ",xaxs="i",yaxs="i",axes=FALSE, cex.lab=2.5)
+			points(Nfactor2$Mean[Nfactor2$regID==2],repN$Mean[Nfactor2$regID==2], pch=19, col=rgb(.5,.5,.5,.15), cex=1.5	)
+	text(.3,1.35, paste("R squared =", round(summary(fit2)$r.squared,2)), cex=2)
+	text(.4,1.3, paste("Predicted =", round(summary(fit2)$coefficients[1,1],2),
+		"+",round(summary(fit2)$coefficients[2,1],2),"observed"), cex=2)
+	
+	abline(0,1,col="red", lwd=lws)
+	abline(fit2,col="cornflowerblue", lty=3, lwd= lws)
+	axis(1, sseq2, cex.axis=1.5)
+	axis(2, sseq2, cex.axis=1.5, las=2)
+	
+dev.off()	
