@@ -36,8 +36,8 @@ library(plyr)
 #######################################
 
 #model directory
-modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\pattern\\model\\run2"
-Nrun <-1
+modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\pattern\\model\\run3"
+Nrun <- 1
 
 
 
@@ -68,18 +68,18 @@ for(i in 1:length(parmV)){
 #Tmax vs Tave
 #set up comparisions
 #x values
-xcomp <- c(4,5)
-ycomp <- c(6,6)
+xcomp <- c(4,5,4)
+ycomp <- c(6,6,5)
 compNameX <- parmV[xcomp]
 compNameY <- parmV[ycomp]
 xcent <- SoilMs[xcomp]
 
 
-SoilCompDF <- data.frame(xobs = c(SoilL[[xcomp[1]]]$Mean,SoilL[[xcomp[2]]]$Mean),
-						yobs= c(SoilL[[ycomp[1]]]$Mean,SoilL[[ycomp[2]]]$Mean),
-						xSD=c(SoilL[[xcomp[1]]]$SD,SoilL[[xcomp[2]]]$SD),
-						ySD=c(SoilL[[ycomp[1]]]$SD,SoilL[[ycomp[2]]]$SD),
-						vegeClass = c(SoilL[[xcomp[1]]]$vegeclass,SoilL[[xcomp[2]]]$vegeclass),			
+SoilCompDF <- data.frame(xobs = c(SoilL[[xcomp[1]]]$Mean,SoilL[[xcomp[2]]]$Mean,SoilL[[xcomp[3]]]$Mean),
+						yobs= c(SoilL[[ycomp[1]]]$Mean,SoilL[[ycomp[2]]]$Mean,SoilL[[ycomp[3]]]$Mean),
+						xSD=c(SoilL[[xcomp[1]]]$SD,SoilL[[xcomp[2]]]$SD,SoilL[[xcomp[3]]]$SD),
+						ySD=c(SoilL[[ycomp[1]]]$SD,SoilL[[ycomp[2]]]$SD,SoilL[[ycomp[3]]]$SD),
+						vegeClass = c(SoilL[[xcomp[1]]]$vegeclass,SoilL[[xcomp[2]]]$vegeclass,SoilL[[xcomp[3]]]$vegeclass),			
 						comp= rep(seq(1,length(xcomp)), each=dim(SoilL[[xcomp[1]]])[1]))
 
 #data frame of vege class and comparision ids
@@ -95,10 +95,10 @@ SoilCompDF2 <- join(SoilCompDF,vegeComp, by=c("vegeClass","comp"),type="left")
 #make plotting data
 
 xcompDF <- data.frame(xcomp=xcomp,ycomp=ycomp,compNameY=compNameY,compNameX=compNameX,xcent=xcent,
-				xmin=c(round_any(min(SoilL[[xcomp[1]]]$pc2.5),5,floor),round_any(min(SoilL[[xcomp[2]]]$pc2.5),5,floor)),
-				xmax=c(round_any(max(SoilL[[xcomp[1]]]$pc97.5),5,ceiling),round_any(max(SoilL[[xcomp[2]]]$pc97.5),5,ceiling)),
-				ymin=c(round_any(min(SoilL[[ycomp[1]]]$pc2.5),5,floor),round_any(min(SoilL[[ycomp[2]]]$pc2.5),5,floor)),
-				ymax=c(round_any(max(SoilL[[ycomp[1]]]$pc97.5),5,ceiling),round_any(max(SoilL[[ycomp[2]]]$pc97.5),5,ceiling)))
+				xmin=c(round_any(min(SoilL[[xcomp[1]]]$pc2.5),5,floor),round_any(min(SoilL[[xcomp[2]]]$pc2.5),5,floor),round_any(min(SoilL[[xcomp[3]]]$pc2.5),5,floor)),
+				xmax=c(round_any(max(SoilL[[xcomp[1]]]$pc97.5),5,ceiling),round_any(max(SoilL[[xcomp[2]]]$pc97.5),5,ceiling),round_any(max(SoilL[[xcomp[3]]]$pc97.5),5,ceiling)),
+				ymin=c(round_any(min(SoilL[[ycomp[1]]]$pc2.5),5,floor),round_any(min(SoilL[[ycomp[2]]]$pc2.5),5,floor),round_any(min(SoilL[[ycomp[3]]]$pc2.5),5,floor)),
+				ymax=c(round_any(max(SoilL[[ycomp[1]]]$pc97.5),5,ceiling),round_any(max(SoilL[[ycomp[2]]]$pc97.5),5,ceiling),round_any(max(SoilL[[ycomp[2]]]$pc97.5),5,ceiling)))
 
 
 
