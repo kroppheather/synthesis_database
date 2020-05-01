@@ -608,8 +608,8 @@ for(j in 1:9){
 		if(j==9){
 		mtext("Day of water year", outer=TRUE, side=1,line=llh, cex=lx) 
 		}
-		polygon(xpolyL ,ypolyL,col=as.character(vegeclassColors$colsH[i]),border=NA)
-		mtext(paste(name2[i]), side=3, line=-10, cex=vlx, col="white") 
+		
+		mtext(paste(name2[i]), side=3, line=-10, cex=vlx, col="black") 
 		text(12,23,paste(panelL[j]), cex=15)
 		
 	
