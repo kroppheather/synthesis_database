@@ -71,8 +71,8 @@ Thawdf$parms <- gsub(dexps,"", rownames(Thawdf))
 
 #read in average pattern results
 #updated 11/12
-patternStat <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\pattern\\model\\run2\\pattern_mod_stats.csv")
-patternQuant <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\pattern\\model\\run2\\pattern_mod_quant.csv")
+patternStat <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\pattern\\model\\run3\\pattern_mod_stats.csv")
+patternQuant <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\pattern\\model\\run3\\pattern_mod_quant.csv")
 patternDF <- cbind(patternStat,patternQuant )
 patternDF$parms <- gsub(dexps,"", rownames(patternDF))
 
@@ -341,14 +341,7 @@ png(paste0(plotDI,"\\vege_site_agg.png"), width = 18, height = 18, units = "in",
 	plot(c(0,1),c(0,1), type="n", xlim=c(0,1), ylim=c(0,10), xaxs="i",yaxs="i",xlab=" ", ylab=" ",axes=FALSE)
 	plot(c(0,1),c(0,1), type="n", xlim=c(0,1), ylim=c(0,10), xaxs="i",yaxs="i",xlab=" ", ylab=" ",axes=FALSE)
 	plot(c(0,1),c(0,1), type="n", xlim=c(0,1), ylim=c(0,10), xaxs="i",yaxs="i",xlab=" ", ylab=" ",axes=FALSE)
-	for(i in 1:3){
-		polygon(c(0,0,1,1),c(Hseql[i],Hseqh[i],Hseqh[i],Hseql[i]),col=as.character(heightCols$colsH[i]),border=NA)
-		
-	}
-	text(.5,1.5,"short",srt=90,cex=4,col="white")
-	text(.5,4,"mixed",srt=90,cex=4,col="white")
-	text(.5,7,"tall",srt=90,cex=4,col="white")		
-	
+
 dev.off()	
 
 ##########################################################################################
