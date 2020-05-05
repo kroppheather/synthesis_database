@@ -621,7 +621,7 @@ dev.off()
 
 ##########################################################################################
 ##########################################################################################
-################# Figure 2& 3.  thaw & ave  & max                        #################
+################# Figure 3& 4.  thaw & ave  & max                        #################
 ##########################################################################################
 ##########################################################################################
 
@@ -1076,21 +1076,23 @@ for(i in 1:length(parmV)){
 
 #Tmin vs Tave
 #Tmax vs Tave
+#Tmin vs Tmax
 #set up comparisions
 #x values
-xcomp <- c(4,5)
-ycomp <- c(6,6)
+xcomp <- c(4,5,4)
+ycomp <- c(6,6,5)
 compNameX <- parmV[xcomp]
 compNameY <- parmV[ycomp]
 xcent <- SoilMs[xcomp]
 
 
-SoilCompDF <- data.frame(xobs = c(SoilL[[xcomp[1]]]$Mean,SoilL[[xcomp[2]]]$Mean),
-						yobs= c(SoilL[[ycomp[1]]]$Mean,SoilL[[ycomp[2]]]$Mean),
-						xSD=c(SoilL[[xcomp[1]]]$SD,SoilL[[xcomp[2]]]$SD),
-						ySD=c(SoilL[[ycomp[1]]]$SD,SoilL[[ycomp[2]]]$SD),
-						vegeClass = c(SoilL[[xcomp[1]]]$vegeclass,SoilL[[xcomp[2]]]$vegeclass),			
+SoilCompDF <- data.frame(xobs = c(SoilL[[xcomp[1]]]$Mean,SoilL[[xcomp[2]]]$Mean,SoilL[[xcomp[3]]]$Mean),
+						yobs= c(SoilL[[ycomp[1]]]$Mean,SoilL[[ycomp[2]]]$Mean,SoilL[[ycomp[3]]]$Mean),
+						xSD=c(SoilL[[xcomp[1]]]$SD,SoilL[[xcomp[2]]]$SD,SoilL[[xcomp[3]]]$SD),
+						ySD=c(SoilL[[ycomp[1]]]$SD,SoilL[[ycomp[2]]]$SD,SoilL[[ycomp[3]]]$SD),
+						vegeClass = c(SoilL[[xcomp[1]]]$vegeclass,SoilL[[xcomp[2]]]$vegeclass,SoilL[[xcomp[3]]]$vegeclass),			
 						comp= rep(seq(1,length(xcomp)), each=dim(SoilL[[xcomp[1]]])[1]))
+
 
 #data frame of vege class and comparision ids
 
@@ -1105,10 +1107,11 @@ SoilCompDF2 <- join(SoilCompDF,vegeComp, by=c("vegeClass","comp"),type="left")
 #make plotting data
 
 xcompDF <- data.frame(xcomp=xcomp,ycomp=ycomp,compNameY=compNameY,compNameX=compNameX,xcent=xcent,
-				xmin=c(round_any(min(SoilL[[xcomp[1]]]$pc2.5),5,floor),round_any(min(SoilL[[xcomp[2]]]$pc2.5),5,floor)),
-				xmax=c(round_any(max(SoilL[[xcomp[1]]]$pc97.5),5,ceiling),round_any(max(SoilL[[xcomp[2]]]$pc97.5),5,ceiling)),
-				ymin=c(round_any(min(SoilL[[ycomp[1]]]$pc2.5),5,floor),round_any(min(SoilL[[ycomp[2]]]$pc2.5),5,floor)),
-				ymax=c(round_any(max(SoilL[[ycomp[1]]]$pc97.5),5,ceiling),round_any(max(SoilL[[ycomp[2]]]$pc97.5),5,ceiling)))
+				xmin=c(round_any(min(SoilL[[xcomp[1]]]$pc2.5),5,floor),round_any(min(SoilL[[xcomp[2]]]$pc2.5),5,floor),round_any(min(SoilL[[xcomp[3]]]$pc2.5),5,floor)),
+				xmax=c(round_any(max(SoilL[[xcomp[1]]]$pc97.5),5,ceiling),round_any(max(SoilL[[xcomp[2]]]$pc97.5),5,ceiling),round_any(max(SoilL[[xcomp[3]]]$pc97.5),5,ceiling)),
+				ymin=c(round_any(min(SoilL[[ycomp[1]]]$pc2.5),5,floor),round_any(min(SoilL[[ycomp[2]]]$pc2.5),5,floor),round_any(min(SoilL[[ycomp[3]]]$pc2.5),5,floor)),
+				ymax=c(round_any(max(SoilL[[ycomp[1]]]$pc97.5),5,ceiling),round_any(max(SoilL[[ycomp[2]]]$pc97.5),5,ceiling),round_any(max(SoilL[[ycomp[2]]]$pc97.5),5,ceiling)))
+
 
 
 
@@ -1160,8 +1163,8 @@ regPlot <- regPlot[regPlot$xplot>=regPlot$xminS&regPlot$xplot<=regPlot$xmaxS,]
 patternSlope <- patternDF[patternDF$parms=="beta1",]
 patternSlope <- cbind(patternSlope,vegeComp)
 #add significance
-patternSlope$sig <- ifelse(patternSlope$X0.3.<0&patternSlope$X99.7.<0,1,
-						ifelse(patternSlope$X0.3.>0&patternSlope$X99.7.>0,1,0))
+patternSlope$sig <- ifelse(patternSlope$X0.2.<0&patternSlope$X99.8.<0,1,
+						ifelse(patternSlope$X0.2.>0&patternSlope$X99.8.>0,1,0))
 #pattern intercept
 patternInt  <- patternDF[patternDF$parms=="beta0",]
 patternInt <- cbind(patternInt,vegeComp)
@@ -1237,15 +1240,15 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3900,height=3900,
 		if(patternSlope$sig[patternSlope$comp==1&patternSlope$vegeClass==j]==1){
 			polygon(c(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j],
 						rev(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j])),
-					c(regPlot$X0.3.[regPlot$comp==1&regPlot$vegeClass==j],	
-					rev(regPlot$X99.7.[regPlot$comp==1&regPlot$vegeClass==j])),	
+					c(regPlot$X0.2.[regPlot$comp==1&regPlot$vegeClass==j],	
+					rev(regPlot$X99.8.[regPlot$comp==1&regPlot$vegeClass==j])),	
 					border=NA,col=as.character(paste(vegeclassColors$colt3[j])))
 		}else{
 		polygon(c(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j],
 						rev(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j])),
-				c(rep(patternInt$X0.3.[patternInt$comp==1&patternInt$vegeClass==j], 
+				c(rep(patternInt$X0.2.[patternInt$comp==1&patternInt$vegeClass==j], 
 					length(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j])),
-				rep(patternInt$X99.7.[patternInt$comp==1&patternInt$vegeClass==j], 
+				rep(patternInt$X99.8.[patternInt$comp==1&patternInt$vegeClass==j], 
 					length(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j]))),	
 					border=NA,col=as.character(paste(vegeclassColors$colt3[j])))
 		}
@@ -1294,15 +1297,15 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3900,height=3900,
 		if(patternSlope$sig[patternSlope$comp==1&patternSlope$vegeClass==j]==1){
 			polygon(c(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j],
 						rev(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j])),
-					c(regPlot$X0.3.[regPlot$comp==1&regPlot$vegeClass==j],	
-					rev(regPlot$X99.7.[regPlot$comp==1&regPlot$vegeClass==j])),	
+					c(regPlot$X0.2.[regPlot$comp==1&regPlot$vegeClass==j],	
+					rev(regPlot$X99.8.[regPlot$comp==1&regPlot$vegeClass==j])),	
 					border=NA,col=as.character(paste(vegeclassColors$colt3[j])))
 		}else{
 		polygon(c(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j],
 						rev(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j])),
-				c(rep(patternInt$X0.3.[patternInt$comp==1&patternInt$vegeClass==j], 
+				c(rep(patternInt$X0.2.[patternInt$comp==1&patternInt$vegeClass==j], 
 					length(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j])),
-				rep(patternInt$X99.7.[patternInt$comp==1&patternInt$vegeClass==j], 
+				rep(patternInt$X99.8.[patternInt$comp==1&patternInt$vegeClass==j], 
 					length(regPlot$xplot[regPlot$comp==1&regPlot$vegeClass==j]))),	
 					border=NA,col=as.character(paste(vegeclassColors$colt3[j])))
 		}
@@ -1349,15 +1352,15 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3900,height=3900,
 		if(patternSlope$sig[patternSlope$comp==2&patternSlope$vegeClass==j]==1){
 			polygon(c(regPlot$xplot[regPlot$comp==2&regPlot$vegeClass==j],
 						rev(regPlot$xplot[regPlot$comp==2&regPlot$vegeClass==j])),
-					c(regPlot$X0.3.[regPlot$comp==2&regPlot$vegeClass==j],	
-					rev(regPlot$X99.7.[regPlot$comp==2&regPlot$vegeClass==j])),	
+					c(regPlot$X0.2.[regPlot$comp==2&regPlot$vegeClass==j],	
+					rev(regPlot$X99.8[regPlot$comp==2&regPlot$vegeClass==j])),	
 					border=NA,col=as.character(paste(vegeclassColors$colt3[j])))
 		}else{
 		polygon(c(regPlot$xplot[regPlot$comp==2&regPlot$vegeClass==j],
 						rev(regPlot$xplot[regPlot$comp==2&regPlot$vegeClass==j])),
-				c(rep(patternInt$X0.3.[patternInt$comp==2&patternInt$vegeClass==j], 
+				c(rep(patternInt$X0.2.[patternInt$comp==2&patternInt$vegeClass==j], 
 					length(regPlot$xplot[regPlot$comp==2&regPlot$vegeClass==j])),
-				rep(patternInt$X99.7.[patternInt$comp==2&patternInt$vegeClass==j], 
+				rep(patternInt$X99.8.[patternInt$comp==2&patternInt$vegeClass==j], 
 					length(regPlot$xplot[regPlot$comp==2&regPlot$vegeClass==j]))),	
 					border=NA,col=as.character(paste(vegeclassColors$colt3[j])))
 		}
@@ -1397,15 +1400,15 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3900,height=3900,
 		if(patternSlope$sig[patternSlope$comp==2&patternSlope$vegeClass==j]==1){
 			polygon(c(regPlot$xplot[regPlot$comp==2&regPlot$vegeClass==j],
 						rev(regPlot$xplot[regPlot$comp==2&regPlot$vegeClass==j])),
-					c(regPlot$X0.3.[regPlot$comp==2&regPlot$vegeClass==j],	
-					rev(regPlot$X99.7.[regPlot$comp==2&regPlot$vegeClass==j])),	
+					c(regPlot$X0.2.[regPlot$comp==2&regPlot$vegeClass==j],	
+					rev(regPlot$X99.8.[regPlot$comp==2&regPlot$vegeClass==j])),	
 					border=NA,col=as.character(paste(vegeclassColors$colt3[j])))
 		}else{
 		polygon(c(regPlot$xplot[regPlot$comp==2&regPlot$vegeClass==j],
 						rev(regPlot$xplot[regPlot$comp==2&regPlot$vegeClass==j])),
-				c(rep(patternInt$X0.3.[patternInt$comp==2&patternInt$vegeClass==j], 
+				c(rep(patternInt$X0.2.[patternInt$comp==2&patternInt$vegeClass==j], 
 					length(regPlot$xplot[regPlot$comp==2&regPlot$vegeClass==j])),
-				rep(patternInt$X99.7.[patternInt$comp==2&patternInt$vegeClass==j], 
+				rep(patternInt$X99.8.[patternInt$comp==2&patternInt$vegeClass==j], 
 					length(regPlot$xplot[regPlot$comp==2&regPlot$vegeClass==j]))),	
 					border=NA,col=as.character(paste(vegeclassColors$colt3[j])))
 		}
@@ -1430,6 +1433,131 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3900,height=3900,
 	mtext(expression(paste("Maximum soil temperature (",degree,"C)")),  line=xll, cex=llmx, side=1)
 	text(1,4.45,"d", cex=lgtxc)	
 dev.off()	
+
+#########################################
+####### Min vs Max plot           #######
+#########################################
+
+lgcx2 <- 5
+
+png(paste0(plotDI,"\\patterns_max.png"), width=2500,height=3900,
+			units="px")
+	layout(matrix(seq(1,2),ncol=1,byrow=FALSE), width=rep(lcm(wd),2),height=rep(lcm(hd),2))
+	par(mai=c(1,0,0,1))
+	plot(c(0,1),c(0,1),type="n", ylim=c(maxL,maxH), xlim=c(minL,minH), xlab=" ", ylab=" ",
+			xaxs="i", yaxs="i", axes=FALSE)
+	
+		#vegetation mean vs min group 1
+	for(i in 1:4){
+		j <- vg1[i]
+		points(SoilL[[xcomp[3]]]$Mean[SoilL[[xcomp[3]]]$vegeclass==j],
+				SoilL[[ycomp[3]]]$Mean[SoilL[[xcomp[3]]]$vegeclass==j], pch=19,
+				col=as.character(paste(vegeclassColors$colt2[j])),cex=px)
+	
+	}
+	#credible interval regression
+	for(i in 1:4){
+		j <- vg1[i]
+		if(patternSlope$sig[patternSlope$comp==3&patternSlope$vegeClass==j]==1){
+			polygon(c(regPlot$xplot[regPlot$comp==3&regPlot$vegeClass==j],
+						rev(regPlot$xplot[regPlot$comp==3&regPlot$vegeClass==j])),
+					c(regPlot$X0.2.[regPlot$comp==3&regPlot$vegeClass==j],	
+					rev(regPlot$X99.8.[regPlot$comp==3&regPlot$vegeClass==j])),	
+					border=NA,col=as.character(paste(vegeclassColors$colt3[j])))
+		}else{
+		polygon(c(regPlot$xplot[regPlot$comp==3&regPlot$vegeClass==j],
+						rev(regPlot$xplot[regPlot$comp==3&regPlot$vegeClass==j])),
+				c(rep(patternInt$X0.2.[patternInt$comp==3&patternInt$vegeClass==j], 
+					length(regPlot$xplot[regPlot$comp==3&regPlot$vegeClass==j])),
+				rep(patternInt$X99.8.[patternInt$comp==3&patternInt$vegeClass==j], 
+					length(regPlot$xplot[regPlot$comp==3&regPlot$vegeClass==j]))),	
+					border=NA,col=as.character(paste(vegeclassColors$colt3[j])))
+		}
+	}	
+	#regression line	
+	for(i in 1:4){
+		j <- vg1[i]
+		if(patternSlope$sig[patternSlope$comp==3&patternSlope$vegeClass==j]==1){
+			points(regPlot$xplot[regPlot$comp==3&regPlot$vegeClass==j],
+					regPlot$Mean[regPlot$comp==3&regPlot$vegeClass==j], type="l",
+					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])))
+		}else{
+			points(regPlot$xplot[regPlot$comp==3&regPlot$vegeClass==j],
+			rep(patternInt$Mean[patternInt$comp==3&patternInt$vegeClass==j],length(regPlot$xplot[regPlot$comp==3&regPlot$vegeClass==j])),
+					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])),lty=3,type="l")
+		}
+	
+	}
+	axis(2, seqMax, rep(" ",length(seqMax)), lwd.ticks=lwt, lwd=lwa)
+	mtext(seqMax,at=seqMax, line=yll, cex=amx,las=2, side=2)
+	text(-28,19.45,"a", cex=lgtxc)
+	
+
+	
+	legend("bottomleft",datVI$name2[vg1], col=as.character(paste(vegeclassColors$coli[vg1])),
+			 lwd=lglw, cex=lgcx2,bty="n")
+	
+	
+	mtext(expression(paste("Maximum soil temperature (",degree,"C)")), outer=TRUE, line=-12, cex=llmx, side=2)
+	par(mai=c(0,0,1,1))
+	plot(c(0,1),c(0,1),type="n", ylim=c(maxL,maxH), xlim=c(minL,minH), xlab=" ", ylab=" ",
+			xaxs="i", yaxs="i", axes=FALSE)
+	
+		#vegetation mean vs min group 2
+	for(i in 1:5){
+		j <- vg2[i]
+		points(SoilL[[xcomp[3]]]$Mean[SoilL[[xcomp[3]]]$vegeclass==j],
+				SoilL[[ycomp[3]]]$Mean[SoilL[[xcomp[3]]]$vegeclass==j], pch=19,
+				col=as.character(paste(vegeclassColors$colt2[j])),cex=px)
+	
+	}
+	
+		#credible interval regression
+	for(i in 1:5){
+		j <- vg2[i]
+		if(patternSlope$sig[patternSlope$comp==3&patternSlope$vegeClass==j]==1){
+			polygon(c(regPlot$xplot[regPlot$comp==3&regPlot$vegeClass==j],
+						rev(regPlot$xplot[regPlot$comp==3&regPlot$vegeClass==j])),
+					c(regPlot$X0.2.[regPlot$comp==3&regPlot$vegeClass==j],	
+					rev(regPlot$X99.8.[regPlot$comp==3&regPlot$vegeClass==j])),	
+					border=NA,col=as.character(paste(vegeclassColors$colt3[j])))
+		}else{
+		polygon(c(regPlot$xplot[regPlot$comp==3&regPlot$vegeClass==j],
+						rev(regPlot$xplot[regPlot$comp==3&regPlot$vegeClass==j])),
+				c(rep(patternInt$X0.2.[patternInt$comp==3&patternInt$vegeClass==j], 
+					length(regPlot$xplot[regPlot$comp==3&regPlot$vegeClass==j])),
+				rep(patternInt$X99.8.[patternInt$comp==3&patternInt$vegeClass==j], 
+					length(regPlot$xplot[regPlot$comp==3&regPlot$vegeClass==j]))),	
+					border=NA,col=as.character(paste(vegeclassColors$colt3[j])))
+		}
+	}
+	
+	for(i in 1:5){
+		j <- vg2[i]
+		if(patternSlope$sig[patternSlope$comp==3&patternSlope$vegeClass==j]==1){
+			points(regPlot$xplot[regPlot$comp==3&regPlot$vegeClass==j],
+					regPlot$Mean[regPlot$comp==3&regPlot$vegeClass==j], type="l",
+					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])))
+		}else{
+			points(regPlot$xplot[regPlot$comp==3&regPlot$vegeClass==j],
+			rep(patternInt$Mean[patternInt$comp==3&patternInt$vegeClass==j],length(regPlot$xplot[regPlot$comp==3&regPlot$vegeClass==j])),
+					lwd=mlw, col=as.character(paste(vegeclassColors$coli[j])),lty=3,type="l")
+		}
+	
+	}
+	axis(2, seqMax, rep(" ",length(seqMax)), lwd.ticks=lwt, lwd=lwa)
+	mtext(seqMax,at=seqMax, line=yll, cex=amx,las=2, side=2)
+	axis(1, seqMin, rep(" ",length(seqMin)), lwd.ticks=lwt, lwd=lwa)
+	mtext(seqMin,at=seqMin, line=yll, cex=amx, side=1)
+	mtext(expression(paste("Minimum soil temperature (",degree,"C)")),  line=xll, cex=llmx, side=1)
+	text(-28,19.45,"b", cex=lgtxc)
+
+	
+		legend("bottomleft",datVI$name2[vg2], col=as.character(paste(vegeclassColors$coli[vg2])),
+			 lwd=lglw, cex=lgcx2,bty="n")
+	
+dev.off()
+
 
 
 #######################################
