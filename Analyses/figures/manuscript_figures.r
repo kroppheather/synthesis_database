@@ -2485,13 +2485,7 @@ png(paste0(plotDI,"\\Supp_vege_site_agg_all.png"), width = 18, height = 18, unit
 	plot(c(0,1),c(0,1), type="n", xlim=c(0,1), ylim=c(0,10), xaxs="i",yaxs="i",xlab=" ", ylab=" ",axes=FALSE)
 	plot(c(0,1),c(0,1), type="n", xlim=c(0,1), ylim=c(0,10), xaxs="i",yaxs="i",xlab=" ", ylab=" ",axes=FALSE)
 	plot(c(0,1),c(0,1), type="n", xlim=c(0,1), ylim=c(0,10), xaxs="i",yaxs="i",xlab=" ", ylab=" ",axes=FALSE)
-	for(i in 1:3){
-		polygon(c(0,0,1,1),c(Hseql[i],Hseqh[i],Hseqh[i],Hseql[i]),col=as.character(heightCols$colsH[i]),border=NA)
-		
-	}
-	text(.5,1.5,"short",srt=90,cex=4,col="white")
-	text(.5,4,"mixed",srt=90,cex=4,col="white")
-	text(.5,7,"tall",srt=90,cex=4,col="white")		
+	
 	
 dev.off()	
 
