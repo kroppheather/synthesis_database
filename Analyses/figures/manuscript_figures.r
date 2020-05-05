@@ -918,43 +918,40 @@ dev.off()
 
 ###############################################
 ################ cold season
-png(paste0(plotDI,"\\intercepts_warm.png"), width=6000,height=8000,
+png(paste0(plotDI,"\\intercepts_cold.png"), width=6000,height=8000,
 			units="px")
 	layout(matrix(seq(1,4),ncol=1,byrow=TRUE), width=c(lcm(wd)),
 				height=c(lcm(hd),lcm(hd),lcm(hd),lcm(75)))
 
 
-		#comparision of average soil temperatures
+		#freeze n factor
 
 	par(mai=c(0,0,2.5,0),xpd=TRUE)
-		plot(c(0,1),c(0,1), ylim=c(yli[2],yhi[2]), xlim=c(xl,xh),
+		plot(c(0,1),c(0,1), ylim=c(yli[1],yhi[1]), xlim=c(xl,xh),
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
-		
 			points(c(xl,xh),c(1,1),type="l",lwd=zlw, col="grey75",lty=3)
 			for(i in 1:9){
 				j <- plotOrder[i]
 				polygon(c(xseq[i]-1,xseq[i]-1,xseq[i]+1,xseq[i]+1),
-						c(beta0$X25.[beta0$regID==2&beta0$vegeclass==j],beta0$X75.[beta0$regID==2&beta0$vegeclass==j],
-							beta0$X75.[beta0$regID==2&beta0$vegeclass==j],beta0$X25.[beta0$regID==2&beta0$vegeclass==j]),
-						col=boxCol ,border=NA)
-				arrows(xseq[i]-1,beta0$Mean[beta0$regID==2&beta0$vegeclass==j],
-						xseq[i]+1,beta0$Mean[beta0$regID==2&beta0$vegeclass==j],code=0,lwd=mlw)
-				arrows(	xseq[i],beta0$X0.3.[beta0$regID==2&beta0$vegeclass==j],
-						xseq[i],beta0$X99.7.[beta0$regID==2&beta0$vegeclass==j],
+						c(beta0$X25.[beta0$regID==1&beta0$vegeclass==j],beta0$X75.[beta0$regID==1&beta0$vegeclass==j],
+							beta0$X75.[beta0$regID==1&beta0$vegeclass==j],beta0$X25.[beta0$regID==1&beta0$vegeclass==j]),
+						col=boxCol,border=NA)
+				arrows(xseq[i]-1,beta0$Mean[beta0$regID==1&beta0$vegeclass==j],
+						xseq[i]+1,beta0$Mean[beta0$regID==1&beta0$vegeclass==j],code=0,lwd=mlw)
+				arrows(	xseq[i],beta0$X0.3.[beta0$regID==1&beta0$vegeclass==j],
+						xseq[i],beta0$X99.7.[beta0$regID==1&beta0$vegeclass==j],
 						code=0, lwd=alw)
 				}
-			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw,lwd=alwd)
-			axis(2, seq(yli[2],yhi[2], by=yii[2]), rep(" ",length(seq(yli[2],yhi[2], by=yii[2]))),
-				 lwd.ticks=tlw,lwd=alwd)
-			mtext(seq(yli[2],yhi[2], by=yii[2]),at=seq(yli[2],yhi[2], by=yii[2]), side=2, line=xll,cex=axc,las=2)	
 				
-
-			mtext("Ratio of soil:air",side=2,line=yll2,cex=mcx)
+			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw,lwd=alwd)
+			axis(2, seq(yli[1],yhi[1], by=yii[1]), rep(" ",length(seq(yli[1],yhi[1], by=yii[1]))),
+				 lwd.ticks=tlw,lwd=alwd)
+			mtext(seq(yli[1],yhi[1], by=yii[1]),at=seq(yli[1],yhi[1], by=yii[1]), side=2, line=xll,cex=axc,las=2)	
+			#mtext(expression(paste("(N"[freeze],")")),side=2,line=yll1,cex=mcx)
+			mtext("Ratio of soil:air ",side=2,line=yll2, cex=mcx)
+			mtext("freezing degree days (-) ",side=2,line=yll3,cex=mcx)
 			
-			
-			mtext("thawing degree days(-) ",side=2,line=yll3,cex=mcx)	
-			
-			text(xc,yhi[2]-(yhi[2]*yc), "a",cex=tcc)	
+			text(xc,yhi[1]-(yhi[1]*yc), "a",cex=tcc)	
 		
 			#plot days freezing	
 		par(mai=c(0,0,2.5,0))
@@ -966,7 +963,7 @@ png(paste0(plotDI,"\\intercepts_warm.png"), width=6000,height=8000,
 				polygon(c(xseq[i]-1,xseq[i]-1,xseq[i]+1,xseq[i]+1),
 						c(compAll$X25.[compAll$vegeclass==j&compAll$regID==1],compAll$X75.[compAll$vegeclass==j&compAll$regID==1],
 							compAll$X75.[compAll$vegeclass==j&compAll$regID==1],compAll$X25.[compAll$vegeclass==j&compAll$regID==1]),
-						col=paste(vegeclassColors$coli[j]),border=NA)
+						col=boxCol,border=NA)
 				arrows(xseq[i]-1,compAll$Mean[compAll$vegeclass==j&compAll$regID==1],
 						xseq[i]+1,compAll$Mean[compAll$vegeclass==j&compAll$regID==1],code=0,lwd=mlw)
 				arrows(	xseq[i],compAll$X0.2.[compAll$vegeclass==j&compAll$regID==1],
