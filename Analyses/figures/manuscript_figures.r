@@ -803,14 +803,234 @@ tcc <- 25
 #one line width
 zlw <- 9
 plotOrder <- c(1,2,4,3,6,5,7,8,9)
+boxCol <- "grey60"
 
-png(paste0(plotDI,"\\intercepts_N.png"), width=6000,height=8000,
+png(paste0(plotDI,"\\intercepts_warm.png"), width=6000,height=8000,
 			units="px")
-	layout(matrix(seq(1,5),ncol=1,byrow=TRUE), width=c(lcm(wd)),
-				height=c(lcm(hd),lcm(hd),lcm(hd),lcm(75),lcm(10)))
+	layout(matrix(seq(1,4),ncol=1,byrow=TRUE), width=c(lcm(wd)),
+				height=c(lcm(hd),lcm(hd),lcm(hd),lcm(75)))
 
 
 		#comparision of average soil temperatures
+
+	par(mai=c(0,0,2.5,0),xpd=TRUE)
+		plot(c(0,1),c(0,1), ylim=c(yli[2],yhi[2]), xlim=c(xl,xh),
+				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+		
+			points(c(xl,xh),c(1,1),type="l",lwd=zlw, col="grey75",lty=3)
+			for(i in 1:9){
+				j <- plotOrder[i]
+				polygon(c(xseq[i]-1,xseq[i]-1,xseq[i]+1,xseq[i]+1),
+						c(beta0$X25.[beta0$regID==2&beta0$vegeclass==j],beta0$X75.[beta0$regID==2&beta0$vegeclass==j],
+							beta0$X75.[beta0$regID==2&beta0$vegeclass==j],beta0$X25.[beta0$regID==2&beta0$vegeclass==j]),
+						col=boxCol ,border=NA)
+				arrows(xseq[i]-1,beta0$Mean[beta0$regID==2&beta0$vegeclass==j],
+						xseq[i]+1,beta0$Mean[beta0$regID==2&beta0$vegeclass==j],code=0,lwd=mlw)
+				arrows(	xseq[i],beta0$X0.3.[beta0$regID==2&beta0$vegeclass==j],
+						xseq[i],beta0$X99.7.[beta0$regID==2&beta0$vegeclass==j],
+						code=0, lwd=alw)
+				}
+			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw,lwd=alwd)
+			axis(2, seq(yli[2],yhi[2], by=yii[2]), rep(" ",length(seq(yli[2],yhi[2], by=yii[2]))),
+				 lwd.ticks=tlw,lwd=alwd)
+			mtext(seq(yli[2],yhi[2], by=yii[2]),at=seq(yli[2],yhi[2], by=yii[2]), side=2, line=xll,cex=axc,las=2)	
+				
+
+			mtext("Ratio of soil:air",side=2,line=yll2,cex=mcx)
+			
+			
+			mtext("thawing degree days(-) ",side=2,line=yll3,cex=mcx)	
+			
+			text(xc,yhi[2]-(yhi[2]*yc), "a",cex=tcc)	
+		
+			#plot days freezing	
+		par(mai=c(0,0,2.5,0))
+		plot(c(0,1),c(0,1), ylim=c(yli[3],yhi[3]), xlim=c(xl,xh),
+				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+	
+		
+			for(i in 1:9){
+				j <- plotOrder[i]
+				polygon(c(xseq[i]-1,xseq[i]-1,xseq[i]+1,xseq[i]+1),
+						c(Tbeta0$X25.[Tbeta0$vegeclass==j],Tbeta0$X75.[Tbeta0$vegeclass==j],
+							Tbeta0$X75.[Tbeta0$vegeclass==j],Tbeta0$X25.[Tbeta0$vegeclass==j]),
+						col=boxCol ,border=NA)
+				arrows(xseq[i]-1,Tbeta0$Mean[Tbeta0$vegeclass==j],
+						xseq[i]+1,Tbeta0$Mean[Tbeta0$vegeclass==j],code=0,lwd=mlw)
+				arrows(	xseq[i],Tbeta0$X0.3.[Tbeta0$vegeclass==j],
+						xseq[i],Tbeta0$X99.7.[Tbeta0$vegeclass==j],
+						code=0, lwd=alw)
+				}		
+			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw,lwd=alwd)
+			axis(2, seq(yli[3],yhi[3], by=yii[3]), rep(" ",length(seq(yli[3],yhi[3], by=yii[3]))),
+				 lwd.ticks=tlw,lwd=alwd)
+			mtext(seq(yli[3],yhi[3], by=yii[3]),at=seq(yli[3],yhi[3], by=yii[3]), side=2, line=xll,cex=axc,las=2)	
+				
+			mtext("Days above freezing",side=2,line=yll2,cex=mcx)
+			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw)
+		text(xc,yhi[3]-(yhi[3]*yc), "b",cex=tcc)	
+	
+	#maximum temp
+	par(mai=c(0,0,2.5,0),xpd=TRUE)
+	
+			plot(c(0,1),c(0,1), ylim=c(0,20), xlim=c(xl,xh),
+				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+		points(c(xl,xh),c(12,12),type="l",lwd=zlw, col="grey75",lty=3)
+			for(i in 1:9){
+				j <- plotOrder[i]
+				polygon(c(xseq[i]-1,xseq[i]-1,xseq[i]+1,xseq[i]+1),
+						c(compAll$X25.[compAll$vegeclass==j&compAll$regID==2],compAll$X75.[compAll$vegeclass==j&compAll$regID==2],
+							compAll$X75.[compAll$vegeclass==j&compAll$regID==2],compAll$X25.[compAll$vegeclass==j&compAll$regID==2]),
+						col=boxCol ,border=NA)
+				arrows(xseq[i]-1,compAll$Mean[compAll$vegeclass==j&compAll$regID==2],
+						xseq[i]+1,compAll$Mean[compAll$vegeclass==j&compAll$regID==2],code=0,lwd=mlw)
+				arrows(	xseq[i],compAll$X0.2.[compAll$vegeclass==j&compAll$regID==2],
+						xseq[i],compAll$X99.8.[compAll$vegeclass==j&compAll$regID==2],
+						code=0, lwd=alw)
+				}		
+	
+	axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw,lwd=alwd)
+			axis(2, seq(0,20, by=5), rep(" ",length(seq(0,20, by=5))),
+				 lwd.ticks=tlw,lwd=alwd)
+			mtext(seq(0,20, by=5),at=seq(0,20, by=5), side=2, line=xll,cex=axc,las=2)	
+			mtext("Maximum soil",side=2,line=yll2,cex=mcx)
+			mtext(expression(paste("temperature (",degree,"C)")),side=2,line=yll3,cex=mcx)	
+			
+	text(xc,20-(20*yc), "c",cex=tcc)
+	
+	#x labels
+	par(mai=c(0,0,0,0),xpd=TRUE)
+		plot(c(0,1),c(0,1), ylim=c(-10,0), xlim=c(xl,xh),
+				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+			text(xseq,rep(-.1,length(xseq)),datVI$name2[plotOrder],
+			srt=90, adj=1,cex=axc2,xpd=TRUE)	
+
+
+
+	
+
+	
+
+				
+dev.off()
+
+
+
+###############################################
+################ cold season
+png(paste0(plotDI,"\\intercepts_warm.png"), width=6000,height=8000,
+			units="px")
+	layout(matrix(seq(1,4),ncol=1,byrow=TRUE), width=c(lcm(wd)),
+				height=c(lcm(hd),lcm(hd),lcm(hd),lcm(75)))
+
+
+		#comparision of average soil temperatures
+
+	par(mai=c(0,0,2.5,0),xpd=TRUE)
+		plot(c(0,1),c(0,1), ylim=c(yli[2],yhi[2]), xlim=c(xl,xh),
+				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+		
+			points(c(xl,xh),c(1,1),type="l",lwd=zlw, col="grey75",lty=3)
+			for(i in 1:9){
+				j <- plotOrder[i]
+				polygon(c(xseq[i]-1,xseq[i]-1,xseq[i]+1,xseq[i]+1),
+						c(beta0$X25.[beta0$regID==2&beta0$vegeclass==j],beta0$X75.[beta0$regID==2&beta0$vegeclass==j],
+							beta0$X75.[beta0$regID==2&beta0$vegeclass==j],beta0$X25.[beta0$regID==2&beta0$vegeclass==j]),
+						col=boxCol ,border=NA)
+				arrows(xseq[i]-1,beta0$Mean[beta0$regID==2&beta0$vegeclass==j],
+						xseq[i]+1,beta0$Mean[beta0$regID==2&beta0$vegeclass==j],code=0,lwd=mlw)
+				arrows(	xseq[i],beta0$X0.3.[beta0$regID==2&beta0$vegeclass==j],
+						xseq[i],beta0$X99.7.[beta0$regID==2&beta0$vegeclass==j],
+						code=0, lwd=alw)
+				}
+			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw,lwd=alwd)
+			axis(2, seq(yli[2],yhi[2], by=yii[2]), rep(" ",length(seq(yli[2],yhi[2], by=yii[2]))),
+				 lwd.ticks=tlw,lwd=alwd)
+			mtext(seq(yli[2],yhi[2], by=yii[2]),at=seq(yli[2],yhi[2], by=yii[2]), side=2, line=xll,cex=axc,las=2)	
+				
+
+			mtext("Ratio of soil:air",side=2,line=yll2,cex=mcx)
+			
+			
+			mtext("thawing degree days(-) ",side=2,line=yll3,cex=mcx)	
+			
+			text(xc,yhi[2]-(yhi[2]*yc), "a",cex=tcc)	
+		
+			#plot days freezing	
+		par(mai=c(0,0,2.5,0))
+			plot(c(0,1),c(0,1), ylim=c(yli[4],yhi[4]), xlim=c(xl,xh),
+				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+		points(c(xl,xh),c(-22,-22),type="l",lwd=zlw, col="grey75",lty=3)
+			for(i in 1:9){
+				j <- plotOrder[i]
+				polygon(c(xseq[i]-1,xseq[i]-1,xseq[i]+1,xseq[i]+1),
+						c(compAll$X25.[compAll$vegeclass==j&compAll$regID==1],compAll$X75.[compAll$vegeclass==j&compAll$regID==1],
+							compAll$X75.[compAll$vegeclass==j&compAll$regID==1],compAll$X25.[compAll$vegeclass==j&compAll$regID==1]),
+						col=paste(vegeclassColors$coli[j]),border=NA)
+				arrows(xseq[i]-1,compAll$Mean[compAll$vegeclass==j&compAll$regID==1],
+						xseq[i]+1,compAll$Mean[compAll$vegeclass==j&compAll$regID==1],code=0,lwd=mlw)
+				arrows(	xseq[i],compAll$X0.2.[compAll$vegeclass==j&compAll$regID==1],
+						xseq[i],compAll$X99.8.[compAll$vegeclass==j&compAll$regID==1],
+						code=0, lwd=alw)
+				}		
+		
+			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw,lwd=alwd)
+			axis(2, seq(yli[4],yhi[4], by=yii[4]), rep(" ",length(seq(yli[4],yhi[4], by=yii[4]))),
+				 lwd.ticks=tlw,lwd=alwd)
+			mtext(seq(yli[4],yhi[4], by=yii[4]),at=seq(yli[4],yhi[4], by=yii[4]), side=2, line=xll,cex=axc,las=2)	
+		
+			mtext("Minimum soil",side=2,line=yll2,cex=mcx)		
+			mtext(expression(paste("temperature (",degree,"C)")),side=2,line=yll3,cex=mcx)
+				
+		text(xc,yhi[4]-(yhi[4]*yc), "b",cex=tcc)	
+	
+	#average temp
+	par(mai=c(0,0,2.5,0),xpd=TRUE)
+	
+			plot(c(0,1),c(0,1), ylim=c(yli[5],yhi[5]), xlim=c(xl,xh),
+				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+		points(c(xl,xh),c(-6,-6),type="l",lwd=zlw, col="grey75",lty=3)
+			for(i in 1:9){
+				j <- plotOrder[i]
+				polygon(c(xseq[i]-1,xseq[i]-1,xseq[i]+1,xseq[i]+1),
+						c(compAll$X25.[compAll$vegeclass==j&compAll$regID==3],compAll$X75.[compAll$vegeclass==j&compAll$regID==3],
+							compAll$X75.[compAll$vegeclass==j&compAll$regID==3],compAll$X25.[compAll$vegeclass==j&compAll$regID==3]),
+						col=boxCol,border=NA)
+				arrows(xseq[i]-1,compAll$Mean[compAll$vegeclass==j&compAll$regID==3],
+						xseq[i]+1,compAll$Mean[compAll$vegeclass==j&compAll$regID==3],code=0,lwd=mlw)
+				arrows(	xseq[i],compAll$X0.2.[compAll$vegeclass==j&compAll$regID==3],
+						xseq[i],compAll$X99.8.[compAll$vegeclass==j&compAll$regID==3],
+						code=0, lwd=alw)
+				}		
+		
+			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw,lwd=alwd)
+			axis(2, seq(yli[5],yhi[5], by=yii[5]), rep(" ",length(seq(yli[5],yhi[5], by=yii[5]))),
+				 lwd.ticks=tlw,lwd=alwd)
+			mtext(seq(yli[5],yhi[5], by=yii[5]),at=seq(yli[5],yhi[5], by=yii[5]), side=2, line=xll,cex=axc,las=2)	
+		
+			mtext("Average soil",side=2,line=yll2,cex=mcx)		
+			mtext(expression(paste("temperature (",degree,"C)")),side=2,line=yll3,cex=mcx)
+
+			
+	text(xc,yhi[5]-(yhi[5]*yc), "c",cex=tcc)
+	
+	#x labels
+	par(mai=c(0,0,0,0),xpd=TRUE)
+		plot(c(0,1),c(0,1), ylim=c(-10,0), xlim=c(xl,xh),
+				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+			text(xseq,rep(-.1,length(xseq)),datVI$name2[plotOrder],
+			srt=90, adj=1,cex=axc2,xpd=TRUE)	
+				
+dev.off()
+
+
+
+
+
+
+
+#####
+#comparision of average soil temperatures
 
 	par(mai=c(0,0,2.5,0),xpd=TRUE)
 		plot(c(0,1),c(0,1), ylim=c(yli[5],yhi[5]), xlim=c(xl,xh),
@@ -838,88 +1058,6 @@ png(paste0(plotDI,"\\intercepts_N.png"), width=6000,height=8000,
 			mtext(expression(paste("temperature (",degree,"C)")),side=2,line=yll3,cex=mcx)
 			text(xc,yhi[5]-(yhi[5]*yc), "a",cex=tcc)	
 		
-			#plot days freezing	
-		par(mai=c(0,0,2.5,0))
-		plot(c(0,1),c(0,1), ylim=c(yli[3],yhi[3]), xlim=c(xl,xh),
-				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
-	
-		
-			for(i in 1:9){
-				j <- plotOrder[i]
-				polygon(c(xseq[i]-1,xseq[i]-1,xseq[i]+1,xseq[i]+1),
-						c(Tbeta0$X25.[Tbeta0$vegeclass==j],Tbeta0$X75.[Tbeta0$vegeclass==j],
-							Tbeta0$X75.[Tbeta0$vegeclass==j],Tbeta0$X25.[Tbeta0$vegeclass==j]),
-						col=paste(vegeclassColors$coli[j]),border=NA)
-				arrows(xseq[i]-1,Tbeta0$Mean[Tbeta0$vegeclass==j],
-						xseq[i]+1,Tbeta0$Mean[Tbeta0$vegeclass==j],code=0,lwd=mlw)
-				arrows(	xseq[i],Tbeta0$X0.3.[Tbeta0$vegeclass==j],
-						xseq[i],Tbeta0$X99.7.[Tbeta0$vegeclass==j],
-						code=0, lwd=alw)
-				}		
-			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw,lwd=alwd)
-			axis(2, seq(yli[3],yhi[3], by=yii[3]), rep(" ",length(seq(yli[3],yhi[3], by=yii[3]))),
-				 lwd.ticks=tlw,lwd=alwd)
-			mtext(seq(yli[3],yhi[3], by=yii[3]),at=seq(yli[3],yhi[3], by=yii[3]), side=2, line=xll,cex=axc,las=2)	
-				
-			mtext("Days above freezing",side=2,line=yll2,cex=mcx)
-			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw)
-		text(xc,yhi[3]-(yhi[3]*yc), "b",cex=tcc)	
-	
-	#maximum temp
-	par(mai=c(0,0,2.5,0),xpd=TRUE)
-	
-			plot(c(0,1),c(0,1), ylim=c(0,20), xlim=c(xl,xh),
-				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
-		points(c(xl,xh),c(12,12),type="l",lwd=zlw, col="grey75",lty=3)
-			for(i in 1:9){
-				j <- plotOrder[i]
-				polygon(c(xseq[i]-1,xseq[i]-1,xseq[i]+1,xseq[i]+1),
-						c(compAll$X25.[compAll$vegeclass==j&compAll$regID==2],compAll$X75.[compAll$vegeclass==j&compAll$regID==2],
-							compAll$X75.[compAll$vegeclass==j&compAll$regID==2],compAll$X25.[compAll$vegeclass==j&compAll$regID==2]),
-						col=paste(vegeclassColors$coli[j]),border=NA)
-				arrows(xseq[i]-1,compAll$Mean[compAll$vegeclass==j&compAll$regID==2],
-						xseq[i]+1,compAll$Mean[compAll$vegeclass==j&compAll$regID==2],code=0,lwd=mlw)
-				arrows(	xseq[i],compAll$X0.2.[compAll$vegeclass==j&compAll$regID==2],
-						xseq[i],compAll$X99.8.[compAll$vegeclass==j&compAll$regID==2],
-						code=0, lwd=alw)
-				}		
-	
-	axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw,lwd=alwd)
-			axis(2, seq(0,20, by=5), rep(" ",length(seq(0,20, by=5))),
-				 lwd.ticks=tlw,lwd=alwd)
-			mtext(seq(0,20, by=5),at=seq(0,20, by=5), side=2, line=xll,cex=axc,las=2)	
-			mtext("Maximum soil",side=2,line=yll2,cex=mcx)
-			mtext(expression(paste("temperature (",degree,"C)")),side=2,line=yll3,cex=mcx)	
-			
-	text(xc,20-(20*yc), "c",cex=tcc)
-	
-	#x labels
-	par(mai=c(0,0,0,0),xpd=TRUE)
-		plot(c(0,1),c(0,1), ylim=c(-10,0), xlim=c(xl,xh),
-				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
-			text(xseq,rep(-.1,length(xseq)),datVI$name2[plotOrder],
-			srt=90, adj=1,cex=axc2,xpd=TRUE)	
-
-
-
-	
-	par(mai=c(0,0,0,0),xpd=TRUE)
-	plot(c(0,1),c(0,1), type="n", xlim=c(xl,xh), ylim=c(0,1), xaxs="i",yaxs="i",xlab=" ", ylab=" ",axes=FALSE)
-	for(i in 1:3){
-		polygon(c(Hseql[i],Hseql[i],Hseqh[i],Hseqh[i]),c(0,1,1,0),col=as.character(heightCols$colsH[i]),border=NA)
-		
-	}
-	
-	text(4.5,0.5,"short",cex=axc2,col="white")
-	text(12,0.5,"mixed",cex=axc2,col="white")
-	text(20.5,0.5,"tall",cex=axc2,col="white")		
-	
-
-				
-dev.off()
-
-
-
 
 #######################################
 #####make a plot of the n-thaw    #####
