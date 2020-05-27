@@ -382,7 +382,8 @@ datI <- join(datI,datV,by="siteid",type="left")
 #join index back into datST
 
 datST <- join(datST,datI, by=c("wyear","depth","siteid"),type="left")	
-
+#remove outlier year and depth
+datST <- datST[-which(datST$wyear == 1996 & datST$siteid == 13 & datST$depth ==2.5),]
 #create a list of dataframes where each year is filled in with NA for plotting		
 dayAll <- data.frame(wdoy=seq(1,366))			
 
@@ -411,6 +412,7 @@ for(i in 1:9){
 #get summary information
 #get count of observations for each day of year and depth
 datSTn <- na.omit(datST)
+
 #create a depth ID
 datSTn$depthID <- ifelse(datSTn$depth <= 5,1,
 					ifelse(datSTn$depth >5 & datSTn$depth <= 10, 2,
@@ -838,10 +840,10 @@ png(paste0(plotDI,"\\intercepts_warm.png"), width=6000,height=8000,
 			mtext(seq(yli[2],yhi[2], by=yii[2]),at=seq(yli[2],yhi[2], by=yii[2]), side=2, line=xll,cex=axc,las=2)	
 				
 
-			mtext("Ratio of soil:air",side=2,line=yll2,cex=mcx)
+			mtext("Thawing",side=2,line=yll2,cex=mcx)
 			
 			
-			mtext("thawing degree days(-) ",side=2,line=yll3,cex=mcx)	
+			mtext("n-factor (-) ",side=2,line=yll3,cex=mcx)	
 			
 			text(xc,yhi[2]-(yhi[2]*yc), "a",cex=tcc)	
 		
@@ -1655,7 +1657,8 @@ AirR <- ldply(AirL,data.frame)
 ParmAll <- join(SoilR,AirR, by=c("siteid","wyear","regID"),type="left")
 #remove outlier year and depth
 SoilParm <- SoilParm[-which(SoilParm$wyear == 1996 & SoilParm$siteid == 13 & SoilParm$depth ==2.5),]
-
+#remove outlier year and depth
+SoilParm <- SoilParm[-which(SoilParm$wyear == 1996 & SoilParm$siteid == 13 & SoilParm$depth ==2.5),]
 #get unique veg regression id
 
 regvegeID <- unique(data.frame(vegeclass=ParmAll$vegeclass,regID=ParmAll$regID))
@@ -2174,135 +2177,6 @@ sumAllSave <- data.frame(siteid=sumAll$siteid,latitude=sumAll$latitude,longitude
 
 write.table(sumAllSave, paste0(plotDI,"\\summary_analysis_sites.csv"),sep=",",row.names=FALSE)
 
-
-
-##########################################################################################
-##########################################################################################
-################# Figure ?. map comparison of study sites with landcover #################
-##########################################################################################
-##########################################################################################
-
-#######################################
-#####landcover                  ##### 
-#######################################
-esa <- raster("z:\\data_repo\\gis_data\\esa_cci_landcover\\ESACCI-LC-L4-LCCS-Map-300m-P1Y-1992_2015-v2.0.7\\scratch\\ESACCI-LC-L4-LCCS-Map-300m-P1Y-1992_2015-v2.0.7.tif")
-
-
-cavm <- raster("z:\\data_repo\\gis_data\\raster_CAVM\\raster_cavm_v1.tif")
-#######################################
-#####projection                   ##### 
-#######################################
-
-laea <- "+proj=laea +lat_0=90 +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs" 
-
-#######################################
-#####world data                   ##### 
-#######################################
-
-worldmap <- map("world", ylim=c(50,90), fill=TRUE)
-#focus on a smaller extent
-worldmap2 <- map("world", ylim=c(55,90))
-
-#######################################
-#####landcover    org             ##### 
-#######################################
-str(esa)
-res(esa)
-res(cavm)
-
-e <- as(extent( -180,180, 55, 90), 'SpatialPolygons')
-crs(e) <- "+proj=longlat +datum=WGS84 +no_defs"
-esaC <- crop(esa, e)
-#plot(esaC)
-esaP <- projectRaster(esaC,res=1000,crs=laea,progress='text', method="ngb")
-#plot(esaP)
-#clear out extra memory
-rm("esa")
-#plot(cavm)
-
-#remove non arctic values & add 500 to make identifiable from esa
-cavmNA <- setValues(cavm,ifelse(getValues(cavm)>80,NA,getValues(cavm)+500))
-#plot(cavmNA)
-#project
-cavmNAP <- projectRaster(cavmNA,res=1000,crs=laea,progress='text', method="ngb")
-#clear up memory
-rm("cavm")
-#run garbage collector
-gc()
-#merge cavm & esa choosing cavm values when they are not NA
-#first resample cavm to match esa
-cavmRE <- resample(cavmNAP,esaP,method="ngb")
-
-#######################################
-#####need to merge two rasters    ##### 
-#######################################
-#merge two rasters, values default to cavm when no na
-landAll <- merge(cavmRE,esaP)
-
-
-
-
-
-#######################################
-#####world data data               ##### 
-#######################################
-
-#reproject into lambers equal aarea
-
-#world map
-world <- project(matrix(c(worldmap$x,worldmap$y), ncol=2,byrow=FALSE),laea)
-world2 <- project(matrix(c(worldmap2$x,worldmap2$y), ncol=2,byrow=FALSE),laea)
-#set up spatial point class
-
-
-#######################################
-#####compare to sites             ##### 
-#######################################
-coord.temp <- data.frame(siteid=siteinfo$site_id,lon=siteinfo$lon,lat=siteinfo$lat)
-siteP <- data.frame(siteid=unique(SoilParm$siteid))
-siteP <- join(siteP,coord.temp, by="siteid",type="left")
-#join vegeclass and 
-siteP <- join(siteP,datV,by="siteid",type="left")
-siteP <- join(siteP,vegeclassColors,by="vegeclass",type="left")
-
-#site coordinates
-sitesV <- project(matrix(c(siteP$lon,siteP$lat),ncol=2,byrow=FALSE),laea)
-colnames(sitesV) <- c("X","Y")
-#add back in to site info
-siteP <- cbind(siteP,sitesV)
-siteSP <- SpatialPoints(data.frame(siteP[,"X"],siteP[,"Y"]), proj4string=CRS(laea))
-#check that points all within the extent
-plot(landAll)
-points(siteSP, pch=19, cex=2)
-
-siteP$siteClass <- extract(landAll, siteSP)
-
-#join two land class tables
-
-landClassIDS <- data.frame(siteClass = c(cavmIDS$CavmID + 500, esaIDS$NB_LAB), 
-							originalName = c(as.character(cavmIDS$CAVMnames),as.character(esaIDS$LCCOwnLabel)),  
-							vegeclassMatch= c(cavmIDS$vegeclassMatch,esaIDS$vegeclassMatch))
-							
-#join into siteP
-siteP2 <- join(siteP,landClassIDS, by="siteClass",type="left")				
-
-#compare classifications
-siteP2$comp <- ifelse(siteP2$vegeclass == siteP2$vegeclassMatch, 1, 0)
-#set sites with na as no match
-siteP2$comp2 <-		ifelse(is.na(siteP2$vegeclassMatch), 0,siteP2$comp )
-
-ClassComp <- sum(siteP2$comp2)	/ length(siteP2$comp2)
-
-
-#######################################
-#####plot all data                ##### 
-#######################################
-
-#make a raster color table
-
-ClassDF <-	data.frame(siteClass = unique(getValues(landAll)))
-#join into ID table
-ClassDF <- join(ClassDF, landClassIDS, by="siteClass", type="left")
 
 
 
