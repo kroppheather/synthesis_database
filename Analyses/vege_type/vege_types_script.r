@@ -50,8 +50,8 @@ library(plyr)
 #set up a plot directory
 plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\plots\\model_all"
 #model directory
-modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run8"
-Nrun <- 7
+modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run9"
+Nrun <- 9
 #indicate if a model run is occuring
 modRun <- 1
 
@@ -111,8 +111,8 @@ AirR <- ldply(AirL,data.frame)
 
 #now join soil and air DF
 ParmAll <- join(SoilR,AirR, by=c("siteid","wyear","regID"),type="left")
-
-
+#remove outlier year and depth
+ParmAll <- ParmAll[-which(ParmAll$wyear == 1996 & ParmAll$siteid == 13 & ParmAll$depth ==2.5),]
 #get unique veg regression id
 
 regvegeID <- unique(data.frame(vegeclass=ParmAll$vegeclass,regID=ParmAll$regID))

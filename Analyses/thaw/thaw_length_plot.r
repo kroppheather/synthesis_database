@@ -50,12 +50,14 @@ library(plyr)
 #set up a plot directory
 plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\thaw\\plots\\model"
 #model directory
-modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\thaw\\model\\run1"
-Nrun <-1
+modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\thaw\\model\\run3"
+Nrun <-3
 
 
 #join vegeclass to data
 ThawParm2 <- join(ThawParm,datV, by="siteid",type="left")
+#remove outlier year and depth
+ThawParm2 <- ThawParm2[-which(ThawParm2$wyear == 1996 & ThawParm2$siteid == 13 & ThawParm2$depth ==2.5),]
 vegeID <- data.frame(vegeclass=unique(ThawParm2$vegeclass))
 vegeIDc <- join(vegeID,datVI,by="vegeclass",type="left")
 vegeIDc <- vegeIDc[order(vegeIDc$vegeclass),]

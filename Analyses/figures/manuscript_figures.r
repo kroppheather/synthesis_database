@@ -40,8 +40,8 @@ plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\figures"
 
 #read in vegetation type regression results
 #updated 11/13
-vegeRS <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run8\\vege_mod_stats.csv")
-vegeRT <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run8\\vege_mod_quant.csv")
+vegeRS <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run9\\vege_mod_stats.csv")
+vegeRT <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run9\\vege_mod_quant.csv")
 vegeR <- cbind(vegeRS,vegeRT)
 
 #pull out parm names
@@ -55,24 +55,24 @@ datWC <- read.csv("c:\\Users\\hkropp\\Google Drive\\map_synth\\WCprecSites.csv")
 
 #read in N factor regression results
 #updated 11/14
-Nstats <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\n_factor\\model\\run3\\vege_mod_stats.csv")
-Nquant <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\n_factor\\model\\run3\\vege_mod_quant.csv")
+Nstats <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\n_factor\\model\\run4\\vege_mod_stats.csv")
+Nquant <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\n_factor\\model\\run4\\vege_mod_quant.csv")
 Ndf <- cbind(Nstats,Nquant)
 
 Ndf$parms <- gsub(dexps,"", rownames(Ndf))
 
 #read in thaw days results
 #update 11/14
-Thawstats <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\thaw\\model\\run2\\vege_mod_stats.csv")
-Thawquant <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\thaw\\model\\run2\\vege_mod_quant.csv")
+Thawstats <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\thaw\\model\\run3\\vege_mod_stats.csv")
+Thawquant <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\thaw\\model\\run3\\vege_mod_quant.csv")
 
 Thawdf <- cbind(Thawstats,Thawquant)
 Thawdf$parms <- gsub(dexps,"", rownames(Thawdf))
 
 #read in average pattern results
 #updated 11/12
-patternStat <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\pattern\\model\\run3\\pattern_mod_stats.csv")
-patternQuant <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\pattern\\model\\run3\\pattern_mod_quant.csv")
+patternStat <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\pattern\\model\\run4\\pattern_mod_stats.csv")
+patternQuant <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\pattern\\model\\run4\\pattern_mod_quant.csv")
 patternDF <- cbind(patternStat,patternQuant )
 patternDF$parms <- gsub(dexps,"", rownames(patternDF))
 
@@ -629,6 +629,7 @@ dev.off()
 
 #join vegeclass to data
 Nfactor2 <- join(Nfactor,datV, by="siteid",type="left")
+Nfactor2 <- Nfactor2[-which(Nfactor2$wyear == 1996 & Nfactor2$siteid == 13 & Nfactor2$depth ==2.5),]
 #create regression id
 Nfactor2$regID <- ifelse(Nfactor2$parm=="Fn",1,2)
 
@@ -642,6 +643,7 @@ regvegeID$regvegeID <- seq(1,dim(regvegeID)[1])
 
 #join vegeclass to data
 ThawParm2 <- join(ThawParm,datV, by="siteid",type="left")
+ThawParm2 <- ThawParm2[-which(ThawParm2$wyear == 1996 & ThawParm2$siteid == 13 & ThawParm2$depth ==2.5),]
 vegeID <- data.frame(vegeclass=unique(ThawParm2$vegeclass))
 vegeIDc <- join(vegeID,datVI,by="vegeclass",type="left")
 vegeIDc <- vegeIDc[order(vegeIDc$vegeclass),]
@@ -720,7 +722,8 @@ regvegeID$regvegeID <- seq(1,dim(regvegeID)[1])
 
 #now join back into parmall
 ParmAll <- join(ParmAll,regvegeID, by=c("vegeclass","regID"),type="left")
-
+#remove outlier year and depth
+ParmAll <- ParmAll[-which(ParmAll$wyear == 1996 & ParmAll$siteid == 13 & ParmAll$depth ==2.5),]
 
 
 
@@ -1058,6 +1061,8 @@ write.table(Tbeta0, paste0(plotDI,"\\inter_thawing_days.csv")	, sep=",", row.nam
 
 #join vege class to soilParm
 SoilParm <- join(SoilParm,datV, by=c("siteid"), type="left")
+#remove outlier year and depth
+SoilParm <- SoilParm[-which(SoilParm$wyear == 1996 & SoilParm$siteid == 13 & SoilParm$depth ==2.5),]
 unique(SoilParm$vegeclass)
 AirParm <- join(AirParm, datV, by=c("siteid"), type="left")
 
@@ -1648,7 +1653,8 @@ AirR <- ldply(AirL,data.frame)
 
 #now join soil and air DF
 ParmAll <- join(SoilR,AirR, by=c("siteid","wyear","regID"),type="left")
-
+#remove outlier year and depth
+SoilParm <- SoilParm[-which(SoilParm$wyear == 1996 & SoilParm$siteid == 13 & SoilParm$depth ==2.5),]
 
 #get unique veg regression id
 

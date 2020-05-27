@@ -63,14 +63,15 @@ vegeclassColors <- data.frame(vegeclass=seq(1,9),
 #set up a plot directory
 plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\n_factor\\plots\\model"
 #model directory
-modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\n_factor\\model\\run2"
-Nrun <-2
+modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\n_factor\\model\\run4"
+Nrun <-4
 #indicate if a model run is occuring
 modRun <- 1
 
 
 #join vegeclass to data
 Nfactor2 <- join(Nfactor,datV, by="siteid",type="left")
+Nfactor2 <- Nfactor2[-which(Nfactor2$wyear == 1996 & Nfactor2$siteid == 13 & Nfactor2$depth ==2.5),]
 #create regression id
 Nfactor2$regID <- ifelse(Nfactor2$parm=="Fn",1,2)
 

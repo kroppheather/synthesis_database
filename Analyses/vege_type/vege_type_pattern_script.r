@@ -36,7 +36,7 @@ library(plyr)
 #######################################
 
 #model directory
-modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\pattern\\model\\run3"
+modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\pattern\\model\\run4"
 Nrun <- 1
 
 
@@ -48,6 +48,9 @@ Nrun <- 1
 
 #join vege class to soilParm
 SoilParm <- join(SoilParm,datV, by=c("siteid"), type="left")
+#remove outlier year and depth
+SoilParm <- SoilParm[-which(SoilParm$wyear == 1996 & SoilParm$siteid == 13 & SoilParm$depth ==2.5),]
+
 unique(SoilParm$vegeclass)
 AirParm <- join(AirParm, datV, by=c("siteid"), type="left")
 
@@ -90,7 +93,6 @@ vegeComp$vegeCompID <- seq(1,dim(vegeComp)[1])
 
 #join back into soildf
 SoilCompDF2 <- join(SoilCompDF,vegeComp, by=c("vegeClass","comp"),type="left")
-
 
 #make plotting data
 

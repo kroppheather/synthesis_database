@@ -49,8 +49,8 @@ library(plyr)
 #set up a plot directory
 plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\plots\\model_all"
 #model directory
-modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run7"
-Nrun <- 7
+modDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run9"
+Nrun <- 9
 #######################################
 #####set up colors               ##### 
 #######################################
@@ -130,7 +130,8 @@ regvegeID$regvegeID <- seq(1,dim(regvegeID)[1])
 #now join back into parmall
 ParmAll <- join(ParmAll,regvegeID, by=c("vegeclass","regID"),type="left")
 
-
+#remove outlier year and depth
+ParmAll <- ParmAll[-which(ParmAll$wyear == 1996 & ParmAll$siteid == 13 & ParmAll$depth ==2.5),]
 
 
 #get range of precip and air temps in each vegetation group for each regression
