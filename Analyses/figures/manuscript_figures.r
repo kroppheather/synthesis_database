@@ -952,8 +952,8 @@ png(paste0(plotDI,"\\intercepts_cold.png"), width=6000,height=8000,
 				 lwd.ticks=tlw,lwd=alwd)
 			mtext(seq(yli[1],yhi[1], by=yii[1]),at=seq(yli[1],yhi[1], by=yii[1]), side=2, line=xll,cex=axc,las=2)	
 			#mtext(expression(paste("(N"[freeze],")")),side=2,line=yll1,cex=mcx)
-			mtext("Ratio of soil:air ",side=2,line=yll2, cex=mcx)
-			mtext("freezing degree days (-) ",side=2,line=yll3,cex=mcx)
+			mtext("Freezing ",side=2,line=yll2, cex=mcx)
+			mtext("n-factor (-) ",side=2,line=yll3,cex=mcx)
 			
 			text(xc,yhi[1]-(yhi[1]*yc), "a",cex=tcc)	
 		
@@ -1284,7 +1284,7 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3900,height=3900,
 			 lwd=lglw, cex=lgcx,bty="n")
 	
 	
-	mtext(expression(paste("Average soil temperature (",degree,"C)")), outer=TRUE, line=-12, cex=llmx, side=2)
+	mtext(expression(paste("Mean annual soil temperature (",degree,"C)")), outer=TRUE, line=-12, cex=llmx, side=2)
 	par(mai=c(0,0,1,1))
 	plot(c(0,1),c(0,1),type="n", ylim=c(aveL,aveH), xlim=c(minL,minH), xlab=" ", ylab=" ",
 			xaxs="i", yaxs="i", axes=FALSE)
@@ -1388,7 +1388,7 @@ png(paste0(plotDI,"\\patterns_ave.png"), width=3900,height=3900,
 	
 	axis(4, seqAve, rep(" ",length(seqAve)), lwd.ticks=lwt, lwd=lwa)
 	mtext(seqAve,at=seqAve, line=yll, cex=amx,las=2, side=4)
-	mtext(expression(paste("Average soil temperature (",degree,"C)")), outer=TRUE, line=-12, cex=llmx, side=4)
+	mtext(expression(paste("Mean annual soil temperature (",degree,"C)")), outer=TRUE, line=-12, cex=llmx, side=4)
 	text(1,4.45,"c", cex=lgtxc)
 	#average vs max group 2 	
 	par(mai=c(0,1,1,0))
