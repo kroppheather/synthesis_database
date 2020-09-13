@@ -2700,3 +2700,27 @@ write.table(avecomp, paste0(plotDI, "\\aveT_comp.csv"), sep=",")
 #evergreen:c
 #deciduous :c
 #mixed: c
+
+
+
+
+#########################
+######get more summary information for sites
+
+
+#now just subset sites, years and depths used in the analysis
+
+#get unique values from soil parm
+sumS <- unique(data.frame(siteid=SoilParm$siteid,depth=SoilParm$depth,wyear=SoilParm$wyear))
+
+sumA <- unique(data.frame(siteid=AirParm$siteid, height=AirParm$height))
+sumSsites <- unique(data.frame(siteid=sumS$siteid))
+
+colnames(siteinfo)[1] <- "siteid"
+
+siteSummary <- join(sumSsites,siteinfo, by = c("siteid"), type="left")
+siteSummary <- join(siteSummary, datV, by="siteid", type="left")
+siteSummary <- join(siteSummary, datVI, by="vegeclass", type="left")
+
+
+hist(siteSummary$lat)
