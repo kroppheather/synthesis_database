@@ -36,7 +36,7 @@ siteinfo <- read.csv("c:\\Users\\hkropp\\Google Drive\\raw_data\\backup_6\\sitei
 datVI$name <- c("herb barren","graminoid tundra","tussock tundra","short shrub tundra","tall shrub tundra","wetland",
 				"evergreen needleleaf boreal","deciduous needleleaf boreal","mixed boreal")
 
-plotDI <- "c:\\Users\\hkropp\\Google Drive\\synthesis_model\\figures"	
+plotDI <- "z:\\Users\\hkropp\\figures"	
 
 #read in vegetation type regression results
 #updated 11/13
@@ -749,6 +749,16 @@ regvegeID$meanAir <- round(meanAir$x,0)
 compAll <- vegeR[vegeR$parms=="meanComp",]
 compAll <- cbind(compAll,regvegeID)
 
+######################
+####sig codes       ##
+######################
+nfLetters <- c("a","b","c","b","c","c","c","c","c")
+ntLetters <- c("a","b","c","d","e","b,d,e","c,f","f,g","c,d,f,h")
+thawLetters <- c("a","a","b","b","c","b,c","b","b,c","b,c")
+minLetters <- c("a","b","c","b","c,d","c,d","c,d","c,d","c,d","d")
+maxLetters <- c("a","b","b","c","c","b,c","b,d","d","b,c,d")
+aveLetters <- c("a","b","c","b","c","c","c","c","c")
+
 
 #######################################
 #####plot just intercept          ##### 
@@ -775,7 +785,7 @@ xseq <-c(1,4,7,10,13,16,19,22,25)
 Hseql <- c(0,9,15)
 Hseqh <- c(9,15,26)
 yli <- c(0,0,75,-35,-12)
-yhi <- c(1.5,1.7,200,5,2)
+yhi <- c(1.5,1.7,200,10,10)
 yii <- c(.5,.5,25,5,2)
 xl <- -1
 xh <- 27
@@ -808,6 +818,16 @@ tcc <- 25
 zlw <- 9
 plotOrder <- c(1,2,4,3,6,5,7,8,9)
 boxCol <- "grey60"
+#letters
+ntH <- 0.1
+thawH <- 5
+maxH <- 1
+nfH <- 0.1
+aveH <- 2
+minH <- 2
+#size of letters
+Lc <- 13
+
 
 png(paste0(plotDI,"\\intercepts_warm.png"), width=6000,height=8000,
 			units="px")
@@ -833,7 +853,9 @@ png(paste0(plotDI,"\\intercepts_warm.png"), width=6000,height=8000,
 				arrows(	xseq[i],beta0$X0.3.[beta0$regID==2&beta0$vegeclass==j],
 						xseq[i],beta0$X99.7.[beta0$regID==2&beta0$vegeclass==j],
 						code=0, lwd=alw)
+					text(xseq[i],beta0$X99.7.[beta0$regID==2&beta0$vegeclass==j]+ntH,ntLetters[j],cex=Lc	)	
 				}
+			
 			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw,lwd=alwd)
 			axis(2, seq(yli[2],yhi[2], by=yii[2]), rep(" ",length(seq(yli[2],yhi[2], by=yii[2]))),
 				 lwd.ticks=tlw,lwd=alwd)
@@ -864,6 +886,7 @@ png(paste0(plotDI,"\\intercepts_warm.png"), width=6000,height=8000,
 				arrows(	xseq[i],Tbeta0$X0.3.[Tbeta0$vegeclass==j],
 						xseq[i],Tbeta0$X99.7.[Tbeta0$vegeclass==j],
 						code=0, lwd=alw)
+						text(xseq[i],Tbeta0$X99.7.[Tbeta0$vegeclass==j]+thawH,thawLetters[j],cex=Lc	)	
 				}		
 			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw,lwd=alwd)
 			axis(2, seq(yli[3],yhi[3], by=yii[3]), rep(" ",length(seq(yli[3],yhi[3], by=yii[3]))),
@@ -891,6 +914,7 @@ png(paste0(plotDI,"\\intercepts_warm.png"), width=6000,height=8000,
 				arrows(	xseq[i],compAll$X0.2.[compAll$vegeclass==j&compAll$regID==2],
 						xseq[i],compAll$X99.8.[compAll$vegeclass==j&compAll$regID==2],
 						code=0, lwd=alw)
+						text(xseq[i],compAll$X99.8.[compAll$vegeclass==j&compAll$regID==2]+maxH,maxLetters[j],cex=Lc	)
 				}		
 	
 	axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw,lwd=alwd)
@@ -945,6 +969,7 @@ png(paste0(plotDI,"\\intercepts_cold.png"), width=6000,height=8000,
 				arrows(	xseq[i],beta0$X0.3.[beta0$regID==1&beta0$vegeclass==j],
 						xseq[i],beta0$X99.7.[beta0$regID==1&beta0$vegeclass==j],
 						code=0, lwd=alw)
+				text(xseq[i],beta0$X99.7.[beta0$regID==1&beta0$vegeclass==j]+nfH,nfLetters[j],cex=Lc	)		
 				}
 				
 			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw,lwd=alwd)
@@ -957,7 +982,7 @@ png(paste0(plotDI,"\\intercepts_cold.png"), width=6000,height=8000,
 			
 			text(xc,yhi[1]-(yhi[1]*yc), "a",cex=tcc)	
 		
-			#plot days freezing	
+			#plot min temp
 		par(mai=c(0,0,2.5,0))
 			plot(c(0,1),c(0,1), ylim=c(yli[4],yhi[4]), xlim=c(xl,xh),
 				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
@@ -973,6 +998,7 @@ png(paste0(plotDI,"\\intercepts_cold.png"), width=6000,height=8000,
 				arrows(	xseq[i],compAll$X0.2.[compAll$vegeclass==j&compAll$regID==1],
 						xseq[i],compAll$X99.8.[compAll$vegeclass==j&compAll$regID==1],
 						code=0, lwd=alw)
+				text(xseq[i],compAll$X99.8.[compAll$vegeclass==j&compAll$regID==1]+minH,minLetters[j],cex=Lc	)		
 				}		
 		
 			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw,lwd=alwd)
@@ -1002,6 +1028,7 @@ png(paste0(plotDI,"\\intercepts_cold.png"), width=6000,height=8000,
 				arrows(	xseq[i],compAll$X0.2.[compAll$vegeclass==j&compAll$regID==3],
 						xseq[i],compAll$X99.8.[compAll$vegeclass==j&compAll$regID==3],
 						code=0, lwd=alw)
+				text(xseq[i],compAll$X99.8.[compAll$vegeclass==j&compAll$regID==3]+aveH,aveLetters[j],cex=Lc	)			
 				}		
 		
 			axis(1, xseq, rep(" ",length(xseq)), lwd.ticks=tlw,lwd=alwd)
@@ -2381,3 +2408,295 @@ sitexyear <- join(sitexyear,datV, by="siteid", type="left")
 sxyCount <- aggregate(sitexyear$siteid, by=list(sitexyear$vegeclass),FUN="length")
 sum(sxyCount$x)
 
+
+##############
+nc1 <- read.csv("C:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\n_factor\\model\\run4\\chain1_coda.csv")
+
+nc2 <- read.csv("C:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\n_factor\\model\\run4\\chain2_coda.csv")
+
+nc3 <- read.csv("C:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\n_factor\\model\\run4\\chain3_coda.csv")
+
+ncAll <- rbind(nc1,nc2,nc3)
+
+fdiffL <- matrix(rep(NA,9*9),ncol=9)
+fdiffH <- matrix(rep(NA,9*9),ncol=9)
+
+#thaw 2, 0.3,99.7
+
+for(i in 1:9){
+
+	for(j in 1:9){
+	if(i <= j){
+		fdiffL[i,j] <- quantile(ncAll[,i]- ncAll[,j], prob=(0.003))
+		fdiffH[i,j] <- quantile(ncAll[,i]- ncAll[,j], prob=(0.997))
+
+
+			
+	}
+	}
+}	
+#set up difference matrix
+fcomp <- matrix(rep(NA,9*9),ncol=9)
+for(i in 1:9){
+	fcomp[i,] <- ifelse(fdiffL[i,] < 0 & fdiffH[i,] < 0, "sig",
+			ifelse(fdiffL[i,] > 0 & fdiffH[i,] > 0, "sig","ns"))
+}
+namesf <- data.frame(vegeclass=beta0$vegeclass[1:9])
+namesf <- join(namesf,datVI, by="vegeclass", type="left")
+
+colnames(fcomp) <- namesf$name
+rownames(fcomp) <- namesf$name
+write.table(fcomp, paste0(plotDI, "\\freezing_n_comp.csv"), sep=",")
+#letters in vegeclass id order
+#freezing herb barren: a
+#graminoid: b
+#tussock: c
+#short shrub: b
+#tall shrub: c
+#wet land: c
+#evergreen: c
+#deciduous: c
+#mixed: c
+tdiffL <- matrix(rep(NA,9*9),ncol=9)
+tdiffH <- matrix(rep(NA,9*9),ncol=9)
+
+#thaw 2, 0.3,99.7
+
+for(i in 1:9){
+
+	for(j in 1:9){
+	if(i < j){
+		tdiffL[i,j] <- quantile(ncAll[,i+9]- ncAll[,j+9], prob=(0.003))
+		tdiffH[i,j] <- quantile(ncAll[,i+9]- ncAll[,j+9], prob=(0.997))
+
+
+			
+	}
+	}
+}	
+#set up difference matrix
+tcomp <- matrix(rep(NA,9*9),ncol=9)
+for(i in 1:9){
+	tcomp[i,] <- ifelse(tdiffL[i,] < 0 & tdiffH[i,] < 0, "sig",
+			ifelse(tdiffL[i,] > 0 & tdiffH[i,] > 0, "sig","ns"))
+}
+namest <- data.frame(vegeclass=beta0$vegeclass[10:18])
+namest <- join(namesf,datVI, by="vegeclass", type="left")
+
+colnames(tcomp) <- namest$name
+rownames(tcomp) <- namest$name
+
+
+write.table(tcomp, paste0(plotDI, "\\thawing_n_comp.csv"), sep=",")
+#letters
+#herb barren: a
+#graminoid: b
+#tussock: c
+#short shrub: d
+#tall shrub: e
+#wetland: b,d,e
+#evergreen: c, f
+#deciduous f,g
+#mixed: c,d,f,h
+
+###thaw days ###
+Tbeta0
+
+tc1 <- read.csv("C:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\thaw\\model\\run3\\chain1_coda.csv")
+tc2 <- read.csv("C:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\thaw\\model\\run3\\chain2_coda.csv")
+tc3 <- read.csv("C:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\thaw\\model\\run3\\chain3_coda.csv")
+
+tcAll <- rbind(tc1,tc2,tc3)
+
+tcdiffL <- matrix(rep(NA,9*9),ncol=9)
+tcdiffH <- matrix(rep(NA,9*9),ncol=9)
+
+#thaw 2, 0.3,99.7
+
+for(i in 1:9){
+
+	for(j in 1:9){
+	if(i < j){
+		tcdiffL[i,j] <- quantile(tcAll[,i]- tcAll[,j], prob=(0.003))
+		tcdiffH[i,j] <- quantile(tcAll[,i]- tcAll[,j], prob=(0.997))
+
+
+			
+	}
+	}
+}	
+
+#set up difference matrix
+tccomp <- matrix(rep(NA,9*9),ncol=9)
+for(i in 1:9){
+	tccomp[i,] <- ifelse(tcdiffL[i,] < 0 & tcdiffH[i,] < 0, "sig",
+			ifelse(tcdiffL[i,] > 0 & tcdiffH[i,] > 0, "sig","ns"))
+}
+namestc <- data.frame(vegeclass=Tbeta0$vegeclass[1:9])
+namestc <- join(namesf,datVI, by="vegeclass", type="left")
+
+colnames(tccomp) <- namestc$name
+rownames(tccomp) <- namestc$name
+
+write.table(tccomp, paste0(plotDI, "\\thaw_day_comp.csv"), sep=",")
+
+#letters
+#herb barren: a
+#graminoid: a
+#tussock: b
+#short shrub: b
+#tall shrub: c
+#wetland: b,c
+#evergreen:b
+#deciduous :b,c
+#mixed: b,c
+
+
+#max & min temp
+#compAll reg 1: min, 2: max, 3: ave
+compAll[,14:16]
+mc1 <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run9\\chain1_coda.csv")
+
+mc2 <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run9\\chain2_coda.csv")
+
+mc3 <- read.csv("c:\\Users\\hkropp\\Google Drive\\synthesis_model\\analyses\\vege_type\\model_all\\run9\\chain3_coda.csv")
+
+mcAll <- rbind(mc1,mc2,mc3)
+
+
+mcP <- mcAll[,82:108]
+
+
+mindiffL <- matrix(rep(NA,9*9),ncol=9)
+mindiffH <- matrix(rep(NA,9*9),ncol=9)
+
+#thaw 2, 0.3,99.7
+
+for(i in 1:9){
+
+	for(j in 1:9){
+	if(i < j){
+		mindiffL[i,j] <- quantile(mcP[,i]- mcP[,j], prob=(0.003))
+		mindiffH[i,j] <- quantile(mcP[,i]- mcP[,j], prob=(0.997))
+
+
+			
+	}
+	}
+}	
+#set up difference matrix
+mincomp <- matrix(rep(NA,9*9),ncol=9)
+for(i in 1:9){
+	mincomp[i,] <- ifelse(mindiffL[i,] < 0 & mindiffH[i,] < 0, "sig",
+			ifelse(mindiffL[i,] > 0 & mindiffH[i,] > 0, "sig","ns"))
+}
+namesMin <- data.frame(vegeclass= compAll[1:9,14])
+namesMin <- join(namesMin,datVI, by="vegeclass", type="left")
+
+colnames(mincomp) <- namesMin$name
+rownames(mincomp) <- namesMin$name
+
+
+write.table(mincomp, paste0(plotDI, "\\minT_comp.csv"), sep=",")
+
+#letters
+#herb barren: a
+#graminoid: b
+#tussock: c
+#short shrub: b
+#tall shrub: c,d
+#wetland: c,d
+#evergreen:c,d
+#deciduous :c,d
+#mixed: d
+
+
+
+
+maxdiffL <- matrix(rep(NA,9*9),ncol=9)
+maxdiffH <- matrix(rep(NA,9*9),ncol=9)
+
+#thaw 2, 0.3,99.7
+
+for(i in 1:9){
+
+	for(j in 1:9){
+	if(i < j){
+		maxdiffL[i,j] <- quantile(mcP[,i+9]- mcP[,j+9], prob=(0.003))
+		maxdiffH[i,j] <- quantile(mcP[,i+9]- mcP[,j+9], prob=(0.997))
+
+
+			
+	}
+	}
+}	
+#set up difference matrix
+maxcomp <- matrix(rep(NA,9*9),ncol=9)
+for(i in 1:9){
+	maxcomp[i,] <- ifelse(maxdiffL[i,] < 0 & maxdiffH[i,] < 0, "sig",
+			ifelse(maxdiffL[i,] > 0 & maxdiffH[i,] > 0, "sig","ns"))
+}
+namesMax <- data.frame(vegeclass= compAll[10:18,14])
+namesMax <- join(namesMax,datVI, by="vegeclass", type="left")
+
+colnames(maxcomp) <- namesMax$name
+rownames(maxcomp) <- namesMax$name
+
+
+write.table(maxcomp, paste0(plotDI, "\\maxT_comp.csv"), sep=",")
+
+#letters
+#herb barren: a
+#graminoid: b
+#tussock: b
+#short shrub: c 
+#tall shrub: c
+#wetland: b,c
+#evergreen: b,d
+#deciduous : d
+#mixed: b,c,d
+
+
+avediffL <- matrix(rep(NA,9*9),ncol=9)
+avediffH <- matrix(rep(NA,9*9),ncol=9)
+
+#thaw 2, 0.3,99.7
+
+for(i in 1:9){
+
+	for(j in 1:9){
+	if(i < j){
+		avediffL[i,j] <- quantile(mcP[,i+18]- mcP[,j+18], prob=(0.003))
+		avediffH[i,j] <- quantile(mcP[,i+18]- mcP[,j+18], prob=(0.997))
+
+
+			
+	}
+	}
+}	
+#set up difference matrix
+avecomp <- matrix(rep(NA,9*9),ncol=9)
+for(i in 1:9){
+	avecomp[i,] <- ifelse(avediffL[i,] < 0 & avediffH[i,] < 0, "sig",
+			ifelse(avediffL[i,] > 0 & avediffH[i,] > 0, "sig","ns"))
+}
+namesAve <- data.frame(vegeclass= compAll[19:27,14])
+namesAve <- join(namesAve,datVI, by="vegeclass", type="left")
+
+colnames(avecomp) <- namesAve$name
+rownames(avecomp) <- namesAve$name
+
+
+
+write.table(avecomp, paste0(plotDI, "\\aveT_comp.csv"), sep=",")
+
+#letters
+#herb barren: a
+#graminoid: b
+#tussock: c
+#short shrub: b
+#tall shrub: c
+#wetland: c
+#evergreen:c
+#deciduous :c
+#mixed: c
