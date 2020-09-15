@@ -2874,7 +2874,7 @@ png(paste0(plotDI,"\\supp_maxAir_info.png"), width=7,height=11,
 			}
 		axis(1, seq(0,25,by=5), rep(" ",length(seq(0,25,by=5))),lwd.ticks=0.25, cex.axis=0.1, lwd=0.5)	
 		axis(2, seq(0,25,by=5),lwd.ticks=0.25, las=2,cex.axis=0.55, lwd=0.5)
-		mtext(paste(datVI$name[i]), at=15, side=3, line=-1.25, cex=0.5, adj=0)
+		mtext(paste(datVI$name[i]),  side=3, line=-1.25, cex=0.5, adj=1)
 			if(k == 9){
 			mtext(seq(5,25,by=5), at=seq(5,25,by=5),line=0.5,side=1,cex=0.35)
 			mtext(expression(paste("Maximum air temperature (",degree,"C)")), side=1, outer=TRUE,line=-1.25, cex=0.5)
@@ -2882,3 +2882,25 @@ png(paste0(plotDI,"\\supp_maxAir_info.png"), width=7,height=11,
 			}
 		}
 dev.off()	
+
+
+
+
+
+##################output regression slopes
+
+#min is reg 1, max is reg 2
+patternTable <- patternSlope[patternSlope$comp <=2,]
+
+datVege <- data.frame(vegeClass = datVI$vegeclass, name=datVI$name)
+
+patternTable <- join(patternTable,datVege ,by="vegeClass",type="left")
+
+patternTable$compName <- ifelse(patternTable$comp == 1, "Minimum vs Average","Maximum vs Average")
+
+patternsOut <- data.frame(vegetation = patternTable$name,
+							comparison = patternTable$compName,
+							slope.mean = patternTable$Mean,
+							lower0.2 = patternTable$X0.2.,
+							upper99.8 =  patternTable$X99.8.)
+write.table(patternsOut, paste0(plotDI,"\\patterns_slopes.csv"),sep=",",row.names=FALSE)
