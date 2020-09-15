@@ -2707,13 +2707,13 @@ write.table(avecomp, paste0(plotDI, "\\aveT_comp.csv"), sep=",")
 #########################
 ######get more summary information for sites
 
-
+#world clim 2 precip in mm
+datWC <- read.csv("c:\\Users\\hkropp\\Google Drive\\map_synth\\WCprecSites.csv")
 #now just subset sites, years and depths used in the analysis
 
 #get unique values from soil parm
 sumS <- unique(data.frame(siteid=SoilParm$siteid,depth=SoilParm$depth,wyear=SoilParm$wyear))
 
-sumA <- unique(data.frame(siteid=AirParm$siteid, height=AirParm$height))
 sumSsites <- unique(data.frame(siteid=sumS$siteid))
 
 colnames(siteinfo)[1] <- "siteid"
@@ -2723,4 +2723,162 @@ siteSummary <- join(siteSummary, datV, by="siteid", type="left")
 siteSummary <- join(siteSummary, datVI, by="vegeclass", type="left")
 
 
-hist(siteSummary$lat)
+
+maxA <- AirParm[AirParm$parm == "TmaxA",]
+#join vegeclass
+maxA <- join(maxA, datV, by="siteid", type="left")
+
+minA <- AirParm[AirParm$parm == "TminA",]
+#join vegeclass
+minA <- join(minA, datV, by="siteid", type="left")
+
+#world clim
+#sum up precip from Oct - Mar
+precipWdf <- cbind(datWC[,2:4],datWC[,11:13])
+precipW <- data.frame(siteid= datWC$site_id, precip.mm=apply(precipWdf,1,"sum"))
+precipW <- join(precipW,siteSummary,  by="siteid", type="inner")
+precipW <- join(precipW,datV,  by="siteid", type="left")
+
+#set up histograms
+precipH <- list()
+latH <- list()
+maxH <- list()
+minH <- list()
+
+for(i in 1:9){
+	precipH[[i]] <- hist(precipW$precip.mm[precipW$vegeclass == i], breaks = seq(30,240, by=20))
+	latH[[i]] <- hist(siteSummary$lat[siteSummary$vegeclass == i], breaks = seq(56,80, by= 1))
+	maxH[[i]] <- hist(maxA$Mean[maxA$vegeclass == i], breaks=seq(4,22, by = 1))
+	minH[[i]] <- hist(minA$Mean[minA$vegeclass == i], breaks=seq(-40,-8, by = 2))
+}
+
+plotOrder <- c(1,2,4,3,6,5,7,8,9)
+wd <- 4
+hd <- 1
+#make plot
+png(paste0(plotDI,"\\supp_precip_info.png"), width=7,height=11,
+			units="cm", res=500)
+	layout(matrix(seq(1,9),ncol=1,byrow=TRUE), width=lcm(wd),
+				height=rep(lcm(hd),9))
+
+		#precip
+	
+
+		for(k in 1:9){
+		i <- plotOrder[k]
+		par(mai=c(0,0,0,0))
+		plot(c(0,1),c(0,1), ylim=c(0,15), xlim=c(30,220),
+				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+		
+			for(j in 1:length(precipH[[i]]$counts)){
+				polygon(c(precipH[[i]]$breaks[j],precipH[[i]]$breaks[j],precipH[[i]]$breaks[j+1],precipH[[i]]$breaks[j+1]),
+					c(0,precipH[[i]]$counts[j],precipH[[i]]$counts[j],0),
+					border=NA, col=paste(vegeclassColors$coli[i]))
+			}
+		axis(1, seq(25,225,by=25), rep(" ",length(seq(25,225,by=25))),lwd.ticks=0.25, cex.axis=0.1, lwd=0.5)	
+		axis(2, seq(0,12,by=4),lwd.ticks=0.25, las=2,cex.axis=0.55, lwd=0.5)
+		mtext(paste(datVI$name[i]), side=3, line=-1.25, cex=0.5)
+			if(k == 9){
+			mtext(seq(50,200,by=25), at=seq(50,200,by=25),line=0.5,side=1,cex=0.35)
+			mtext("Total Precipitation (mm, Oct - March)", side=1, outer=TRUE,line=-1.25, cex=0.5)
+			mtext("Number of sites", side=2, outer=TRUE,line=-2,cex=0.5)
+			}
+		}
+dev.off()		
+
+
+#make plot
+png(paste0(plotDI,"\\supp_lat_info.png"), width=7,height=11,
+			units="cm", res=500)
+	layout(matrix(seq(1,9),ncol=1,byrow=TRUE), width=lcm(wd),
+				height=rep(lcm(hd),9))
+
+		#precip
+	
+
+		for(k in 1:9){
+		i <- plotOrder[k]
+		par(mai=c(0,0,0,0))
+		plot(c(0,1),c(0,1), ylim=c(0,15), xlim=c(55,80),
+				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+		
+			for(j in 1:length(latH[[i]]$counts)){
+				polygon(c(latH[[i]]$breaks[j],latH[[i]]$breaks[j],latH[[i]]$breaks[j+1],latH[[i]]$breaks[j+1]),
+					c(0,latH[[i]]$counts[j],latH[[i]]$counts[j],0),
+					border=NA, col=paste(vegeclassColors$coli[i]))
+			}
+		axis(1, seq(55,80,by=5), rep(" ",length(seq(55,80,by=5))),lwd.ticks=0.25, cex.axis=0.1, lwd=0.5)	
+		axis(2, seq(0,12,by=4),lwd.ticks=0.25, las=2,cex.axis=0.55, lwd=0.5)
+		mtext(paste(datVI$name[i]),at=57, side=3, line=-1.25, cex=0.5, adj=0)
+			if(k == 9){
+			mtext(seq(55,80,by=5), at=seq(55,80,by=5),line=0.5,side=1,cex=0.35)
+			mtext("Latitude", side=1, outer=TRUE,line=-1.25, cex=0.5)
+			mtext("Number of sites", side=2, outer=TRUE,line=-2,cex=0.5)
+			}
+		}
+dev.off()		
+
+
+
+#make plot
+png(paste0(plotDI,"\\supp_minAir_info.png"), width=7,height=11,
+			units="cm", res=500)
+	layout(matrix(seq(1,9),ncol=1,byrow=TRUE), width=lcm(wd),
+				height=rep(lcm(hd),9))
+
+		#precip
+	
+
+		for(k in 1:9){
+		i <- plotOrder[k]
+		par(mai=c(0,0,0,0))
+		plot(c(0,1),c(0,1), ylim=c(0,25), xlim=c(-40,-8),
+				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+		
+			for(j in 1:length(minH[[i]]$counts)){
+				polygon(c(minH[[i]]$breaks[j],minH[[i]]$breaks[j],minH[[i]]$breaks[j+1],minH[[i]]$breaks[j+1]),
+					c(0,minH[[i]]$counts[j],minH[[i]]$counts[j],0),
+					border=NA, col=paste(vegeclassColors$coli[i]))
+			}
+		axis(1, seq(-40,-0,by=5), rep(" ",length(seq(-40,-0,by=5))),lwd.ticks=0.25, cex.axis=0.1, lwd=0.5)	
+		axis(2, seq(0,20,by=5),lwd.ticks=0.25, las=2,cex.axis=0.55, lwd=0.5)
+		mtext(paste(datVI$name[i]),at=-39, side=3, line=-1.25, cex=0.5, adj=0)
+			if(k == 9){
+			mtext(seq(-40,-5,by=5), at=seq(-40,-5,by=5),line=0.5,side=1,cex=0.35)
+			mtext(expression(paste("Minimum air temperature (",degree,"C)")), side=1, outer=TRUE,line=-1.25, cex=0.5)
+			mtext("Number of sites x years", side=2, outer=TRUE,line=-2,cex=0.5)
+			}
+		}
+dev.off()	
+
+
+#make plot
+png(paste0(plotDI,"\\supp_maxAir_info.png"), width=7,height=11,
+			units="cm", res=500)
+	layout(matrix(seq(1,9),ncol=1,byrow=TRUE), width=lcm(wd),
+				height=rep(lcm(hd),9))
+
+		#precip
+	
+
+		for(k in 1:9){
+		i <- plotOrder[k]
+		par(mai=c(0,0,0,0))
+		plot(c(0,1),c(0,1), ylim=c(0,32), xlim=c(4,25),
+				xlab=" ", ylab=" ",xaxs="i",yaxs="i",axes=FALSE)
+		
+			for(j in 1:length(maxH[[i]]$counts)){
+				polygon(c(maxH[[i]]$breaks[j],maxH[[i]]$breaks[j],maxH[[i]]$breaks[j+1],maxH[[i]]$breaks[j+1]),
+					c(0,maxH[[i]]$counts[j],maxH[[i]]$counts[j],0),
+					border=NA, col=paste(vegeclassColors$coli[i]))
+			}
+		axis(1, seq(0,25,by=5), rep(" ",length(seq(0,25,by=5))),lwd.ticks=0.25, cex.axis=0.1, lwd=0.5)	
+		axis(2, seq(0,25,by=5),lwd.ticks=0.25, las=2,cex.axis=0.55, lwd=0.5)
+		mtext(paste(datVI$name[i]), at=15, side=3, line=-1.25, cex=0.5, adj=0)
+			if(k == 9){
+			mtext(seq(5,25,by=5), at=seq(5,25,by=5),line=0.5,side=1,cex=0.35)
+			mtext(expression(paste("Maximum air temperature (",degree,"C)")), side=1, outer=TRUE,line=-1.25, cex=0.5)
+			mtext("Number of sites x years", side=2, outer=TRUE,line=-2,cex=0.5)
+			}
+		}
+dev.off()	
